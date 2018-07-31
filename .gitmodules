@@ -1,0 +1,12 @@
+[submodule "module/eigen-git-mirror"]
+	path = module/eigen-git-mirror
+	url = https://github.com/eigenteam/eigen-git-mirror
+[submodule "module/verilog-parser"]
+	path = module/verilog-parser
+	url = https://github.com/mgwoo/verilog-parser
+[submodule "module/CImg"]
+	path = module/CImg
+	url = https://github.com/dtschump/CImg
+[submodule "module/sparsehash"]
+	path = module/sparsehash
+	url = https://github.com/sparsehash/sparsehash

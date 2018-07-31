@@ -1,0 +1,16 @@
+bin/
+bin/lefdiff
+bin/lefrw
+bin/lefwrite
+lef/*.output
+lef/*.tab.h
+lef/*.tab.cpp
+lefdiff/lefdiff
+lefrw/lefrw
+lefwrite/lefwrite
+lefzlib/*.a
+include/*.h
+include/*.hpp
+lib/*.a
+*.a
+**/*.a

@@ -1,0 +1,13 @@
+lefdef/**/*.lef
+lefdef/**/*.def
+lefdef/**/*.v
+lefdef/**/*.guide
+bookshelf/**/*.aux
+bookshelf/**/*.scl
+bookshelf/**/*.nodes
+bookshelf/**/*.route
+bookshelf/**/*.nets
+bookshelf/**/*.wts
+bookshelf/**/*.shapes
+bookshelf/**/*.pl
+

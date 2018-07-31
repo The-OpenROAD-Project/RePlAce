@@ -1,0 +1,15 @@
+*.log
+*.swo
+*.swd
+*.swp
+*/**/*.o
+
+bench_**
+output/*
+logdir/*
+ntuplace
+ntuplace/*
+evaluation/*
+module/flute/*
+
+!*.gitignore

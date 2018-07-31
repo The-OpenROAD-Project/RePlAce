@@ -1,0 +1,1473 @@
+///////////////////////////////////////////////////////////////////////////////
+// Authors: Ilgweon Kang and Lutong Wang
+//          (respective Ph.D. advisors: Chung-Kuan Cheng, Andrew B. Kahng),
+//          based on Dr. Jingwei Lu with ePlace and ePlace-MS
+//
+//          Many subsequent improvements were made by Mingyu Woo
+//          leading up to the initial release.
+//
+// BSD 3-Clause License
+//
+// Copyright (c) 2018, The Regents of the University of California
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// * Redistributions of source code must retain the above copyright notice, this
+//   list of conditions and the following disclaimer.
+//
+// * Redistributions in binary form must reproduce the above copyright notice,
+//   this list of conditions and the following disclaimer in the documentation
+//   and/or other materials provided with the distribution.
+//
+// * Neither the name of the copyright holder nor the names of its
+//   contributors may be used to endorse or promote products derived from
+//   this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////
+//
+//  This code was implemented by mgwoo at 18.01.17
+//          
+//          http://mgwoo.github.io/
+//
+///////////////////////////////////////////////////////
+
+#include <iostream>
+#include "lefdefIO.h"
+#include "bookShelfIO.h"
+#include "global.h"
+#include "mkl.h"
+
+#include "verilog_writer.h"
+#include "verilog_parser.h"
+#include "verilog_ast_util.h"
+
+using namespace std;
+using Circuit::Circuit;
+
+// 
+// The below global variable is updated.
+//
+//
+// terminalInstance // terminalCNT
+// moduleInstance // moduleCNT
+// netInstnace // netCNT
+// pinInstance // pinCNT
+// row_st // row_cnt
+//
+// shapeMap // (Fixed cell can have rectilinear polygon)
+// 
+// numNonRectangularNodes // required bookshelf writing - *.shape aware
+// totalShapeCount // required bookshelf writing - *.shape aware
+//
+// terminal_pmin
+// terminal_pmax
+//
+// grow_pmin
+// grow_pmax
+//
+// rowHeight
+//
+//
+
+// global variable.. to write output as DEF
+static Circuit::Circuit __ckt;
+
+// lef 2 def unit convert
+static prec l2d = 0.0f;
+
+// 
+// To support book-shelf based tools, scale down all values..
+// 
+// Set unitX as siteWidth
+// Set unitY as Vertical routing pitch (in lowest metal) 
+//
+static prec unitX = 0.0f;
+static prec unitY = 0.0f;
+
+//
+// To prevent mis-matching in ROW offset.
+//
+static prec offsetX = 0.0f;
+static prec offsetY = 0.0f;
+
+
+// module & terminal Makp
+// 
+// first : nodeName
+// second, first : isModule (true -> moduleInst // false -> termInst)
+// second, second : corresponding index
+//
+static dense_hash_map< string, pair<bool, int> > moduleTermMap;
+
+// 
+// Metal1 Name.
+// It usually depends on the lef files
+//
+static string metal1Name;
+
+// helper function for LEF/DEF in siteorient
+static char* orientStr(int orient) {
+    switch (orient) {
+        case 0: return ((char*)"N");
+        case 1: return ((char*)"W");
+        case 2: return ((char*)"S");
+        case 3: return ((char*)"E");
+        case 4: return ((char*)"FN");
+        case 5: return ((char*)"FW");
+        case 6: return ((char*)"FS");
+        case 7: return ((char*)"FE");
+    };
+    return ((char*)"BOGUS");
+}
+
+
+// from main.cpp
+void ParseInput() {
+    if( auxCMD == "" && lefCMD != "" && defCMD != "" ) {
+        inputMode = InputMode::lefdef; 
+        ParseLefDef();
+    }
+    else if( auxCMD != "" && lefCMD == "" && defCMD == "") {
+        inputMode = InputMode::bookshelf; 
+        ParseBookShelf();
+    }
+}
+
+void SetUnitY(float _unitY) {
+    unitY = _unitY;
+}
+
+void SetUnitY(double _unitY) {
+    unitY = _unitY;
+}
+
+inline static bool IsPrecEqual(prec a, prec b) {
+    return std::fabs(a-b) < std::numeric_limits<float>::epsilon();
+}
+
+
+// 
+// this will set below (global) parameter, needed to parse LEF/DEF file
+//
+// l2d,                 - lef to def scale difference
+// metal1Name,          - metal1 Layer Name
+// unitX, unitY         - scale down parameter for bookshelf porting
+// offsetX, offsetY     - offset parameter to exactly fit on 'ROW' structure
+//
+void SetParameter() {
+    // lef 2 def unit info setting
+    if( __ckt.lefUnit.hasDatabase() ) {
+        l2d = __ckt.lefUnit.databaseNumber();
+    }
+    else {
+        cout << "\n** WARNING : LEF unit Info is missing..! (UNITS/DATABASE), "
+             << "so use the unit in the DEF file instead. (" 
+             << __ckt.defUnit << ")" << endl;
+        l2d = __ckt.defUnit;
+    }
+    cout << "INFO:  LEF UNIT: " << l2d << endl;
+
+    // Metal1 Name extract 
+    for(auto& curLayer : __ckt.lefLayerStor) {
+        if(!curLayer.hasType()) {
+            continue;   
+        }
+        if( strcmp(curLayer.type(), "ROUTING") == 0 ) {
+            metal1Name = string(curLayer.name());
+            break;
+        }
+    }
+    cout << "INFO:  METAL1 NAME IN LEF: " << metal1Name << endl;
+
+    // required for FIXED components(DEF) -> *.shape bookshelf
+    shapeMap.set_empty_key(INIT_STR);
+
+    // required for net(DEF) -> module fast access
+    moduleTermMap.set_empty_key(INIT_STR);
+
+    // unitX setting : CORE SITE's Width
+    for(auto& curSite : __ckt.lefSiteStor) {
+        if( !curSite.hasClass() || !curSite.hasSize() ) {
+            continue;
+        }
+        if( strcmp( curSite.siteClass(), "CORE" ) == 0 ) {
+            unitX = l2d* curSite.sizeX();
+            break;
+        }
+    }
+  
+    // unitY setting : first metal1 LAYER's yPitch 
+    // 
+    // unitY was not initialized by SetUnitY function before.
+    // (is equal to 0.0f)
+    if( IsPrecEqual(unitY, 0.0f) ) {
+        for(auto& curLayer : __ckt.lefLayerStor) {
+            if( metal1Name == string(curLayer.name()) ) {
+                if( curLayer.hasPitch() ) {
+                    unitY = l2d * curLayer.pitch();
+                }
+                else if( curLayer.hasXYPitch() ){
+                    unitY = l2d * curLayer.pitchY();
+                }
+                break;
+            }
+        }
+    } 
+
+    // unitY *= 1.5;
+
+    cout << "INFO:  SCALE DOWN UNIT: ( " << unitX << ", " << unitY << " )" << endl;
+
+    // offsetX & offsetY : Minimum coordinate of ROW's x/y
+    offsetX = offsetY = PREC_MAX; 
+    for(auto& curRow : __ckt.defRowStor) {
+        offsetX = (offsetX > curRow.x())? curRow.x() : offsetX;
+        offsetY = (offsetY > curRow.y())? curRow.y() : offsetY;
+    }
+//    cout << INT_CONVERT(offsetX) << endl;
+//    cout << INT_CONVERT(offsetY) << endl;
+
+    offsetX = (INT_CONVERT(offsetX) % INT_CONVERT(unitX) == 0)? 
+              0 : 
+              unitX - (INT_CONVERT(offsetX) % (INT_CONVERT(unitX)));
+
+    offsetY = (INT_CONVERT(offsetY) % INT_CONVERT(unitY) == 0)? 
+              0 : 
+              unitY - (INT_CONVERT(offsetY) % (INT_CONVERT(unitY)));
+
+    cout << "INFO:  OFFSET COORDINATE: ( " << offsetX << ", " << offsetY << " )" << endl << endl;
+    
+}
+
+void ParseLefDef() {
+    
+    // for input parse only
+    // 
+    // Circuit::Circuit __ckt(lefCMD, defCMD, "");
+    //
+    __ckt.Init(lefCMD, defCMD);
+
+    SetParameter(); 
+
+    GenerateModuleTerminal(__ckt);
+    GenerateRow(__ckt);
+    if( __ckt.defNetStor.size() > 0 ) {
+        cout << "INFO:  EXTRACT NET INFO FROM DEF ONLY" << endl;
+        GenerateNetDefOnly(__ckt);
+    }
+    else {
+        cout << "INFO:  EXTRACT NET INFO FROM DEF & VERILOG" << endl;
+        if( verilogCMD == "" ) {
+            cout << "** ERROR:  Cannot Find any Net information "
+                 << "(Check NETS statement in DEF) "
+                 << "or use -verilog command instead"  << endl;
+            exit(1);
+        }
+
+        GenerateNetDefVerilog(__ckt);
+    }
+    cout << "INFO:  SUCCESSFULLY LEF/DEF PARSED" << endl; 
+
+
+    // do weird things..
+    POS tier_min, tier_max;
+    int tier_row_cnt = 0;
+
+    get_mms_3d_dim( &tier_min, &tier_max, &tier_row_cnt);
+    transform_3d(&tier_min, &tier_max, tier_row_cnt);
+    post_read_3d();
+}
+
+void WriteDef(const char* defOutput) {
+    MODULE* curModule = NULL;
+
+    // moduleInstnace -> defComponentStor
+    for(int i=0; i<moduleCNT; i++) {
+        curModule = &moduleInstance[i];
+        auto cmpPtr = __ckt.defComponentMap.find(string(curModule-> name));
+        if( cmpPtr == __ckt.defComponentMap.end() ) {
+            cout << "** ERROR:  Module Instance ( "<< curModule->name
+                << " ) does not exist in COMPONENT statement (defComponentMap) " << endl;
+            exit(1);
+        }
+
+        // update into PLACED status
+        if( !__ckt.defComponentStor[cmpPtr->second].isPlaced() ) {
+            __ckt.defComponentStor[cmpPtr->second].setPlacementStatus( DEFI_COMPONENT_PLACED );
+        }
+        
+        // update into corresponding coordinate
+        //
+        // unitX & unitY is used to recover scaling
+        
+        int x = INT_CONVERT( curModule->pmin.x * unitX ) - offsetX;
+        int y = INT_CONVERT( curModule->pmin.y * unitY ) - offsetY;
+
+        // x-coordinate, y-coordinate, cell-orient
+        auto orientPtr = __ckt.defRowY2OrientMap.find(y);
+
+        __ckt.defComponentStor[cmpPtr->second].
+            setPlacementLocation( x, y, 
+                                    (orientPtr != __ckt.defRowY2OrientMap.end())? 
+                                    orientPtr->second : -1 );
+
+        // cout << curModule->name << ": " << curModule->pmin.x << " " << curModule->pmin.y << endl;
+    }
+
+
+    FILE* fp = fopen( defOutput, "w"); 
+    if( !fp ) {
+        cout << "** ERROR:  Cannot open " << defOutput << " (DEF WRITING)" << endl;
+        exit(1);
+    }
+
+    __ckt.WriteDef(fp);
+    cout << "INFO:  SUCCESSFULLY WRITE DEF FILE INTO " << defOutput << endl; 
+}
+
+////////
+//
+// Generate Module&Terminal Instance
+//
+// helper function for FIXED cells(in DEF Components), which can have multiple rectangles, 
+// i.e. it is corresponded to *.shape
+//
+// The shapeMap & shapeStor is updated in here.
+// numNonRectangularNodes, totalShapeCount also updated in here
+//
+// COMPONENTS -> MACRO(TYPE: BLOCK) -> OBS -> LAYER -> RECT 
+//
+// return type :
+// true -- the sub-rectangular has been found and added
+// false -- the sub-rectangular has not been found.
+bool AddShape(int defCompIdx, int lx, int ly) {
+    
+    string compName = string(__ckt.defComponentStor[defCompIdx].id());
+    string macroName = string(__ckt.defComponentStor[defCompIdx].name());
+
+    // reference MACRO in lef
+    auto mcPtr = __ckt.lefMacroMap.find( macroName );
+    if( mcPtr == __ckt.lefMacroMap.end() ) {
+        cout << "** ERROR:  Macro Instance ( "
+            << macroName 
+            << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
+        exit(1);
+    }
+
+    // Check whether MACRO have CLASS statement
+    int macroIdx = mcPtr->second;
+    if( !__ckt.lefMacroStor[macroIdx].hasClass() ) {
+        cout << "** ERROR: Macro Instance ( "
+             << __ckt.lefMacroStor[macroIdx].name()
+             << " ) does not have Class! (lefMacroStor) " << endl;
+        exit(1);
+    }
+    
+    // 
+    // only for MACRO TYPE == BLOCK cases 
+    // & OBS command must exist in LEF
+    //
+    if( strcmp( __ckt.lefMacroStor[macroIdx].macroClass(), "BLOCK") != 0 ||
+        __ckt.lefObsStor[macroIdx].size() == 0 ) {
+        return false;
+    }
+
+    // already updated into shapeMap, then skip
+//    if( shapeMap.find( compName ) != shapeMap.end() ) {
+//        cout << "already updated: " << compName << endl;
+//        return ;
+//    }
+//    cout << "compName: " << compName << endl;
+
+    bool isMetal1 = false;
+    int shapeCnt = 0;
+
+    for(auto& curObs : __ckt.lefObsStor[macroIdx]) {
+        lefiGeometries* curGeom = curObs.geometries();
+        
+        // LAYER Metal1 <-- lefiGeomLayerE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //
+        //
+        // LAYER VIA1 <-- Skip for this 
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+       
+        for(int j=0; j<curGeom->numItems(); j++) {
+            // Meets 'Metal1' Layer
+            if( curGeom->itemType(j) == lefiGeomLayerE &&
+                    string(curGeom->getLayer(j)) == metal1Name ) {
+//                cout << j << " " << curGeom->getLayer(j) << endl;
+                isMetal1 = true;
+                continue;
+            }
+            
+            // calculate BBox
+            if( isMetal1 && curGeom->itemType(j) == lefiGeomRectE ) {
+                lefiGeomRect* rect = curGeom->getRect(j);
+
+                // shape Name -> bunch of shapeStor's index
+                if( shapeMap.find(compName) == shapeMap.end() ) {
+                    vector<int> tmpStor;
+                    tmpStor.push_back( shapeStor.size() );
+                    shapeMap[compName] = tmpStor;
+                }
+                else {
+                    shapeMap[compName].push_back( shapeStor.size() );
+                }
+                totalShapeCount ++;
+
+                // finally pushed into shapeStor
+                shapeStor.push_back( 
+                    SHAPE( string("shape_")+to_string( shapeCnt ),
+                           compName, shapeStor.size(), 
+                           (l2d * rect->xl + lx + offsetX)/unitX,        // lx  
+                           (l2d * rect->yl + ly + offsetY)/unitY,        // ly
+                           l2d*(rect->xh - rect->xl)/unitX,         // xWidth
+                           l2d*(rect->yh - rect->yl)/unitY ) );     // yWidth
+
+//                cout << compName << ", " << string("shape_")+to_string(shapeCnt) << endl;
+                shapeCnt++;
+            }
+            // now, meets another Layer
+            else if( isMetal1 && curGeom->itemType(j) == lefiGeomLayerE ) {
+                break;
+            }
+        }
+        // firstMetal was visited
+        if( isMetal1 ) {
+            break;
+        }
+    }
+
+    if( isMetal1 ) {
+        numNonRectangularNodes ++;
+    }
+    
+    return (isMetal1)? true : false;
+}
+
+
+//
+// defComponentStor(non FIXED cell) -> moduleInstance
+// defComponentStor(FIXED cell), defPinStor -> terminalInstnace
+//
+// terminal_pmin & terminal_pmax must be updated...
+void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
+    
+    moduleInstance = (MODULE*) mkl_malloc( sizeof(MODULE)* 
+                                __ckt.defComponentStor.size(), 64 );
+
+    // to fast traverse when building TerminalInstance
+    vector<int> fixedComponent;
+    
+    MODULE* curModule = NULL;
+    defiComponent* curComp = NULL;
+    lefiMacro* curMacro = NULL;
+
+    moduleCNT = 0;
+   
+    // not 1-to-1 mapping (into moduleInstnace), so traverse by index 
+    for(int i=0; i<__ckt.defComponentStor.size(); i++) {
+        curComp = &(__ckt.defComponentStor[i]);
+
+        curModule = &moduleInstance[moduleCNT];
+        new (curModule) MODULE();
+    
+        if( curComp->isFixed() ) {
+            fixedComponent.push_back(i);
+            continue;
+        }
+    
+        // pmin info update
+        if( curComp->isPlaced() ) {
+            // only when is already placed
+            curModule->pmin.Set( ((prec)curComp->placementX() + offsetX)/unitX, 
+                    ((prec)curComp->placementY() + offsetY)/unitY, (prec)0);
+        }
+        else {
+            curModule->pmin.SetZero();
+        }
+
+        // cout << curComp->name() << endl;
+    
+        auto macroPtr = __ckt.lefMacroMap.find( string(curComp->name()) );
+        if( macroPtr == __ckt.lefMacroMap.end() ) {
+            cout << "\n** ERROR : Cannot find MACRO cell in lef files: " 
+                 << curComp->name() << endl;
+            exit(1);
+        }
+        
+        curMacro = &__ckt.lefMacroStor[ macroPtr->second ];
+
+        if( !curMacro->hasSize() ) {
+            cout << "\n** ERROR : Cannot find MACRO SIZE in lef files: " 
+                 << curComp->name() << endl;
+            exit(1);
+        }
+
+        // size info update from LEF Macro
+        curModule->size.Set( l2d * curMacro->sizeX()/unitX, 
+                             l2d * curMacro->sizeY()/unitY, 1 );
+
+        // set half_size
+        curModule->half_size.Set( curModule->size.x / 2, 
+                                  curModule->size.y / 2, 0);
+        
+        // set center coordi
+        curModule->center.SetAdd( curModule->pmin, curModule->half_size );
+
+        // set pinMax coordi
+        curModule->pmax.SetAdd( curModule->pmin, curModule->size ); 
+        
+        // set area
+        curModule->area = curModule->size.GetProduct();
+
+        // set which tier
+        curModule->tier = 0;
+
+        // set Name
+        strcpy( curModule->name, curComp->id() ); 
+
+        // set Index
+        curModule->idx = moduleCNT;
+
+        moduleTermMap[ string(curModule->name) ] = 
+                make_pair( true, moduleCNT ); 
+      
+        // check 
+//        curModule->Dump(string("Macro ") + to_string(moduleCNT)); 
+        moduleCNT++;
+    }
+//    cout << moduleCNT << endl;
+
+    // memory cutting
+    moduleInstance = (MODULE*) mkl_realloc( moduleInstance, sizeof(MODULE) * moduleCNT );
+
+   
+    // 
+    // Terminal Update
+    //
+    TERM* curTerm = NULL;
+    terminalCNT = 0;
+    terminalInstance = (TERM*) mkl_malloc( sizeof(TERM)*
+        ( fixedComponent.size() + __ckt.defPinStor.size() ), 64);
+
+    // for fixed cells.
+    for(auto& curIdx : fixedComponent) {
+        curTerm = &terminalInstance[terminalCNT];
+        new (curTerm) TERM();
+
+        curComp = &(__ckt.defComponentStor[curIdx]);
+        
+        curTerm->idx = terminalCNT;
+
+        // check whether this nodes contains sub-rectangular sets
+        bool shapeFound = AddShape( curIdx, curComp->placementX(), curComp->placementY() );
+
+        // pmin info update
+        curTerm->pmin.Set( ((prec)curComp->placementX() + offsetX)/unitX, 
+                           ((prec)curComp->placementY() + offsetY)/unitY, (prec)0);
+   
+//        cout << "Fixed: " << curComp->name() << endl;
+        auto macroPtr = __ckt.lefMacroMap.find( string(curComp->name()) );
+        if( macroPtr == __ckt.lefMacroMap.end() ) {
+            cout << "\n** ERROR : Cannot find MACRO cell in lef files: " 
+                 << curComp->name() << endl;
+            exit(1);
+        }
+        
+        curMacro = &__ckt.lefMacroStor[ macroPtr->second ];
+        int macroIdx = macroPtr->second;
+
+        if( !curMacro->hasSize() ) {
+            cout << "\n** ERROR : Cannot find MACRO SIZE in lef files: " 
+                 << curComp->name() << endl;
+            exit(1);
+        }
+
+        // 
+        // ** terminal/terminal_NI determination rule
+        //
+        // if OBS exists,
+        //   1) if M1 exists -> (Then shapeFound has 'true') ->  terminal Cell
+        //   2) if M1 does not exists in OBS -> terminal_NI Cell
+        //
+        // if OBS not exists -> terminal Cell (All Metal layer cannot accross this region)
+        //
+        //
+        // size info update from LEF Macro
+//        if( shapeFound || __ckt.lefObsStor[macroIdx].size() == 0) {
+            // terminal nodes (in bookshelf)
+            curTerm->size.Set( l2d * curMacro->sizeX()/unitX, 
+                               l2d * curMacro->sizeY()/unitY, 1 );  
+            curTerm->isTerminalNI = false;
+//        }
+//        else {
+            // terminal_NI nodes (in bookshelf)
+//            curTerm->size.Set(0, 0, 1);
+//            curTerm->isTerminalNI = true;
+//        }
+        
+//        curTerm->isTerminalNI = (shapeFound || __ckt.lefObsStor[macroIdx].size() == 0)? false : true;
+
+        // set center coordi
+        curTerm->center.x = curTerm->pmin.x + curTerm->size.x/2;
+        curTerm->center.y = curTerm->pmin.y + curTerm->size.y/2;
+
+        // set pinMax coordi
+        curTerm->pmax.SetAdd( curTerm->pmin, curTerm->size ); 
+        
+        // set area
+        curTerm->area = curTerm->size.GetProduct();
+        
+        // set Name
+        strcpy( curTerm->name, curComp->id() ); 
+
+        // set tier
+        curTerm->tier = 0;
+        
+        moduleTermMap[ string(curTerm->name) ] = 
+                make_pair( false, terminalCNT ); 
+
+//        curTerm->Dump();
+        terminalCNT++;
+    }
+
+    // for pin
+    for(auto& curPin : __ckt.defPinStor) {
+        curTerm = &terminalInstance[terminalCNT];
+        new (curTerm) TERM();
+
+        strcpy( curTerm->name, curPin.pinName() );
+        curTerm->idx = terminalCNT;
+        curTerm->IO = (strcmp( curPin.direction(), "INPUT") == 0)? 0 : 1;
+        curTerm->pmin.Set( (curPin.placementX() + offsetX)/unitX, 
+                           (curPin.placementY() + offsetY)/unitY, 0 );
+        curTerm->isTerminalNI = true;
+
+        // since size == 0, pmin == center == pmax; 
+        curTerm->pmax.Set(curTerm->pmin);
+        curTerm->center.Set(curTerm->pmin);
+        
+        moduleTermMap[ string(curTerm->name) ] = 
+                make_pair( false, terminalCNT ); 
+
+//        curTerm->Dump();
+        terminalCNT++;
+    }
+    cout << "INFO:  #MODULE: " << moduleCNT << ", #TERMINAL: " << terminalCNT << endl;
+}
+//////// 
+//
+//  Generate RowInstance
+// 
+// defRowStor -> rowInstance
+//
+// this must update grow_pmin / grow_pmax, rowHeight
+void GenerateRow(Circuit::Circuit &__ckt) {
+    row_cnt = __ckt.defRowStor.size();
+    row_st = (ROW*) mkl_malloc( sizeof(ROW)*row_cnt, 64 );
+
+    int i=0;
+    ROW* curRow = NULL;
+    
+    bool isFirst = true;
+    for(auto& row : __ckt.defRowStor) {
+        auto sitePtr = __ckt.lefSiteMap.find( string(row.macro()) ) ;
+        if( sitePtr == __ckt.lefSiteMap.end() ) {
+            cout << "\n** ERROR:  Cannot find SITE in lef files: " 
+                 << row.macro() << endl;
+            exit(1);
+        }
+
+        curRow = &row_st[i];
+        new (curRow) ROW();
+
+        curRow->pmin.Set( (row.x()+offsetX)/unitX, (row.y()+offsetY)/unitY, 0 );
+        curRow->size.Set( 
+            INT_CONVERT( 
+                l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX ) 
+                * row.xNum(),
+            INT_CONVERT(
+                l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY ) 
+                * row.yNum(),
+            1 );
+
+        curRow->pmax.Set( 
+            curRow->pmin.x + curRow->size.x,
+            curRow->pmin.y + curRow->size.y,
+            1 );
+
+        if( isFirst ) {
+            grow_pmin.Set(curRow->pmin);
+            grow_pmax.Set(curRow->pmax);
+
+            rowHeight = INT_CONVERT( l2d* __ckt.lefSiteStor[sitePtr->second].sizeY()/unitY );
+
+            if( INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY()) % 
+                    INT_CONVERT( unitY ) != 0 ) {
+                int _rowHeight = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY());
+                cout << endl 
+                     << "** ERROR: rowHeight \% unitY is not zero,  " << endl
+                     << "          ( rowHeight : " << _rowHeight << ", unitY : " << INT_CONVERT(unitY) 
+                     << ", rowHeight \% unitY : " << _rowHeight % INT_CONVERT(unitY) << " )" << endl;
+                cout << "          so it causes serious problem in RePlACE" << endl << endl;
+                cout << "          Use custom unitY in here using -unitY command, as a divider of rowHeight" << endl;
+                exit(1);
+            }
+            isFirst = false;
+        }
+        else {
+            grow_pmin.x = min( grow_pmin.x, (prec)curRow->pmin.x);
+            grow_pmin.y = min( grow_pmin.y, (prec)curRow->pmin.y);
+            
+            grow_pmax.x = max( grow_pmax.x, (prec)curRow->pmax.x);
+            grow_pmax.y = max( grow_pmax.y, (prec)curRow->pmax.y);
+        }
+        
+        curRow->x_cnt = row.xNum();
+
+        // 
+        // this is essential to DetailPlacer
+        //
+        // scale down to 1.
+        //  
+        curRow->site_wid = curRow->site_spa = SITE_SPA = row.xStep()/unitX; 
+    
+        curRow->ori = string( orientStr(row.orient()) );
+        curRow->isXSymmetry = (__ckt.lefSiteStor[sitePtr->second].
+                                    hasXSymmetry() )? true : false;
+
+        curRow->isYSymmetry = (__ckt.lefSiteStor[sitePtr->second].
+                                    hasYSymmetry() )? true : false;
+
+        curRow->isR90Symmetry = (__ckt.lefSiteStor[sitePtr->second].
+                                    has90Symmetry() )? true : false;
+
+//        curRow->Dump(to_string(i));
+        i++;
+    }
+
+    
+    cout << "INFO:  ROW SIZE: ( " << SITE_SPA << ", " << rowHeight << " ) "<< endl;
+    cout << "INFO:  #ROW: " << row_cnt << endl;
+
+}
+
+
+////////
+//
+// Generate NetInstnace
+// 
+// helper function for building Net Instance; Get OFFSET coordinate
+// NETS -> COMPONENTS -> MACRO -> PORT -> RECT
+//
+// If macroName is given (like verilog), 
+// then skip for NETS->COMPONENTS->MACRO 
+//
+FPOS GetOffset( Circuit::Circuit& __ckt, 
+                string& instName, string& pinName, 
+                string* macroName = NULL) {
+
+    int defCompIdx = INT_MAX;
+    // macroName is empty
+    if (macroName == NULL) {
+        // Extract Offset info from lef's MACRO statement
+        // 
+        // First, it references COMPONENTS
+
+        auto dcPtr = __ckt.defComponentMap.find( instName );
+        if( dcPtr == __ckt.defComponentMap.end() ) {
+            cout << "** ERROR:  Net Instance ( "<< instName
+                << " ) does not exist in COMPONENT statement (defComponentMap) " << endl;
+            exit(1);
+        }
+        defCompIdx = dcPtr->second;
+    }
+
+    // Second, it reference MACRO in lef
+    auto mcPtr = __ckt.lefMacroMap.find(
+            (macroName)? *macroName : 
+                         string( __ckt.defComponentStor[defCompIdx].name() ) );
+    if( mcPtr == __ckt.lefMacroMap.end() ) {
+        cout << "** ERROR:  Macro Instance ( "
+            << ((macroName)? *macroName : 
+                             __ckt.defComponentStor[defCompIdx].name() )
+            << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
+        exit(1);
+    }
+
+    int macroIdx = mcPtr->second;
+
+    // Finally, it reference PIN from MACRO in lef
+    auto pinPtr = __ckt.lefPinMapStor[macroIdx].find( pinName );
+    if( pinPtr == __ckt.lefPinMapStor[macroIdx].end() ) {
+        cout << "** ERROR:  Pin Instance ( "
+            << pinName 
+            << " ) does not exist in MACRO statement (lefPinMapStor) " << endl;
+        exit(1);
+    }
+
+    int pinIdx = pinPtr->second;
+    
+    if( !__ckt.lefMacroStor[macroIdx].hasSize() ) {
+        cout << "** ERROR:  Macro Instance ( "
+             << __ckt.lefMacroStor[macroIdx].name() 
+             << " ) does not have Size! (lefPinStor) " << endl;
+        exit(1);
+    }
+
+    // extract center Macro Cell Coordinate
+    prec centerX = l2d * __ckt.lefMacroStor[macroIdx].sizeX() / 2;
+    prec centerY = l2d * __ckt.lefMacroStor[macroIdx].sizeY() / 2;
+    
+
+    bool isFirstMetal = false;
+
+    // prepare for bbox
+    prec lx = PREC_MAX, ly = PREC_MAX, ux = PREC_MIN, uy = PREC_MIN;
+
+    // MACRO PORT traverse
+    for( int i=0; i<__ckt.lefPinStor[macroIdx][pinIdx].numPorts(); i++ ) {
+        lefiGeometries* curGeom = __ckt.lefPinStor[macroIdx][pinIdx].port(i);
+
+        // LAYER Metal1 <-- lefiGeomLayerE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //
+        //
+        // LAYER VIA1 <-- Skip for this 
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+       
+        for(int j=0; j<curGeom->numItems(); j++) {
+            // First 'Metal' Layer (Metal layer have 'ROUTING' type)
+            if( !isFirstMetal && curGeom->itemType(j) == lefiGeomLayerE &&
+                    string( __ckt.lefLayerStor[ 
+                                __ckt.lefLayerMap[ string(curGeom->getLayer(j)) ] ].type() ) 
+                    == "ROUTING" ) {
+//                cout << j << " " << curGeom->getLayer(j) << endl;
+                isFirstMetal = true;
+                continue;
+            }
+            
+            // calculate BBox
+            if( isFirstMetal && curGeom->itemType(j) == lefiGeomRectE ) {
+                lefiGeomRect* rect = curGeom->getRect(j);
+                // generate BBox
+                lx = (lx > rect->xl)? rect->xl : lx;
+                ly = (ly > rect->yl)? rect->yl : ly;
+                ux = (ux < rect->xh)? rect->xh : ux;
+                uy = (uy < rect->yh)? rect->yh : uy;
+            }
+            // now, meets another Layer
+            else if( isFirstMetal && curGeom->itemType(j) == lefiGeomLayerE ) {
+                break;
+            }
+        }
+        // firstMetal was visited
+        if( isFirstMetal ) {
+            break;
+        }
+    }
+    
+    if( !isFirstMetal ) { 
+        cout << "**ERROR:  CANNOT find first metal information : " << instName 
+            << " - " << pinName << endl;
+        exit(1);
+    }
+
+    // calculate center offset
+    return FPOS( (l2d*(lx + ux)/2 - centerX)/unitX, 
+            (l2d*(ly + uy)/2 - centerY)/unitY, 0);
+}
+
+
+//
+// helper function for building Net Instance; Get IO info
+//
+// 0 : Input
+// 1 : Output
+// 2 : Both (INOUT)
+//
+// NETS -> COMPONENTS -> MACRO -> PIN -> DIRECTION 
+//
+// If macroName is given (like verilog), 
+// then skip for NETS->COMPONENTS->MACRO 
+//
+int GetIO( Circuit::Circuit &__ckt, 
+           string& instName, string& pinName,
+           string* macroName = NULL) {
+    
+    
+    int defCompIdx = INT_MAX;
+    if( macroName == NULL ) {
+        // First, it references COMPONENTS
+        auto dcPtr = __ckt.defComponentMap.find( instName );
+        if( dcPtr == __ckt.defComponentMap.end() ) {
+            cout << "** ERROR:  Net Instance ( "<< instName
+                << " ) does not exist in COMPONENT statement (defComponentMap) " << endl;
+            exit(1);
+        }
+        defCompIdx = dcPtr->second;
+    }
+
+    // Second, it reference MACRO in lef
+    auto mcPtr = __ckt.lefMacroMap.find( 
+            (macroName)? *macroName :
+                         string( __ckt.defComponentStor[defCompIdx].name() ) );
+    if( mcPtr == __ckt.lefMacroMap.end() ) {
+        cout << "** ERROR:  Macro Instance ( "
+            << ((macroName)? *macroName : 
+                            __ckt.defComponentStor[defCompIdx].name() )
+            << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
+        exit(1);
+    }
+
+    int macroIdx = mcPtr->second;
+
+    // Finally, it reference PIN from MACRO in lef
+    auto pinPtr = __ckt.lefPinMapStor[macroIdx].find( pinName );
+    if( pinPtr == __ckt.lefPinMapStor[macroIdx].end() ) {
+        cout << "** ERROR:  Pin Instance ( "
+            << pinName 
+            << " ) does not exist in MACRO statement (lefPinMapStor) " << endl;
+        exit(1);
+    }
+    
+    int pinIdx = pinPtr->second;
+    
+    if( !__ckt.lefPinStor[macroIdx][pinIdx].hasDirection() ) {
+        cout << "** WARNING: Macro Instance ( "
+             << __ckt.lefMacroStor[macroIdx].name() 
+             << " - " 
+             << __ckt.lefPinStor[macroIdx][pinIdx].name()
+             << " ) does not have Direction! (lefPinStor) " << endl
+             << "            Use INOUT(both direction) instead " << endl;
+        return 2;
+    }
+
+    string pinDir = string(__ckt.lefPinStor[macroIdx][pinIdx].direction());
+    return (pinDir == "INPUT")? 0 : (pinDir == "OUTPUT")? 1 : (pinDir == "INOUT")? 2:2;
+}
+
+
+////// 
+//
+// defNetStor -> netInstnace
+// defPinStor -> pinInstance
+//
+void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
+    pinCNT = 0;
+    netCNT = __ckt.defNetStor.size();
+    for(auto& curNet : __ckt.defNetStor) {
+        pinCNT += curNet.numConnections();
+    }
+
+    // memory reserve
+    netInstance = (NET*) mkl_malloc( sizeof(NET)* netCNT, 64 );
+    pinInstance = (PIN*) mkl_malloc( sizeof(PIN)* pinCNT, 64 );
+
+    TERM* curTerm = NULL;
+    MODULE* curModule = NULL;
+
+    NET* curNet = NULL;
+    PIN* curPin = NULL;
+
+    int pinIdx = 0;
+    int netIdx = 0;
+
+    for(auto& net : __ckt.defNetStor) {
+        // skip for Power/Ground/Reset Nets
+        if( net.hasUse() ) {
+            continue;
+        }
+
+        curNet = &netInstance[netIdx];
+        curNet->idx = netIdx;
+    
+        curNet->pinCNTinObject = net.numConnections();
+//        cout << "connection: " << net.numConnections() << endl;
+        curNet->pin = (PIN**) mkl_malloc( 
+                        sizeof(PIN*)*net.numConnections(), 64);
+        
+        for(int i=0; i<net.numConnections(); i++) {
+            // net.pin(i) itself exists on termInst
+            if( strcmp( net.instance(i), "PIN") == 0 ) {
+
+                auto mtPtr = moduleTermMap.find( string(net.pin(i)) );
+                if(mtPtr == moduleTermMap.end()) {
+                    cout << "** ERROR:  Net Instance ( "<<net.pin(i) 
+                         << " ) does not exist in PINS statement (moduleTermMap) " << endl;
+                    exit(1);
+                }
+               
+                int termIdx = mtPtr->second.second; 
+                curTerm = &terminalInstance[ termIdx ];
+//                assert( termIdx < terminalCNT );
+//                cout << "foundTermIdx: " << termIdx << endl;
+               
+                // extract Input/Output direction from PINS statement
+                auto pinPtr = __ckt.defPinMap.find( string(net.pin(i)) );
+                if( pinPtr == __ckt.defPinMap.end() ) {
+                    cout << "** ERROR:  Net Instance ( "<<net.pin(i) 
+                         << " ) does not exist in PINS statement (defPinMap) " << endl;
+                    exit(1);
+                }
+
+                int defPinIdx = pinPtr->second;
+//                cout << "foundPinIdx: " << defPinIdx << endl;
+//                assert( defPinIdx < __ckt.defPinStor.size() );
+
+                int io = INT_MAX;
+                if( !__ckt.defPinStor[defPinIdx].hasDirection() ) {
+                    io = 2; // both direction
+                }
+                else {
+                    // input : 0
+                    // output : 1
+                    io = (strcmp( __ckt.defPinStor[defPinIdx].
+                                    direction(), "INPUT") == 0 )? 0 : 1;
+                }
+               
+                // pin Instnace mapping 
+                curPin = &pinInstance[pinIdx];
+                curNet->pin[i] = curPin;
+
+                AddPinInfoForModuleAndTerminal( 
+                    &curTerm->pin, &curTerm->pof,
+                    curTerm->pinCNTinObject++,
+                    FPOS(0, 0, 0), termIdx,  
+                    netIdx, i, pinIdx++, 
+                    io, true); 
+            }
+            // net.instance(i) must exist on moduleInst or termInst
+            else {
+                string instName = string(net.instance(i));
+                string pinName = string(net.pin(i));
+
+                auto mtPtr = moduleTermMap.find( instName );
+                if(mtPtr == moduleTermMap.end()) {
+                    cout << "** ERROR:  Net Instance ( "<< instName
+                         << " ) does not exist in COMPONENTS/PINS statement "
+                         << "(moduleTermMap) " << endl;
+                    exit(1);
+                }
+               
+                // Get Offset Infomation 
+                FPOS curOffset = GetOffset( __ckt, instName, pinName );
+//                cout << "instName: " << instName << ", pinName: " << pinName << endl;
+//                curOffset.Dump("offset"); cout << endl; 
+                
+                // Get IO information
+                int io = GetIO( __ckt, instName, pinName );
+//                cout << io << endl;
+                
+                // pin Instnace mapping 
+                curPin = &pinInstance[pinIdx];
+                curNet->pin[i] = curPin;
+
+                // module case
+                if( mtPtr->second.first ) {
+                    curModule = &moduleInstance[mtPtr->second.second];
+                    AddPinInfoForModuleAndTerminal( 
+                            &curModule->pin, &curModule->pof,
+                            curModule->pinCNTinObject++,
+                            curOffset, curModule->idx,  
+                            netIdx, i, pinIdx++, 
+                            io, false); 
+                }
+                // terminal case
+                else {
+                    curTerm = &terminalInstance[mtPtr->second.second];
+                    AddPinInfoForModuleAndTerminal( 
+                            &curTerm->pin, &curTerm->pof,
+                            curTerm->pinCNTinObject++,
+                            curOffset, curTerm->idx,  
+                            netIdx, i, pinIdx++, 
+                            io, true); 
+                }
+            }
+        }
+        netIdx++;
+    }
+
+    // update instance number
+    pinCNT = pinIdx;
+    netCNT = netIdx;
+
+    // memory cutting (shrink)
+    netInstance = (NET*) mkl_realloc( netInstance, sizeof(NET)* netCNT );
+    pinInstance = (PIN*) mkl_realloc( pinInstance, sizeof(PIN)* pinCNT );
+    
+    cout << "INFO:  #NET: " << netCNT << ", #PIN: " << pinCNT << endl;
+}
+
+
+// net Info Storage
+struct NetInfo {
+    string macroName;
+    string compName;
+    string pinName;
+    NetInfo(char* _macroName, char* _compName, char* _pinName) {
+        macroName = string(_macroName);
+        compName = string(_compName);
+        pinName = string(_pinName);
+    }
+};
+
+//////
+//
+// defPinStor -> pinInstnace -- (verilog cannot store pin's coordinate)!
+// verilog -> netInstnace
+//
+void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
+    using namespace verilog;
+
+    FILE* verilogInput = fopen(verilogCMD.c_str(), "rb");
+    if( !verilogInput ) {
+        cout << "** ERROR:  Cannot open verilog file: " << verilogCMD << endl;
+        exit(1);
+    }
+
+    verilog::verilog_parser_init();
+    int result = verilog::verilog_parse_file( verilogInput );
+    if( result != 0 ) {
+        cout << "** ERROR:  Verilog Parse Failed: " << verilogCMD << endl;
+        exit(1);
+    }
+
+    verilog::verilog_source_tree* tree = verilog::yy_verilog_source_tree;
+    verilog::verilog_resolve_modules(tree);
+   
+    if( tree->modules->items > 2 ) {
+        cout << "WARNING:  # Modules in Verilog: " << tree->modules->items
+             << ", so only use the 'First' module" << endl;
+    }
+
+    // extract the '1st' module
+    ast_module_declaration* module = (ast_module_declaration*)ast_list_get(tree->modules, 0);
+
+    /*
+    // IO map update 
+    // (used in Net Instance Mapping)
+    dense_hash_map<string, int> ioMap; 
+    ioMap.set_empty_key(INIT_STR);
+
+    int portCnt = module->module_ports->items;
+    for(int i=0; i< portCnt; i++) {
+        ast_port_declaration* port = (ast_port_declaration*)ast_list_get(module->module_ports, i);
+
+        // 
+        // input : 0
+        // output : 1
+        // inout : 2
+        //
+        int io = (port->direction == PORT_INPUT)? 0:
+                 (port->direction == PORT_OUTPUT)? 1:2; 
+
+        for(int j=0; j<port->port_names->items; j++) {
+            ast_identifier name = (ast_identifier) ast_list_get( port->port_names, j);
+            char* tmp = ast_identifier_tostring(name);
+            ioMap[string(tmp)] = io;
+            free(tmp);
+        }
+    }
+    */
+
+    // 
+    // first : netName
+    // second : netInfo (macroName / compName / pinName)
+    //
+    dense_hash_map<string, vector<NetInfo>> netMap; 
+    netMap.set_empty_key(INIT_STR);
+  
+    // pinCNT check && netMap build
+    pinCNT = 0;
+    for(int i=0; i<module->module_instantiations->items; i++) {
+        ast_module_instantiation* inst =
+            (ast_module_instantiation*) ast_list_get( module->module_instantiations, i);
+
+        ast_module_instance* innerInst = 
+            (ast_module_instance*) ast_list_get( inst->module_instances, 0 );
+       
+        char* macroNamePtr = ast_identifier_tostring( inst-> module_identifer );
+        char* compNamePtr = ast_identifier_tostring( innerInst->instance_identifier );
+        
+        pinCNT += innerInst->port_connections->items;
+        for(int j=0; j<innerInst->port_connections->items; j++) {
+            ast_port_connection* port =
+                (ast_port_connection*) ast_list_get( innerInst->port_connections, j );
+
+            char* netNamePtr = ast_identifier_tostring(
+                                port->expression->primary->value.identifier);
+            string netName( netNamePtr );
+            free(netNamePtr);
+         
+            char* pinNamePtr = ast_identifier_tostring(port-> port_name);
+             
+            // netMap build 
+            if(netMap.find( netName ) == netMap.end()) {
+                vector<NetInfo> tmpStor;
+                tmpStor.push_back( NetInfo(macroNamePtr, compNamePtr, pinNamePtr ) );
+                netMap[netName] = tmpStor;   
+            }
+            else {
+                netMap[netName].push_back( NetInfo( macroNamePtr, compNamePtr, pinNamePtr) );
+            }
+            free(pinNamePtr);
+        }
+
+        free(macroNamePtr);
+        free(compNamePtr);
+    }
+//    cout << "NET MAP BUILD DONE" << endl; 
+    netCNT = netMap.size();
+    
+    // memory reserve
+    netInstance = (NET*) mkl_malloc( sizeof(NET)* netCNT, 64 );
+    pinInstance = (PIN*) mkl_malloc( sizeof(PIN)* pinCNT, 64 );
+
+    NET* curNet = NULL;
+    PIN* curPin = NULL;
+
+    struct MODULE* curModule = NULL;
+    struct TERM* curTerm = NULL;
+
+    int netIdx = 0;
+    int pinIdx = 0;
+
+    // net traverse
+    // netMap is silimar with __ckt.defNetStor
+    for(auto& net : netMap) {
+
+//        cout << net.first << endl; 
+        curNet = &netInstance[netIdx];
+        curNet->idx = netIdx;
+
+        curNet->pinCNTinObject = net.second.size();
+        curNet->pin = (PIN**) mkl_malloc( 
+                        sizeof(PIN*)*net.second.size(), 64);
+    
+        // all names are saved in here.
+        for(auto& connection : net.second) {
+            
+            /////////////// Net Info Mapping part
+            // 
+            // find current component is in module or terminal
+            //
+            auto mtPtr = moduleTermMap.find( connection.compName );
+            if(mtPtr == moduleTermMap.end()) {
+                cout << "** ERROR:  Net Instance ( "<< connection.compName 
+                    << " ) does not exist in COMPONENTS/PINS statement "
+                    << "(moduleTermMap) " << endl;
+                exit(1);
+            }
+
+            // pin Info set
+            int connectIdx = &connection - &net.second[0];
+            curPin = &pinInstance[pinIdx];
+            curNet->pin[ connectIdx ] = curPin;
+
+            FPOS curOffset = GetOffset( __ckt, 
+                                connection.compName, 
+                                connection.pinName, 
+                                &connection.macroName );
+            int io = GetIO( __ckt, 
+                        connection.compName, 
+                        connection.pinName, 
+                        &connection.macroName ); 
+
+            // module case
+            if( mtPtr->second.first ) {
+                curModule = &moduleInstance[mtPtr->second.second];
+                AddPinInfoForModuleAndTerminal( 
+                        &curModule->pin, &curModule->pof,
+                        curModule->pinCNTinObject++,
+                        curOffset, curModule->idx,  
+                        netIdx, connectIdx, pinIdx++, 
+                        io, false); 
+            }
+            // terminal case
+            else {
+                curTerm = &terminalInstance[mtPtr->second.second];
+                AddPinInfoForModuleAndTerminal( 
+                        &curTerm->pin, &curTerm->pof,
+                        curTerm->pinCNTinObject++,
+                        curOffset, curTerm->idx,  
+                        netIdx, connectIdx, pinIdx++, 
+                        io, true); 
+            }
+
+            // curOffset.Dump("curOffset");
+            // cout << macroName << " " << compName << " " << pinName << endl;
+        }
+        netIdx++;
+        // cout << endl; 
+    }
+
+
+    /*
+    // fully traverse
+    for(int i=0; i<module->module_instantiations->items; i++) {
+        ast_module_instantiation* inst =
+            (ast_module_instantiation*) ast_list_get( module->module_instantiations, i);
+
+        char* macroNamePtr = ast_identifier_tostring( inst->module_identifier );
+        string macroName(macroNamePtr);
+        free(macroNamePtr);
+
+        // 
+        // it is only composed of module-module pair
+        //
+        ast_module_instance* innerInst = 
+            (ast_module_instance*) ast_list_get( inst->module_instances, 0 );
+        
+        char* compNamePtr = ast_identifier_tostring( innerInst-> instance_identifier );
+        string compName(compNamePtr);
+        free(compNamePtr); 
+
+        // 
+        // find current component is in module or terminal
+        //
+        auto mtPtr = moduleTermMap.find( compName );
+        if(mtPtr == moduleTermMap.end()) {
+            cout << "** ERROR:  Net Instance ( "<< compName 
+                << " ) does not exist in COMPONENTS/PINS statement "
+                << "(moduleTermMap) " << endl;
+            exit(1);
+        }
+
+        for(int j=0; j<innerInst->port_connections->items; j++) {
+            ast_port_connection* port =
+                (ast_port_connection*) ast_list_get( innerInst->port_connections, j );
+
+            char* pinNamePtr = ast_identifier_tostring(port->port_name);
+            string pinName( pintNamePtr );
+            free(pinNamePtr);
+
+            char* netNamePtr = ast_identifier_tostring(
+                                port->expression->primary->value.identifier);
+            string netName( netNamePtr );
+            free(netNamePtr);
+            
+//            ast_identifier_tostring( port-> );
+
+        }
+    }
+    
+
+    */ 
+//    ast_free_all();
+    cout << "INFO:  SUCCESSFULLY VERILOG PARSED" << endl; 
+}
+
+// 
+// this function is indended for 
+// re-parsing the result of detail-placer
+//
+// ReadPlLefDef -- moduleTermMap -- lefdefIO.cpp
+// ReadBookshelf -- nodesMap -- bookshelfIO.cpp
+//
+void ReadPl(const char* fileName) {
+    if( auxCMD == "" && lefCMD != "" && defCMD != "" ) {
+        // it references moduleTermMap 
+        ReadPlLefDef(fileName);
+    }
+    else if( auxCMD != "" && lefCMD == "" && defCMD == "") {
+        // it references nodesMap
+        ReadPlBookshelf(fileName);
+    }
+}
+
+//////
+// 
+// Read PL back from Detailed Placer -- to use moduleTermMap again
+//
+// See also ReadPlBookshelf(const char* fileName) in bookShelfIO.cpp
+//
+void ReadPlLefDef(const char* fileName) {
+    FILE *fp = fopen(fileName, "r");
+    if( !fp ) {
+        runtimeError( fileName + string( " is not Exist!" ) );
+    }
+
+    char buf[BUF_SZ], name[BUF_SZ];
+    int moduleID = 0;
+    FPOS pof;
+    while(fgets(buf, BUF_SZ, fp)) {
+        char* token = strtok(buf, " \t\n");
+        if(!token || token[0] == '#' || !strcmp(token, "UCLA"))
+            continue;
+
+        strcpy(name, token);
+
+        if(name[0] == 'f' && name[1] == 'a' && name[2] == 'k' && name[3] == 'e')
+            continue;
+
+        // if(!getCellIndex ( name , & moduleID , & isTerminal,
+        // &isTerminalNI))
+        // continue;
+
+        bool isModule = false;
+        auto mtPtr = moduleTermMap.find(string(name));
+        if(mtPtr == moduleTermMap.end()) {
+            continue;
+        }
+        else {
+            isModule = mtPtr->second.first;
+            moduleID = mtPtr->second.second;
+        }
+
+        if(isModule) {
+            MODULE* curModule = &moduleInstance[moduleID];
+
+            if(curModule->flg == Macro)
+                continue;
+
+            token = strtok(NULL, " \t\n");
+            curModule->pmin.x = atof(token);
+
+            token = strtok(NULL, " \t\n");
+            curModule->pmin.y = atof(token);
+
+            curModule->pmax.x = curModule->pmin.x + curModule->size.x;
+            curModule->pmax.y = curModule->pmin.y + curModule->size.y;
+
+            curModule->center.x = 0.5 * (curModule->pmin.x + curModule->pmax.x);
+            curModule->center.y = 0.5 * (curModule->pmin.y + curModule->pmax.y);
+
+            for(int i = 0; i < curModule->pinCNTinObject; i++) {
+                PIN* pin = curModule->pin[i];
+                pof = curModule->pof[i];
+                pin->fp.x = curModule->center.x + pof.x;
+                pin->fp.y = curModule->center.y + pof.y;
+            }
+        }
+        else {
+            continue;
+        }
+    }
+
+    fclose(fp);
+}

@@ -1,0 +1,6 @@
+*.o
+*.swo
+*.swi
+*.nfs*
+RePlAce
+tags
