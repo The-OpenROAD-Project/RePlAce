@@ -7,8 +7,6 @@
 bench_**
 output/*
 logdir/*
-ntuplace
-ntuplace/*
 evaluation/*
 module/flute/*
 
