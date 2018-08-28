@@ -93,12 +93,12 @@ valgrindStr = "valgrind --log-fd=1" if isValgrind else ""
 nohupFrontStr = "nohup" if isNohup else "" 
 nohupEndStr = "&" if isNohup else ""
 
-origFormat = "%s %s %s -bmflag %s FILESTR -output %s -t %d %s %s %s %s/%s_%s.log %s"
+addStr = ""
+for i in range(2, len(sys.argv)):
+    addStr += sys.argv[i] + " "
 
-#print curTime
-    
-#exeStr = "cd pngdraw;./clear.sh"
-#sp.call(exeStr, shell=True)
+origFormat = "%s %s %s -bmflag %s FILESTR -output %s -t %d %s " + addStr + " %s %s %s/%s_%s.log %s"
+
 
 if type(benchName) is list:
     for curBench in benchName:
