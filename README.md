@@ -5,6 +5,10 @@
 |:--:| 
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |
 
+
+### Pre-requisite
+* Procedures for
+
 ### Pre-requisite
 * Intel MKL and IPP package
 
@@ -47,6 +51,7 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 * Eigen
 * CImg
 * Google Dense Hash Map
+* NTUPlacer3/4h (Thanks for agreeing with redistribution)
 * Ben Marshall's verilog-parser (Modified by mgwoo)
 * LEF/DEF Parser (Modified by mgwoo)
 
