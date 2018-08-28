@@ -657,7 +657,7 @@ void ddcst2d(int n1, int n2, int isgn, prec   **a, prec   *t,
     }
 #ifdef USE_FFT2D_THREADS
     if ((prec  ) n1 * n2 >= (prec  ) FFT2D_THREADS_BEGIN_N) {
-        ddxt2d0_subth(n1, n2, 0, isgn, a, ip, w);
+        ddxt2d0_subth(n1, n2, 1, isgn, a, ip, w);
         ddxt2d_subth(n1, n2, 0, isgn, a, t, ip, w);
     } else 
 #endif /* USE_FFT2D_THREADS */
@@ -726,7 +726,7 @@ void ddsct2d(int n1, int n2, int isgn, prec   **a, prec   *t,
 #ifdef USE_FFT2D_THREADS
     if ((prec  ) n1 * n2 >= (prec  ) FFT2D_THREADS_BEGIN_N) {
         ddxt2d0_subth(n1, n2, 0, isgn, a, ip, w);
-        ddxt2d_subth(n1, n2, 0, isgn, a, t, ip, w);
+        ddxt2d_subth(n1, n2, 1, isgn, a, t, ip, w);
     } else 
 #endif /* USE_FFT2D_THREADS */
     {
