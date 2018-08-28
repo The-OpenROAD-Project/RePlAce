@@ -74,6 +74,10 @@ MODULE *moduleInstance;
 int pinCNT;
 int moduleCNT;
 
+// for module/term's pinName
+vector< vector<string> > mPinName;
+vector< vector<string> > tPinName;
+
 
 TERM *terminalInstance;
 NET *netInstance;

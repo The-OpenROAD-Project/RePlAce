@@ -46,6 +46,8 @@
 ///////////////////////////////////////////////////////
 
 #include <iostream>
+#include <boost/functional/hash.hpp>
+
 #include "lefdefIO.h"
 #include "bookShelfIO.h"
 #include "global.h"
@@ -56,6 +58,7 @@
 #include "verilog_ast_util.h"
 
 using namespace std;
+using Circuit::NetInfo;
 using Circuit::Circuit;
 
 // 
@@ -84,7 +87,7 @@ using Circuit::Circuit;
 //
 
 // global variable.. to write output as DEF
-static Circuit::Circuit __ckt;
+Circuit::Circuit __ckt;
 
 // lef 2 def unit convert
 static prec l2d = 0.0f;
@@ -133,6 +136,17 @@ static char* orientStr(int orient) {
     };
     return ((char*)"BOGUS");
 }
+
+// for Saving verilog information
+// declaired here to send verilog -> timing inst.. 
+static dense_hash_map<string, vector<NetInfo>, boost::hash<std::string>> netMap; 
+
+// save clockNets' index
+// for DEF parsing
+static vector<int> clockNetsDef;
+
+// for Verilog parsing
+static vector<string> clockNetsVerilog;
 
 
 // from main.cpp
@@ -228,7 +242,7 @@ void SetParameter() {
         }
     } 
 
-    // unitY *= 1.5;
+//    unitY *= 1.5;
 
     cout << "INFO:  SCALE DOWN UNIT: ( " << unitX << ", " << unitY << " )" << endl;
 
@@ -506,8 +520,6 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
             curModule->pmin.SetZero();
         }
 
-        // cout << curComp->name() << endl;
-    
         auto macroPtr = __ckt.lefMacroMap.find( string(curComp->name()) );
         if( macroPtr == __ckt.lefMacroMap.end() ) {
             cout << "\n** ERROR : Cannot find MACRO cell in lef files: " 
@@ -642,8 +654,6 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
         strcpy( curTerm->name, curComp->id() ); 
 
         // set tier
-        curTerm->tier = 0;
-        
         moduleTermMap[ string(curTerm->name) ] = 
                 make_pair( false, terminalCNT ); 
 
@@ -688,7 +698,7 @@ void GenerateRow(Circuit::Circuit &__ckt) {
 
     int i=0;
     ROW* curRow = NULL;
-    
+
     bool isFirst = true;
     for(auto& row : __ckt.defRowStor) {
         auto sitePtr = __ckt.lefSiteMap.find( string(row.macro()) ) ;
@@ -773,6 +783,95 @@ void GenerateRow(Circuit::Circuit &__ckt) {
 }
 
 
+
+// return Component Index
+inline int GetDefComponentIdx( Circuit::Circuit &__ckt, string& compName ) {
+    auto dcPtr = __ckt.defComponentMap.find( compName );
+    if( dcPtr == __ckt.defComponentMap.end() ) {
+        cout << "** ERROR:  Net Instance ( "<< compName 
+            << " ) does not exist in COMPONENT statement (defComponentMap) " << endl;
+        exit(1);
+    }
+    return dcPtr->second;
+}
+
+// return Macro Index
+inline int GetLefMacroIdx( Circuit::Circuit &__ckt, string& macroName ) {
+    auto mcPtr = __ckt.lefMacroMap.find( macroName );
+    if( mcPtr == __ckt.lefMacroMap.end() ) {
+        cout << "** ERROR:  Macro Instance ( "
+            << macroName  
+            << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
+        exit(1);
+    }
+    return mcPtr->second;
+}
+
+// return Pin Index
+inline int GetLefMacroPinIdx( Circuit::Circuit &__ckt, int macroIdx, string& pinName ) {
+    auto pinPtr = __ckt.lefPinMapStor[macroIdx].find( pinName );
+    if( pinPtr == __ckt.lefPinMapStor[macroIdx].end() ) {
+        cout << "** ERROR:  Pin Instance ( "
+            << pinName 
+            << " ) does not exist in MACRO statement (lefPinMapStor) " << endl;
+        exit(1);
+    }
+    return pinPtr->second;
+}
+
+inline int GetDefPinIdx( Circuit::Circuit &__ckt, string& pinName) { 
+    auto pinPtr = __ckt.defPinMap.find(pinName);
+    if( pinPtr == __ckt.defPinMap.end() ) {
+        cout << "** ERROR:  Pin Instance ( "
+            << pinName 
+            << " ) does not exist in PINS statement (defPinMap) " << endl;
+        exit(1);
+    }
+    return pinPtr->second;
+}
+
+//
+// helper function for building Net Instance; Get IO info
+//
+// 0 : Input
+// 1 : Output
+// 2 : Both (INOUT)
+//
+// NETS -> COMPONENTS -> MACRO -> PIN -> DIRECTION 
+//
+// If macroName is given (like verilog), 
+// then skip for NETS->COMPONENTS->MACRO 
+//
+int GetIO( Circuit::Circuit &__ckt, 
+           string& instName, string& pinName,
+           int macroIdx = INT_MAX) {
+    
+    if( macroIdx == INT_MAX ) {
+        // First, it references COMPONENTS
+        int defCompIdx = GetDefComponentIdx(__ckt, instName);
+
+        // Second, it reference MACRO in lef
+        string compName = string( __ckt.defComponentStor[defCompIdx].name());
+        macroIdx = GetLefMacroIdx( __ckt, compName);
+    }
+
+    // Finally, it reference PIN from MACRO in lef
+    int pinIdx = GetLefMacroPinIdx( __ckt, macroIdx, pinName );
+    
+    if( !__ckt.lefPinStor[macroIdx][pinIdx].hasDirection() ) {
+        cout << "** WARNING: Macro Instance ( "
+             << __ckt.lefMacroStor[macroIdx].name() 
+             << " - " 
+             << __ckt.lefPinStor[macroIdx][pinIdx].name()
+             << " ) does not have Direction! (lefPinStor) " << endl
+             << "            Use INOUT(both direction) instead " << endl;
+        return 2;
+    }
+
+    string pinDir = string(__ckt.lefPinStor[macroIdx][pinIdx].direction());
+    return (pinDir == "INPUT")? 0 : (pinDir == "OUTPUT")? 1 : (pinDir == "INOUT")? 2:2;
+}
+
 ////////
 //
 // Generate NetInstnace
@@ -785,56 +884,21 @@ void GenerateRow(Circuit::Circuit &__ckt) {
 //
 FPOS GetOffset( Circuit::Circuit& __ckt, 
                 string& instName, string& pinName, 
-                string* macroName = NULL) {
+                int macroIdx = INT_MAX) {
 
-    int defCompIdx = INT_MAX;
-    // macroName is empty
-    if (macroName == NULL) {
-        // Extract Offset info from lef's MACRO statement
-        // 
+//    int defCompIdx = INT_MAX;
+    if( macroIdx == INT_MAX ) {
         // First, it references COMPONENTS
+        int defCompIdx = GetDefComponentIdx(__ckt, instName);
 
-        auto dcPtr = __ckt.defComponentMap.find( instName );
-        if( dcPtr == __ckt.defComponentMap.end() ) {
-            cout << "** ERROR:  Net Instance ( "<< instName
-                << " ) does not exist in COMPONENT statement (defComponentMap) " << endl;
-            exit(1);
-        }
-        defCompIdx = dcPtr->second;
+        // Second, it reference MACRO in lef
+        string compName = string( __ckt.defComponentStor[defCompIdx].name());
+        macroIdx = GetLefMacroIdx( __ckt, compName);
     }
-
-    // Second, it reference MACRO in lef
-    auto mcPtr = __ckt.lefMacroMap.find(
-            (macroName)? *macroName : 
-                         string( __ckt.defComponentStor[defCompIdx].name() ) );
-    if( mcPtr == __ckt.lefMacroMap.end() ) {
-        cout << "** ERROR:  Macro Instance ( "
-            << ((macroName)? *macroName : 
-                             __ckt.defComponentStor[defCompIdx].name() )
-            << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
-        exit(1);
-    }
-
-    int macroIdx = mcPtr->second;
 
     // Finally, it reference PIN from MACRO in lef
-    auto pinPtr = __ckt.lefPinMapStor[macroIdx].find( pinName );
-    if( pinPtr == __ckt.lefPinMapStor[macroIdx].end() ) {
-        cout << "** ERROR:  Pin Instance ( "
-            << pinName 
-            << " ) does not exist in MACRO statement (lefPinMapStor) " << endl;
-        exit(1);
-    }
-
-    int pinIdx = pinPtr->second;
+    int pinIdx = GetLefMacroPinIdx( __ckt, macroIdx, pinName );
     
-    if( !__ckt.lefMacroStor[macroIdx].hasSize() ) {
-        cout << "** ERROR:  Macro Instance ( "
-             << __ckt.lefMacroStor[macroIdx].name() 
-             << " ) does not have Size! (lefPinStor) " << endl;
-        exit(1);
-    }
-
     // extract center Macro Cell Coordinate
     prec centerX = l2d * __ckt.lefMacroStor[macroIdx].sizeX() / 2;
     prec centerY = l2d * __ckt.lefMacroStor[macroIdx].sizeY() / 2;
@@ -903,75 +967,6 @@ FPOS GetOffset( Circuit::Circuit& __ckt,
 }
 
 
-//
-// helper function for building Net Instance; Get IO info
-//
-// 0 : Input
-// 1 : Output
-// 2 : Both (INOUT)
-//
-// NETS -> COMPONENTS -> MACRO -> PIN -> DIRECTION 
-//
-// If macroName is given (like verilog), 
-// then skip for NETS->COMPONENTS->MACRO 
-//
-int GetIO( Circuit::Circuit &__ckt, 
-           string& instName, string& pinName,
-           string* macroName = NULL) {
-    
-    
-    int defCompIdx = INT_MAX;
-    if( macroName == NULL ) {
-        // First, it references COMPONENTS
-        auto dcPtr = __ckt.defComponentMap.find( instName );
-        if( dcPtr == __ckt.defComponentMap.end() ) {
-            cout << "** ERROR:  Net Instance ( "<< instName
-                << " ) does not exist in COMPONENT statement (defComponentMap) " << endl;
-            exit(1);
-        }
-        defCompIdx = dcPtr->second;
-    }
-
-    // Second, it reference MACRO in lef
-    auto mcPtr = __ckt.lefMacroMap.find( 
-            (macroName)? *macroName :
-                         string( __ckt.defComponentStor[defCompIdx].name() ) );
-    if( mcPtr == __ckt.lefMacroMap.end() ) {
-        cout << "** ERROR:  Macro Instance ( "
-            << ((macroName)? *macroName : 
-                            __ckt.defComponentStor[defCompIdx].name() )
-            << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
-        exit(1);
-    }
-
-    int macroIdx = mcPtr->second;
-
-    // Finally, it reference PIN from MACRO in lef
-    auto pinPtr = __ckt.lefPinMapStor[macroIdx].find( pinName );
-    if( pinPtr == __ckt.lefPinMapStor[macroIdx].end() ) {
-        cout << "** ERROR:  Pin Instance ( "
-            << pinName 
-            << " ) does not exist in MACRO statement (lefPinMapStor) " << endl;
-        exit(1);
-    }
-    
-    int pinIdx = pinPtr->second;
-    
-    if( !__ckt.lefPinStor[macroIdx][pinIdx].hasDirection() ) {
-        cout << "** WARNING: Macro Instance ( "
-             << __ckt.lefMacroStor[macroIdx].name() 
-             << " - " 
-             << __ckt.lefPinStor[macroIdx][pinIdx].name()
-             << " ) does not have Direction! (lefPinStor) " << endl
-             << "            Use INOUT(both direction) instead " << endl;
-        return 2;
-    }
-
-    string pinDir = string(__ckt.lefPinStor[macroIdx][pinIdx].direction());
-    return (pinDir == "INPUT")? 0 : (pinDir == "OUTPUT")? 1 : (pinDir == "INOUT")? 2:2;
-}
-
-
 ////// 
 //
 // defNetStor -> netInstnace
@@ -996,6 +991,10 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
 
     int pinIdx = 0;
     int netIdx = 0;
+    int cNetIdx = 0;
+
+    tPinName.resize(terminalCNT);
+    mPinName.resize(moduleCNT);
 
     for(auto& net : __ckt.defNetStor) {
         // skip for Power/Ground/Reset Nets
@@ -1003,7 +1002,20 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
             continue;
         }
 
+        if( strcmp (net.name(), "iccad_clk") == 0 ||
+                strcmp( net.name(), "clk") == 0 ||
+                strcmp( net.name(), "clock") == 0 ) {
+
+            cout << "** WARNING:  " << net.name() << " is detected. "
+                 << " It'll be automatically excluded"
+                 << " (defNetStor)" << endl; 
+
+            clockNetsDef.push_back( &net - &__ckt.defNetStor[0]);
+            continue;
+        }
+
         curNet = &netInstance[netIdx];
+        strcpy( curNet->name, net.name() );
         curNet->idx = netIdx;
     
         curNet->pinCNTinObject = net.numConnections();
@@ -1054,6 +1066,9 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
                 curPin = &pinInstance[pinIdx];
                 curNet->pin[i] = curPin;
 
+                // save terminal pin Name into tPinName
+                tPinName[termIdx].push_back(string(net.pin(i)));
+
                 AddPinInfoForModuleAndTerminal( 
                     &curTerm->pin, &curTerm->pof,
                     curTerm->pinCNTinObject++,
@@ -1090,6 +1105,10 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
                 // module case
                 if( mtPtr->second.first ) {
                     curModule = &moduleInstance[mtPtr->second.second];
+                
+                    // save module pin Name into mPinName
+                    mPinName[mtPtr->second.second].push_back(pinName);
+
                     AddPinInfoForModuleAndTerminal( 
                             &curModule->pin, &curModule->pof,
                             curModule->pinCNTinObject++,
@@ -1100,6 +1119,10 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
                 // terminal case
                 else {
                     curTerm = &terminalInstance[mtPtr->second.second];
+                    
+                    // save terminal pin Name into tPinName
+                    tPinName[mtPtr->second.second].push_back(pinName);
+
                     AddPinInfoForModuleAndTerminal( 
                             &curTerm->pin, &curTerm->pof,
                             curTerm->pinCNTinObject++,
@@ -1124,17 +1147,6 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
 }
 
 
-// net Info Storage
-struct NetInfo {
-    string macroName;
-    string compName;
-    string pinName;
-    NetInfo(char* _macroName, char* _compName, char* _pinName) {
-        macroName = string(_macroName);
-        compName = string(_compName);
-        pinName = string(_pinName);
-    }
-};
 
 //////
 //
@@ -1197,11 +1209,13 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 
     // 
     // first : netName
-    // second : netInfo (macroName / compName / pinName)
-    //
-    dense_hash_map<string, vector<NetInfo>> netMap; 
+    // second : NetInfo (macroName / compName / pinName)
     netMap.set_empty_key(INIT_STR);
   
+    bool warnIccadClk = false;
+    bool warnLcb = false;
+    string lcbStr = "lcb_";
+
     // pinCNT check && netMap build
     pinCNT = 0;
     for(int i=0; i<module->module_instantiations->items; i++) {
@@ -1210,9 +1224,25 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 
         ast_module_instance* innerInst = 
             (ast_module_instance*) ast_list_get( inst->module_instances, 0 );
-       
+      
+        /*
+         * memory leak?  
         char* macroNamePtr = ast_identifier_tostring( inst-> module_identifer );
         char* compNamePtr = ast_identifier_tostring( innerInst->instance_identifier );
+        string macroName = string(macroNamePtr);
+        string compName = string(compNamePtr);
+
+        int macroIdx = GetLefMacroIdx( __ckt, macroName );
+        int compIdx = GetDefComponentIdx( __ckt, compName );
+        free(macroNamePtr);
+        free(compNamePtr);
+        */
+        
+        string macroName =  string(ast_identifier_tostring( inst-> module_identifer ));
+        string compName = string(ast_identifier_tostring( innerInst->instance_identifier ));
+
+        int macroIdx = GetLefMacroIdx( __ckt, macroName );
+        int compIdx = GetDefComponentIdx( __ckt, compName );
         
         pinCNT += innerInst->port_connections->items;
         for(int j=0; j<innerInst->port_connections->items; j++) {
@@ -1223,32 +1253,79 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
                                 port->expression->primary->value.identifier);
             string netName( netNamePtr );
             free(netNamePtr);
-         
+        
+//            if( !warnIccadClk && netName == "iccad_clk" ) {
+//                cout << "** WARNING:  iccad_clk is detected. It'll be automatically excluded"
+//                    << " (netMap)" << endl;
+//                warnIccadClk = true;
+//                continue;
+//            }
+
+//            if( !warnLcb && std::equal( lcbStr.begin(), lcbStr.end(), netName.begin()) ) {
+//                cout << "** WARNING:  lcb_ prefix is detected. It'll be automatically excluded"
+//                    << " (netMap)" << endl;
+//                warnLcb = true;
+//                continue;
+//            }
+
+//            if( netName == "iccad_clk" ||
+//                    std::equal( lcbStr.begin(), lcbStr.end(), netName.begin() ) ) {
+//                continue;
+//            }
+//            if( netName == "iccad_clk" ) {
+//                continue;
+//            }
+
             char* pinNamePtr = ast_identifier_tostring(port-> port_name);
+            string pinName = string(pinNamePtr);
+            int pinIdx = GetLefMacroPinIdx( __ckt, macroIdx, pinName );
+            free(pinNamePtr);
              
             // netMap build 
             if(netMap.find( netName ) == netMap.end()) {
                 vector<NetInfo> tmpStor;
-                tmpStor.push_back( NetInfo(macroNamePtr, compNamePtr, pinNamePtr ) );
+                tmpStor.push_back( NetInfo(macroIdx, compIdx, pinIdx ) );
                 netMap[netName] = tmpStor;   
             }
             else {
-                netMap[netName].push_back( NetInfo( macroNamePtr, compNamePtr, pinNamePtr) );
+                netMap[netName].push_back( NetInfo( macroIdx, compIdx, pinIdx ) );
             }
-            free(pinNamePtr);
         }
 
-        free(macroNamePtr);
-        free(compNamePtr);
     }
-//    cout << "NET MAP BUILD DONE" << endl; 
+
+    // insert PIN information into nets based on the DefPinStor
+    if( __ckt.defPinStor.size() > 0 ) {
+        for(auto& curPin : __ckt.defPinStor) {
+
+            auto nmPtr = netMap.find( string(curPin.netName()) );
+            if( nmPtr == netMap.end() ) {
+                cout << "** ERROR: Cannnot find " << curPin.netName() << " (netMap)" << endl;
+                exit(1);
+            }
+
+            // save defPinStor's index
+            nmPtr->second.push_back( NetInfo( INT_MAX, INT_MAX, &curPin - &__ckt.defPinStor[0] ) );
+            pinCNT++;
+        }
+    }
+    // this is worst cases. It must reference all information from Verilog files
+    // TODO
+    else {
+        if( module->continuous_assignments ) {
+            int assignCnt = module->continuous_assignments->items;
+            for(int i=0; i<assignCnt; i++) {
+//                ast_continuous_assignment* 
+            }
+        }
+    }
+    //    cout << "NET MAP BUILD DONE" << endl; 
     netCNT = netMap.size();
     
     // memory reserve
     netInstance = (NET*) mkl_malloc( sizeof(NET)* netCNT, 64 );
     pinInstance = (PIN*) mkl_malloc( sizeof(PIN)* pinCNT, 64 );
 
-    NET* curNet = NULL;
     PIN* curPin = NULL;
 
     struct MODULE* curModule = NULL;
@@ -1257,75 +1334,147 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
     int netIdx = 0;
     int pinIdx = 0;
 
+    tPinName.resize(terminalCNT);
+    mPinName.resize(moduleCNT);
+
     // net traverse
     // netMap is silimar with __ckt.defNetStor
     for(auto& net : netMap) {
+        
+        if( net.first ==  "iccad_clk" ||
+            net.first ==  "clk" ||
+            net.first == "clock" ) {
 
+            cout << "** WARNING:  " << net.first << " is detected. "
+                 << " It'll be automatically excluded"
+                 << " (defNetStor)" << endl; 
+
+            clockNetsVerilog.push_back( net.first );
+            continue;
+        }
 //        cout << net.first << endl; 
-        curNet = &netInstance[netIdx];
+        NET* curNet = &netInstance[netIdx];
         curNet->idx = netIdx;
 
         curNet->pinCNTinObject = net.second.size();
         curNet->pin = (PIN**) mkl_malloc( 
                         sizeof(PIN*)*net.second.size(), 64);
-    
+        // net name initialize
+        strcpy( curNet->name, net.first.c_str() );
         // all names are saved in here.
         for(auto& connection : net.second) {
-            
-            /////////////// Net Info Mapping part
-            // 
-            // find current component is in module or terminal
-            //
-            auto mtPtr = moduleTermMap.find( connection.compName );
-            if(mtPtr == moduleTermMap.end()) {
-                cout << "** ERROR:  Net Instance ( "<< connection.compName 
-                    << " ) does not exist in COMPONENTS/PINS statement "
-                    << "(moduleTermMap) " << endl;
-                exit(1);
-            }
 
-            // pin Info set
             int connectIdx = &connection - &net.second[0];
-            curPin = &pinInstance[pinIdx];
-            curNet->pin[ connectIdx ] = curPin;
+            /////////////// Net Info Mapping part
+            //
+            // This means external PIN cases
+            if( connection.macroIdx == INT_MAX && connection.compIdx == INT_MAX) {
+                string pinName = string(__ckt.defPinStor[connection.pinIdx].pinName());
+                auto mtPtr = moduleTermMap.find( pinName );
+                if(mtPtr == moduleTermMap.end()) {
+                    cout << "** ERROR:  Net Instance ( "
+                        << pinName
+                        << " ) does not exist in COMPONENTS/PINS statement "
+                        << "(moduleTermMap) " << endl;
+                    exit(1);
+                }
 
-            FPOS curOffset = GetOffset( __ckt, 
-                                connection.compName, 
-                                connection.pinName, 
-                                &connection.macroName );
-            int io = GetIO( __ckt, 
-                        connection.compName, 
-                        connection.pinName, 
-                        &connection.macroName ); 
+                // terminal Index setting
+                int termIdx = mtPtr->second.second;
 
-            // module case
-            if( mtPtr->second.first ) {
-                curModule = &moduleInstance[mtPtr->second.second];
-                AddPinInfoForModuleAndTerminal( 
-                        &curModule->pin, &curModule->pof,
-                        curModule->pinCNTinObject++,
-                        curOffset, curModule->idx,  
-                        netIdx, connectIdx, pinIdx++, 
-                        io, false); 
-            }
-            // terminal case
-            else {
-                curTerm = &terminalInstance[mtPtr->second.second];
+                int io = INT_MAX;
+                if( !__ckt.defPinStor[connection.pinIdx].hasDirection() ) {
+                    io = 2; // both direction
+                }
+                else {
+                    // input : 0
+                    // output : 1
+                    io = (strcmp( __ckt.defPinStor[connection.pinIdx].
+                                    direction(), "INPUT") == 0 )? 0 : 1;
+                }
+                
+                // pin Instnace mapping 
+                curPin = &pinInstance[pinIdx];
+                curNet->pin[ connectIdx ] = curPin;
+                
+                curTerm = &terminalInstance[termIdx];
+
+                // save terminal pin Name into tPinName
+                tPinName[termIdx].push_back(pinName);
+
                 AddPinInfoForModuleAndTerminal( 
                         &curTerm->pin, &curTerm->pof,
                         curTerm->pinCNTinObject++,
-                        curOffset, curTerm->idx,  
+                        FPOS(0, 0, 0), curTerm->idx,  
                         netIdx, connectIdx, pinIdx++, 
                         io, true); 
-            }
 
+            }
+            else {
+                // 
+                // find current component is in module or terminal
+                //
+                auto mtPtr = moduleTermMap.find( string(__ckt.defComponentStor[connection.compIdx].id() ) );
+                if(mtPtr == moduleTermMap.end()) {
+                    cout << "** ERROR:  Net Instance ( "
+                        << __ckt.defComponentStor[connection.compIdx].id()
+                        << " ) does not exist in COMPONENTS/PINS statement "
+                        << "(moduleTermMap) " << endl;
+                    exit(1);
+                }
+
+                // pin Info set
+                curPin = &pinInstance[pinIdx];
+                curNet->pin[ connectIdx ] = curPin;
+
+                string compName = string( __ckt.defComponentStor[connection.compIdx].id());
+                string pinName = string( __ckt.lefPinStor[connection.macroIdx][connection.pinIdx].name()); 
+
+                FPOS curOffset = GetOffset( __ckt, 
+                        compName, 
+                        pinName, 
+                        connection.macroIdx );
+                int io = GetIO( __ckt, 
+                        compName, 
+                        pinName, 
+                        connection.macroIdx ); 
+
+                // module case
+                if( mtPtr->second.first ) {
+                    curModule = &moduleInstance[mtPtr->second.second];
+                    mPinName[mtPtr->second.second].push_back(pinName);
+
+                    AddPinInfoForModuleAndTerminal( 
+                            &curModule->pin, &curModule->pof,
+                            curModule->pinCNTinObject++,
+                            curOffset, curModule->idx,  
+                            netIdx, connectIdx, pinIdx++, 
+                            io, false); 
+                }
+                // terminal case
+                else {
+                    curTerm = &terminalInstance[mtPtr->second.second];
+                    tPinName[mtPtr->second.second].push_back(pinName);
+
+                    AddPinInfoForModuleAndTerminal( 
+                            &curTerm->pin, &curTerm->pof,
+                            curTerm->pinCNTinObject++,
+                            curOffset, curTerm->idx,  
+                            netIdx, connectIdx, pinIdx++, 
+                            io, true); 
+                }
+
+            }
             // curOffset.Dump("curOffset");
             // cout << macroName << " " << compName << " " << pinName << endl;
         }
         netIdx++;
-        // cout << endl; 
     }
-
+    netCNT = netIdx;
+    pinCNT = pinIdx;
+   
+    netInstance = (NET*) mkl_realloc( netInstance, sizeof(NET)* netCNT );
+    // pinInstance is not re-allocable!!!
 
     /*
     // fully traverse
@@ -1471,3 +1620,4 @@ void ReadPlLefDef(const char* fileName) {
 
     fclose(fp);
 }
+

@@ -256,7 +256,28 @@ class Circuit {
         void DumpDefComponentPinToNet();
 
 };
+
+// Verilog net Info Storage
+struct NetInfo {
+//    string macroName;
+//    string compName;
+//    string pinName;
+    
+    int macroIdx;
+    int compIdx;
+    int pinIdx;
+
+//    NetInfo(char* _macroName, char* _compName, char* _pinName) {
+//        macroName = string(_macroName);
+//        compName = string(_compName);
+//        pinName = string(_pinName);
+//    }
+    NetInfo( int _macroIdx, int _compIdx, int _pinIdx) 
+        : macroIdx(_macroIdx), compIdx(_compIdx), pinIdx(_pinIdx) {};
+};
+
 CIRCUIT_NAMESPACE_CLOSE
+
 
 void ParseInput();
 void ParseLefDef();
