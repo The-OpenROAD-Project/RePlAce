@@ -48,7 +48,7 @@ ifndef	IPPROOT
     IPPROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/ipp
 endif
 
-HASHROOT 		= ../module/sparsehash/install/include
+HASHROOT 		= ../module/sparsehash/install-sp/include
 EIGENROOT 		= ../module/eigen-git-mirror/
 CIMGROOT 		= ../module/CImg/
 

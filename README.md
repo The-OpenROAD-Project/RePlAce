@@ -5,10 +5,6 @@
 |:--:| 
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |
 
-
-### Pre-requisite
-* Procedures for
-
 ### Pre-requisite
 * Intel MKL and IPP package
 
