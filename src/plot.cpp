@@ -2639,12 +2639,15 @@ void get_bin_color(struct BIN *bp, int *color, int *power) {
 
 void mkdirPlot() {
     char mkdir_cmd[BUF_SZ] = {0, };
-    
-    sprintf(mkdir_cmd, "mkdir -p %s/initPlace", dir_bnd);
-    system(mkdir_cmd);
+   
+    if( approxiPlotCMD ) { 
+        sprintf(mkdir_cmd, "mkdir -p %s/initPlace", dir_bnd);
+        system(mkdir_cmd);
 
-    sprintf(mkdir_cmd, "mkdir -p %s/cell", dir_bnd);
-    system(mkdir_cmd);
+        sprintf(mkdir_cmd, "mkdir -p %s/cell", dir_bnd);
+        system(mkdir_cmd);
+    }
+
     /*
     sprintf(mkdir_cmd, "mkdir -p %s/den", dir_bnd);
     system(mkdir_cmd);

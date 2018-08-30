@@ -581,10 +581,12 @@ int main(int argc, char *argv[]) {
     WriteBookshelf();
     printf("PROC:  END WRITE BOOKSHELF\n\n");
     fflush(stdout);
-    
-    SavePlotAsJPEG( "Final Global Placement Result", false, 
+   
+    if( approxiPlotCMD ) { 
+        SavePlotAsJPEG( "Final Global Placement Result", false, 
             string(dir_bnd) 
             + string("/globalPlaceResult") );
+    }
    
     if( inputMode == InputMode::lefdef )  {
         WriteDef( defGpOutput );
@@ -646,10 +648,11 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
     
 //    SavePlot( "Final Placement Result");
-    
-    SavePlotAsJPEG( "Final Placement Result", false, 
-            string(dir_bnd) 
-            + string("/finalResult") );
+    if( approxiPlotCMD ) { 
+        SavePlotAsJPEG( "Final Placement Result", false, 
+                string(dir_bnd) 
+                + string("/finalResult") );
+    }
 
 //    ShowPlot( benchName );   
     return 0;
