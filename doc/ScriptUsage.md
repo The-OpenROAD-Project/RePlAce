@@ -16,7 +16,7 @@ You can easily find this part inside of the python scripts.
 * __logpos__ : (__string__) Set a log folder location - The binary saves standard-output log like superblue9_2018-07-30_20:46:56.log
 * __numThread__ : (__int__) Define the number of threads RePlAce can use
 * __isOnlyGP__ : (__T__/__F__) Determine whether RePlAce stops after Global placement
-* __isAplot__ : (__T__/__F__) Determine whether RePlAce generates visualized images (using CImg)
+* __isPlot__ : (__T__/__F__) Determine whether RePlAce generates visualized images (using CImg)
 * __isValgrind__ : (__T__/__F__) Use Valgrind to debug
 * __isNohup__ : (__T__/__F__) Execute RePlAce in background mode using nohup
 * __useScreen__ : (__T__/__F__) Execute RePlAce in background mode using screen

@@ -122,9 +122,7 @@ void initial_placement() {
         update_net_by_pin ();
         HPWL_count ();
 
-        if( approxiPlotCMD && i % 5 == 0 ||
-            !approxiPlotCMD && plotCellCMD ) {
-            
+        if( isPlot && i % 5 == 0 ) {
             SavePlotAsJPEG( string("FIP - Iter: ") + to_string(i), false, 
                            string(dir_bnd) 
                            + string("/initPlace/initPlacement_") 
@@ -149,7 +147,7 @@ void initial_placement() {
 
 }
 
-void build_data_struct(void) {
+void build_data_struct(bool initCoordi) {
     MODULE *mdp = NULL;
     TERM *term = NULL;
     PIN *pin = NULL;
@@ -179,9 +177,11 @@ void build_data_struct(void) {
 
     for(int i = 0; i < moduleCNT; i++) {
         mdp = &moduleInstance[i];
-        mdp->center = place.center;
 
-        mdp->center.z = tier_st[0].center.z;
+        if( initCoordi ) {
+            mdp->center = place.center;
+            mdp->center.z = tier_st[0].center.z;
+        }
 
         mdp->pmin.x = mdp->center.x - 0.5 * mdp->size.x;
         mdp->pmin.y = mdp->center.y - 0.5 * mdp->size.y;
@@ -203,8 +203,6 @@ void build_data_struct(void) {
             pin->X_MAX = 0;
             pin->Y_MIN = 0;
             pin->Y_MAX = 0;
-            pin->Z_MIN = 0;
-            pin->Z_MAX = 0;
         }
     }
 
@@ -251,8 +249,6 @@ void build_data_struct(void) {
             pin->X_MAX = 0;
             pin->Y_MIN = 0;
             pin->Y_MAX = 0;
-            pin->Z_MIN = 0;
-            pin->Z_MAX = 0;
         }
     }
 
@@ -304,20 +300,6 @@ void build_data_struct(void) {
                 pin->Y_MIN = 1;
             }
 
-            if(pin_zmin) {
-                if(min_z > pin->fp.z)  // mdp->center.y)
-                {
-                    min_z = pin->fp.z;  // mdp->center.y ;
-                    pin_zmin->Z_MIN = 0;
-                    pin_zmin = pin;
-                    pin->Z_MIN = 1;
-                }
-            }
-            else {
-                min_z = pin->fp.z;  // mdp->center.y ;
-                pin_zmin = pin;
-                pin->Z_MIN = 1;
-            }
 
             if(pin_xmax) {
                 if(max_x < pin->fp.x)  // mdp->center.x)
@@ -349,20 +331,6 @@ void build_data_struct(void) {
                 pin->Y_MAX = 1;
             }
 
-            if(pin_zmax) {
-                if(max_z < pin->fp.z)  // mdp->center.y)
-                {
-                    max_z = pin->fp.z;  // mdp->center.y ;
-                    pin_zmax->Z_MAX = 0;
-                    pin_zmax = pin;
-                    pin->Z_MAX = 1;
-                }
-            }
-            else {
-                max_z = pin->fp.z;  // mdp->center.y ;
-                pin_zmax = pin;
-                pin->Z_MAX = 1;
-            }
         }
 
         curNet->min_x = min_x;
@@ -428,8 +396,6 @@ void update_pin_by_module(void) {
             pin->X_MAX = 0;
             pin->Y_MIN = 0;
             pin->Y_MAX = 0;
-            pin->Z_MIN = 0;
-            pin->Z_MAX = 0;
         }
     }
 }
@@ -507,42 +473,11 @@ void update_net_by_pin() {
                 pin->Y_MAX = 1;
             }
 
-            if(pin_zmin) {
-                if(min_z > pin->fp.z)  // mdp->center.z)
-                {
-                    min_z = pin->fp.z;  // mdp->center.z ;
-                    pin_zmin->Z_MIN = 0;
-                    pin_zmin = pin;
-                    pin->Z_MIN = 1;
-                }
-            }
-            else {
-                min_z = pin->fp.z;  // mdp->center.z ;
-                pin_zmin = pin;
-                pin->Z_MIN = 1;
-            }
-
-            if(pin_zmax) {
-                if(max_z < pin->fp.z)  // mdp->center.z)
-                {
-                    max_z = pin->fp.z;  // mdp->center.z ;
-                    pin_zmax->Z_MAX = 0;
-                    pin_zmax = pin;
-                    pin->Z_MAX = 1;
-                }
-            }
-            else {
-                max_z = pin->fp.z;  // mdp->center.z ;
-                pin_zmax = pin;
-                pin->Z_MAX = 1;
-            }
         }
         curNet->min_x = min_x;
         curNet->min_y = min_y;
-        curNet->min_z = min_z;
         curNet->max_x = max_x;
         curNet->max_y = max_y;
-        curNet->max_z = max_z;
     }
 }
 

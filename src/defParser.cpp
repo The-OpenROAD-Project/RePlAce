@@ -100,6 +100,11 @@ static string* defDividerCharPtr = 0;
 static string* defBusBitCharPtr = 0;
 static string* defDesignNamePtr = 0;
 
+static bool isVersionVisit = false;
+static bool isDividerCharVisit = false;
+static bool isBusBitCharVisit = false;
+static bool isDesignNameVisit = false;
+
 static vector<defiProp>* defPropStorPtr = 0;
 
 static defiBox* defDieAreaPtr = 0;
@@ -1637,7 +1642,10 @@ int tname(defrCallbackType_e c, const char* string, defiUserData ud) {
 int dname(defrCallbackType_e c, const char* str, defiUserData ud) {
     checkType(c);
     if (ud != userData) dataError();
+
     (*defDesignNamePtr) = string(str);
+    isDesignNameVisit = true;
+
     CIRCUIT_FPRINTF(fout, "DESIGN %s ;\n", str);
     return 0;
 }
@@ -1887,7 +1895,10 @@ int fn(defrCallbackType_e c, const char* h, defiUserData ud) {
 int bbn(defrCallbackType_e c, const char* h, defiUserData ud) {
     checkType(c);
     if (ud != userData) dataError();
+
     (*defBusBitCharPtr) = string(h);
+    isBusBitCharVisit = true;
+
     CIRCUIT_FPRINTF(fout, "BUSBITCHARS \"%s\" ;\n", h);
     return 0;
 }
@@ -1910,7 +1921,10 @@ int vers(defrCallbackType_e c, double d, defiUserData ud) {
 int versStr(defrCallbackType_e c, const char* versionName, defiUserData ud) {
     checkType(c);
     if (ud != userData) dataError();
+    
     (*defVersionPtr) = string(versionName);
+    isVersionVisit = true;
+
     CIRCUIT_FPRINTF(fout, "VERSION %s ;\n", versionName);
     return 0;
 }
@@ -2974,6 +2988,8 @@ int dn(defrCallbackType_e c, const char* h, defiUserData ud) {
     if (ud != userData) dataError();
 
     (*defDividerCharPtr) = string(h);
+    isDividerCharVisit = true;
+
     CIRCUIT_FPRINTF(fout, "DIVIDERCHAR \"%s\" ;\n",h);
     return 0;
 }
@@ -3062,21 +3078,25 @@ static void printWarning(const char *str) {
 ///////////////////////////////////////////////////////////////////////
 
 void Circuit::Circuit::DumpDefVersion() {
-    CIRCUIT_FPRINTF(fout, "VERSION %s ;\n", defVersion.c_str());
+    CIRCUIT_FPRINTF(fout, "VERSION %s ;\n", 
+            (isVersionVisit)? defVersion.c_str() : "5.8");
 }
 
 
 void Circuit::Circuit::DumpDefDividerChar() {
-    CIRCUIT_FPRINTF(fout, "DIVIDERCHAR \"%s\" ;\n",defDividerChar.c_str());
+    CIRCUIT_FPRINTF(fout, "DIVIDERCHAR \"%s\" ;\n",
+            (isDividerCharVisit)? defDividerChar.c_str() : "/" );
 }
 
 
 void Circuit::Circuit::DumpDefBusBitChar() {
-    CIRCUIT_FPRINTF(fout, "BUSBITCHARS \"%s\" ;\n", defBusBitChar.c_str());
+    CIRCUIT_FPRINTF(fout, "BUSBITCHARS \"%s\" ;\n", 
+            (isBusBitCharVisit)? defBusBitChar.c_str() : "[]");
 }
 
 void Circuit::Circuit::DumpDefDesignName() {
-    CIRCUIT_FPRINTF(fout, "DESIGN %s ;\n", defDesignName.c_str());
+    CIRCUIT_FPRINTF(fout, "DESIGN %s ;\n", 
+            (isDesignNameVisit)? defDesignName.c_str() : "noname");
 }
 
 void Circuit::Circuit::DumpDefUnit() {
