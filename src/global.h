@@ -215,7 +215,6 @@ struct FPOS {
     inline void Dump(string a) {
         cout << a << ": (" << x << " " << y << " " << z << ")" << endl;   
     }
-   
 };
 
 struct POS {
@@ -348,10 +347,8 @@ struct PIN {
     int tier;
     int X_MIN;
     int Y_MIN;
-    int Z_MIN;
     int X_MAX;
     int Y_MAX;
-    int Z_MAX;
 };
 
 // for saving pinName
@@ -494,6 +491,7 @@ struct CELLx {
     FPOS *pof_tmp;
     PIN **pin_tmp;
 };
+
 typedef struct CELLx CELL;
 
 class SHAPE {

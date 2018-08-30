@@ -1302,17 +1302,15 @@ int HPWL_count() {
         curNet = &netInstance[i];
         tx_HPWL += (curNet->max_x - curNet->min_x);
         ty_HPWL += (curNet->max_y - curNet->min_y);
-        tz_HPWL += (curNet->max_z - curNet->min_z);
         // printf("%.16lf %.16lf\n",(curNet->max_x - curNet->min_x),
         //        (curNet->max_y - curNet->min_y));
 
-        if(tx_HPWL < 0 || ty_HPWL < 0 || tz_HPWL < 0) {
+        if(tx_HPWL < 0 || ty_HPWL < 0) {
             printf("ERROR\n");
-            cout << tx_HPWL << " " << ty_HPWL << " " << tz_HPWL << endl;
+            cout << tx_HPWL << " " << ty_HPWL << endl;
             g_rrr++;
             exit(1);
         }
-//        cout << i << " : " << curNet->min_x << " " << curNet->max_x << endl;
     }
     // exit(0);
     tot_HPWL = tx_HPWL + ty_HPWL;
