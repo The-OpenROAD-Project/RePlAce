@@ -385,11 +385,11 @@ void cell_filler_init() {
     struct CELLx *gcell_st_tmp = NULL;
     prec a = 0;
     FILE *fp = NULL;
-    char filler_fn[BUF_SZ];
+//    char filler_fn[BUF_SZ];
     struct FPOS org = zeroFPoint, end = zeroFPoint, len = zeroFPoint,
                 rnd = zeroFPoint;
 
-    sprintf(filler_fn, "%s/%s_filler.txt", dir_bnd, gbch);
+//    sprintf(filler_fn, "%s/%s_filler.txt", dir_bnd, gbch);
     a = k_f2c * avg80p_cell_area;
     f_area = a;
 
@@ -410,7 +410,7 @@ void cell_filler_init() {
         f_area = f_size.x * f_size.y * f_size.z;
     }
 
-    fp = fopen(filler_fn, "w");
+//    fp = fopen(filler_fn, "w");
 
     total_move_available_area = total_WS_area * target_cell_den;
     total_filler_area = total_move_available_area - total_modu_area;
@@ -427,7 +427,7 @@ void cell_filler_init() {
 
     gfiller_cnt = (int)(total_filler_area / filler_area + 0.5);
 
-    fprintf(fp, "%d %.6lf\n", gfiller_cnt, filler_area);
+//    fprintf(fp, "%d %.6lf\n", gfiller_cnt, filler_area);
 
     if(flg_3dic) {
         printf(
@@ -435,14 +435,14 @@ void cell_filler_init() {
             "FillerCell's Z = %.6lf\n",
             filler_size.x, filler_size.y, filler_size.z);
 
-        fprintf(fp, "%.6lf %.6lf %.6lf\n", filler_size.x, filler_size.y,
-                filler_size.z);
+//        fprintf(fp, "%.6lf %.6lf %.6lf\n", filler_size.x, filler_size.y,
+//                filler_size.z);
     }
     else {
         printf("INFO:  FillerCell's X = %.6lf , FillerCell's Y = %.6lf\n",
                filler_size.x, filler_size.y);
 
-        fprintf(fp, "%.6lf %.6lf\n", filler_size.x, filler_size.y);
+//        fprintf(fp, "%.6lf %.6lf\n", filler_size.x, filler_size.y);
     }
 
     gcell_cnt = moduleCNT + gfiller_cnt;
@@ -489,13 +489,13 @@ void cell_filler_init() {
         filler->pmin = fp_add(filler->center, fp_scal(-0.5, filler->size));
         filler->pmax = fp_add(filler->center, fp_scal(0.5, filler->size));
 
-        if(flg_3dic)
-            fprintf(fp, "%.6lf %.6lf %.6lf\n", filler->center.x,
-                    filler->center.y, filler->center.z);
-        else
-            fprintf(fp, "%.6lf %.6lf\n", filler->center.x, filler->center.y);
+//        if(flg_3dic)
+//            fprintf(fp, "%.6lf %.6lf %.6lf\n", filler->center.x,
+//                    filler->center.y, filler->center.z);
+//        else
+//            fprintf(fp, "%.6lf %.6lf\n", filler->center.x, filler->center.y);
     }
-    fclose(fp);
+//    fclose(fp);
 }
 
 void cell_init(void) {
