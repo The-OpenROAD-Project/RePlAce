@@ -54,7 +54,7 @@ void CreateSparseMatrix(VectorXf &xcg_x, VectorXf &xcg_b,
                         SMatrix &eMatX, SMatrix &eMatY);
 
 void update_module(VectorXf &xcg_x, VectorXf &ycg_x);
-void build_data_struct();
+void build_data_struct(bool initCoordi = true);
 void update_pin_by_module();
 
 #endif

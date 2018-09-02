@@ -1212,6 +1212,7 @@ void update_pin2(void) {
     for(int i = 0; i < netCNT; i++) {
         NET* net = &netInstance[i];
 
+//        cout << net->pinCNTinObject2 << endl;
         for(int j = 0; j < net->pinCNTinObject2; j++) {
             PIN* pin = net->pin2[j];
 

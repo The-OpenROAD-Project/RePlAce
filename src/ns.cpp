@@ -1341,22 +1341,7 @@ void myNesterov::UpdateNesterovIter(int iter, struct ITER *it,
         it->tot_wlen = 0;
     }
 
-    /*
-    if(approxiPlotCMD) {
-        if((iter % 10 == 0 || iter == 1) ||
-           (isBloatingBegin && iter % 5 == 0)) {
-            PlotNesterov(iter);
-        }
-    }
-    else {
-        if(plotCellCMD || plotDensityCMD || plotFieldCMD) {
-            PlotNesterov(iter);
-        }
-    }
-*/
-
-    if( approxiPlotCMD && iter % 10 == 0 ||
-        !approxiPlotCMD && plotCellCMD ){
+    if( isPlot && iter % 10 == 0 ){
         cell_update(x_st, N);
 
         // For circuit viewer

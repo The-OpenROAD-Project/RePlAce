@@ -71,38 +71,21 @@ void initArgument(int argc, char *argv[]) {
     inflcoefCMD = "2.33";        // lutong
     filleriterCMD = "0";
 
-//    numLayerCMD = "1";           // string
-//    gTSVcofCMD = "1.0";          // string
-//    ALPHAmGP_CMD = "1E-12";      // string
-//    BETAmGP_CMD = "1E-13";       // string
-//    ALPHAcGP_CMD = "1E-6";       // string
-//    BETAcGP_CMD = "1E-8";        // string
-//    dampParam_CMD = "0.999999";  // string
-//    aspectRatioCMD = "1.0";      // string
-//    dimCMD = "3d";               // string
-//
-//    stnweightCMD = "0.1";        // lutong
-//    racntoCMD = "1";             // lutong
-//    hpitchCMD = "1.1";           // lutong
-//    vpitchCMD = "1.5";           // lutong
-//    routepath_maxdistCMD = "0";
-//    edgeadjcoefCMD = "1.19";     // lutong
-//    pincntcoefCMD = "1.66";      // lutong
-//    gRoute_pitch_scalCMD = "1.09";
-
-
     auxCMD = "";
     lefCMD = "";
     defCMD = "";
     verilogCMD = "";
     outputCMD = "";
-    
+   
+    isSkipPlacement = false; 
+    hasDensityDP = false;
+    densityDP = 0.0f; 
 
+    isPlot = false;                 // bool
     plotCellCMD = false;            // bool
     plotMacroCMD = false;           // bool
     plotDensityCMD = false;         // bool
     plotFieldCMD = false;           // bool
-    approxiPlotCMD = false;         // bool
     constraintDrivenCMD = false;    // bool
     routabilityCMD = false;         // bool
     stnCMD = false;                 // lutong
@@ -114,8 +97,9 @@ void initArgument(int argc, char *argv[]) {
     trialRunCMD = false;            // bool
     autoEvalRC_CMD = false;         // bool
     
-    detailPlacerFlagCMD = "";  // mgwoo
-    detailPlacerLocationCMD = "";
+    dpFlag = "";  // mgwoo
+    dpLocation = "";
+    isOnlyLGinDP = (routabilityCMD)? true : false;
 
     numThread = 1; // default
 
@@ -136,40 +120,9 @@ void initArgument(int argc, char *argv[]) {
     overflowMinCMD = (overflowMinCMD == "NULL")? ((routabilityCMD)? "0.17" : "0.1") : overflowMinCMD; 
 
     DEN_ONLY_PRECON = false;
-    onlyLG_CMD = (routabilityCMD)? true : false;
-
-//    if(dimCMD == "3d") {
-//        flg_3dic = 1;
-//        flg_3dic_io = 0;
-//    }
-//    else if(dimCMD == "2d") {
-//        printf("Currently, this tool cannot solve 2D placement...\n");
-//        exit(0);
-//    }
-//    else {
-//        exit(0);
-//    }
-
-//    numLayer = atoi(numLayerCMD.c_str());
 
     numLayer = 1;
 
-//    aspectRatio = atof(aspectRatioCMD.c_str());
-//    gtsv_cof = atof(gTSVcofCMD.c_str());
-
-//    ALPHAmGP = atof(ALPHAmGP_CMD.c_str());
-//    ALPHAcGP = atof(ALPHAcGP_CMD.c_str());
-//    BETAmGP = atof(BETAmGP_CMD.c_str());
-//    BETAcGP = atof(BETAcGP_CMD.c_str());
-//    dampParam = atof(dampParam_CMD.c_str());
-//    stn_weight = atof(stnweightCMD.c_str());           // lutong
-//    bloating_max_count = atof(racntoCMD.c_str());            // lutong
-//    routepath_maxdist = atoi(routepath_maxdistCMD.c_str());  // lutong
-//    h_pitch = atof(hpitchCMD.c_str());                 // lutong
-//    v_pitch = atof(vpitchCMD.c_str());                 // lutong
-//    pincnt_coef = atof(pincntcoefCMD.c_str());         // lutong
-//    gRoute_pitch_scal = atof(gRoute_pitch_scalCMD.c_str());
-    
     ALPHAmGP = 1e-12;
     BETAmGP = 1e-13; 
     
@@ -207,15 +160,15 @@ void initArgument(int argc, char *argv[]) {
     dim_bin.z = atoi(bzMaxCMD.c_str());
 
     // detailPlacer settings
-    detailPlacer = None;
-    if(!strcmp(detailPlacerFlagCMD.c_str(), "FP")) {
-        detailPlacer = FastPlace;
+    dpMode = None;
+    if(!strcmp(dpFlag.c_str(), "FP")) {
+        dpMode = FastPlace;
     }
-    else if(!strcmp(detailPlacerFlagCMD.c_str(), "NTU3")) {
-        detailPlacer = NTUplace3;
+    else if(!strcmp(dpFlag.c_str(), "NTU3")) {
+        dpMode = NTUplace3;
     }
-    else if(!strcmp(detailPlacerFlagCMD.c_str(), "NTU4")) {
-        detailPlacer = NTUplace4h;
+    else if(!strcmp(dpFlag.c_str(), "NTU4")) {
+        dpMode = NTUplace4h;
     }
     else {
         printf(
@@ -611,7 +564,7 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-dpflag")) {
             i++;
             if(argv[i][0] != '-') {
-                detailPlacerFlagCMD = argv[i];
+                dpFlag = argv[i];
             }
             else {
                 printf("\n**ERROR: Option %s requires which Detailed Placer you want to use",
@@ -626,7 +579,7 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-dploc")) {
             i++;
             if(argv[i][0] != '-') {
-                detailPlacerLocationCMD = argv[i];
+                dpLocation = argv[i];
             }
             else {
                 printf("\n**ERROR: Option %s requires your Detailed Placer's location ",
@@ -645,6 +598,23 @@ bool argument(int argc, char *argv[]) {
                 return false;
             }
             SetUnitY( atof(argv[++i]) );
+        }
+        else if(!strcmp(argv[i], "-onlyDP")) {
+            isSkipPlacement = true;
+        }
+        // set target density manually for dp
+        else if(!strcmp(argv[i], "-denDP")) {
+            if( i + 1 >= argc || argv[i+1][0] == '-' ) {
+                printf("\n**ERROR: Option %s requires target density for DP\n",
+                       argv[i]);
+                return false;
+            }
+            hasDensityDP = true;
+            densityDP = atof(argv[++i]);
+        }
+        // detail placer with only Legalization modes
+        else if(!strcmp(argv[i], "-onlyLG")) {
+            isOnlyLGinDP = true;
         }
         /*
         else if(!strcmp(argv[i], "-CE")) {
@@ -727,15 +697,8 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-2d")) {
             dimCMD = "2d";
         }*/
-        else if(!strcmp(argv[i], "-aplot")) {
-            approxiPlotCMD = true;
-            plotCellCMD = true;
-            plotMacroCMD = true;
-            plotDensityCMD = true;
-            plotFieldCMD = true;
-        }
         else if(!strcmp(argv[i], "-plot")) {
-            approxiPlotCMD = false;
+            isPlot = true;
             plotCellCMD = true;
             plotMacroCMD = true;
             plotDensityCMD = true;
@@ -785,9 +748,6 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-auto_eval_RC")) {
             autoEvalRC_CMD = true;
         }
-        else if(!strcmp(argv[i], "-onlyLG")) {
-            onlyLG_CMD = true;
-        }
         else {
             printf("\n**ERROR: Option %s is NOT available.\n", argv[i]);
             return false;
@@ -833,7 +793,7 @@ void printUsage() {
     cout << "  -filleriter : #Filler Only Placement Iterations, Floating Number, Default = 20" << endl;
     cout << "  -stepScale  : ∆HPWL_REF, Floating Number, Default=346000" << endl << endl;
     cout << " Plot" << endl;
-    cout << "  -aplot      : Plot Layout Every 10 Iterations"  << endl << endl;
+    cout << "  -plot       : Plot Layout Every 10 Iterations"  << endl << endl;
     cout << " Detail Placer" << endl;
     cout << "  -dpflag     : Specify which Detailed Placer is Used" << endl;
     cout << "  -dploc      : Specify the Location of Detailed Placer" << endl ;
