@@ -72,16 +72,16 @@ void CallDetailPlace() {
         sprintf(tier_aux, "%s.aux", gbch);
         sprintf(tier_pl, "%s.pl", gbch);
 
-//        if(detailPlacer == NTUplace4h && !strcmp(bmFlagCMD.c_str(), "sb")) {
+//        if(dpMode == NTUplace4h && !strcmp(bmFlagCMD.c_str(), "sb")) {
 //            link_original_SB_files_to_Dir(tier_dir);
 //        }
 
         TIER* tier = &tier_st[i];
-        if(tier->modu_cnt <= 0) {
+        if( tier->modu_cnt <= 0) {
             continue;
         }
 
-        switch(detailPlacer) {
+        switch(dpMode) {
             case FastPlace:
                 call_FastDP_tier(tier_dir, tier_aux, tier_pl);
                 sprintf(tier_dp, "%s/%s_FP_dp.pl", tier_dir, gbch);
@@ -89,24 +89,15 @@ void CallDetailPlace() {
 
             case NTUplace3:  // Default of ePlace except SB benchmarks.
                 CallNtuPlacer3(tier_dir, tier_aux, tier_pl);
-                if(onlyLG_CMD) {
-                    sprintf(tier_dp, "%s/%s.lg.pl", tier_dir, gbch);
-                }
-                else {
-                    sprintf(tier_dp, "%s/%s.ntup.pl", tier_dir, gbch);
-                }
+                sprintf(tier_dp, ((isOnlyLGinDP)? "%s/%s.lg.pl":"%s/%s.ntup.pl"), 
+                        tier_dir, gbch);
                 break;
 
             case NTUplace4h:  // ePlace will always use NTUplace4h for SB
                 // benchmarks.
                 CallNtuPlacer4h(tier_dir, tier_aux, tier_pl);
-
-                if(onlyLG_CMD) {
-                    sprintf(tier_dp, "%s/%s.lg.pl", tier_dir, gbch);
-                }
-                else {
-                    sprintf(tier_dp, "%s/%s.ntup.pl", tier_dir, gbch);
-                }
+                sprintf(tier_dp, ((isOnlyLGinDP)? "%s/%s.lg.pl":"%s/%s.ntup.pl"), 
+                        tier_dir, gbch);
                 break;
         }
 
@@ -140,14 +131,14 @@ void call_FastDP_tier(char *tier_dir, char *tier_aux, char *tier_pl) {
     sprintf(cmd,
             "%s -legalize -noFlipping -noDp -target_density %.2lf -window 10 "
             "%s %s %s %s\n",
-            detailPlacerLocationCMD.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
+            dpLocation.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
 
 #else
 
     sprintf(cmd,
             "%s -legalize -noFlipping -target_density %.2lf -window 10 %s %s "
             "%s %s\n",
-            detailPlacerLocationCMD.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
+            dpLocation.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
 
 #endif
 
@@ -159,12 +150,12 @@ void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
 
     if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
         sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -util %.2lf -noglobal \n",
-                detailPlacerLocationCMD.c_str(), tier_dir, tier_aux, tier_dir, tier_pl,
+                dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl,
                 target_cell_den);
     }
     else {
         sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
-                detailPlacerLocationCMD.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
+                dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
     }
 
     // call
@@ -195,7 +186,7 @@ void CallNtuPlacer4h(char *tier_dir, char *tier_aux, char *tier_pl) {
 
     char cmd[BUF_SZ] = {0, };
     sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n", 
-            detailPlacerLocationCMD.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
+            dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
     
     cout << "INFO:  Execute NTUPlacer4h" << endl;
     cout << cmd << endl;
@@ -230,7 +221,7 @@ void call_DP(void) {
     return;
 #endif
 
-    switch(detailPlacer) {
+    switch(dpMode) {
         case FastPlace:
             call_FastDP();
             break;
@@ -244,32 +235,32 @@ void call_FastDP(void) {
 
     switch(INPUT_FLG) {
         case IBM:
-            sprintf(cmd, "%s -legalize -noFlipping %s %s %s %s\n", detailPlacerLocationCMD.c_str(),
+            sprintf(cmd, "%s -legalize -noFlipping %s %s %s %s\n", dpLocation.c_str(),
                     gbch_dir, gbch_aux, dir_bnd, gGP_pl_file);
             break;
         case ISPD05:
-            sprintf(cmd, "%s -legalize -noFlipping %s %s %s %s\n", detailPlacerLocationCMD.c_str(),
+            sprintf(cmd, "%s -legalize -noFlipping %s %s %s %s\n", dpLocation.c_str(),
                     gbch_dir, gbch_aux, dir_bnd, gGP_pl_file);
             break;
         case ISPD06:
             sprintf(cmd,
                     "%s -legalize -noFlipping -target_density %.2lf -window "
                     "10 %s %s %s %s\n",
-                    detailPlacerLocationCMD.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
+                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
                     gGP_pl_file);
             break;
         case ISPD06m:
             sprintf(cmd,
                     "%s -legalize -noFlipping -target_density %.2lf -window "
                     "10 %s %s %s %s\n",
-                    detailPlacerLocationCMD.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
+                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
                     gGP_pl_file);
             break;
         case MMS:
             sprintf(cmd,
                     "%s -legalize -noFlipping -target_density %.2lf -window "
                     "10 %s %s %s %s\n",
-                    detailPlacerLocationCMD.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
+                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
                     gGP_pl_file);
 
             break;
@@ -277,7 +268,7 @@ void call_FastDP(void) {
             sprintf(cmd,
                     "%s -legalize -noFlipping -target_density %.2lf -window "
                     "10 %s %s %s %s\n",
-                    detailPlacerLocationCMD.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
+                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
                     gGP_pl_file);
 
             break;
@@ -285,7 +276,7 @@ void call_FastDP(void) {
             sprintf(cmd,
                     "%s -legalize -noFlipping -target_density %.2lf -window "
                     "10 %s %s %s %s\n",
-                    detailPlacerLocationCMD.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
+                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux, dir_bnd,
                     gGP_pl_file);
 
             break;
@@ -300,32 +291,32 @@ void call_NTUpl3(void) {
     switch(INPUT_FLG) {
         case IBM:
             sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
-                    detailPlacerLocationCMD.c_str(), gbch_dir, gbch_aux,
+                    dpLocation.c_str(), gbch_dir, gbch_aux,
                     // target_cell_den ,
                     dir_bnd, gGP_pl_file);
             break;
         case ISPD05:
             sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
-                    detailPlacerLocationCMD.c_str(), gbch_dir, gbch_aux,
+                    dpLocation.c_str(), gbch_dir, gbch_aux,
                     // target_cell_den ,
                     dir_bnd, gGP_pl_file);
             break;
         case ISPD06:
             sprintf(cmd,
                     "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    detailPlacerLocationCMD.c_str(), gbch_dir, gbch_aux, target_cell_den, dir_bnd,
+                    dpLocation.c_str(), gbch_dir, gbch_aux, target_cell_den, dir_bnd,
                     gGP_pl_file);
             break;
         case ISPD06m:
             sprintf(cmd,
                     "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    detailPlacerLocationCMD.c_str(), gbch_dir, gbch_aux, target_cell_den, dir_bnd,
+                    dpLocation.c_str(), gbch_dir, gbch_aux, target_cell_den, dir_bnd,
                     gGP_pl_file);
             break;
         case MMS:
             sprintf(cmd,
                     "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    detailPlacerLocationCMD.c_str(), gbch_dir, gbch_aux, target_cell_den, dir_bnd,
+                    dpLocation.c_str(), gbch_dir, gbch_aux, target_cell_den, dir_bnd,
                     gGP_pl_file);
             break;
         case SB:

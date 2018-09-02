@@ -14,10 +14,10 @@ import time
 
 #####################################
 # configure 
-bmflag = "sb"
+bmflag = "etc"
 dpflag = "NTU3"
 dploc = "../ntuplace/ntuplace3"
-dirpos = "../bench/lefdef"
+dirpos = "../bench_lefdef"
 binaryName = "./RePlAce"
 outpos = "../output"
 logpos = "../logdir"
@@ -29,8 +29,7 @@ isValgrind = False
 isNohup = False
 isCentos = False
 useScreen = False 
-isAplot = False 
-
+isPlot = False 
 
 ## configure done 
 #####################################
@@ -87,7 +86,7 @@ curTime = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
 
 placeModeStr = "-onlyGP" if isOnlyGP else "-dpflag %s -dploc %s" % (dpflag, dploc)
 directStr = ">" if isNohup else "|& tee" if isCentos else "| tee"
-aplotStr = "-aplot" if isAplot else ""
+plotStr = "-plot" if isPlot else ""
 
 valgrindStr = "valgrind --log-fd=1" if isValgrind else ""
 nohupFrontStr = "nohup" if isNohup else "" 
@@ -124,12 +123,12 @@ if type(benchName) is list:
             ExecuteCommand( "screen -dmS %s bash" % (curBench) )
             ExecuteCommand( exeFormat % (curBench, nohupFrontStr, valgrindStr, \
                     binaryName, bmflag, \
-                    outpos, numThread, placeModeStr, aplotStr, \
+                    outpos, numThread, placeModeStr, plotStr, \
                     directStr, logpos, fileName, curTime, nohupEndStr ) )
         else:
             ExecuteCommand( exeFormat % (nohupFrontStr, valgrindStr, \
                     binaryName, bmflag, \
-                    outpos, numThread, placeModeStr, aplotStr, \
+                    outpos, numThread, placeModeStr, plotStr, \
                     directStr, logpos, fileName, curTime, nohupEndStr ) )
 
 
@@ -147,11 +146,11 @@ else:
         ExecuteCommand( "screen -dmS %s bash" % (benchName) )
         ExecuteCommand( exeFormat % (benchName, nohupFrontStr, valgrindStr,\
                 binaryName, bmflag, \
-                outpos, numThread, placeModeStr, aplotStr, \
+                outpos, numThread, placeModeStr, plotStr, \
                 directStr, logpos, fileName , curTime, nohupEndStr ) )
     else:
         ExecuteCommand( exeFormat % (nohupFrontStr, valgrindStr, \
                 binaryName, bmflag, \
-                outpos, numThread, placeModeStr, aplotStr, \
+                outpos, numThread, placeModeStr, plotStr, \
                 directStr, logpos, fileName , curTime, nohupEndStr ) )
 

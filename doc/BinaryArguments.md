@@ -28,7 +28,7 @@
 * __-stepScale__  : ∆HPWL_REF, Floating Number, Default=346000
 
 ### Plot
-* __-aplot__      : Plot Layout Every 10 Iterations
+* __-plot__       : Plot Layout Every 10 Iterations
 
 ### Detail Placer
 * __-dpflag__     : Specify which Detailed Placer is Used

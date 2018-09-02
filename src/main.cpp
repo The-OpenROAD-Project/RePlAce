@@ -64,10 +64,6 @@
 #define compileDate __DATE__
 #define compileTime __TIME__
 
-//int *modu_map;
-//int *term_map;
-//int modu_map_cnt;
-//int term_map_cnt;
 
 PIN *pinInstance;
 MODULE *moduleInstance;
@@ -77,7 +73,6 @@ int moduleCNT;
 // for module/term's pinName
 vector< vector<string> > mPinName;
 vector< vector<string> > tPinName;
-
 
 TERM *terminalInstance;
 NET *netInstance;
@@ -94,9 +89,6 @@ int STAGE;
 int placementStdcellCNT;
 int gfiller_cnt;
 int placementMacroCNT;
-//int gfft_flg;
-//int SCALING;
-//int ROW_Y0;
 int msh_yz;
 int INPUT_FLG;
 int gmov_mac_cnt;
@@ -119,11 +111,6 @@ int bloatCNT = 0;
 int potnPhaseDS;
 
 // routability
-//prec row_height = 8;   // lutong
-//prec gcell_x_cof = 4;  // lutong
-//prec gcell_y_cof = 5;  // lutong
-//prec gcell_cof = 16;   // not used
-//prec eq_pitch = 4;     // not used
 prec h_pitch = 0.80;
 prec v_pitch = 0.72;
 prec max_inflation_ratio = 2.5;
@@ -140,18 +127,14 @@ prec total_inflatedNewAreaDelta;
 bool isBloatingBegin = false;
 bool isRoutabilityInit = false;
 bool flg_noroute = false;
-// bool isRestoreCells = true;
 int routepath_maxdist;
 int inflation_cnt = 0;
 int inflation_max_cnt = 4;
-// LW changed in routability_init()
 prec inflation_area_over_whitespace = 0.25;
 prec curr_filler_area = 0;
 prec adjust_ratio = 0;
 prec currTotalInflation;
 bool is_inflation_h = false;
-// int total_inflation_cnt = 0;
-// int currBloatCNT = -1;
 vector< pair< int, prec > > inflationList;
 
 bool isTrial = false;
@@ -188,8 +171,6 @@ prec BETA;
 prec dampParam;
 prec stn_weight;  // lutong
 prec global_ovfl;
-// prec            initialALPHA;
-// prec            initialBETA;
 prec maxALPHA;
 prec ExtraWSfor3D;
 prec MaxExtraWSfor3D;
@@ -274,17 +255,8 @@ char sing_fn_nodes[BUF_SZ];
 char sing_fn_pl[BUF_SZ];
 char sing_fn_wts[BUF_SZ];
 char sing_fn_scl[BUF_SZ];
-//char fn_bch_IP[BUF_SZ];
-//char fn_bch_GP[BUF_SZ];
-//char fn_bch_GP2[BUF_SZ];
-//char fn_bch_GP3[BUF_SZ];
-//char fn_bch_mac_LG[BUF_SZ];
-//char fn_bch_DP[BUF_SZ];
 char bench_aux[BUF_SZ];
 char dir_bnd[BUF_SZ];
-//char FastDP_cmd[1023];
-//char NTUplace3_cmd[1023];
-//char NTUplace4h_cmd[1023];
 char global_router[1023];
 char output_dir[BUF_SZ];
 char currentDir[BUF_SZ];
@@ -295,7 +267,6 @@ string sourceCodeDir;
 
 // opt.cpp -> main.cpp
 CELLx *gcell_st;
-
 ROW *row_st;
 
 PLACE *place_st;
@@ -317,7 +288,6 @@ POS dim_bin;
 POS dim_bin_mGP2D;
 
 // .shapes
-//
 // SHAPE's storage
 vector< SHAPE > shapeStor;
 
@@ -325,26 +295,6 @@ vector< SHAPE > shapeStor;
 dense_hash_map< string, vector< int > > shapeMap;
 POS dim_bin_cGP2D;
 
-
-// FPOS            grow_pmin;
-// FPOS            grow_pmax;
-// FPOS            terminal_pmin;
-// FPOS            terminal_pmax;
-// FPOS            terminal_size_max;
-// FPOS            module_size_max;
-
-///  HASH TABLE  //////////////////////////////////////////
-// char            **cellName;
-// int             numNodes;
-// int             movableNodes;
-// int             numTerminals;
-// int             numNonRectangularNodes;
-// long            hashSize;
-// long            hashBits;
-// unsigned long   *RN;
-// unsigned char   *hashFlag;
-// NODES           **NodesInfo;
-///////////////////////////////////////////////////////////
 
 ///  ARGUMENTS  ///////////////////////////////////////////
 int numLayer;
@@ -366,7 +316,6 @@ string dimCMD;
 string bxMaxCMD;
 string byMaxCMD;
 string bzMaxCMD;
-//string numLayerCMD;
 string gTSVcofCMD;
 string ALPHAmGP_CMD;
 string ALPHAcGP_CMD;
@@ -392,16 +341,21 @@ string gRoute_pitch_scalCMD;
 string filleriterCMD;
 
 // for detail Placer
-int detailPlacer;
-string detailPlacerLocationCMD;
-string detailPlacerFlagCMD;
+int dpMode;
+string dpLocation;
+string dpFlag;
+
+prec densityDP;
+bool hasDensityDP;
+bool isSkipPlacement;
+bool isOnlyLGinDP;
+bool isPlot;
 
 int conges_eval_methodCMD;
 bool plotCellCMD;
 bool plotMacroCMD;
 bool plotDensityCMD;
 bool plotFieldCMD;
-bool approxiPlotCMD;
 bool constraintDrivenCMD;
 bool routabilityCMD;
 bool stnCMD;  // lutong
@@ -412,11 +366,9 @@ bool isARbyUserCMD;
 bool thermalAwarePlaceCMD;
 bool trialRunCMD;
 bool autoEvalRC_CMD;
-bool onlyLG_CMD;
 ///////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
-    srand(777);
 
     double tot_cpu = 0;
     double time_ip = 0;
@@ -456,7 +408,6 @@ int main(int argc, char *argv[]) {
 
     if(numLayer > 1)
         calcTSVweight();
-    build_data_struct();
     
     net_update_init();
     init_tier();
@@ -466,123 +417,129 @@ int main(int argc, char *argv[]) {
 
     time_start(&tot_cpu);
 
-    ///////////////////////////////////////////////////////////////////////
-    ///// IP:  INITIAL PLACEMENT //////////////////////////////////////////
-    printf("PROC:  BEGIN INITIAL PLACEMENT (IP)\n");
-    time_start(&time_ip);
-    initialPlacement_main();
-    time_end(&time_ip);
-    printf("PROC:  END INITIAL PLACEMENT (IP)\n\n\n");
-    fflush(stdout);
-    ///////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////////////////
-    ///// Setup before Placement Optimization  ////////////////////////////
-    setup_before_opt();
-    ///////////////////////////////////////////////////////////////////////
-
-    if(trialRunCMD == true) {
-        isTrial = true;
+    // Normal cases
+    if( !isSkipPlacement ) {
         ///////////////////////////////////////////////////////////////////////
-        ///// PP:  Pre-Placement (Trial Run to Catch Parameters) //////////////
-        time_start(&time_tp);
-        trial_main();
-        time_end(&time_tp);
-        ///////////////////////////////////////////////
-        free_trial_mallocs();
-        ParseInput();
+        ///// IP:  INITIAL PLACEMENT //////////////////////////////////////////
+        printf("PROC:  BEGIN INITIAL PLACEMENT (IP)\n");
+        time_start(&time_ip);
         build_data_struct();
-        net_update_init();
-        init_tier();
         initialPlacement_main();
+        time_end(&time_ip);
+        printf("PROC:  END INITIAL PLACEMENT (IP)\n\n\n");
+        fflush(stdout);
+        ///////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////
+        ///// Setup before Placement Optimization  ////////////////////////////
         setup_before_opt();
         ///////////////////////////////////////////////////////////////////////
-        isTrial = false;
-    }
 
-    time_start(&time_mGP);
-    if(numLayer > 1 && placementMacroCNT > 0) {
-        ///////////////////////////////////////////////////////////////////////
-        ///// mGP3D:  MIXED_SIZE_3D_GLOBAL_PLACE //////////////////////////////
-        printf("PROC:  BEGIN GLOBAL 3D PLACEMENT\n");
-        printf("PROC:  Mixed-Size 3D Global Placement (mGP3D)\n");
-        time_start(&time_mGP3D);
-        mGP3DglobalPlacement_main();
-        time_end(&time_mGP3D);
-        printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP3D);
-        printf("PROC:  END GLOBAL 3D PLACEMENT\n\n\n");
-        ///////////////////////////////////////////////////////////////////////
-    }
+        if(trialRunCMD == true) {
+            isTrial = true;
+            ///////////////////////////////////////////////////////////////////////
+            ///// PP:  Pre-Placement (Trial Run to Catch Parameters) //////////////
+            time_start(&time_tp);
+            trial_main();
+            time_end(&time_tp);
+            ///////////////////////////////////////////////
+            free_trial_mallocs();
+            ParseInput();
+            build_data_struct();
+            net_update_init();
+            init_tier();
+            initialPlacement_main();
+            setup_before_opt();
+            ///////////////////////////////////////////////////////////////////////
+            isTrial = false;
+        }
 
-    if(placementMacroCNT > 0) {
-        ///////////////////////////////////////////////////////////////////////
-        ///// mGP2D:  MIXED_SIZE_2D_GLOBAL_PLACE //////////////////////////////
-        printf("PROC:  BEGIN GLOBAL 2D PLACEMENT IN EACH TIER\n");
-        printf("PROC:  Mixed-Size 2D Global Placement (mGP2D)\n");
-        time_start(&time_mGP2D);
-        mGP2DglobalPlacement_main();
-        time_end(&time_mGP2D);
-        printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP2D);
-        printf("PROC:  END GLOBAL 2D PLACEMENT (mGP2D)\n\n\n");
-        ///////////////////////////////////////////////////////////////////////
-    }
-    time_end(&time_mGP);
+        time_start(&time_mGP);
+        if(numLayer > 1 && placementMacroCNT > 0) {
+            ///////////////////////////////////////////////////////////////////////
+            ///// mGP3D:  MIXED_SIZE_3D_GLOBAL_PLACE //////////////////////////////
+            printf("PROC:  BEGIN GLOBAL 3D PLACEMENT\n");
+            printf("PROC:  Mixed-Size 3D Global Placement (mGP3D)\n");
+            time_start(&time_mGP3D);
+            mGP3DglobalPlacement_main();
+            time_end(&time_mGP3D);
+            printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP3D);
+            printf("PROC:  END GLOBAL 3D PLACEMENT\n\n\n");
+            ///////////////////////////////////////////////////////////////////////
+        }
 
-    if(placementMacroCNT > 0 /*&& INPUT_FLG != ISPD*/) {
-        ///////////////////////////////////////////////////////////////////////
-        ///// mLG:  MACRO_LEGALIZATION ////////////////////////////////////////
-        printf("PROC:  BEGIN MACRO LEGALIZATION IN EACH TIER\n");
-        printf("PROC:  SA-based Macro Legalization (mLG)\n");
-        time_start(&time_lg);
-        // mgwoo
-        bin_init();
-        macroLegalization_main();
-        time_end(&time_lg);
-        printf("   RUNTIME(s) : %.4f\n\n\n", time_lg);
-        printf("PROC:  END MACRO LEGALIZATION (mLG)\n\n\n");
-        ///////////////////////////////////////////////////////////////////////
-    }
+        if(placementMacroCNT > 0) {
+            ///////////////////////////////////////////////////////////////////////
+            ///// mGP2D:  MIXED_SIZE_2D_GLOBAL_PLACE //////////////////////////////
+            printf("PROC:  BEGIN GLOBAL 2D PLACEMENT IN EACH TIER\n");
+            printf("PROC:  Mixed-Size 2D Global Placement (mGP2D)\n");
+            time_start(&time_mGP2D);
+            mGP2DglobalPlacement_main();
+            time_end(&time_mGP2D);
+            printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP2D);
+            printf("PROC:  END GLOBAL 2D PLACEMENT (mGP2D)\n\n\n");
+            ///////////////////////////////////////////////////////////////////////
+        }
+        time_end(&time_mGP);
 
-    time_start(&time_cGP);
-    if(numLayer > 1) {
-        ///////////////////////////////////////////////////////////////////////
-        ///// cGP3D:  STDCELL_ONLY_3D_GLOBAL_PLACE
-        /////////////////////////////////
-        printf("PROC:  Standard Cell 3D Global Placement (cGP3D)\n");
-        time_start(&time_cGP3D);
-        cGP3DglobalPlacement_main();
-        time_end(&time_cGP3D);
-        printf("   RUNTIME(s) : %.4f\n\n\n", time_cGP3D);
-        printf("PROC:  END GLOBAL 3D PLACEMENT\n\n\n");
-        ///////////////////////////////////////////////////////////////////////
-    }
+        if(placementMacroCNT > 0 /*&& INPUT_FLG != ISPD*/) {
+            ///////////////////////////////////////////////////////////////////////
+            ///// mLG:  MACRO_LEGALIZATION ////////////////////////////////////////
+            printf("PROC:  BEGIN MACRO LEGALIZATION IN EACH TIER\n");
+            printf("PROC:  SA-based Macro Legalization (mLG)\n");
+            time_start(&time_lg);
+            // mgwoo
+            bin_init();
+            macroLegalization_main();
+            time_end(&time_lg);
+            printf("   RUNTIME(s) : %.4f\n\n\n", time_lg);
+            printf("PROC:  END MACRO LEGALIZATION (mLG)\n\n\n");
+            ///////////////////////////////////////////////////////////////////////
+        }
 
-    // if (placementMacroCNT > 0 && INPUT_FLG == ISPD) {
-    //} else {
-    ///////////////////////////////////////////////////////////////////////
-    ///// cGP2D:  STDCELL_ONLY_2D_GLOBAL_PLACE //////////////////////////////
-    printf("PROC:  Standard Cell 2D Global Placement (cGP2D)\n");
-    fflush(stdout);
-    time_start(&time_cGP2D);
-    cGP2DglobalPlacement_main();
-    time_end(&time_cGP2D);
-    time_end(&time_cGP);
-    printf("   RUNTIME(s) : %.4f\n\n\n", time_cGP2D);
-    fflush(stdout);
-    printf("PROC:  END GLOBAL 2D PLACEMENT\n\n");
-    fflush(stdout);
-    ///////////////////////////////////////////////////////////////////////
-    //}
+        time_start(&time_cGP);
+        if(numLayer > 1) {
+            ///////////////////////////////////////////////////////////////////////
+            ///// cGP3D:  STDCELL_ONLY_3D_GLOBAL_PLACE
+            /////////////////////////////////
+            printf("PROC:  Standard Cell 3D Global Placement (cGP3D)\n");
+            time_start(&time_cGP3D);
+            cGP3DglobalPlacement_main();
+            time_end(&time_cGP3D);
+            printf("   RUNTIME(s) : %.4f\n\n\n", time_cGP3D);
+            printf("PROC:  END GLOBAL 3D PLACEMENT\n\n\n");
+            ///////////////////////////////////////////////////////////////////////
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        ///// cGP2D:  STDCELL_ONLY_2D_GLOBAL_PLACE //////////////////////////////
+        printf("PROC:  Standard Cell 2D Global Placement (cGP2D)\n");
+        fflush(stdout);
+        time_start(&time_cGP2D);
+        cGP2DglobalPlacement_main();
+        time_end(&time_cGP2D);
+        time_end(&time_cGP);
+        printf("   RUNTIME(s) : %.4f\n\n\n", time_cGP2D);
+        fflush(stdout);
+        printf("PROC:  END GLOBAL 2D PLACEMENT\n\n");
+        fflush(stdout);
+        ///////////////////////////////////////////////////////////////////////
 
 //    SavePlot( "Final GP Result");
 //    ShowPlot( benchName );   
-     
+    } 
+    else {
+        build_data_struct(false);
+        tier_assign(STDCELLonly);
+        setup_before_opt();
+    }
+
     // Write BookShelf format
     WriteBookshelf();
     printf("PROC:  END WRITE BOOKSHELF\n\n");
     fflush(stdout);
    
-    if( approxiPlotCMD ) { 
+    if( isPlot ) { 
         SavePlotAsJPEG( "Final Global Placement Result", false, 
             string(dir_bnd) 
             + string("/globalPlaceResult") );
@@ -613,6 +570,7 @@ int main(int argc, char *argv[]) {
     if( inputMode == InputMode::lefdef )  {
         WriteDef( defOutput );
     }
+
 
     printf("\n\n");
     printf(
@@ -648,7 +606,7 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
     
 //    SavePlot( "Final Placement Result");
-    if( approxiPlotCMD ) { 
+    if( isPlot ) { 
         SavePlotAsJPEG( "Final Placement Result", false, 
                 string(dir_bnd) 
                 + string("/finalResult") );
@@ -686,7 +644,7 @@ void init() {
     // sprintf (global_router, "NCTUgr2_fast");
     // sprintf (global_router, "NCTUgr2");
 
-    switch(detailPlacer) {
+    switch(dpMode) {
         case FastPlace:
 #ifdef SA_LG
             sprintf(str_lg, "%s", "_eplace_lg");
@@ -1040,7 +998,7 @@ void WriteBookshelf() {
         // call Write Bookshelf function by its tier
         WriteBookshelfWithTier(i, 
             (placementMacroCNT == 0)? STDCELLonly : MIXED,
-            (detailPlacer == NTUplace3 || shapeMap.size() == 0)? false : true );
+            (dpMode == NTUplace3 || shapeMap.size() == 0)? false : true );
     }
 }
 

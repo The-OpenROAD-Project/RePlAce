@@ -356,6 +356,7 @@ struct PIN {
 extern vector< vector<string> > mPinName;
 extern vector< vector<string> > tPinName;
 
+
 // *.nodes -> not isTerminal
 // Module Instance
 struct MODULE {
@@ -613,13 +614,6 @@ struct NET {
     PIN **pin2;
     FPOS terminalMin;
     FPOS terminalMax;
-    // prec term_min_x;
-    // prec term_min_y;
-    // prec term_min_z;
-
-    // prec term_max_x;
-    // prec term_max_y;
-    // prec term_max_z;
 
     prec hpwl_x;
     prec hpwl_y;
@@ -687,7 +681,6 @@ struct TIER {
     prec filler_area;
     prec pl_area;
     prec ws_area;
-//    prec modu_den;
     prec bin_area;
     prec tot_bin_area;
     prec inv_bin_area;
@@ -720,10 +713,6 @@ struct TIER {
 
 enum { STDCELLonly, MIXED };
 
-//extern int *modu_map;
-//extern int *term_map;
-//extern int modu_map_cnt;
-//extern int term_map_cnt;
 extern int pinCNT;
 extern int moduleCNT;
 extern int gcell_cnt;
@@ -734,10 +723,6 @@ extern int netCNT;
 extern int numNonRectangularNodes;
 extern int totalShapeCount;
 
-//extern int x_sa_cnt;
-//extern int y_sa_cnt;
-//extern int max_obx;
-//extern int max_oby;
 extern int g_rrr;
 extern int STAGE;
 
@@ -757,18 +742,21 @@ enum {
 };
 
 // these variable is required to have detailPlacer settings
-extern int detailPlacer;
+extern int dpMode;
 enum { None, FastPlace, NTUplace3, NTUplace4h };
-extern string detailPlacerLocationCMD;
-extern string detailPlacerFlagCMD;
+extern string dpLocation;
+extern string dpFlag;
+
+extern bool isOnlyLGinDP;
+extern bool isSkipPlacement;
+extern bool hasDensityDP ;
+extern prec densityDP ;
+
 
 extern int placementStdcellCNT;
 extern int gfiller_cnt;
 extern int placementMacroCNT;
-//extern int gfft_flg;
 enum { CDFT, RDFT, DDCT };
-//extern int SCALING;
-//extern int ROW_Y0;
 extern int msh_yz;
 extern int INPUT_FLG;
 enum { ISPD05, ISPD06, ISPD06m, ISPD, MMS, SB, ETC, IBM };
@@ -812,8 +800,6 @@ extern int cGP3D_iterCNT;
 extern int cGP2D_iterCNT;
 
 // routability
-//extern prec h_pitch;
-//extern prec v_pitch;
 extern prec row_height;   // lutong
 extern prec gcell_x_cof;  // lutong
 extern prec gcell_y_cof;  // lutong
@@ -839,7 +825,6 @@ extern prec adjust_ratio;
 extern bool is_inflation_h;
 extern bool flg_noroute;
 
-//extern prec gtsv_cof;
 extern prec ALPHAmGP;
 extern prec ALPHAcGP;
 extern prec ALPHA;
@@ -849,12 +834,9 @@ extern prec BETA;
 
 extern prec dampParam;
 extern prec global_ovfl;  ////////////
-// extern  prec            initialALPHA;
-// extern  prec            initialBETA;
 extern prec maxALPHA;
 extern prec ExtraWSfor3D;
 extern prec MaxExtraWSfor3D;
-//extern prec aspectRatio;
 extern prec rowHeight;
 extern prec SITE_SPA;
 extern prec layout_area;
@@ -946,9 +928,6 @@ extern char fn_bch_mac_LG[BUF_SZ];
 extern char fn_bch_DP[BUF_SZ];
 extern char bench_aux[BUF_SZ];
 extern char dir_bnd[BUF_SZ];
-//extern char FastDP_cmd[1023];
-//extern char NTUplace3_cmd[1023];
-//extern char NTUplace4h_cmd[1023];
 extern char global_router[1023];
 extern char output_dir[BUF_SZ];
 extern char currentDir[BUF_SZ];
@@ -1027,13 +1006,6 @@ extern POS dim_bin_cGP2D;
 extern FPOS grow_pmin;
 extern FPOS grow_pmax;
 
-// below is only for IO.cpp
-// extern  FPOS    terminal_pmin;
-// extern  FPOS    terminal_pmax;
-// extern  FPOS    terminal_size_max;
-// extern  FPOS    module_size_max;
-// extern  POS     max_mac_dim;
-
 ///////////////////////////////////////////////////////////////////////////
 /*  ARGUMENTS: main.cpp                                                  */
 ///////////////////////////////////////////////////////////////////////////
@@ -1051,37 +1023,21 @@ enum class InputMode { bookshelf, lefdef };
 extern InputMode inputMode;
 
 extern string denCMD;
-//extern string dimCMD;
 extern string bxMaxCMD;
 extern string byMaxCMD;
 extern string bzMaxCMD;
-//extern string numLayerCMD;
-//extern string gTSVcofCMD;
-//extern string ALPHAmGP_CMD;
-//extern string ALPHAcGP_CMD;
-//extern string BETAmGP_CMD;
-//extern string BETAcGP_CMD;
-//extern string dampParam_CMD;
-//extern string aspectRatioCMD;
 extern string overflowMinCMD;
 extern string pcofmaxCMD;
 extern string pcofminCMD;
-//extern string stnweightCMD;    // lutong
 extern string racntiCMD;       // lutong
-//extern string racntoCMD;       // lutong
-//extern string hpitchCMD;       // lutong
-//extern string vpitchCMD;       // lutong
 extern string maxinflCMD;      // lutong
 extern string inflcoefCMD;     // lutong
-//extern string edgeadjcoefCMD;  // lutong
-//extern string pincntcoefCMD;   // lutong
-//extern string routepath_maxdistCMD;
-//extern string gRoute_pitch_scalCMD;
 extern string filleriterCMD;
 extern string refdWLCMD;
 extern int conges_eval_methodCMD;  // grouter | prob
+
+extern bool isPlot;
 extern bool plotCellCMD;
-extern bool approxiPlotCMD;
 extern bool plotMacroCMD;
 extern bool plotDensityCMD;
 extern bool plotFieldCMD;
@@ -1095,7 +1051,6 @@ extern bool isARbyUserCMD;
 extern bool stnCMD;  // lutong
 extern bool trialRunCMD;
 extern bool autoEvalRC_CMD;
-extern bool onlyLG_CMD;
 
 //////////////////////////////////////////////////////////////////////////
 // Defined in main.cpp ///////////////////////////////////////////////////

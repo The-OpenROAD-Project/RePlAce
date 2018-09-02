@@ -28,7 +28,7 @@ isValgrind = False
 isNohup = False
 isCentos = False
 useScreen = False 
-isAplot = False 
+isPlot = False 
 
 ## configure done 
 #####################################
@@ -77,7 +77,7 @@ curTime = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
 
 placeModeStr = "-onlyGP" if isOnlyGP else "-dpflag %s -dploc %s" % (dpflag, dploc)
 directStr = ">" if isNohup else "|& tee" if isCentos else "| tee"
-aplotStr = "-aplot" if isAplot else ""
+plotStr = "-plot" if isPlot else ""
 
 valgrindStr = "valgrind --log-fd=1" if isValgrind else ""
 nohupFrontStr = "nohup" if isNohup else "" 
@@ -107,13 +107,13 @@ if type(benchName) is list:
             ExecuteCommand( exeFormat % (curBench, nohupFrontStr, valgrindStr, \
                     binaryName, bmflag, \
                     dirpos, curBench, AuxName, \
-                    outpos, numThread, placeModeStr, aplotStr, \
+                    outpos, numThread, placeModeStr, plotStr, \
                     directStr, logpos, fileName, curTime, nohupEndStr ) )
         else:
             ExecuteCommand( exeFormat % (nohupFrontStr, valgrindStr, \
                     binaryName, bmflag, \
                     dirpos, curBench, AuxName, \
-                    outpos, numThread, placeModeStr, aplotStr, \
+                    outpos, numThread, placeModeStr, plotStr, \
                     directStr, logpos, fileName, curTime, nohupEndStr ) )
 
 
@@ -126,12 +126,12 @@ else:
         ExecuteCommand( exeFormat % (benchName, nohupFrontStr, valgrindStr, \
                 binaryName, bmflag, \
                 dirpos, benchName, AuxName, \
-                outpos, numThread, placeModeStr, aplotStr, \
+                outpos, numThread, placeModeStr, plotStr, \
                 directStr, logpos, fileName , curTime, nohupEndStr ) )
     else:
         ExecuteCommand( exeFormat % (nohupFrontStr, valgrindStr, \
                 binaryName, bmflag, \
                 dirpos, benchName, AuxName, \
-                outpos, numThread, placeModeStr, aplotStr, \
+                outpos, numThread, placeModeStr, plotStr, \
                 directStr, logpos, fileName , curTime, nohupEndStr ) )
 
