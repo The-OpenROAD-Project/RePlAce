@@ -151,7 +151,7 @@ void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
     if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
         sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -util %.2lf -noglobal \n",
                 dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl,
-                target_cell_den);
+                ((hasDensityDP)? densityDP : target_cell_den));
     }
     else {
         sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
