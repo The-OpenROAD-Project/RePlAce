@@ -935,7 +935,7 @@ FPOS GetOffset( Circuit::Circuit& __ckt,
                 continue;
             }
             
-            // calculate BBox
+            // calculate BBox when rect type
             if( isFirstMetal && curGeom->itemType(j) == lefiGeomRectE ) {
                 lefiGeomRect* rect = curGeom->getRect(j);
                 // generate BBox
@@ -943,6 +943,17 @@ FPOS GetOffset( Circuit::Circuit& __ckt,
                 ly = (ly > rect->yl)? rect->yl : ly;
                 ux = (ux < rect->xh)? rect->xh : ux;
                 uy = (uy < rect->yh)? rect->yh : uy;
+            }
+            // calculate BBox when polygon type
+            else if( isFirstMetal && curGeom->itemType(j) == lefiGeomPolygonE ) {
+                lefiGeomPolygon* polygon = curGeom->getPolygon(j);
+                // generate BBox
+                for( int k=0; k < polygon->numPoints; k++ ) {
+                    lx = (lx > polygon->x[k])? polygon->x[k] : lx;
+                    ly = (ly > polygon->y[k])? polygon->y[k] : ly;
+                    ux = (ux < polygon->x[k])? polygon->x[k] : ux;
+                    uy = (uy < polygon->y[k])? polygon->y[k] : uy;
+                }
             }
             // now, meets another Layer
             else if( isFirstMetal && curGeom->itemType(j) == lefiGeomLayerE ) {

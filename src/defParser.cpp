@@ -4356,10 +4356,11 @@ void Circuit::Circuit::DumpDefNet() {
         }
 
         if (curNet.numProps()) {
+            CIRCUIT_FPRINTF(fout, "\n  + PROPERTY ");
             for (i = 0; i < curNet.numProps(); i++) {
-                CIRCUIT_FPRINTF(fout, "  + PROPERTY %s ", curNet.propName(i));
+                CIRCUIT_FPRINTF(fout, "%s ", curNet.propName(i));
                 switch (curNet.propType(i)) {
-                    case 'R': CIRCUIT_FPRINTF(fout, "%g REAL ", curNet.propNumber(i));
+                    case 'R': CIRCUIT_FPRINTF(fout, "%.6f ", curNet.propNumber(i));
                               break;
                     case 'I': CIRCUIT_FPRINTF(fout, "%g INTEGER ", curNet.propNumber(i));
                               break;
@@ -4370,20 +4371,20 @@ void Circuit::Circuit::DumpDefNet() {
                     case 'N': CIRCUIT_FPRINTF(fout, "%g NUMBER ", curNet.propNumber(i));
                               break;
                 }
-                CIRCUIT_FPRINTF(fout, "\n");
             }
+            CIRCUIT_FPRINTF(fout, "\n");
         }
 
         if (curNet.hasWeight())
             CIRCUIT_FPRINTF(fout, "+ WEIGHT %d ", curNet.weight());
         if (curNet.hasCap())
-            CIRCUIT_FPRINTF(fout, "+ ESTCAP %g ", curNet.cap());
+            CIRCUIT_FPRINTF(fout, "+ ESTCAP %.6f ", curNet.cap());
         if (curNet.hasSource())
             CIRCUIT_FPRINTF(fout, "+ SOURCE %s ", curNet.source());
         if (curNet.hasFixedbump())
             CIRCUIT_FPRINTF(fout, "+ FIXEDBUMP ");
         if (curNet.hasFrequency())
-            CIRCUIT_FPRINTF(fout, "+ FREQUENCY %g ", curNet.frequency());
+            CIRCUIT_FPRINTF(fout, "+ FREQUENCY %.6f ", curNet.frequency());
         if (curNet.hasPattern())
             CIRCUIT_FPRINTF(fout, "+ PATTERN %s ", curNet.pattern());
         if (curNet.hasOriginal())
