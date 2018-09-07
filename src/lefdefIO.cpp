@@ -195,6 +195,10 @@ void SetParameter() {
     }
     cout << "INFO:  LEF UNIT: " << l2d << endl;
 
+    if( __ckt.lefLayerStor.size() == 0) {
+        cout << "\n** ERROR : LAYER statements not exists in lef file!" << endl;
+        exit(1);
+    }
     // Metal1 Name extract 
     for(auto& curLayer : __ckt.lefLayerStor) {
         if(!curLayer.hasType()) {
