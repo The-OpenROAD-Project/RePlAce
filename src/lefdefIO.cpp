@@ -184,14 +184,9 @@ inline static bool IsPrecEqual(prec a, prec b) {
 //
 void SetParameter() {
     // lef 2 def unit info setting
+    l2d = __ckt.defUnit;
     if( __ckt.lefUnit.hasDatabase() ) {
-        l2d = __ckt.lefUnit.databaseNumber();
-    }
-    else {
-        cout << "\n** WARNING : LEF unit Info is missing..! (UNITS/DATABASE), "
-             << "so use the unit in the DEF file instead. (" 
-             << __ckt.defUnit << ")" << endl;
-        l2d = __ckt.defUnit;
+        cout << "\n** WARNING : LEF unit Info is missing..! (UNITS/DATABASE)" << endl; 
     }
     cout << "INFO:  LEF UNIT: " << l2d << endl;
 
