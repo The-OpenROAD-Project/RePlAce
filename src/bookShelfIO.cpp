@@ -3255,7 +3255,8 @@ void WriteNodes( char* dir_tier, int curLayer, int lab, int pin_term_cnt, bool i
 }
 
 // *.nets writing
-void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt, bool isShapeDrawing) {
+void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt,
+        vector<int>& netChk, bool isShapeDrawing) {
     
     char fn_nets[BUF_SZ] = {0, };
     sprintf(fn_nets, "%s/%s.nets", dir_tier, gbch);
@@ -3281,8 +3282,9 @@ void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt, bool isSh
 
         total_pinCNTinObject2 += net->pinCNTinObject2;
 
-        if(net->tier != curLayer)
+        if( netChk[i] != 1 ){
             continue;
+        }
 
         fprintf(fp_nets, "NetDegree : %d   %s\n", net->pinCNTinObject_tier,
                 net->name);
@@ -3458,18 +3460,25 @@ void WriteScl( char* dir_tier, int curLayer ) {
     fprintf(fp_scl, "NumRows :  \t%d\n", tier->row_cnt + tier->row_term_cnt);
     fputs("\n", fp_scl);
 
-    for(int i = 0; i < tier->row_cnt; i++) {
-        ROW* row = &(tier->row_st[i]);
-
+    // sort the Y-Order due to limit of DP
+    vector<ROW> tmpRowStor;
+    for(int i=0; i<tier->row_cnt; i++) {
+        tmpRowStor.push_back(row_st[i]);
+    }
+    sort( tmpRowStor.begin(), tmpRowStor.end(), [](ROW& lhs, ROW& rhs) {
+            return (lhs.pmin.y < rhs.pmin.y);});
+    
+    // iterate based on the sorted order
+    for(auto& curRow : tmpRowStor){ 
         fprintf(fp_scl, "CoreRow Horizontal\n");
-        fprintf(fp_scl, "  Coordinate    :   %d\n", row->pmin.y);
+        fprintf(fp_scl, "  Coordinate    :   %d\n", curRow.pmin.y);
         fprintf(fp_scl, "  Height        :   %d\n", (int)(rowHeight+0.5f));
-        fprintf(fp_scl, "  Sitewidth     :    %d\n", row->site_wid);
-        fprintf(fp_scl, "  Sitespacing   :    %d\n", row->site_spa);
-        fprintf(fp_scl, "  Siteorient    :    %s\n", (row->isYSymmetry)? "Y" : "1");
-        fprintf(fp_scl, "  Sitesymmetry  :    %s\n", row->ori.c_str());
+        fprintf(fp_scl, "  Sitewidth     :    %d\n", curRow.site_wid);
+        fprintf(fp_scl, "  Sitespacing   :    %d\n", curRow.site_spa);
+        fprintf(fp_scl, "  Siteorient    :    %s\n", (curRow.isYSymmetry)? "Y" : "1");
+        fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
         fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n",
-                row->pmin.x, row->x_cnt);
+                curRow.pmin.x, curRow.x_cnt);
         fprintf(fp_scl, "End\n");
     }
 
@@ -3499,9 +3508,7 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
     int net_cnt = 0;
 
     // to calculate net_cnt
-    for(int i=0; i<netCNT; i++) {
-        netInstance[i].tier = -1;
-    }
+    vector<int> netChk( netCNT, -1);
 
     for(int i = 0; i < pinCNT; i++) {
         pin = &pinInstance[i];
@@ -3511,9 +3518,8 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
             pin_term_cnt++;
         }
         else if(pin->tier == z) {
-            net = &netInstance[pin->netID];
-            if(net->tier < z) {
-                net->tier = z;
+            if(netChk[pin->netID] == -1) {
+                netChk[pin->netID] = 1;
                 net_cnt++;
             }
         }
@@ -3528,8 +3534,9 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
         net = &netInstance[i];
         net->pinCNTinObject_tier = 0;
 
-        if(net->tier != z)
+        if( netChk[i] != 1 ) {
             continue;
+        }
 
         for(int j = 0; j < net->pinCNTinObject2; j++) {
             pin = net->pin[j];
@@ -3548,7 +3555,7 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
 //    cout << "shape finish" << endl;
     WriteNodes( dir_tier, z, lab, pin_term_cnt, isShapeDrawing );
 //    cout << "nodes finish" << endl;
-    WriteNet( dir_tier, z, pin_cnt, net_cnt, isShapeDrawing );
+    WriteNet( dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing );
 //    cout << "net finish" << endl;
     WritePl( dir_tier, z, lab, isShapeDrawing );
 //    cout << "pl finish" << endl;

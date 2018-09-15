@@ -579,7 +579,7 @@ int myNesterov::DoNesterovOptimization() {
 #pragma omp parallel \
             default(none) \
             private(j) \
-            shared( x_st, start_idx, end_idx, gcell_st, cof, x0_st, y0_st )
+            shared( gcell_st )
             {
                 FPOS u, v;
                 FPOS half_desize;

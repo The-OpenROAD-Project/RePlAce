@@ -148,10 +148,16 @@ void call_FastDP_tier(char *tier_dir, char *tier_aux, char *tier_pl) {
 void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
     char cmd[BUF_SZ] = {0, };
 
-    if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
+//    if(INPUT_FLG == ISPD || INPUT_FLG == MMS) {
+    if(hasDensityDP ||
+            INPUT_FLG == ISPD || INPUT_FLG == MMS ) {
         sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -util %.2lf -noglobal \n",
                 dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl,
                 ((hasDensityDP)? densityDP : target_cell_den));
+    }
+    else if( isOnlyLGinDP ){
+        sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal -nodetail\n",
+                dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
     }
     else {
         sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",

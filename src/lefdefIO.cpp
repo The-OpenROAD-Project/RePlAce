@@ -188,7 +188,7 @@ void SetParameter() {
     if( __ckt.lefUnit.hasDatabase() ) {
         cout << "\n** WARNING : LEF unit Info is missing..! (UNITS/DATABASE)" << endl; 
     }
-    cout << "INFO:  LEF UNIT: " << l2d << endl;
+    cout << "INFO:  DEF SCALE UNIT: " << l2d << endl;
 
     if( __ckt.lefLayerStor.size() == 0) {
         cout << "\n** ERROR : LAYER statements not exists in lef file!" << endl;
@@ -992,6 +992,9 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
     // memory reserve
     netInstance = (NET*) mkl_malloc( sizeof(NET)* netCNT, 64 );
     pinInstance = (PIN*) mkl_malloc( sizeof(PIN)* pinCNT, 64 );
+    for(int i=0; i<pinCNT; i++) {
+        new (&pinInstance[i]) PIN;
+    }
 
     TERM* curTerm = NULL;
     MODULE* curModule = NULL;
@@ -1007,11 +1010,7 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
     mPinName.resize(moduleCNT);
 
     for(auto& net : __ckt.defNetStor) {
-        // skip for Power/Ground/Reset Nets
-        if( net.hasUse() ) {
-            continue;
-        }
-
+        
         if( strcmp (net.name(), "iccad_clk") == 0 ||
                 strcmp( net.name(), "clk") == 0 ||
                 strcmp( net.name(), "clock") == 0 ) {
@@ -1021,6 +1020,11 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
                  << " (defNetStor)" << endl; 
 
             clockNetsDef.push_back( &net - &__ckt.defNetStor[0]);
+            continue;
+        }
+        
+        // skip for Power/Ground/Reset Nets
+        if( net.hasUse() ) {
             continue;
         }
 

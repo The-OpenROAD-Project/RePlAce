@@ -349,6 +349,7 @@ struct PIN {
     int Y_MIN;
     int X_MAX;
     int Y_MAX;
+    PIN() { fp.SetZero(); e1.SetZero(); e2.SetZero(); flg1.SetZero(); flg2.SetZero();}
 };
 
 // for saving pinName
