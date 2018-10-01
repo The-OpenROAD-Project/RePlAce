@@ -50,7 +50,7 @@ clean:
 	@for i in $(BUILD_ORDER) ;do \
 		echo $(MAKE) $@ in $$i ; \
 		cd $$i ; \
-		CXXFLAGS="-g -ggdb -O3" CFLAGS="-g -ggdb -O3" $(MAKE) -j8 $(MFLAGS) $@ || exit ; \
+		CXXFLAGS="-g -ggdb -O3" CFLAGS="-g -ggdb -O3" $(MAKE) $(MFLAGS) $@ || exit ; \
 		cd .. ; \
 	done
 
