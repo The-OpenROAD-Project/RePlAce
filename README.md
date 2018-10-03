@@ -25,7 +25,7 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
     
 ### How To Execute
     // download lefdef benchmarks
-    $ cd ~/RePlAce/becnh/lefdef
+    $ cd ~/RePlAce/bench/lefdef
     $ ./download_ispd18.sh
     
     // download bookshelf benchmarks
