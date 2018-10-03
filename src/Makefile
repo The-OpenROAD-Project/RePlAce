@@ -12,7 +12,7 @@ INCLUDE = 	-I$(CURDIR) -I$(MKLROOT)/include -I$(IPPROOT)/include \
 IMATH 	= 	-I$(MKLROOT)/include -I$(IPPROOT)/include
 
 CFLAG   =   -std=c11   $(OPTFLAG)  
-CPPFLAG =   -std=c++14 $(OPTFLAG)
+CPPFLAG =   -std=c++1y $(OPTFLAG)
 
 #Get Only the Internal Structure of SRCDIR Recursively
 SRCDIR	= 	$(CURDIR)
@@ -41,11 +41,11 @@ LEFLIB         	= -L$(LEFROOT)/lib -llef -llefzlib -lclef -lclefzlib
 VERILOGLIB 		= -L$(VERILOGROOT)/lib -lverilog_parser 
 
 ifndef	MKLROOT
-    MKLROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/mkl
+    MKLROOT		=	/home/tool/intel/compilers_and_libraries_2016.3.210/linux/mkl
 endif
 
 ifndef	IPPROOT
-    IPPROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/ipp
+    IPPROOT		=	/home/tool/intel/compilers_and_libraries_2016.3.210/linux/ipp
 endif
 
 HASHROOT 		= ../module/sparsehash/install-sp/include

@@ -47,7 +47,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-// #include        <ncurses.h>
 
 #include "bookShelfIO.h"
 #include "bin.h"

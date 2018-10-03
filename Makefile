@@ -7,7 +7,12 @@ all: prep hash
 	$(MAKE) -C $(REPLACEDIR);
 
 hash:
-	cd $(HASHDIR) && mkdir -p install-sp && ./configure --prefix=$(CURDIR)/$(HASHDIR)/install-sp && $(MAKE) && $(MAKE) install;
+	echo $(MAKEFLAGS)
+	cd $(HASHDIR); \
+	mkdir -p install-sp; \
+	./configure --prefix=$(CURDIR)/$(HASHDIR)/install-sp; \
+	$(MAKE); \
+	$(MAKE) install;
 
 prep: 
 	for dir in $(SUBDIR); do \
@@ -16,7 +21,7 @@ prep:
 
 clean:
 	for dir in $(SUBDIR); do \
-		$(MAKE) -C $$dir clean; \
+		$(MAKE) -C $$dir clean > /dev/null 2>&1; \
 	done;
-	cd $(HASHDIR) && $(MAKE) distclean && rm -rf install-sp;
-	$(MAKE) -C $(REPLACEDIR) clean;
+	cd $(HASHDIR) && $(MAKE) distclean && rm -rf install-sp > /dev/null 2>&1; true 
+	cd $(REPLACEDIR) && $(MAKE) clean;

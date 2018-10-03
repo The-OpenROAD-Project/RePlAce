@@ -6,7 +6,11 @@
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |
 
 ### Pre-requisite
-* Intel MKL and IPP package
+* Intel MKL and IPP package [Link](https://software.intel.com/en-us/articles/free-ipsxe-tools-and-libraries) >= 2016.3.210
+* GCC compiler and libstdc++ static library >= 5.4.0
+* boost library >= 1.53
+* X11 library (for CImg library to visualize) >= 1.6.5
+* Recommended OS: Centos7 or Ubuntu 16.04
 
 ### How To Compile
     $ git clone --recursive https://github.com/abk-openroad/RePlAce.git
@@ -15,6 +19,8 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 
     $ cd ~/RePlAce
     $ make clean
+    $ ./prerequisite/install_centos7.sh   // for centos 7
+    $ ./prerequisite/install_ubuntu16.sh  // for ubuntu 16
     $ make 
     
 ### How To Execute
