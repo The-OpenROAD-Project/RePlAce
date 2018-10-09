@@ -56,17 +56,14 @@ DEF_COPY_CONSTRUCTOR_C( defiPoints )
   y(0)
 {
     DEF_COPY_FUNC( numPoints );
-    DEF_MALLOC_FUNC( x, int, sizeof(int) * 1 );
-    DEF_MALLOC_FUNC( y, int, sizeof(int) * 1 );
+    DEF_MALLOC_FUNC( x, int, sizeof(int) * numPoints );
+    DEF_MALLOC_FUNC( y, int, sizeof(int) * numPoints );
 }
 
 DEF_ASSIGN_OPERATOR_C( defiPoints ) {
-//    numPoints = 0;
-//    x = NULL;
-//    y = NULL;
     DEF_COPY_FUNC( numPoints );
-    DEF_MALLOC_FUNC( x, int, sizeof(int) * 1 );
-    DEF_MALLOC_FUNC( y, int, sizeof(int) * 1 );
+    DEF_MALLOC_FUNC( x, int, sizeof(int) * numPoints );
+    DEF_MALLOC_FUNC( y, int, sizeof(int) * numPoints );
 }
 
 

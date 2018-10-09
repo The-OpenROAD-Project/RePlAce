@@ -151,11 +151,11 @@ static vector<string> clockNetsVerilog;
 
 // from main.cpp
 void ParseInput() {
-    if( auxCMD == "" && lefCMD != "" && defCMD != "" ) {
+    if( auxCMD == "" && lefStor.size() != 0 && defCMD != "" ) {
         inputMode = InputMode::lefdef; 
         ParseLefDef();
     }
-    else if( auxCMD != "" && lefCMD == "" && defCMD == "") {
+    else if( auxCMD != "" && lefStor.size() == 0 && defCMD == "") {
         inputMode = InputMode::bookshelf; 
         ParseBookShelf();
     }
@@ -270,9 +270,9 @@ void ParseLefDef() {
     
     // for input parse only
     // 
-    // Circuit::Circuit __ckt(lefCMD, defCMD, "");
+    // Circuit::Circuit __ckt(lefStor, defCMD, "");
     //
-    __ckt.Init(lefCMD, defCMD);
+    __ckt.Init(lefStor, defCMD);
 
     SetParameter(); 
 
@@ -1553,11 +1553,11 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 // ReadBookshelf -- nodesMap -- bookshelfIO.cpp
 //
 void ReadPl(const char* fileName) {
-    if( auxCMD == "" && lefCMD != "" && defCMD != "" ) {
+    if( auxCMD == "" && lefStor.size() != 0 && defCMD != "" ) {
         // it references moduleTermMap 
         ReadPlLefDef(fileName);
     }
-    else if( auxCMD != "" && lefCMD == "" && defCMD == "") {
+    else if( auxCMD != "" && lefStor.size() == 0 && defCMD == "") {
         // it references nodesMap
         ReadPlBookshelf(fileName);
     }

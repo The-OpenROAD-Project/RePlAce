@@ -72,7 +72,6 @@ void initArgument(int argc, char *argv[]) {
     filleriterCMD = "0";
 
     auxCMD = "";
-    lefCMD = "";
     defCMD = "";
     verilogCMD = "";
     outputCMD = "";
@@ -212,7 +211,7 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-lef")) {
             i++;
             if(argv[i][0] != '-') {
-                lefCMD = argv[i];
+                lefStor.push_back( string(argv[i]) );
             }
             else {
                 printf("\n**ERROR: Option %s requires *.lef.\n",
@@ -813,14 +812,14 @@ bool criticalArgumentError() {
     }
 
     // mgwoo
-    if( auxCMD == "" && lefCMD == "" && defCMD == "" ) {
+    if( auxCMD == "" && lefStor.size() == 0 && defCMD == "" ) {
         printf("\n** ERROR: lef/def pair or aux files are needed, use (-lef/-def) or (-aux) options.\n");
         printUsage();
         return true;
     }
     
     // mgwoo
-    if( auxCMD == "" && !(lefCMD != "" && defCMD != "" ) ) {
+    if( auxCMD == "" && !(lefStor.size() != 0 && defCMD != "" ) ) {
         printf("\n** ERROR: Both of lef/def files are needed.\n");
         printUsage();
         return true;

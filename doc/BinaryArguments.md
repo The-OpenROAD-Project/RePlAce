@@ -1,15 +1,15 @@
 # Usage
 ## Bookshelf    
-    $ ./RePlACE -bmflag <mms/ispd/sb/ibm/etc> -aux <*.aux> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
+    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -aux <*.aux> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
     
 * __-bmflag__ : Specify which Benchmark is used
 * __-aux__ : \*.aux Location
 
 ## Lef/Def/Verilog
-    $ ./RePlACE -bmflag <mms/ispd/sb/ibm/etc> -lef <*.lef> -def <*.def> [-v <*.v>] -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
+    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> [-v <*.v>] -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
 
 * __-bmflag__ : Specify which Benchmark is used
-* __-lef__ : \*.lef Location
+* __-lef__ : \*.lef Location (Multiple lef files supported.)
 * __-def__ : \*.def Location
 * __-v__ : \*.v Location (Optional)
 
@@ -39,4 +39,4 @@
 * __-R__          : Enable Routability flow (currently only supports DAC-2012 and ICCAD-2012 benchmark suites)
 
 ### Other
-* __-unitY__      : Custom scaledown param for LEF/DEF/Verilog (especially for ASAP N7 library)
+* __-unitY__      : Custom scaledown param for LEF/DEF/Verilog (especially for ASAP N7 library; Recommended: 864)

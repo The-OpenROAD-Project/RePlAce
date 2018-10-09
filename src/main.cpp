@@ -301,10 +301,10 @@ int numLayer;
 prec aspectRatio;
 string bmFlagCMD;
 string auxCMD;   // mgwoo
-string lefCMD;   // mgwoo
 string defCMD;   // mgwoo
 string verilogCMD; // mgwoo
 string outputCMD;  // mgwoo
+vector<string> lefStor;   // mgwoo
 
 int numThread;
 InputMode inputMode;

@@ -106,7 +106,7 @@ class Circuit {
         // LEF/DEF is essential, 
         // but verilog is optional
         //
-        Circuit(string lefFilename, 
+        Circuit(vector<string>& lefStor, 
                 string defFilename, string verilogFilename = "" )
         : lefManufacturingGrid(DBL_MIN) {
             lefMacroMap.set_empty_key(INIT_STR);
@@ -118,12 +118,12 @@ class Circuit {
             defPinMap.set_empty_key(INIT_STR);
             defRowY2OrientMap.set_empty_key(INT_MAX);
 
-            Init( lefFilename, defFilename, verilogFilename );
+            Init( lefStor, defFilename, verilogFilename );
         }
 
-        void Init( string lefFilename, string defFilename, 
+        void Init( vector<string>& lefStor, string defFilename, 
                    string verilogFilename = "" ) {
-            ParseLef(lefFilename);
+            ParseLef(lefStor);
             ParseDef(defFilename);
             if( verilogFilename != "" ) {
                 // ParseVerilog(verilogFilename);   
@@ -201,7 +201,7 @@ class Circuit {
 
     private:
         // Parsing function
-        void ParseLef(string filename);
+        void ParseLef(vector<string>& lefStor);
         void ParseDef(string filename);
         // void ParseVerilog(string filename);
 

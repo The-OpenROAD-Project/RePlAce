@@ -2910,7 +2910,7 @@ void Circuit::Circuit::DumpLefPin(lefiPin* pin) {
 
 
 
-void Circuit::Circuit::ParseLef(string fileName) {
+void Circuit::Circuit::ParseLef(vector<string>& lefStor) {
 //    char* outFile;
 
     FILE* f;
@@ -3083,32 +3083,34 @@ void Circuit::Circuit::ParseLef(string fileName) {
     // is set to off or not set
     lefrSetOpenLogFileAppend();
 
+    for(auto& lefName : lefStor) {
 
-    lefrReset();
+        lefrReset();
 
-    if ((f = fopen(fileName.c_str(),"r")) == 0) {
-         fprintf(stderr,"\n**ERROR: Couldn't open input file '%s'\n", fileName.c_str());
-         exit(1);
+        if ((f = fopen(lefName.c_str(),"r")) == 0) {
+            fprintf(stderr,"\n**ERROR: Couldn't open input file '%s'\n", lefName.c_str());
+            exit(1);
+        }
+
+        (void)lefrEnableReadEncrypted();
+
+        status = lefwInit(fout); // initialize the lef writer,
+        // need to be called 1st
+        if (status != LEFW_OK)
+            return;
+
+        fout = NULL;
+        res = lefrRead(f, lefName.c_str(), (void*)userData);
+
+
+        if (res)
+            CIRCUIT_FPRINTF(stderr, "Reader returns bad status.\n", lefName.c_str());
+
+        (void)lefrPrintUnusedCallbacks(fout);
+        (void)lefrReleaseNResetMemory();
+
     }
 
-    (void)lefrEnableReadEncrypted();
-
-    status = lefwInit(fout); // initialize the lef writer,
-    // need to be called 1st
-    if (status != LEFW_OK)
-        return;
-
-    fout = NULL;
-    res = lefrRead(f, fileName.c_str(), (void*)userData);
-
-
-    if (res)
-        CIRCUIT_FPRINTF(stderr, "Reader returns bad status.\n", fileName.c_str());
-
-
-
-    (void)lefrPrintUnusedCallbacks(fout);
-    (void)lefrReleaseNResetMemory();
     (void)lefrUnsetCallbacks();
 
 

@@ -97,10 +97,3 @@ For example, if you have LEF/DEF/verilog benchmarks as
     If netlist is found in both of verilog and DEF, RePlAce shows __WARNING__, and parses netlist from the DEF file.  
     (DEF > Verilog)
 
-3. Current RePlAce doesn't support multiple LEF files.  
-    I recommend to concatenate 'Multiple LEF files' into one LEF file using below command.
-
-        $ cat techlib.lef leon2.lef > leon2_concat.lef
-    
-    Be sure that concatenated-LEF file must have the single __END LIBRARY__ statement.  
-    (I’ll try to fix this issue later) 

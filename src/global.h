@@ -1012,9 +1012,9 @@ extern FPOS grow_pmax;
 ///////////////////////////////////////////////////////////////////////////
 extern string bmFlagCMD;
 extern string auxCMD;
-extern string lefCMD;
 extern string defCMD;
 extern string verilogCMD;
+extern vector<string> lefStor;
 extern string outputCMD;
 
 extern string benchName;

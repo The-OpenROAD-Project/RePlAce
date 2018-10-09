@@ -17,7 +17,7 @@ import time
 bmflag = "etc"
 dpflag = "NTU3"
 dploc = "../ntuplace/ntuplace3"
-dirpos = "../bench/lefdef"
+dirpos = "../bench_lefdef"
 binaryName = "./RePlAce"
 outpos = "../output"
 logpos = "../logdir"
@@ -41,18 +41,18 @@ def ExecuteCommand( command ):
 
 def GetFileName( pos, extension ):
     lis = os.listdir( pos )
+    res = []
     for curFile in lis:
         if curFile.endswith("." + extension):
-            return curFile
-
-    return None
+            res.append(curFile)
+    return res
 
 def GetFileStr( pos, folder, ext, modeStr ):
-    retStr = GetFileName("%s/%s"%(pos, folder), ext)
-    if retStr != None :
-        return "%s %s/%s/%s " % (modeStr, pos, folder, retStr)
-    else:
-        return ""
+    retList = GetFileName("%s/%s"%(pos, folder), ext)
+    retStr = ""
+    for rStr in retList:
+        retStr = retStr + "%s %s/%s/%s " % (modeStr, pos, folder, rStr)
+    return retStr
 
 dirList = os.listdir(dirpos)
 try:
@@ -97,7 +97,6 @@ for i in range(2, len(sys.argv)):
     addStr += sys.argv[i] + " "
 
 origFormat = "%s %s %s -bmflag %s FILESTR -output %s -t %d %s " + addStr + " %s %s %s/%s_%s.log %s"
-
 
 if type(benchName) is list:
     for curBench in benchName:
