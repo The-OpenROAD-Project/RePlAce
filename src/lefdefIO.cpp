@@ -45,17 +45,17 @@
 //
 ///////////////////////////////////////////////////////
 
-#include <iostream>
-#include <boost/functional/hash.hpp>
-
+#include "global.h"
 #include "lefdefIO.h"
 #include "bookShelfIO.h"
-#include "global.h"
-#include "mkl.h"
 
 #include "verilog_writer.h"
 #include "verilog_parser.h"
 #include "verilog_ast_util.h"
+
+#include "mkl.h"
+#include <iostream>
+#include <boost/functional/hash.hpp>
 
 using namespace std;
 using Circuit::NetInfo;
