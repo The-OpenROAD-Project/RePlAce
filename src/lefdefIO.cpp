@@ -1314,12 +1314,14 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 
             auto nmPtr = netMap.find( string(curPin.netName()) );
             if( nmPtr == netMap.end() ) {
-                cout << "** ERROR: Cannnot find " << curPin.netName() << " (netMap)" << endl;
-                exit(1);
+                netMap[ string(curPin.netName()) ].push_back( 
+                        NetInfo( INT_MAX, INT_MAX, &curPin - &__ckt.defPinStor[0] ) );
             }
-
-            // save defPinStor's index
-            nmPtr->second.push_back( NetInfo( INT_MAX, INT_MAX, &curPin - &__ckt.defPinStor[0] ) );
+            else {
+                // save defPinStor's index
+                nmPtr->second.push_back( 
+                        NetInfo( INT_MAX, INT_MAX, &curPin - &__ckt.defPinStor[0] ) );
+            }
             pinCNT++;
         }
     }
