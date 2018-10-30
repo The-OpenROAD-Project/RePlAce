@@ -750,7 +750,9 @@ extern string dpFlag;
 
 extern bool isOnlyLGinDP;
 extern bool isSkipPlacement;
-extern bool hasDensityDP ;
+extern bool hasDensityDP;
+extern bool isSkipIP;
+extern bool isBinSet;
 extern prec densityDP ;
 
 

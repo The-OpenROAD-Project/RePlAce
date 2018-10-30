@@ -78,7 +78,9 @@ void initArgument(int argc, char *argv[]) {
    
     isSkipPlacement = false; 
     hasDensityDP = false;
-    densityDP = 0.0f; 
+    densityDP = 0.0f;
+    isBinSet = false;
+    isSkipIP = false; 
 
     isPlot = false;                 // bool
     plotCellCMD = false;            // bool
@@ -601,6 +603,9 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-onlyDP")) {
             isSkipPlacement = true;
         }
+        else if(!strcmp(argv[i], "-skipIP")) {
+            isSkipIP= true;
+        }
         // set target density manually for dp
         else if(!strcmp(argv[i], "-denDP")) {
             if( i + 1 >= argc || argv[i+1][0] == '-' ) {
@@ -649,6 +654,7 @@ bool argument(int argc, char *argv[]) {
                 bxMaxCMD = argv[i];
                 byMaxCMD = argv[i];
                 bzMaxCMD = argv[i];
+                isBinSet = true;
             }
             else {
                 printf("\n**ERROR: Option %s requires # bins in axis (INT).\n",

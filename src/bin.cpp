@@ -308,6 +308,16 @@ void bin_init_2D(int STAGE) {
             if(dim_bin_cGP2D.y < tier->dim_bin.y)
                 dim_bin_cGP2D.y = tier->dim_bin.y;
         }
+        if( isBinSet ) { 
+            if( STAGE == mGP2D ) {
+                dim_bin_mGP2D.x = dim_bin.x;
+                dim_bin_mGP2D.y = dim_bin.y;
+            }
+            else if( STAGE == cGP2D ) {
+                dim_bin_cGP2D.x = dim_bin.x;
+                dim_bin_cGP2D.y = dim_bin.y;
+            }
+        }
     }
 
     if(STAGE == mGP2D) {
@@ -337,6 +347,7 @@ void bin_init_2D(int STAGE) {
         bin_stp_cGP2D.x = place.cnt.x / (prec)dim_bin_cGP2D.x;
         bin_stp_cGP2D.y = place.cnt.y / (prec)dim_bin_cGP2D.y;
         bin_stp_cGP2D.z = TIER_DEP;
+
         printf("INFO:  dim_bin_cGP2D.(x,y) = (%d, %d)\n", dim_bin_cGP2D.x,
                dim_bin_cGP2D.y);
     }

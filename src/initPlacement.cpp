@@ -74,6 +74,11 @@ void initial_placement() {
 //    max_ip = 0;
 
     HPWL_count();
+
+    if(isSkipIP) {
+        return ;
+    }
+
     printf("INFO:  The Initial HPWL is %.6lf\n", tot_HPWL);
 
     if(tot_HPWL <= 0) {

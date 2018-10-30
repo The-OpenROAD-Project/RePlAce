@@ -108,9 +108,6 @@ int setup_before_opt_mGP2D(void) {
     tier_init_2D(mGP2D);
     bin_init_2D(mGP2D);
 
-    if(dim_bin_mGP2D.x <= dim_bin.x && dim_bin_mGP2D.y <= dim_bin.y)
-        return 0;
-
     charge_fft_init(dim_bin_mGP2D, bin_stp_mGP2D, 0);
     wcof_init(bin_stp_mGP2D);
     wlen_init_mGP2D();
@@ -126,14 +123,6 @@ int setup_before_opt_cGP2D(void) {
     // routability
     if(routabilityCMD == true)
         tile_init_cGP2D();
-    // if (isRoutabilityInit == false)     routability_init();
-
-    if(dim_bin_cGP2D.x <= dim_bin.x && dim_bin_cGP2D.y <= dim_bin.y) {
-        cout << "** ERROR: Minimum required Density is too low" << endl;
-        cout << " Try Skip IP (initial placement) commend." << endl;
-        exit(0);
-        return 0;
-    }
 
     charge_fft_init(dim_bin_cGP2D, bin_stp_cGP2D, 0);
     wcof_init(bin_stp_cGP2D);

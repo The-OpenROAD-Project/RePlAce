@@ -350,6 +350,8 @@ bool hasDensityDP;
 bool isSkipPlacement;
 bool isOnlyLGinDP;
 bool isPlot;
+bool isSkipIP;
+bool isBinSet;
 
 int conges_eval_methodCMD;
 bool plotCellCMD;

@@ -15,6 +15,7 @@
 
 ## Options
 ### Placement
+* __-skipIP__ : Skip Initial Placement Mode 
 * __-onlyGP__ : Only Global Placement Mode
 * __-den__ : Target Density, Floating Number, Default = 1 [0.00,1.00]
 * __-bin__ : #bins (in power of 2) for x, y, z Directions, Unsigned Integer[3], Default = 32 32 32
