@@ -128,7 +128,7 @@ void initial_placement() {
         HPWL_count ();
 
         if( isPlot && i % 5 == 0 ) {
-            SavePlotAsJPEG( string("FIP - Iter: ") + to_string(i), false, 
+            SaveCellPlotAsJPEG( string("FIP - Iter: ") + to_string(i), false, 
                            string(dir_bnd) 
                            + string("/initPlace/initPlacement_") 
                            + intoFourDigit(i) );

@@ -1347,9 +1347,13 @@ void myNesterov::UpdateNesterovIter(int iter, struct ITER *it,
 //        SavePlot(string("Nesterov - Iter: " + std::to_string(iter)), true);
 
         // For JPEG Saving
-        SavePlotAsJPEG(string("Nesterov - Iter: " + std::to_string(iter)), true,
+        SaveCellPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(iter)), true,
                        string(dir_bnd) 
                        + string("/cell/cell_") 
+                       + intoFourDigit(iter) );
+        SaveBinPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(iter)), 
+                       string(dir_bnd) 
+                       + string("/bin/bin_") 
                        + intoFourDigit(iter) );
     }
 

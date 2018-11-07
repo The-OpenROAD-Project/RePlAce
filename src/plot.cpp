@@ -43,6 +43,7 @@
 #include "opt.h"
 
 #include "CImg.h"
+#include "bookShelfIO.h"
 
 #include <sstream>
 #include <cfloat>
@@ -58,8 +59,16 @@ using namespace cimg_library;
 
 // to save snapshot of the circuit.
 static vector< CImg<unsigned char> > imgStor;
-static int imageWidth = 0;
-static int imageHeight = 0;
+
+// possible color settings
+static const unsigned char 
+    yellow[] = { 255,255,0 }, white[] = { 255,255,255 }, 
+    green[] = { 0,255,0 }, blue[] = { 120,200,255 }, 
+    purple[] = { 255,100,255 }, black[] = { 0,0,0 },
+    red[] = {255,0,0};
+
+static PlotEnv pe;
+static bool isPlotEnvInit = false;
 
 void plotFinalLayout() {
     GCellPinCoordiUpdate();    
@@ -105,22 +114,210 @@ void plot(string fileName, int idx, prec scale, int lab) {
 }
 
 
-inline int GetX(FPOS _coord, float unitX) {
-    return (_coord.x - gmin.x) * unitX;
+//inline int GetX(FPOS _coord, float unitX) {
+//    return (_coord.x - gmin.x) * unitX;
+//}
+
+//inline int GetX(float _coordX, float unitX) {
+//    return (_coordX - gmin.x) * unitX;
+//}
+
+//// the Y-axis must be mirrored 
+//inline int GetY(FPOS _coord, float unitY, float origHeight) {
+//    return ( origHeight - (_coord.y - gmin.y)) * unitY;
+//}
+
+//inline int GetY(float _coordY, float unitY, float origHeight ) {
+//    return ( origHeight - (_coordY - gmin.y)) * unitY;
+//}
+
+
+////////////////////////////////////////////////////////////////////////
+// 
+// below is for the CImg drawing
+//
+
+PlotEnv::PlotEnv() {
+    Init();
 }
 
-inline int GetX(float _coordX, float unitX) {
-    return (_coordX - gmin.x) * unitX;
+void PlotEnv::Init() {
+    origWidth = gmax.x - gmin.x;
+    origHeight = gmax.y - gmin.y;
+    minLength = 1000;
+    xMargin = yMargin = 30;
+
+    // imageWidth & height setting
+    // Set minimum length of picture as minLength
+    if( origWidth < origHeight ) {
+        imageHeight = 1.0 * origHeight / (origWidth/minLength); 
+        imageWidth = minLength;
+    }
+    else {
+        imageWidth = 1.0 * origWidth/ (origHeight/minLength);
+        imageHeight = minLength;
+    }
+//        imageWidth = origWidth*0.5;
+//        imageHeight = origHeight*0.5;
+//        imageWidth = origWidth;
+//        imageHeight = origHeight;
+//        imageWidth = origWidth*1.3;
+//        imageHeight = origHeight*1.3;
+    
+    // scaling
+    unitX = imageWidth / origWidth; 
+    unitY = imageHeight / origHeight;
+
+    dispWidth = imageWidth * 0.2;
+    dispHeight = imageHeight * 0.2;
 }
 
-// the Y-axis must be mirrored 
-inline int GetY(FPOS _coord, float unitY, float origHeight) {
-    return ( origHeight - (_coord.y - gmin.y)) * unitY;
+int PlotEnv::GetTotalImageWidth() {
+    return imageWidth + 2*xMargin;
 }
 
-inline int GetY(float _coordY, float unitY, float origHeight ) {
-    return ( origHeight - (_coordY - gmin.y)) * unitY;
+int PlotEnv::GetTotalImageHeight() {
+    return imageHeight + 2*yMargin;
 }
+
+int PlotEnv::GetX( FPOS& coord ) {
+    return (coord.x - gmin.x) * unitX + xMargin;
+}
+
+int PlotEnv::GetX( prec coord ) {
+    return (coord - gmin.x) * unitX + xMargin;
+}
+
+int PlotEnv::GetY( FPOS& coord ) {
+    return ( origHeight - (coord.y - gmin.y)) * unitY + yMargin;
+}
+
+int PlotEnv::GetY( prec coord ) {
+    return ( origHeight - (coord - gmin.y)) * unitY + yMargin;
+}
+
+typedef CImg<unsigned char> CImgObj;
+
+void DrawTerminal(CImgObj& img, const unsigned char color[], float opacity) {
+    // FIXED CELL
+    for(int i=0; i<terminalCNT; i++) {
+        TERM* curTerminal = &terminalInstance[i];
+
+        // skip for drawing terminalNI pins
+        if(curTerminal->isTerminalNI) {
+            continue;
+        }
+        
+        if( shapeMap.find( curTerminal->name ) == shapeMap.end() ) {
+            int x1 = pe.GetX( curTerminal->pmin );
+            int x3 = pe.GetX( curTerminal->pmax );
+            int y1 = pe.GetY( curTerminal->pmin );
+            int y3 = pe.GetY( curTerminal->pmax );
+            img.draw_rectangle( x1, y1, x3, y3, color, opacity );
+//            img.draw_text((x1+x3)/2, (y1+y3)/2, curTerminal->name, black, NULL, 1, 30); 
+        }
+        else {
+            for(auto& curIdx : shapeMap[curTerminal->name]) {
+                int x1 = pe.GetX( shapeStor[curIdx].llx );
+                int y1 = pe.GetY( shapeStor[curIdx].lly );
+                
+                int x3 = pe.GetX( shapeStor[curIdx].llx + shapeStor[curIdx].width );
+                int y3 = pe.GetY( shapeStor[curIdx].lly + shapeStor[curIdx].height );
+                
+                img.draw_rectangle( x1, y1, x3, y3, color, opacity); 
+            }
+        }
+    }
+}
+
+void DrawGcell(CImgObj& img, const unsigned char fillerColor[], 
+        const unsigned char cellColor[], float opacity) {
+    for(int i=0; i<gcell_cnt; i++) {
+        CELLx* curGCell = &gcell_st[i];
+
+        curGCell->pmin.x = curGCell->center.x - 0.5*curGCell->size.x;
+        curGCell->pmax.x = curGCell->center.x + 0.5*curGCell->size.x;
+
+        curGCell->pmin.y = curGCell->center.y - 0.5*curGCell->size.y;
+        curGCell->pmax.y = curGCell->center.y + 0.5*curGCell->size.y;
+
+        int x1 = pe.GetX( curGCell->pmin ); 
+        int x3 = pe.GetX( curGCell->pmax ); 
+        int y1 = pe.GetY( curGCell->pmin ); 
+        int y3 = pe.GetY( curGCell->pmax ); 
+        img.draw_rectangle( x1, y1, x3, y3, 
+                (curGCell->flg == FillerCell)? fillerColor: cellColor, opacity );
+        if( curGCell->flg == Macro) {
+            img.draw_rectangle( x1, y1, x3, y3, black, opacity, ~0U);
+        }
+    }
+}
+
+void DrawModule(CImgObj& img, const unsigned char color[], float opacity) {
+    for(int i=0; i<moduleCNT; i++) {
+        MODULE* curModule = &moduleInstance[i];
+
+        // update pmin & pmax 
+        curModule->pmin.x = curModule->center.x - 0.5*curModule->size.x;
+        curModule->pmax.x = curModule->center.x + 0.5*curModule->size.x;
+
+        curModule->pmin.y = curModule->center.y - 0.5*curModule->size.y;
+        curModule->pmax.y = curModule->center.y + 0.5*curModule->size.y;
+
+        int x1 = pe.GetX( curModule->pmin );
+        int x3 = pe.GetX( curModule->pmax ); 
+        int y1 = pe.GetY( curModule->pmin );
+        int y3 = pe.GetY( curModule->pmax );
+        img.draw_rectangle( x1, y1, x3, y3, color, opacity );
+    }
+}
+
+void DrawBinDensity(CImgObj& img, float opacity) {
+
+    for(int i=0; i<tier_st[0].tot_bin_cnt; i++) {
+        BIN* curBin = &tier_st[0].bin_mat[i];
+        int x1 = pe.GetX( curBin->pmin );
+        int x3 = pe.GetX( curBin->pmax );
+        int y1 = pe.GetY( curBin->pmin );
+        int y3 = pe.GetY( curBin->pmax );
+
+        int color = curBin->den * 50 + 20;
+        color = (color > 255)? 255 : (color < 20)? 20 : color;
+        color = 255 - color;
+        
+        char denColor[3] = {(char)color, (char)color, (char)color};
+        img.draw_rectangle( x1, y1, x3, y3, denColor, opacity );
+    }
+}
+
+void DrawArrowDensity(CImgObj& img, float opacity) {
+
+}
+
+void SaveCellPlot(CImgObj& img, bool isGCell) {
+    float opacity = 0.7;
+    // FIXED CELL
+    DrawTerminal(img, blue, opacity);
+
+    // STD CELL
+    if( !isGCell ) {
+        DrawModule(img, red, opacity);
+    }
+    else {
+        DrawGcell(img, purple, red, opacity);
+    }
+}
+
+void SaveBinPlot(CImgObj& img) {
+    float opacity = 1;
+    DrawBinDensity(img, opacity);     
+}
+
+void SaveArrowPlot(CImgObj& img) {
+    float opacity = 1;
+    DrawArrowDensity(img, opacity);     
+}
+
 
 // 
 // using X11
@@ -132,122 +329,19 @@ void SavePlot(string imgName, bool isGCell){
 //    if( gcell_st ) {
 //        GCellPinCoordiUpdate();    
 //    }
-    
-    float origWidth = gmax.x - gmin.x, 
-          origHeight = gmax.y - gmin.y;
+    if( !isPlotEnvInit ) {
+        pe.Init();
+        isPlotEnvInit = true;
+    } 
+
+    CImg<unsigned char> img( pe.GetTotalImageWidth(), 
+           pe.GetTotalImageHeight(), 1, 3, 255);
+  
+    SaveCellPlot(img, isGCell); 
+//    SaveBinPlot(img); 
    
-    // Minimum length; (either width or height)
-    int minLength = 1000;
-    
-    // imageWidth & height setting
-    // Set minimum length of picture as minLength
-    if( imageHeight == 0 || imageWidth == 0 ) {
-        if( origWidth < origHeight ) {
-            imageHeight = 1.0 * origHeight / (origWidth/minLength); 
-            imageWidth = minLength;
-        }
-        else {
-            imageWidth = 1.0 * origWidth/ (origHeight/minLength);
-            imageHeight = minLength;
-        }
-//        imageWidth = origWidth*0.5;
-//        imageHeight = origHeight*0.5;
-//        imageWidth = origWidth;
-//        imageHeight = origHeight;
-//        imageWidth = origWidth*1.3;
-//        imageHeight = origHeight*1.3;
-    }
-    
-    float opacity = 0.7;
-    int xMargin = 30, yMargin = 30;
-    CImg<unsigned char> img(imageWidth + 2*xMargin, imageHeight + 2*yMargin, 1, 3, 255);
-    
-//    const unsigned char yellow[] = { 255,255,0 }, white[] = { 255,255,255 }, green[] = { 0,255,0 },
-//                        blue[] = { 120,200,255 }, purple[] = { 255,100,255 }, black[] = { 0,0,0 };
-    const unsigned char blue[] = { 120, 200, 255 }, 
-                        black[] = { 0, 0, 0 }, red[] = {255, 0, 0};
-
-    // scaling
-    float unitX = imageWidth / origWidth, 
-          unitY = imageHeight / origHeight;
-
-//    int cnt = (lab == 0)? moduleCNT : gcell_cnt;
-
-    // FIXED CELL
-    for(int i=0; i<terminalCNT; i++) {
-        TERM* curTerminal = &terminalInstance[i];
-
-        // skip for drawing terminalNI pins
-        if(curTerminal->isTerminalNI) {
-            continue;
-        }
-        
-        if( shapeMap.find( curTerminal->name ) == shapeMap.end() ) {
-            int x1 = GetX( curTerminal->pmin, unitX ) + xMargin;
-            int x3 = GetX( curTerminal->pmax, unitX ) + xMargin;
-            int y1 = GetY( curTerminal->pmin, unitY, origHeight ) + yMargin;
-            int y3 = GetY( curTerminal->pmax, unitY, origHeight ) + yMargin;
-            img.draw_rectangle( x1, y1, x3, y3, blue, opacity );
-//            img.draw_text((x1+x3)/2, (y1+y3)/2, curTerminal->name, black, NULL, 1, 30); 
-        }
-        else {
-            for(auto& curIdx : shapeMap[curTerminal->name]) {
-                int x1 = GetX( shapeStor[curIdx].llx, unitX ) + xMargin;
-                int y1 = GetY( shapeStor[curIdx].lly, unitY, origHeight ) + yMargin;
-                
-                int x3 = GetX( shapeStor[curIdx].llx + shapeStor[curIdx].width, unitX ) + xMargin;
-                int y3 = GetY( shapeStor[curIdx].lly + shapeStor[curIdx].height, unitY, origHeight ) + yMargin;
-                
-                img.draw_rectangle( x1, y1, x3, y3, blue, opacity); 
-            }
-        }
-
-    }
-
-    // STD CELL
-    if( !isGCell ) {
-        for(int i=0; i<moduleCNT; i++) {
-            MODULE* curModule = &moduleInstance[i];
-
-            // update pmin & pmax 
-            curModule->pmin.x = curModule->center.x - 0.5*curModule->size.x;
-            curModule->pmax.x = curModule->center.x + 0.5*curModule->size.x;
-
-            curModule->pmin.y = curModule->center.y - 0.5*curModule->size.y;
-            curModule->pmax.y = curModule->center.y + 0.5*curModule->size.y;
-
-            int x1 = GetX( curModule->pmin, unitX ) + xMargin;
-            int x3 = GetX( curModule->pmax, unitX ) + xMargin; 
-            int y1 = GetY( curModule->pmin, unitY, origHeight ) + yMargin;
-            int y3 = GetY( curModule->pmax, unitY, origHeight ) + yMargin;
-            img.draw_rectangle( x1, y1, x3, y3, red, opacity );
-        }
-    }
-    else {
-        for(int i=0; i<gcell_cnt; i++) {
-            CELLx* curGCell = &gcell_st[i];
-            if( curGCell -> flg != StdCell ) {
-                continue;
-            }
-            
-            curGCell->pmin.x = curGCell->center.x - 0.5*curGCell->size.x;
-            curGCell->pmax.x = curGCell->center.x + 0.5*curGCell->size.x;
-
-            curGCell->pmin.y = curGCell->center.y - 0.5*curGCell->size.y;
-            curGCell->pmax.y = curGCell->center.y + 0.5*curGCell->size.y;
-
-            int x1 = GetX( curGCell->pmin, unitX ) + xMargin;
-            int x3 = GetX( curGCell->pmax, unitX ) + xMargin; 
-            int y1 = GetY( curGCell->pmin, unitY, origHeight ) + yMargin;
-            int y3 = GetY( curGCell->pmax, unitY, origHeight ) + yMargin;
-            img.draw_rectangle( x1, y1, x3, y3, red, opacity );
-        }
-    }
-   
-//    cout << "current imgName: " << imgName << endl; 
     // Finally draw image info
     img.draw_text(50, 50, imgName.c_str(), black, NULL, 1, 100); 
-
     imgStor.push_back(img);
 }
 
@@ -255,124 +349,100 @@ void SavePlot(string imgName, bool isGCell){
 // save current circuit's as BMP file in imgPosition & iternumber
 // isGCell : GCell drawing mode. true->gcell_st, false->moduleInstance
 //
-void SavePlotAsJPEG(string imgName, bool isGCell, string imgPosition ){
+void SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition ){
     // if gcell is exist, then update module's information
     // before drawing
 //    if( gcell_st ) {
 //        GCellPinCoordiUpdate();    
 //    }
     
-    float origWidth = gmax.x - gmin.x, 
-          origHeight = gmax.y - gmin.y;
-  
-    // Minimum length; (either width or height)
-    int minLength = 1000;
-     
-    // imageWidth & height setting
-    // Set minimum length of picture as minLength
-    if( imageHeight == 0 || imageWidth == 0 ) {
-        if( origWidth < origHeight ) {
-            imageHeight = 1.0 * origHeight / (origWidth/minLength); 
-            imageWidth = minLength;
-        }
-        else {
-            imageWidth = 1.0 * origWidth/ (origHeight/minLength);
-            imageHeight = minLength;
-        }
-//        imageWidth = origWidth*0.5;
-//        imageHeight = origHeight*0.5;
-//        imageWidth = origWidth;
-//        imageHeight = origHeight;
-//        imageWidth = origWidth*1.3;
-//        imageHeight = origHeight*1.3;
-    }
+    if( !isPlotEnvInit ) {
+        pe.Init();
+        isPlotEnvInit = true;
+    } 
     
     float opacity = 0.7;
-    int xMargin = 30, yMargin = 30;
-    CImg<unsigned char> img(imageWidth + 2*xMargin, imageHeight + 2*yMargin, 1, 3, 255);
+    CImg<unsigned char> img( pe.GetTotalImageWidth(), 
+           pe.GetTotalImageHeight(), 1, 3, 255);
     
-//    const unsigned char yellow[] = { 255,255,0 }, white[] = { 255,255,255 }, green[] = { 0,255,0 },
-//                        blue[] = { 120,200,255 }, purple[] = { 255,100,255 }, black[] = { 0,0,0 };
-    const unsigned char blue[] = { 120, 200, 255 }, 
-                        black[] = { 0, 0, 0 }, red[] = {255, 0, 0};
-
-    // scaling
-    float unitX = imageWidth / origWidth, 
-          unitY = imageHeight / origHeight;
-
 //    int cnt = (lab == 0)? moduleCNT : gcell_cnt;
 
-    // FIXED CELL
-    for(int i=0; i<terminalCNT; i++) {
-        TERM* curTerminal = &terminalInstance[i];
+    /*
+    for(int i=0; i<row_cnt; i++) {
+        ROW* curRow = &row_st[i];
+        int x1 = GetX( curRow->pmin.x, unitX ) + xMargin;
+        int x3 = GetX( curRow->pmax.x, unitX ) + xMargin;
+        int y1 = GetY( curRow->pmin.y, unitY, origHeight ) + yMargin;
+        int y3 = GetY( curRow->pmax.y, unitY, origHeight ) + yMargin;
+        img.draw_rectangle( x1, y1, x3, y3, black, 0.025 );
+    }*/
 
-        // ignore pin's location
-        if(curTerminal->isTerminalNI) {
-            continue;
-        }
-        
-        if( shapeMap.find( curTerminal->name ) == shapeMap.end() ) {
-            int x1 = GetX( curTerminal->pmin, unitX ) + xMargin;
-            int x3 = GetX( curTerminal->pmax, unitX ) + xMargin;
-            int y1 = GetY( curTerminal->pmin, unitY, origHeight ) + yMargin;
-            int y3 = GetY( curTerminal->pmax, unitY, origHeight ) + yMargin;
-            img.draw_rectangle( x1 , y1, x3, y3, blue, opacity );
-//            img.draw_text((x1+x3)/2, (y1+y3)/2, curTerminal->name, black, NULL, 1, 15); 
-        }
-        else {
-            for(auto& curIdx : shapeMap[curTerminal->name]) {
-                int x1 = GetX( shapeStor[curIdx].llx, unitX ) + xMargin;
-                int y1 = GetY( shapeStor[curIdx].lly, unitY, origHeight ) + yMargin;
-                
-                int x3 = GetX( shapeStor[curIdx].llx + shapeStor[curIdx].width, unitX ) + xMargin;
-                int y3 = GetY( shapeStor[curIdx].lly + shapeStor[curIdx].height, unitY, origHeight ) + yMargin;
-                
-                img.draw_rectangle( x1, y1, x3, y3, blue, opacity); 
-            }
-        }
+    SaveCellPlot(img, isGCell); 
 
+    /*
+    for(int i=0; i<tier_st[0].tot_bin_cnt; i++) {
+        BIN* curBin = &tier_st[0].bin_mat[i];
+        int x1 = GetX( curBin->pmin.x, unitX ) + xMargin;
+        int x3 = GetX( curBin->pmax.x, unitX ) + xMargin; 
+        int y1 = GetY( curBin->pmin.y, unitY, origHeight ) + yMargin;
+        int y3 = GetY( curBin->pmax.y, unitY, origHeight ) + yMargin;
+//        img.draw_rectangle( x1, y1, x3, y3, purple, opacity );
+        img.draw_text( x1, (y1 + y3)/2 , to_string(int(100*curBin->den)).c_str(), black, NULL, 1, 25); 
+        img.draw_text( x1 + 35, (y1 + y3)/2 , to_string(int(100*curBin->den2)).c_str(), black, NULL, 1, 25);
+
+
+//        if( i > 5)
+//            break; 
     }
-
-    // STD CELL
-    if( !isGCell ) {
-        for(int i=0; i<moduleCNT; i++) {
-            MODULE* curModule = &moduleInstance[i];
-
-            // update pmin & pmax 
-            curModule->pmin.x = curModule->center.x - 0.5*curModule->size.x;
-            curModule->pmax.x = curModule->center.x + 0.5*curModule->size.x;
-
-            curModule->pmin.y = curModule->center.y - 0.5*curModule->size.y;
-            curModule->pmax.y = curModule->center.y + 0.5*curModule->size.y;
-
-            int x1 = GetX( curModule->pmin, unitX ) + xMargin;
-            int x3 = GetX( curModule->pmax, unitX ) + xMargin; 
-            int y1 = GetY( curModule->pmin, unitY, origHeight ) + yMargin;
-            int y3 = GetY( curModule->pmax, unitY, origHeight ) + yMargin;
-            img.draw_rectangle( x1, y1, x3, y3, red, opacity );
-        }
-    }
-    else {
-        for(int i=0; i<gcell_cnt; i++) {
-            CELLx* curGCell = &gcell_st[i];
-            if( curGCell -> flg != StdCell ) {
-                continue;
-            }
-            
-            curGCell->pmin.x = curGCell->center.x - 0.5*curGCell->size.x;
-            curGCell->pmax.x = curGCell->center.x + 0.5*curGCell->size.x;
-
-            curGCell->pmin.y = curGCell->center.y - 0.5*curGCell->size.y;
-            curGCell->pmax.y = curGCell->center.y + 0.5*curGCell->size.y;
-
-            int x1 = GetX( curGCell->pmin, unitX ) + xMargin;
-            int x3 = GetX( curGCell->pmax, unitX ) + xMargin; 
-            int y1 = GetY( curGCell->pmin, unitY, origHeight ) + yMargin;
-            int y3 = GetY( curGCell->pmax, unitY, origHeight ) + yMargin;
-            img.draw_rectangle( x1, y1, x3, y3, red, opacity );
-        }
-    }
+    */
    
+//    cout << "current imgName: " << imgName << endl; 
+    // Finally draw image info
+    string saveName = imgPosition + string(".jpg");
+
+    img.draw_text(50, 50, imgName.c_str(), black, NULL, 1, 30); 
+    img.save_jpeg( saveName.c_str(), 70 );
+//  img.save_bmp( string(imgPosition + string(".bmp")).c_str() );
+    cout << "INFO:  JPEG HAS BEEN SAVED: " << saveName << endl;
+}
+
+// 
+// save current circuit's as BMP file in imgPosition & iternumber
+void SaveBinPlotAsJPEG(string imgName, string imgPosition ){
+    
+    if( !isPlotEnvInit ) {
+        pe.Init();
+        isPlotEnvInit = true;
+    } 
+    
+    CImg<unsigned char> img( pe.GetTotalImageWidth(), 
+           pe.GetTotalImageHeight(), 1, 3, 255);
+    
+    SaveBinPlot(img); 
+
+//    cout << "current imgName: " << imgName << endl; 
+    // Finally draw image info
+    string saveName = imgPosition + string(".jpg");
+
+    img.draw_text(50, 50, imgName.c_str(), black, NULL, 1, 30); 
+    img.save_jpeg( saveName.c_str(), 70 );
+//  img.save_bmp( string(imgPosition + string(".bmp")).c_str() );
+    cout << "INFO:  JPEG HAS BEEN SAVED: " << saveName << endl;
+}
+// 
+// save current circuit's as BMP file in imgPosition & iternumber
+void SaveArrowPlotAsJPEG(string imgName, string imgPosition ){
+    
+    if( !isPlotEnvInit ) {
+        pe.Init();
+        isPlotEnvInit = true;
+    } 
+    
+    CImg<unsigned char> img( pe.GetTotalImageWidth(), 
+           pe.GetTotalImageHeight(), 1, 3, 255);
+    
+    SaveArrowPlot(img); 
+
 //    cout << "current imgName: " << imgName << endl; 
     // Finally draw image info
     string saveName = imgPosition + string(".jpg");
@@ -396,10 +466,13 @@ int DecreaseIdx(unsigned* curIdx) {
 void ShowPlot(string circuitName) {
     // imgStor must have at least one image.
     assert( imgStor.size() > 1 );
-    float dispWidth = imageWidth * 0.2, 
-          dispHeight = imageHeight * 0.2;
 
-    CImgDisplay disp((int)dispWidth, (int)dispHeight, string(circuitName + " Circuit viewer (Made by mgwoo)").c_str(), 0);
+    if( !isPlotEnvInit ) {
+        pe.Init();
+        isPlotEnvInit = true;
+    } 
+
+    CImgDisplay disp((int)pe.dispWidth, (int)pe.dispHeight, string(circuitName + " Circuit viewer (Made by mgwoo)").c_str(), 0);
     CImgDisplay dispz(500, 500, string(circuitName + " Circuit zoomer (Made by mgwoo)").c_str(), 0);
 
     disp.move( (CImgDisplay::screen_width() - disp.width() )/2,
@@ -438,8 +511,8 @@ void ShowPlot(string circuitName) {
     unsigned itercnt = 0;
     float factor = 200;
     int x = 0, y = 0;
-    float xUnit = imageWidth / dispWidth,
-          yUnit = imageHeight / dispHeight;
+    float xUnit = pe.imageWidth / pe.dispWidth,
+          yUnit = pe.imageHeight / pe.dispHeight;
     
     bool redraw = false;
     while (!disp.is_closed() && !dispz.is_closed() &&
@@ -454,7 +527,6 @@ void ShowPlot(string circuitName) {
             const int
                 x0 = x - factor, y0 = y - factor,
                    x1 = x + factor, y1 = y + factor;
-            const unsigned char red[] = { 255, 0, 0 }, black[] = { 0, 0, 0}, yellow[] ={255, 255, 0};
             
             (+imgStor[itercnt]).draw_rectangle(x0,y0,x1,y1,yellow,0.7f).display(disp);
 
@@ -2639,14 +2711,15 @@ void get_bin_color(struct BIN *bp, int *color, int *power) {
 
 void mkdirPlot() {
     char mkdir_cmd[BUF_SZ] = {0, };
-   
-    if( isPlot ) { 
-        sprintf(mkdir_cmd, "mkdir -p %s/initPlace", dir_bnd);
-        system(mkdir_cmd);
+    
+    sprintf(mkdir_cmd, "mkdir -p %s/initPlace", dir_bnd);
+    system(mkdir_cmd);
 
-        sprintf(mkdir_cmd, "mkdir -p %s/cell", dir_bnd);
-        system(mkdir_cmd);
-    }
+    sprintf(mkdir_cmd, "mkdir -p %s/cell", dir_bnd);
+    system(mkdir_cmd);
+    
+    sprintf(mkdir_cmd, "mkdir -p %s/bin", dir_bnd);
+    system(mkdir_cmd);
 
     /*
     sprintf(mkdir_cmd, "mkdir -p %s/den", dir_bnd);

@@ -73,7 +73,9 @@ void GCellPinCoordiUpdate();
 
 // X11 drawing function
 // below function is added by mgwoo.
-void SavePlotAsJPEG(string imgName, bool isGCell, string imgPosition);
+void SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition);
+void SaveBinPlotAsJPEG(string imgName, string imgPosition);
+void SaveArrowPlotAsJPEG(string imgName, string imgPosition);
 void SavePlot(string imgName = "", bool isGCell = false);
 void ShowPlot(string circuitName = "");
 
@@ -88,5 +90,34 @@ enum {
     YELLOW,
     WHITE
 };
+
+
+// for X11 drawing
+class PlotEnv { 
+    public:
+        int minLength;
+        int imageWidth;
+        int imageHeight;
+        int xMargin;
+        int yMargin;
+        float origWidth;
+        float origHeight;
+        float unitX;
+        float unitY;
+
+        // for showPlot
+        float dispWidth;
+        float dispHeight;
+
+        PlotEnv();
+        void Init();
+        int GetTotalImageWidth();
+        int GetTotalImageHeight();
+        int GetX( FPOS& coord );
+        int GetX( prec coord );
+        int GetY( FPOS& coord );
+        int GetY( prec coord );
+}; 
+
 
 #endif

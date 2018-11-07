@@ -542,9 +542,9 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
    
     if( isPlot ) { 
-        SavePlotAsJPEG( "Final Global Placement Result", false, 
-            string(dir_bnd) 
-            + string("/globalPlaceResult") );
+        SaveCellPlotAsJPEG( "Final Global Placement Result", false, 
+                string(dir_bnd) 
+                + string("/globalPlaceResult") );
     }
    
     if( inputMode == InputMode::lefdef )  {
@@ -609,7 +609,7 @@ int main(int argc, char *argv[]) {
     
 //    SavePlot( "Final Placement Result");
     if( isPlot ) { 
-        SavePlotAsJPEG( "Final Placement Result", false, 
+        SaveCellPlotAsJPEG( "Final Placement Result", false, 
                 string(dir_bnd) 
                 + string("/finalResult") );
     }
