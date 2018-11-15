@@ -235,7 +235,7 @@ LEF_ASSIGN_OPERATOR_C( lefiPinAntennaModel ) {
     LEF_MALLOC_FUNC( antennaGateArea_, double, sizeof(double) * numAntennaGateArea_);
 
     // !!
-    LEF_MALLOC_FUNC_FOR_2D_STR( antennaGateAreaLayer_, antennaGateAreaAllocated_  );
+    LEF_MALLOC_FUNC_FOR_2D_STR( antennaGateAreaLayer_, numAntennaGateArea_ );
 
     LEF_COPY_FUNC( numAntennaMaxAreaCar_ );
     LEF_COPY_FUNC( antennaMaxAreaCarAllocated_ );
@@ -1060,17 +1060,19 @@ LEF_COPY_CONSTRUCTOR_C(lefiPin)
 
     LEF_MALLOC_FUNC( taperRule_, char, sizeof(char) *   (strlen(prev.taperRule_) + 1));
     LEF_MALLOC_FUNC( netEpxr_, char, sizeof(char)   *   (strlen(prev.netEpxr_) + 1));
-    LEF_MALLOC_FUNC( ssPinName_, char, sizeof(char) *   (strlen(ssPinName_) + 1));
-    LEF_MALLOC_FUNC( gsPinName_, char, sizeof(char) *   (strlen(gsPinName_) + 1));
+    LEF_MALLOC_FUNC( ssPinName_, char, sizeof(char) *   (strlen(prev.ssPinName_) + 1));
+    LEF_MALLOC_FUNC( gsPinName_, char, sizeof(char) *   (strlen(prev.gsPinName_) + 1));
 
     memcpy(direction_, prev.direction_, sizeof(char)*32);
     memcpy(use_, prev.use_, sizeof(char)*12);
     memcpy(shape_, prev.shape_, sizeof(char)*12);
     memcpy(currentSource_, prev.currentSource_, sizeof(char)*12);
+
     LEF_COPY_FUNC( numProperties_ );
     LEF_COPY_FUNC( propertiesAllocated_ );
-    LEF_MALLOC_FUNC_FOR_2D_STR( propNames_, propertiesAllocated_ );
-    LEF_MALLOC_FUNC_FOR_2D_STR( propValues_, propertiesAllocated_ );
+
+    LEF_MALLOC_FUNC_FOR_2D_STR( propNames_, numProperties_);
+    LEF_MALLOC_FUNC_FOR_2D_STR( propValues_, numProperties_);
     LEF_MALLOC_FUNC( propNums_, double, sizeof(double) * propertiesAllocated_);
     LEF_MALLOC_FUNC( propTypes_, char, sizeof(char) * propertiesAllocated_ );
 
@@ -3302,7 +3304,9 @@ LEF_COPY_CONSTRUCTOR_C( lefiMacro )
     LEF_COPY_FUNC( sizeY_ );
     LEF_COPY_FUNC( numSites_ );
     LEF_COPY_FUNC( sitesAllocated_ );
-    LEF_MALLOC_FUNC_FOR_2D( pattern_, lefiSitePattern, sitesAllocated_, 1 );
+
+    LEF_MALLOC_FUNC_FOR_2D( pattern_, lefiSitePattern, numSites_ , 1 );
+
     LEF_COPY_FUNC( numForeigns_ );
     LEF_COPY_FUNC( foreignAllocated_ );
     LEF_MALLOC_FUNC( hasForeignOrigin_, int, sizeof(int) * foreignAllocated_ );
@@ -3389,7 +3393,7 @@ lefiMacro::clear()
 
     if (pattern_) {
         for (i = 0; i < numSites_; i++) {
-            pattern_[i]->Destroy();
+//            pattern_[i]->Destroy();
             lefFree((char*) (pattern_[i]));
         }
         numSites_ = 0;

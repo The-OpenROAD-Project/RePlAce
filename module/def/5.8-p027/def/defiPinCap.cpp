@@ -1065,6 +1065,10 @@ void defiPin::Init() {
   polyMinSpacing_ = 0;
   polyEffectiveWidth_ = 0;
   polyMask_ = 0;
+  layerMinSpacing_ = 0;
+  layerEffectiveWidth_ = 0;
+  layerMask_ =0;
+  viaMask_ = 0;
 }
 
 
@@ -1324,6 +1328,7 @@ void defiPin::clear() {
       if (pinPort_[i]) {
          pinPort_[i]->clear();
          delete pinPort_[i];
+//         free(pinPort_[i]);
       }
     }
     free(pinPort_);
