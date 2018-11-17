@@ -188,8 +188,6 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
         // = grow_pmin.y + (curTerminal->center.y - grow_pmin.y) *
         // shrunk_ratio.y;
 
-        curTerminal->tier = 0;
-
         curTerminal->center.z = 0.5 * TIER_DEP;
 
         curTerminal->pmin.x = curTerminal->center.x - 0.5 * curTerminal->size.x;
@@ -359,8 +357,7 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
     // mgwoo
     for(int i = 0; i < terminalCNT; i++) {
         curTerminal = &terminalInstance[i];
-        tier = &tier_st[curTerminal->tier];
-
+        tier = &tier_st[0];
         tier->term_st[tier->term_cnt++] = curTerminal;
        
         // skip for IO pin informations

@@ -675,6 +675,9 @@ void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad) {
     return;
 }
 
+// wlen_cof
+// obj? 
+//
 void get_net_wlen_grad_wa(FPOS obj, NET *net, PIN *pin, FPOS *grad) {
     FPOS grad_sum_num1 = zeroFPoint, grad_sum_num2 = zeroFPoint;
     FPOS grad_sum_denom1 = zeroFPoint, grad_sum_denom2 = zeroFPoint;
@@ -1107,6 +1110,17 @@ void net_update_wa(FPOS *st) {
 //        sum_num1.x = sum_num1.y = sum_num2.x = sum_num2.y = 0;
 //        sum_denom1.x = sum_denom1.y = sum_denom2.x = sum_denom2.y = 0;
 
+        // UPDATE 
+        // pin->e1 (MAX)
+        // net->sum_num1 (MAX)
+        // net->sum_denom1 (MAX)
+        // pin->flg1 (MAX)
+        //
+        // pin->e2 (MIN)
+        // net->sum_num2 (MIN)
+        // net->sum_denom2 (MIN)
+        // pin->flg2 (MIN)
+        //
         for(int j = 0; j < net->pinCNTinObject; j++) {
             PIN* pin = net->pin[j];
             FPOS fp = pin->fp;

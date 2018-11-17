@@ -7,7 +7,7 @@ There are two python scripts to feed both of bookshelf and lef/def/verilog files
 ## Configure options to execute scripts
 You can easily find this part inside of the python scripts.
 
-* __bmflag__ : (__mms__/__ispd__/__sb__/__ibm__/__etc__) Benchmark flag. Default is 'sb'
+* __bmflag__ : (__mms__/__ispd__/__sb__/__ibm__/__etc__) Benchmark flag. Default is 'etc'
 * __dpflag__ : (__NTU3__/__NTU4__) Detail placer flag. Current RePlAce can take 'NTU3' or 'NTU4'
 * __dploc__ : (__string__) Detail placer binary location
 * __dirpos__ : (__string__) Benchmark directory position

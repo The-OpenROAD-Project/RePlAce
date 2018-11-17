@@ -57,11 +57,20 @@
 #include "opt.h"
 #include "plot.h"
 #include "wlen.h"
+#include "timing.h"
 
 static int backtrack_cnt = 0;
 
 void myNesterov::nesterov_opt() {
     int last_iter = 0;
+    Timing::Timing TimingInst(moduleInstance, terminalInstance,
+            netInstance, netCNT, pinInstance, pinCNT,
+            mPinName, tPinName, "clk", timingClock);
+
+    if( isTiming ) {
+        TimingInst.BuildSteiner(true);
+        TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, "");
+    }
 
     InitializationCommonVar();
 
@@ -117,7 +126,10 @@ void myNesterov::nesterov_opt() {
 
     if(isTrial) {
         initialOVFL = it->ovfl;
-        trial_HPWLs.push_back(std::pair< prec, prec >(it->tot_hpwl, 0.0));
+        
+       
+        prec tot_hpwl(it->tot_hpwl);
+        trial_HPWLs.push_back(make_pair(tot_hpwl, 0.0));
         trial_POTNs.push_back(it->potn);
     }
 
@@ -126,7 +138,7 @@ void myNesterov::nesterov_opt() {
     // if (dynamicStepCMD) NUM_ITER_FILLER_PLACE = 20;
     // else                NUM_ITER_FILLER_PLACE = 20;
 
-    last_iter = DoNesterovOptimization();
+    last_iter = DoNesterovOptimization(TimingInst);
 
     SummarizeNesterovOpt(last_iter);
 
@@ -137,11 +149,26 @@ void myNesterov::nesterov_opt() {
     //    congEstimation (x_st);
     //    calcCong_print_detail();
     //}
+    TimingInst.BuildSteiner(true);
+//    TimingInst.PrintNetSteiner();
+    // BU  asked
+    string spefName = string(dir_bnd) + "/" + gbch + "_gp.spef";
+    TimingInst.WriteSpef( spefName );
 
+    if( isTiming ) {
+        TimingInst.ExecuteStaLater();
+    }
+    else {
+//        TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, "");
+    }
     mkl_malloc_free();
 }
 
 void myNesterov::InitializationCommonVar() {
+    for(int i=0; i<200; i++) {
+        timingCheck[i] = 0;
+    }
+
     N = gcell_cnt;
     N_org = moduleCNT;
     start_idx = 0;
@@ -167,9 +194,9 @@ void myNesterov::InitializationCommonVar() {
     sum_wgrad = 0;
     sum_pgrad = 0;
     sum_tgrad = 0;
-    u.SetZero();
-    v.SetZero();
-    half_densize.SetZero();
+//    u.SetZero();
+//    v.SetZero();
+//    half_densize.SetZero();
     wcof.SetZero();
     wpre.SetZero();
     charge_dpre.SetZero();
@@ -471,7 +498,7 @@ void myNesterov::InitializationIter() {
     it->grad = get_norm(y_dst, N, 2.0);
 }
 
-int myNesterov::DoNesterovOptimization() {
+int myNesterov::DoNesterovOptimization( Timing::Timing& TimingInst) {
     int i;
     prec minPotn = PREC_MAX;
     temp_iter = 0;
@@ -584,7 +611,7 @@ int myNesterov::DoNesterovOptimization() {
                 FPOS half_desize;
         #pragma omp for
             for(j = start_idx; j < end_idx; j++) {
-                half_densize = gcell_st[j].half_den_size;
+                FPOS half_densize = gcell_st[j].half_den_size;
 
                 u.x = y_st[j].x + alpha_pred * y_dst[j].x;
                 u.y = y_st[j].y + alpha_pred * y_dst[j].y;
@@ -667,8 +694,8 @@ int myNesterov::DoNesterovOptimization() {
 
         if(isTrial) {
             if(it->ovfl > initialOVFL / 2.5) {
-                trial_HPWLs.push_back(
-                    std::pair< prec, prec >(it->tot_hpwl, 0.0));
+                prec tot_hpwl(it->tot_hpwl);
+                trial_HPWLs.push_back(make_pair(tot_hpwl, 0.0));
                 trial_POTNs.push_back(it->potn);
             }
             else {
@@ -742,13 +769,23 @@ int myNesterov::DoNesterovOptimization() {
         if(it->tot_hpwl > 2000000000)
             exit(0);
 
+        if( isTiming ) {
+            int checkIter = INT_CONVERT(it->ovfl*100);
+            cout << "checkIter: " << checkIter << endl;
+            if( timingCheck[ checkIter ] == 0 ) { 
+                TimingInst.BuildSteiner(true);
+                TimingInst.ExecuteStaLater();
+                timingCheck[ checkIter ] = 1;
+            }
+        }
         // Termination Condition 1
-        if(it->ovfl <= overflowMin && i > 220)
+        if(it->ovfl <= overflowMin && i > 50) {
             return i;
+        }
 
         // Termination Condition 2
-        if(STAGE == cGP2D && i > 220) {
-            if((it->ovfl <= 0.13f && dynamicStepCMD) || (it->ovfl <= 0.10f)) {
+        if(STAGE == cGP2D && i > 50) {
+            if((it->ovfl <= 0.13f && dynamicStepCMD) || (it->ovfl <= 0.05f)) {
                 if(minPotn * 1.01 <= it->potn && temp_iter == 0) {
                     temp_iter++;
                 }
@@ -1229,17 +1266,17 @@ void myNesterov::z_init() {
         if(GP_DIM_ONE) {
             zx = y_st[j].x + place_backup.cnt.x * coeffi * y_dst[j].x;
             zy = y_st[j].y + place_backup.cnt.y * coeffi * y_dst[j].y;
-            zz = y_st[j].z + place_backup.cnt.z * coeffi * y_dst[j].z;
+//            zz = y_st[j].z + place_backup.cnt.z * coeffi * y_dst[j].z;
         }
         else {
             zx = y_st[j].x + z_ref_alpha * y_dst[j].x;
             zy = y_st[j].y + z_ref_alpha * y_dst[j].y;
-            zz = y_st[j].z + z_ref_alpha * y_dst[j].z;
+//            zz = y_st[j].z + z_ref_alpha * y_dst[j].z;
         }
 
         z_st[j].x = valid_coor2(zx, half_densize.x, 0);
         z_st[j].y = valid_coor2(zy, half_densize.y, 1);
-        z_st[j].z = valid_coor2(zz, half_densize.z, 2);
+//        z_st[j].z = valid_coor2(zz, half_densize.z, 2);
     }
 }
 
@@ -1340,20 +1377,26 @@ void myNesterov::UpdateNesterovIter(int iter, struct ITER *it,
         it->tot_wlen = 0;
     }
 
-    if( isPlot && iter % 10 == 0 ){
+    if( (iter % 10 == 0) && 
+           ( isPlot || plotCellCMD ) ) {
         cell_update(x_st, N);
 
         // For circuit viewer
 //        SavePlot(string("Nesterov - Iter: " + std::to_string(iter)), true);
 
+        string modeStr = (STAGE == cGP2D)? "cGP2D" : (STAGE == mGP2D)? "mGP2D" : "";
         // For JPEG Saving
         SaveCellPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(iter)), true,
                        string(dir_bnd) 
-                       + string("/cell/cell_") 
+                       + string("/cell/" + modeStr + "_cell_") 
                        + intoFourDigit(iter) );
         SaveBinPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(iter)), 
                        string(dir_bnd) 
-                       + string("/bin/bin_") 
+                       + string("/bin/" + modeStr + "_bin_") 
+                       + intoFourDigit(iter) );
+        SaveArrowPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(iter)), 
+                       string(dir_bnd) 
+                       + string("/arrow/" + modeStr + "_arrow_") 
                        + intoFourDigit(iter) );
     }
 

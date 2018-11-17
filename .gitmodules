@@ -10,3 +10,6 @@
 [submodule "module/sparsehash"]
 	path = module/sparsehash
 	url = https://github.com/sparsehash/sparsehash
+[submodule "module/OpenSTA"]
+	path = module/OpenSTA
+	url = https://github.com/mgwoo/OpenSTA

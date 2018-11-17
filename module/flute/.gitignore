@@ -1,0 +1,3 @@
+src/flute
+lib/libflute.a
+include/*.h

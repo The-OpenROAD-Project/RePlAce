@@ -75,6 +75,8 @@ void initArgument(int argc, char *argv[]) {
     defCMD = "";
     verilogCMD = "";
     outputCMD = "";
+    experimentCMD = "";
+    
    
     isSkipPlacement = false; 
     hasDensityDP = false;
@@ -93,16 +95,28 @@ void initArgument(int argc, char *argv[]) {
     lambda2CMD = false;             // bool
     dynamicStepCMD = false;         // bool
     onlyGlobalPlaceCMD = false;     // bool
+    isSkipIP = false;     // bool
+    isTiming = false;
+    isNewLayout = false;
+
     isARbyUserCMD = false;          // bool
     thermalAwarePlaceCMD = false;   // bool
     trialRunCMD = false;            // bool
     autoEvalRC_CMD = false;         // bool
-    
-    dpFlag = "";  // mgwoo
-    dpLocation = "";
+   
+
+    detailPlacerFlagCMD = "";  // mgwoo
+    detailPlacerLocationCMD = "";
     isOnlyLGinDP = (routabilityCMD)? true : false;
 
     numThread = 1; // default
+    netWeight = 1.00;
+    netWeightBase = 1.2f;
+    netWeightBound = 1.8f;
+    netWeightScale = 500.0f;
+
+    netCut = 1;
+    timingUpdateIter = 10;
 
     conges_eval_methodCMD = global_router_based;  // int (enum: defined in global.h)
 
@@ -118,9 +132,13 @@ void initArgument(int argc, char *argv[]) {
 
     // density & overflowMin settings
     denCMD = (denCMD == "NULL")? ((routabilityCMD)? "0.9" : "1.0") : denCMD;
-    overflowMinCMD = (overflowMinCMD == "NULL")? ((routabilityCMD)? "0.17" : "0.1") : overflowMinCMD; 
+    overflowMinCMD = (overflowMinCMD == "NULL")? 
+        ((routabilityCMD)? "0.17" : "0.1") : overflowMinCMD; 
+    overflowMin = overflowMin_initial = atof(overflowMinCMD.c_str());
+
 
     DEN_ONLY_PRECON = false;
+    onlyLG_CMD = (routabilityCMD)? true : false;
 
     numLayer = 1;
 
@@ -152,7 +170,6 @@ void initArgument(int argc, char *argv[]) {
     inflation_max_cnt = atof(racntiCMD.c_str());             // lutong
 
 
-
     ref_dwl0 = atof(refdWLCMD.c_str());
     ExtraWSfor3D = 0;     //.12; //0.1;
     MaxExtraWSfor3D = 0;  //.20; //0.2;
@@ -161,15 +178,15 @@ void initArgument(int argc, char *argv[]) {
     dim_bin.z = atoi(bzMaxCMD.c_str());
 
     // detailPlacer settings
-    dpMode = None;
-    if(!strcmp(dpFlag.c_str(), "FP")) {
-        dpMode = FastPlace;
+    detailPlacer = None;
+    if(!strcmp(detailPlacerFlagCMD.c_str(), "FP")) {
+        detailPlacer = FastPlace;
     }
-    else if(!strcmp(dpFlag.c_str(), "NTU3")) {
-        dpMode = NTUplace3;
+    else if(!strcmp(detailPlacerFlagCMD.c_str(), "NTU3")) {
+        detailPlacer = NTUplace3;
     }
-    else if(!strcmp(dpFlag.c_str(), "NTU4")) {
-        dpMode = NTUplace4h;
+    else if(!strcmp(detailPlacerFlagCMD.c_str(), "NTU4")) {
+        detailPlacer = NTUplace4h;
     }
     else {
         printf(
@@ -243,10 +260,32 @@ bool argument(int argc, char *argv[]) {
                 return false;
             }
         }
+        else if(!strcmp(argv[i], "-lib")) {
+            i++;
+            if(argv[i][0] != '-') {
+                libStor.push_back( string(argv[i]) );
+            }
+            else {
+                printf("\n**ERROR: Option %s requires *.lib.\n",
+                       argv[i - 1]);
+                return false;
+            }
+        }
         else if(!strcmp(argv[i], "-output")) {
             i++;
             if(argv[i][0] != '-') {
                 outputCMD = argv[i];
+            }
+            else {
+                printf("\n**ERROR: Option %s requires output's directory.\n",
+                       argv[i - 1]);
+                return false;
+            }
+        }
+        else if(!strcmp(argv[i], "-experi")) {
+            i++;
+            if(argv[i][0] != '-') {
+                experimentCMD = argv[i];
             }
             else {
                 printf("\n**ERROR: Option %s requires output's directory.\n",
@@ -273,6 +312,76 @@ bool argument(int argc, char *argv[]) {
             else {
                 printf("\n**ERROR: Option %s requires density (FLT).\n",
                        argv[i - 1]);
+                return false;
+            }
+        }
+        // timing-related param; NetCut
+        else if(!strcmp(argv[i], "-nc")) {
+            i++;
+            if(argv[i][0] != '-') {
+                netCut = atof(argv[i]);
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; NetWeight
+        else if(!strcmp(argv[i], "-nw")) {
+            i++;
+            if(argv[i][0] != '-') {
+                netWeight = atof(argv[i]);
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; NetWeightBase
+        else if(!strcmp(argv[i], "-nwb")) {
+            i++;
+            if(argv[i][0] != '-') {
+                netWeightBase = atof(argv[i]);
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; NetWeightBoundary
+        else if(!strcmp(argv[i], "-nwbd")) {
+            i++;
+            if(argv[i][0] != '-') {
+                netWeightBound = atof(argv[i]);
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; NetWeightScale
+        else if(!strcmp(argv[i], "-nws")) {
+            i++;
+            if(argv[i][0] != '-') {
+                netWeightScale = atof(argv[i]);
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; Clock 
+        else if(!strcmp(argv[i], "-clock")) {
+            i++;
+            if(argv[i][0] != '-') {
+                timingClock= atof(argv[i]);
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; timingUpdateIter
+        else if(!strcmp(argv[i], "-tIter")) {
+            i++;
+            if(argv[i][0] != '-') {
+                timingUpdateIter = atoi(argv[i]);
+            }
+            else {
                 return false;
             }
         }
@@ -565,7 +674,7 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-dpflag")) {
             i++;
             if(argv[i][0] != '-') {
-                dpFlag = argv[i];
+                detailPlacerFlagCMD = argv[i];
             }
             else {
                 printf("\n**ERROR: Option %s requires which Detailed Placer you want to use",
@@ -580,7 +689,7 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-dploc")) {
             i++;
             if(argv[i][0] != '-') {
-                dpLocation = argv[i];
+                detailPlacerLocationCMD = argv[i];
             }
             else {
                 printf("\n**ERROR: Option %s requires your Detailed Placer's location ",
@@ -743,6 +852,15 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-TR")) {
             trialRunCMD = true;
         }*/
+        else if(!strcmp(argv[i], "-skipIP")) {
+            isSkipIP = true;
+        }
+        else if(!strcmp(argv[i], "-timing")) {
+            isTiming = true;
+        }
+        else if(!strcmp(argv[i], "-newLayout")) {
+            isNewLayout = true;
+        }
         else if(!strcmp(argv[i], "-onlyGP")) {
             onlyGlobalPlaceCMD = true;
         }
@@ -752,6 +870,9 @@ bool argument(int argc, char *argv[]) {
         }*/
         else if(!strcmp(argv[i], "-auto_eval_RC")) {
             autoEvalRC_CMD = true;
+        }
+        else if(!strcmp(argv[i], "-onlyLG")) {
+            onlyLG_CMD = true;
         }
         else {
             printf("\n**ERROR: Option %s is NOT available.\n", argv[i]);
@@ -780,7 +901,7 @@ void printUsage() {
     cout << "  -bmflag     : Specify which Benchmark is Used" << endl ;
     cout << "  -lef        : *.lef Location" << endl ;
     cout << "  -def        : *.def Location" << endl ;
-    cout << "  -v          : *.v Location (Optional)" << endl << endl;
+    cout << "  -verilog    : *.v Location (Optional)" << endl << endl;
     cout << "[Options]"<< endl;
     cout << " Placement " << endl;
     cout << "  -onlyGP     : Only Global Placement mode" << endl;

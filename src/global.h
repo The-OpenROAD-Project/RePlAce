@@ -70,17 +70,20 @@
 typedef float prec;
 #define PREC_MAX FLT_MAX 
 #define PREC_MIN FLT_MIN
+#define PREC_EPSILON numeric_limits<float>::epsilon()
 
 #elif PREC_MODE == IS_DOUBLE
 
 typedef double prec;
 #define PREC_MAX DBL_MAX 
 #define PREC_MIN DBL_MIN
+#define PREC_EPSILON numeric_limits<double>::epsilon()
 
 #endif
 
 #define INT_CONVERT(a)          (int)(1.0*(a) + 0.5f)
 #define INT_DOWN(a)             (int)(a)
+#define INT_UP(a)               (int)(a) + 1
 #define UNSIGNED_CONVERT(a)     (unsigned)(1.0*(a) + 0.5f)
 
 #define TSV_CAP 30.0  // fF
@@ -142,6 +145,8 @@ using std::setprecision;
 using std::map;
 using std::to_string;
 
+using std::numeric_limits;
+using std::make_pair;
 using google::dense_hash_map;
 
 struct POS;
@@ -357,7 +362,6 @@ struct PIN {
 extern vector< vector<string> > mPinName;
 extern vector< vector<string> > tPinName;
 
-
 // *.nodes -> not isTerminal
 // Module Instance
 struct MODULE {
@@ -428,14 +432,14 @@ struct TERM {
     int netCNTinObject;
     int pinCNTinObject;
     int IO;    // I -> 0; O -> 1
-    int tier;
+//    int tier;
     bool isTerminalNI;
     
     prec PL_area;
     
     TERM() : area(0.0f), pof(0), pin(0), name(""), 
     idx(0), netCNTinObject(0), pinCNTinObject(0),
-    IO(0), tier(0), isTerminalNI(0), PL_area(0.0f)  {
+    IO(0), isTerminalNI(0), PL_area(0.0f)  {
         pmin.SetZero();
         pmax.SetZero();
         size.SetZero();
@@ -449,7 +453,7 @@ struct TERM {
         cout << fixed << setprecision(0) ;
         cout << "isTerminalNI: " << (isTerminalNI? "YES" : "NO") << endl;
         cout << "IO: " << ((IO==0)? "Input" : "Output") << endl;
-        cout << "tier: " << tier << endl;
+//        cout << "tier: " << tier << endl;
         pmin.Dump("pmin"); 
         pmax.Dump("pmax"); 
         cout << "area: " << area << endl;
@@ -620,14 +624,13 @@ struct NET {
     prec hpwl_y;
     prec hpwl_z;
     prec hpwl;
+    int outPinIdx; // determine outpin's index
     int pinCNTinObject;
     int pinCNTinObject2;
     int pinCNTinObject_tier; // used for writing bookshelf
-    int HPWL;
     int idx;
     int mod_idx;
-    int flg;
-    int tier;
+    prec timingWeight; // mgwoo
     prec stn_cof;  // lutong
     prec wl_rsmt;  // lutong
 };
@@ -714,6 +717,19 @@ struct TIER {
 
 enum { STDCELLonly, MIXED };
 
+// for timing
+extern prec netCut;
+extern prec netWeight;
+extern prec netWeightMin;
+extern prec netWeightMax;
+
+extern prec netWeightBase;
+extern prec netWeightBound;
+extern prec netWeightScale;
+
+
+extern prec timingClock;
+extern int timingUpdateIter; 
 extern int pinCNT;
 extern int moduleCNT;
 extern int gcell_cnt;
@@ -743,10 +759,10 @@ enum {
 };
 
 // these variable is required to have detailPlacer settings
-extern int dpMode;
+extern int detailPlacer;
 enum { None, FastPlace, NTUplace3, NTUplace4h };
-extern string dpLocation;
-extern string dpFlag;
+extern string detailPlacerLocationCMD;
+extern string detailPlacerFlagCMD;
 
 extern bool isOnlyLGinDP;
 extern bool isSkipPlacement;
@@ -968,7 +984,9 @@ extern PIN *pinInstance;
 extern MODULE *moduleInstance;
 extern CELLx *gcell_st;
 extern TERM *terminalInstance;
+
 extern NET *netInstance;
+extern dense_hash_map<string, int> netNameMap;
 
 // structure for *.scl
 extern ROW *row_st;
@@ -1018,6 +1036,8 @@ extern string defCMD;
 extern string verilogCMD;
 extern vector<string> lefStor;
 extern string outputCMD;
+extern string experimentCMD;
+extern vector<string> libStor;
 
 extern string benchName;
 
@@ -1050,10 +1070,14 @@ extern bool lambda2CMD;
 extern bool dynamicStepCMD;
 extern bool thermalAwarePlaceCMD;
 extern bool onlyGlobalPlaceCMD;
+extern bool isSkipIP;
+extern bool isTiming;
+extern bool isNewLayout;
 extern bool isARbyUserCMD;
 extern bool stnCMD;  // lutong
 extern bool trialRunCMD;
 extern bool autoEvalRC_CMD;
+extern bool onlyLG_CMD;
 
 //////////////////////////////////////////////////////////////////////////
 // Defined in main.cpp ///////////////////////////////////////////////////

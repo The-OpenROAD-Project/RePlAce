@@ -81,7 +81,7 @@ void CallDetailPlace() {
             continue;
         }
 
-        switch(dpMode) {
+        switch(detailPlacer) {
             case FastPlace:
                 call_FastDP_tier(tier_dir, tier_aux, tier_pl);
                 sprintf(tier_dp, "%s/%s_FP_dp.pl", tier_dir, gbch);
@@ -89,15 +89,24 @@ void CallDetailPlace() {
 
             case NTUplace3:  // Default of ePlace except SB benchmarks.
                 CallNtuPlacer3(tier_dir, tier_aux, tier_pl);
-                sprintf(tier_dp, ((isOnlyLGinDP)? "%s/%s.lg.pl":"%s/%s.ntup.pl"), 
-                        tier_dir, gbch);
+                if(onlyLG_CMD) {
+                    sprintf(tier_dp, "%s/%s.lg.pl", tier_dir, gbch);
+                }
+                else {
+                    sprintf(tier_dp, "%s/%s.ntup.pl", tier_dir, gbch);
+                }
                 break;
 
             case NTUplace4h:  // ePlace will always use NTUplace4h for SB
                 // benchmarks.
                 CallNtuPlacer4h(tier_dir, tier_aux, tier_pl);
-                sprintf(tier_dp, ((isOnlyLGinDP)? "%s/%s.lg.pl":"%s/%s.ntup.pl"), 
-                        tier_dir, gbch);
+
+                if(onlyLG_CMD) {
+                    sprintf(tier_dp, "%s/%s.lg.pl", tier_dir, gbch);
+                }
+                else {
+                    sprintf(tier_dp, "%s/%s.ntup.pl", tier_dir, gbch);
+                }
                 break;
         }
 
@@ -131,14 +140,14 @@ void call_FastDP_tier(char *tier_dir, char *tier_aux, char *tier_pl) {
     sprintf(cmd,
             "%s -legalize -noFlipping -noDp -target_density %.2lf -window 10 "
             "%s %s %s %s\n",
-            dpLocation.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
+            detailPlacerLocationCMD.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
 
 #else
 
     sprintf(cmd,
             "%s -legalize -noFlipping -target_density %.2lf -window 10 %s %s "
             "%s %s\n",
-            dpLocation.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
+            detailPlacerLocationCMD.c_str(), target_cell_den, tier_dir, tier_aux, tier_dir, tier_pl);
 
 #endif
 
@@ -148,20 +157,18 @@ void call_FastDP_tier(char *tier_dir, char *tier_aux, char *tier_pl) {
 void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
     char cmd[BUF_SZ] = {0, };
 
-//    if(INPUT_FLG == ISPD || INPUT_FLG == MMS) {
-    if(hasDensityDP ||
-            INPUT_FLG == ISPD || INPUT_FLG == MMS ) {
-        sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -util %.2lf -noglobal \n",
-                dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl,
-                ((hasDensityDP)? densityDP : target_cell_den));
-    }
-    else if( isOnlyLGinDP ){
-        sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal -nodetail\n",
-                dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
+    sprintf(cmd,"ln -s %s %s/", detailPlacerLocationCMD.c_str(), tier_dir);
+    cout << cmd << endl;
+    system(cmd);
+
+    if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
+        sprintf(cmd, "cd %s && ./ntuplace3 -aux %s -loadpl %s -util %.2lf -noglobal \n",
+                tier_dir, tier_aux, tier_pl,
+                target_cell_den);
     }
     else {
-        sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
-                dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
+        sprintf(cmd, "cd %s && ./ntuplace3 -aux %s -loadpl %s -noglobal \n",
+                tier_dir, tier_aux, tier_pl);
     }
 
     // call
@@ -169,6 +176,7 @@ void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
     cout << cmd << endl;
     system(cmd);
 
+    /*
     // mv All generated pl files
     cout << "Move to " << tier_dir << "..." << endl;
     sprintf(cmd,"mv ./%s.ntup.pl %s", gbch, tier_dir);
@@ -186,13 +194,14 @@ void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
     sprintf(cmd,"mv ./%s.lg.plt %s", gbch, tier_dir);
     cout << cmd << endl;
     system(cmd);
+    */
 }
 
 void CallNtuPlacer4h(char *tier_dir, char *tier_aux, char *tier_pl) {
 
     char cmd[BUF_SZ] = {0, };
     sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n", 
-            dpLocation.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
+            detailPlacerLocationCMD.c_str(), tier_dir, tier_aux, tier_dir, tier_pl);
     
     cout << "INFO:  Execute NTUPlacer4h" << endl;
     cout << cmd << endl;

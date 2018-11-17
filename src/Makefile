@@ -1,18 +1,22 @@
 CC		=   gcc
 CPPC	=   g++
 LD      =   ld
-OPTFLAG = 	-m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
+OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
+# OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
 WFLAG 	= 	-W -Wall -Wextra -Wunreachable-code 
 WSTRICT =	-Werror -Wundef -Wpointer-arith 
 
 INCLUDE = 	-I$(CURDIR) -I$(MKLROOT)/include -I$(IPPROOT)/include \
 			-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
-			-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/include
+			-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/include \
+		    -I$(FLUTEROOT)/include -I$(BOOSTROOT)/include \
+			-I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT) \
+			-I/home/tool/tcl/tcl8.5.13/include	
 
 IMATH 	= 	-I$(MKLROOT)/include -I$(IPPROOT)/include
 
 CFLAG   =   -std=c11   $(OPTFLAG)  
-CPPFLAG =   -std=c++1y $(OPTFLAG)
+CPPFLAG =   -std=c++14 $(OPTFLAG)
 
 #Get Only the Internal Structure of SRCDIR Recursively
 SRCDIR	= 	$(CURDIR)
@@ -35,22 +39,46 @@ DEPENDS			=   $(HFILES)
 LEFROOT 		= ../module/lef/5.8-p027
 DEFROOT 		= ../module/def/5.8-p027
 VERILOGROOT 	= ../module/verilog-parser
+FLUTEROOT 		= ../module/flute
+BOOSTROOT 		=  /home/tool/boost/boost_1_66_0/
 
 DEFLIB         	= -L$(DEFROOT)/lib -ldef -ldefzlib -lcdef -lcdefzlib
 LEFLIB         	= -L$(LEFROOT)/lib -llef -llefzlib -lclef -lclefzlib
-VERILOGLIB 		= -L$(VERILOGROOT)/lib -lverilog_parser 
+VERILOGLIB 		= -L$(VERILOGROOT)/lib -lverilog_parser
+FLUTELIB 		= -L$(FLUTEROOT)/lib -lflute
+BOOSTLIB 		= -L$(BOOSTROOT)/lib
+MKLLIB 			= ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
+					${MKLROOT}/lib/intel64/libmkl_gnu_thread.a \
+					${MKLROOT}/lib/intel64/libmkl_core.a \
+					${IPPROOT}/lib/intel64/libippi.a \
+				   	${IPPROOT}/lib/intel64/libipps.a \
+					${IPPROOT}/lib/intel64/libippcore.a \
+				   	${IPPROOT}/lib/intel64/libippvm.a
+
+OPENSTALIB 		= $(OPENSTAROOT)/lib/libliberty.a \
+					$(OPENSTAROOT)/lib/libutil.a \
+					$(OPENSTAROOT)/lib/libsearch.a \
+					$(OPENSTAROOT)/lib/libdcalc.a \
+					$(OPENSTAROOT)/lib/libgraph.a \
+					$(OPENSTAROOT)/lib/libnetwork.a \
+					$(OPENSTAROOT)/lib/libparasitics.a \
+					$(OPENSTAROOT)/lib/libsdc.a \
+					$(OPENSTAROOT)/lib/libsdf.a \
+					$(OPENSTAROOT)/lib/libverilog.a
 
 ifndef	MKLROOT
-    MKLROOT		=	/home/tool/intel/compilers_and_libraries_2016.3.210/linux/mkl
+    MKLROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/mkl
 endif
 
 ifndef	IPPROOT
-    IPPROOT		=	/home/tool/intel/compilers_and_libraries_2016.3.210/linux/ipp
+    IPPROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/ipp
 endif
 
 HASHROOT 		= ../module/sparsehash/install-sp/include
 EIGENROOT 		= ../module/eigen-git-mirror/
 CIMGROOT 		= ../module/CImg/
+OPENSTAROOT 	= ../module/OpenSTA/install-sp/
+OPENSTASRCROOT 	= ../module/OpenSTA/
 
 ### RULES ###############
 %.o:		%.c 	$(DEPENDS)
@@ -64,7 +92,9 @@ CIMGROOT 		= ../module/CImg/
 	@echo "  Building... $@"
 	$(CPPC) $(CPPFLAG) $(INCLUDE) -c -o $@ $< 
 
-RePlAce	: $(OBJFILES) 
+RePlAce	: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
+	$(OPENSTASRCROOT)/app/StaMain.o \
+	$(OPENSTASRCROOT)/app/TclInitVar.o
 	@echo " "
 	@echo "  Linking..."
 	@echo "    Intel Math Kernel Library (MKL 11.3.3) and"
@@ -76,11 +106,9 @@ RePlAce	: $(OBJFILES)
 	$(CPPC) -o $@                               \
 	$(CPPFLAG) 					    			\
 	$^ 											\
- 	-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
-	${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a \
-	${IPPROOT}/lib/intel64/libippi.a  ${IPPROOT}/lib/intel64/libipps.a \
-	${IPPROOT}/lib/intel64/libippcore.a  ${IPPROOT}/lib/intel64/libippvm.a \
-	-Wl,--end-group -lgomp -lpthread -lm -ldl -lX11 ${LEFLIB} ${DEFLIB} ${VERILOGLIB} -static-libstdc++ 
+ 	-Wl,--start-group ${MKLLIB} ${OPENSTALIB} -Wl,--end-group \
+	-lgomp -lpthread -lm -ldl -lX11 -ltcl8.5 -lz \
+	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} ${BOOSTLIB} -static-libstdc++ 	
 	@echo " "
 	@echo "  Linking is completed !!"
 	@echo " "

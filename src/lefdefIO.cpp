@@ -54,6 +54,9 @@
 #include "verilog_ast_util.h"
 
 #include "mkl.h"
+
+#include "timing.h"
+#include "timingSta.h"
 #include <iostream>
 #include <boost/functional/hash.hpp>
 
@@ -173,6 +176,15 @@ inline static bool IsPrecEqual(prec a, prec b) {
     return std::fabs(a-b) < std::numeric_limits<float>::epsilon();
 }
 
+// for string escape
+void ReplaceStringInPlace(std::string& subject, const std::string& search,
+                          const std::string& replace) {
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != std::string::npos) {
+         subject.replace(pos, search.length(), replace);
+         pos += replace.length();
+    }
+}
 
 // 
 // this will set below (global) parameter, needed to parse LEF/DEF file
@@ -478,6 +490,52 @@ bool AddShape(int defCompIdx, int lx, int ly) {
 }
 
 
+void SetSizeForObsMacro( int macroIdx, MODULE* curModule )  {
+    bool isMetal1 = false;
+    for(auto& curObs : __ckt.lefObsStor[macroIdx]) {
+        lefiGeometries* curGeom = curObs.geometries();
+        
+        // LAYER Metal1 <-- lefiGeomLayerE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //
+        //
+        // LAYER VIA1 <-- Skip for this 
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+        //   RECT XXXX XXXX XXXX XXXX <-- lefiGeomRectE
+       
+        for(int j=0; j<curGeom->numItems(); j++) {
+            // Meets 'Metal1' Layer
+            if( curGeom->itemType(j) == lefiGeomLayerE &&
+                    string(curGeom->getLayer(j)) == metal1Name ) {
+//                cout << j << " " << curGeom->getLayer(j) << endl;
+                isMetal1 = true;
+                continue;
+            }
+            
+            // calculate BBox
+            if( isMetal1 && curGeom->itemType(j) == lefiGeomRectE ) {
+                lefiGeomRect* rect = curGeom->getRect(j);
+                
+                curModule->size.Set( l2d*(rect->xh - rect->xl)/unitX, l2d*(rect->yh - rect->yl)/unitY, 1 );
+//                cout << rect->xl << " " << rect->yl << endl;
+//                cout << rect->xh << " " << rect->yh << endl;
+            }
+            // now, meets another Layer
+            else if( isMetal1 && curGeom->itemType(j) == lefiGeomLayerE ) {
+                break;
+            }
+        }
+        // firstMetal was visited
+        if( isMetal1 ) {
+            break;
+        }
+    }
+//    cout << "func end" << endl;
+}
+
 //
 // defComponentStor(non FIXED cell) -> moduleInstance
 // defComponentStor(FIXED cell), defPinStor -> terminalInstnace
@@ -534,9 +592,18 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
             exit(1);
         }
 
-        // size info update from LEF Macro
-        curModule->size.Set( l2d * curMacro->sizeX()/unitX, 
-                             l2d * curMacro->sizeY()/unitY, 1 );
+        if( strcmp( curMacro->macroClass(), "BLOCK") == 0 &&
+            __ckt.lefObsStor[macroPtr->second].size() != 0 ) {
+//            cout << "BLOCK/OBS macro dected" << endl;
+
+            SetSizeForObsMacro(macroPtr->second, curModule);
+//            curModule.size.Set( l2d * curMacro);
+        }
+        else {
+            // size info update from LEF Macro
+            curModule->size.Set( l2d * curMacro->sizeX()/unitX, 
+                    l2d * curMacro->sizeY()/unitY, 1 );
+        }
 
         // set half_size
         curModule->half_size.Set( curModule->size.x / 2, 
@@ -684,6 +751,66 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
     }
     cout << "INFO:  #MODULE: " << moduleCNT << ", #TERMINAL: " << terminalCNT << endl;
 }
+
+
+struct Rect {
+    int llx, lly, urx, ury;
+    Rect() : llx(INT_MAX), lly(INT_MAX), urx(INT_MIN), ury(INT_MIN) {};
+    bool isNotInitialize () {
+        return ( llx == INT_MAX || lly == INT_MAX
+            || urx == INT_MIN || ury == INT_MIN) ;
+    }
+    void Dump() {
+        cout << "(" << llx << ", " << lly << ") - (" << urx << ", " << ury << ")" << endl;
+    }
+};
+
+
+Rect GetDieFromProperty() {
+
+    // Set DieArea from PROPERTYDEFINITIONS
+    string llxStr = "FE_CORE_BOX_LL_X", urxStr = "FE_CORE_BOX_UR_X";
+    string llyStr = "FE_CORE_BOX_LL_Y", uryStr = "FE_CORE_BOX_UR_Y";
+
+    Rect retRect;
+    for(auto& prop: __ckt.defPropStor) {
+        if (strcmp( prop.propType(), "design") != 0) {
+            continue;
+        }
+
+        if( string(prop.propName()) == llxStr ) {
+            retRect.llx = INT_CONVERT(prop.number() * l2d / unitX); 
+        }
+        else if( string(prop.propName()) == llyStr ) {
+            retRect.lly = INT_CONVERT(prop.number() * l2d / unitY);
+        }
+        else if( string(prop.propName()) == urxStr ) {
+            retRect.urx = INT_CONVERT(prop.number() * l2d / unitX);
+        }
+        else if( string(prop.propName()) == uryStr ) {
+            retRect.ury = INT_CONVERT(prop.number() * l2d / unitY);
+        }
+    }
+    return retRect; 
+}
+
+Rect GetDieFromDieArea() {
+    Rect retRect;
+    defiPoints points = __ckt.defDieArea.getPoint();
+    if( points.numPoints >=2 ) {
+        retRect.llx = points.x[0] / unitX;
+        retRect.lly = points.y[0] / unitY;
+        retRect.urx = points.x[1] / unitX;
+        retRect.ury = points.y[1] / unitY;
+    }
+    for(int i=0; i<points.numPoints; i++) {
+        cout << points.x[i] << " " << points.y[i] << endl;
+    }
+    
+    retRect.Dump();
+    return retRect;
+}
+
 //////// 
 //
 //  Generate RowInstance
@@ -1009,8 +1136,8 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
     tPinName.resize(terminalCNT);
     mPinName.resize(moduleCNT);
 
+    netNameMap.set_empty_key(INIT_STR);
     for(auto& net : __ckt.defNetStor) {
-        
         if( strcmp (net.name(), "iccad_clk") == 0 ||
                 strcmp( net.name(), "clk") == 0 ||
                 strcmp( net.name(), "clock") == 0 ) {
@@ -1022,15 +1149,20 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
             clockNetsDef.push_back( &net - &__ckt.defNetStor[0]);
             continue;
         }
-        
         // skip for Power/Ground/Reset Nets
         if( net.hasUse() ) {
             continue;
         }
 
         curNet = &netInstance[netIdx];
-        strcpy( curNet->name, net.name() );
+        string netName = string(net.name());
+        ReplaceStringInPlace(netName, "\\[", "[");
+        ReplaceStringInPlace(netName, "\\]", "]");
+
+        strcpy( curNet->name, netName.c_str() );
+        netNameMap[ netName ] = netIdx;
         curNet->idx = netIdx;
+        curNet->timingWeight = 0;
     
         curNet->pinCNTinObject = net.numConnections();
 //        cout << "connection: " << net.numConnections() << endl;
@@ -1637,3 +1769,167 @@ void ReadPlLefDef(const char* fileName) {
     fclose(fp);
 }
 
+TIMING_NAMESPACE_OPEN
+
+// copy scale down parameter into Timing Instance
+void Timing::SetLefDefEnv() {
+    _unitX = unitX;
+    _unitY = unitY;
+    _l2d = l2d;
+}
+
+void Timing::WriteSpefClockNet( stringstream& feed ) {
+    if( clockNetsDef.size() != 0) {
+        WriteSpefClockNetDef( feed );
+    }
+    else if( clockNetsVerilog.size() != 0 ) {
+        WriteSpefClockNetVerilog( feed );
+    }
+}
+
+void Timing::WriteSpefClockNetDef( stringstream& feed ) { 
+    for(auto& curClockNet : clockNetsDef) {
+        defiNet& net = __ckt.defNetStor[curClockNet];
+        feed << "*D_NET " << net.name() << " 0" << endl << "*CONN" << endl;
+        for(int i=0; i<net.numConnections(); i++) {
+            // net.pin(i) itself exists on termInst
+            if( strcmp( net.instance(i), "PIN") == 0 ) {
+                feed << "*P " << net.pin(i);
+                
+                // extract Input/Output direction from PINS statement
+                auto pinPtr = __ckt.defPinMap.find( string(net.pin(i)) );
+                if( pinPtr == __ckt.defPinMap.end() ) {
+                    cout << "** ERROR:  Net Instance ( "<<net.pin(i) 
+                         << " ) does not exist in PINS statement (defPinMap) " << endl;
+                    exit(1);
+                }
+
+                int defPinIdx = pinPtr->second;
+//                cout << "foundPinIdx: " << defPinIdx << endl;
+//                assert( defPinIdx < __ckt.defPinStor.size() );
+
+                int io = INT_MAX;
+                if( !__ckt.defPinStor[defPinIdx].hasDirection() ) {
+                    cout << "** ERROR:  PINS statement in DEF, " << net.pin(i)
+                        << " have no direction!!" << endl;
+                    exit(0);
+//                    io = 2; // both direction
+                }
+                else {
+                    // input : 0
+                    // output : 1
+                    io = (strcmp( __ckt.defPinStor[defPinIdx].
+                                    direction(), "INPUT") == 0 )? 0 : 1;
+                }
+                feed << (( io == 0)? " I" : " O") << endl;
+            }
+            else {
+                string instName = string(net.instance(i));
+                string pinName = string(net.pin(i));
+                
+                // Get IO information
+                int io = GetIO( __ckt, instName, pinName );
+                
+                feed << "*I " << instName << ":" << pinName << (( io == 0)? " I" : " O") << endl;
+            }
+        }
+        feed << "*END" << endl << endl; 
+    }
+}
+
+void Timing::WriteSpefClockNetVerilog( stringstream& feed ) {
+    for(auto& curClockNet : clockNetsVerilog) {
+        feed << "*D_NET " << curClockNet << " 0" << endl << "*CONN" << endl;
+        for( auto& connection : netMap[curClockNet]) {
+            /////////////// Net Info Mapping part
+            // 
+            // find current component is in module or terminal
+            //
+            if( connection.macroIdx == INT_MAX && connection.compIdx == INT_MAX) {
+                string pinName = string(__ckt.defPinStor[connection.pinIdx].pinName());
+                auto mtPtr = moduleTermMap.find( pinName );
+                if(mtPtr == moduleTermMap.end()) {
+                    cout << "** ERROR:  Net Instance ( "
+                        << pinName
+                        << " ) does not exist in COMPONENTS/PINS statement "
+                        << "(moduleTermMap) " << endl;
+                    exit(1);
+                }
+
+                // terminal Index setting
+                int termIdx = mtPtr->second.second;
+
+                int io = INT_MAX;
+                if( !__ckt.defPinStor[connection.pinIdx].hasDirection() ) {
+                    io = 2; // both direction
+                }
+                else {
+                    // input : 0
+                    // output : 1
+                    io = (strcmp( __ckt.defPinStor[connection.pinIdx].
+                                    direction(), "INPUT") == 0 )? 0 : 1;
+                }
+                feed << "*P " << pinName;
+                feed << (( io == 0)? " I" : " O") << endl;
+            }
+            else {
+                auto mtPtr = moduleTermMap.find( 
+                        string(__ckt.defComponentStor[connection.compIdx].id()) );
+
+                if(mtPtr == moduleTermMap.end()) {
+                    cout << "** ERROR:  Net Instance ( "
+                        << __ckt.defComponentStor[connection.compIdx].id()
+                        << " ) does not exist in COMPONENTS/PINS statement "
+                        << "(moduleTermMap) " << endl;
+                    exit(1);
+                }
+                
+                string compName = 
+                    string( __ckt.defComponentStor[connection.compIdx].id());
+                string pinName = 
+                    string( __ckt.lefPinStor[connection.macroIdx][connection.pinIdx].name()); 
+
+                int moduleIdx = mtPtr->second.second;
+
+                // 
+                // located in terminal cases
+                if( !mtPtr->second.first ) {
+                    TERM* curTerminal = &terminalInstance[moduleIdx];
+                    // outer pin
+                    if( curTerminal->isTerminalNI ) {
+                        feed << "*P " << compName;
+                    }
+                    // inner fixed cell's pin
+                    else {
+                        feed << "*I " << compName << ":" << pinName;
+                    }
+                }  
+                // inner module pin
+                else {
+                    feed << "*I " << compName << ":" << pinName;
+                }
+
+                int io = GetIO( __ckt, 
+                        compName, 
+                        pinName, 
+                        connection.macroIdx ); 
+                feed << (( io == 0)? " I" : " O") << endl;
+
+            }
+        }
+        feed << "*END" << endl << endl; 
+    }
+}
+
+void Timing::UpdateSpefClockNetVerilog() {
+    for(auto& curClockNet : clockNetsVerilog) {
+        char* netNamePtr = new char[curClockNet.length()+1];
+        strcpy(netNamePtr, curClockNet.c_str());
+        sta::Net* net = sta::spef_reader->findNet(netNamePtr);
+        SpefTriple* netCap = new SpefTriple ( 0 );
+        sta::spef_reader->dspfBegin( net , netCap );
+        sta::spef_reader->dspfFinish();
+    }
+}
+
+TIMING_NAMESPACE_CLOSE

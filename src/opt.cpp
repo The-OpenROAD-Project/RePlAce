@@ -933,7 +933,7 @@ void expand_gp_from_one(void) {
 //        bp->term_area2 *= area_scal;
         bp->virt_area *= area_scal;
 //        bp->virt_area2 *= area_scal;
-        bp->pl_area *= area_scal;
+//        bp->pl_area *= area_scal;
         bp->pmin = fp_add(bin_org, fp_mul(bin_stp, p2fp(bp->p)));
         bp->pmax = fp_add(bp->pmin, bin_stp);
         bp->center = fp_add(bp->pmin, fp_scal(0.5, bin_stp));
@@ -1153,7 +1153,7 @@ void shrink_gp_to_one(void) {
 //        bp->term_area2 *= area_scal;
         bp->virt_area *= area_scal;
 //        bp->virt_area2 *= area_scal;
-        bp->pl_area *= area_scal;
+//        bp->pl_area *= area_scal;
         bp->pmin = fp_add(bin_org, fp_mul(bin_stp, p2fp(bp->p)));
         bp->pmax = fp_add(bp->pmin, bin_stp);
         bp->center = fp_add(bp->pmin, fp_scal(0.5, bin_stp));
@@ -1420,7 +1420,7 @@ void cell_init_2D(void) {
     int z = 0, i = 0;
     struct CELLx *cell = NULL;
     struct TIER *tier = NULL;
-    struct FPOS scal = zeroFPoint;
+    struct FPOS scal;
 
     // if ((INPUT_FLG == MMS && (target_cell_den == 1.00f ||
     //                          target_cell_den == 0.80f ||

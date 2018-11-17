@@ -290,8 +290,146 @@ void DrawBinDensity(CImgObj& img, float opacity) {
     }
 }
 
-void DrawArrowDensity(CImgObj& img, float opacity) {
 
+void CimgDrawArrow( CImgObj& img, int x1, int y1, 
+        int x3, int y3, int thick, 
+        const unsigned char color[], float opacity) {
+
+    // ARROW HEAD DRAWING
+    float arrowHeadSize = thick;
+    float theta = atan( 1.0 * (y3-y1)/(x3-x1));
+    float invTheta = atan( -1.0 * (x3-x1)/(y3-y1));
+    
+    // ARROW RECT DRAWING
+    int ldX = x1 - 1.0*thick/4*cos(invTheta);
+    int ldY = y1 - 1.0*thick/4*sin(invTheta);
+    int rdX = x1 + 1.0*thick/4*cos(invTheta);
+    int rdY = y1 + 1.0*thick/4*sin(invTheta);
+
+    int luX = x3 - 1.0*thick/4*cos(invTheta);
+    int luY = y3 - 1.0*thick/4*sin(invTheta);
+    int ruX = x3 + 1.0*thick/4*cos(invTheta);
+    int ruY = y3 + 1.0*thick/4*sin(invTheta);
+
+    cimg_library::CImg<int> rectPoints(4, 2);
+    rectPoints(0, 0) = ldX;
+    rectPoints(0, 1) = ldY;
+    rectPoints(1, 0) = rdX;
+    rectPoints(1, 1) = rdY;
+    rectPoints(2, 0) = ruX;
+    rectPoints(2, 1) = ruY;
+    rectPoints(3, 0) = luX;
+    rectPoints(3, 1) = luY;
+
+    img.draw_polygon(rectPoints, color); 
+    
+
+    cimg_library::CImg<int> headPoints(3, 2);
+    int lPointX = x3 - 1.0*thick/2*cos(invTheta);
+    int lPointY = y3 - 1.0*thick/2*sin(invTheta);
+    int rPointX = x3 + 1.0*thick/2*cos(invTheta);
+    int rPointY = y3 + 1.0*thick/2*sin(invTheta);
+
+    int uPointX = ( 1.0*(x3-x1) >= 0 )? 
+        x3 + 1.0*thick*cos(theta): 
+        x3 - 1.0*thick*cos(theta);
+    int uPointY = ( 1.0*(x3-x1) >= 0 )? 
+        y3 + 1.0*thick*sin(theta): 
+        y3 - 1.0*thick*sin(theta);
+    
+//    int uPointX = x3 + 1.0*thick*cos(theta);
+//    int uPointY = y3 + 1.0*thick*sin(theta);
+
+    headPoints(0, 0) = lPointX;
+    headPoints(0, 1) = lPointY;
+    headPoints(1, 0) = rPointX;
+    headPoints(1, 1) = rPointY;
+    headPoints(2, 0) = uPointX;
+    headPoints(2, 1) = uPointY;
+
+//    cout << x3 << " " << y3 << endl;
+//    cout << lPointX << " " << lPointY << endl;
+//    cout << rPointX << " " << rPointY << endl;
+//    cout << uPointX << " " << uPointY << endl << endl;
+
+    img.draw_polygon(headPoints, color);
+//    img.draw_arrow( x1, y1, x3, y3, color, opacity );
+}
+
+void DrawArrowDensity(CImgObj& img, float opacity) {
+   
+
+    int binMaxX = (STAGE==cGP2D)? dim_bin_cGP2D.x : 
+        (STAGE==mGP2D)? dim_bin_mGP2D.x : INT_MIN;
+    int binMaxY = (STAGE==cGP2D)? dim_bin_cGP2D.y : 
+        (STAGE==mGP2D)? dim_bin_mGP2D.y : INT_MIN;
+    
+    int arrowSpacing = binMaxX/16;
+
+    // below is essential for extracting e?Max
+    prec exMax = PREC_MIN, eyMax = PREC_MIN, ezMax = PREC_MIN;
+    for(int i=0; i<binMaxX; i += arrowSpacing ) {
+        for(int j=0; j<binMaxY; j += arrowSpacing ) {
+            int binIdx = binMaxX*j + i;
+            BIN* curBin = &tier_st[0].bin_mat[binIdx];
+            
+            prec newEx = fabs(curBin->e.x);
+            prec newEy = fabs(curBin->e.y);
+
+            exMax = (exMax < newEx)? newEx : exMax;
+            eyMax = (eyMax < newEy)? newEy : eyMax;
+        }
+    }
+        
+
+    for(int i=0; i<binMaxX; i += arrowSpacing ) {
+        for(int j=0; j<binMaxY; j += arrowSpacing ) {
+            int binIdx = binMaxX*j + i;
+            BIN* curBin = &tier_st[0].bin_mat[binIdx];
+
+            int signX = (curBin->e.x > 0)? 1:-1;
+            int signY = (curBin->e.y > 0)? 1:-1;
+            //        int signZ = (curBin->e.z > 0)? 1:-1;
+
+            prec newVx = fabs(curBin->e.x);
+            prec newVy = fabs(curBin->e.y);
+            //        prec newEz = fabs(curBin->e.z / place.cnt.z);
+
+            int x1 = curBin->center.x;
+            int y1 = curBin->center.y;
+
+            prec dx = signX*newVx/exMax;
+            prec dy = signY*newVy/eyMax;
+
+            //        prec theta = atan(dy / dx);
+            prec length = sqrt( 
+                    pow(tier_st[0].bin_stp.x, 2.0)
+                    + pow(tier_st[0].bin_stp.y, 2.0)) * 5;
+
+            int x3 = x1 + dx*length;
+            int y3 = y1 + dy*length;
+
+
+            int drawX1 = pe.GetX( x1 );
+            int drawY1 = pe.GetY( y1 );
+            int drawX3 = pe.GetX( x3 );
+            int drawY3 = pe.GetY( y3 );
+
+//            img.draw_arrow( drawX1, drawY1, drawX3, drawY3, black, opacity );
+            CimgDrawArrow( img, drawX1, drawY1, drawX3, drawY3, 20, 
+                    red , opacity );
+//        cout << "sign: " <<signX << endl;
+//        cout << "newVx: " << newVx << endl;
+//        cout << "exMax: " << exMax << endl;
+//        cout << "bin_stp: " << bin_stp.x << endl;
+//        cout << binCoordi.x << " " << binCoordi.y << " " 
+//            << curBin->center.x << " " << curBin->center.y << " " 
+//            << signX*newVx/exMax * bin_stp.x * 10 << " " 
+//            << signY*newVy/eyMax * bin_stp.y * 10 << endl;
+        }
+    }
+
+//    cout << "theta: " << theta << endl;
 }
 
 void SaveCellPlot(CImgObj& img, bool isGCell) {
@@ -315,6 +453,7 @@ void SaveBinPlot(CImgObj& img) {
 
 void SaveArrowPlot(CImgObj& img) {
     float opacity = 1;
+    DrawBinDensity(img, opacity);     
     DrawArrowDensity(img, opacity);     
 }
 
@@ -2721,6 +2860,8 @@ void mkdirPlot() {
     sprintf(mkdir_cmd, "mkdir -p %s/bin", dir_bnd);
     system(mkdir_cmd);
 
+    sprintf(mkdir_cmd, "mkdir -p %s/arrow", dir_bnd);
+    system(mkdir_cmd);
     /*
     sprintf(mkdir_cmd, "mkdir -p %s/den", dir_bnd);
     system(mkdir_cmd);

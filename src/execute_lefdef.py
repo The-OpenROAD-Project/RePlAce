@@ -17,7 +17,7 @@ import time
 bmflag = "etc"
 dpflag = "NTU3"
 dploc = "../ntuplace/ntuplace3"
-dirpos = "../bench_lefdef"
+dirpos = "../bench/lefdef"
 binaryName = "./RePlAce"
 outpos = "../output"
 logpos = "../logdir"
@@ -29,10 +29,14 @@ isValgrind = False
 isNohup = False
 isCentos = False
 useScreen = False 
-isPlot = False 
+isAplot = False 
+
 
 ## configure done 
 #####################################
+
+dploc = os.path.abspath(dploc)
+
 
 def ExecuteCommand( command ):
     print( command )
@@ -86,7 +90,7 @@ curTime = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
 
 placeModeStr = "-onlyGP" if isOnlyGP else "-dpflag %s -dploc %s" % (dpflag, dploc)
 directStr = ">" if isNohup else "|& tee" if isCentos else "| tee"
-plotStr = "-plot" if isPlot else ""
+plotStr = "-plot" if isAplot else ""
 
 valgrindStr = "valgrind --log-fd=1" if isValgrind else ""
 nohupFrontStr = "nohup" if isNohup else "" 
@@ -109,8 +113,10 @@ if type(benchName) is list:
         lefStr = GetFileStr( dirpos, curBench, 'lef', '-lef')
         defStr = GetFileStr( dirpos, curBench, 'def', '-def')
         verilogStr = GetFileStr( dirpos, curBench, 'v', '-verilog')
+        libStr = GetFileStr( dirpos, curBench, 'lib', '-lib')
+        sdcStr = GetFileStr( dirpos, curBench, 'sdc', '-sdc')
 
-        exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr )
+        exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr + sdcStr )
         exeFormat = "screen -S %s -X stuff \"" + exeFormat + "\n\"" if useScreen else exeFormat
 
         nameList = (nohupFrontStr, valgrindStr, \
@@ -137,8 +143,10 @@ else:
     lefStr = GetFileStr( dirpos, benchName, 'lef', '-lef')
     defStr = GetFileStr( dirpos, benchName, 'def', '-def')
     verilogStr = GetFileStr( dirpos, benchName, 'v', '-verilog')
+    libStr = GetFileStr( dirpos, benchName, 'lib', '-lib')
+    sdcStr = GetFileStr( dirpos, benchName, 'sdc', '-sdc')
         
-    exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr )
+    exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr + sdcStr )
     exeFormat = "screen -S %s -X stuff \"" + exeFormat + "\n\"" if useScreen else exeFormat
    
     if useScreen: 

@@ -96,12 +96,10 @@ POS get_bin_idx(int idx) {
     }
     else {
         if(STAGE == mGP2D) {
-            cout << "this is Mixed GP" << endl;
             p.x = idx / dim_bin_mGP2D.y;
             p.y = idx % dim_bin_mGP2D.y;
         }
         else if(STAGE == cGP2D) {
-            cout << "this is Original GP" << endl;
             p.x = idx / dim_bin_cGP2D.y;
             p.y = idx % dim_bin_cGP2D.y;
         }
@@ -194,14 +192,15 @@ void bin_init() {
 //        binp->term_area2 = 0;
         binp->flg = 0;
         binp->virt_area = 0;
-        binp->pl_area = 0;
+//        binp->pl_area = 0;
+        prec plArea = 0;
 
         for(int k = 0; k < place_st_cnt; k++) {
             PLACE *pl = &place_st[k];
-            binp->pl_area += pGetCommonAreaXY(pl->org, pl->end, binp->pmin, binp->pmax);
+            plArea += pGetCommonAreaXY(pl->org, pl->end, binp->pmin, binp->pmax);
         }
 
-        binp->virt_area = (bin_area - binp->pl_area) * global_macro_area_scale;
+        binp->virt_area = (bin_area - plArea ) * global_macro_area_scale;
 //        binp->dump(to_string(i));
     }
 
@@ -428,16 +427,17 @@ void bin_init_2D(int STAGE) {
 
             bp->virt_area = 0;
 
-            bp->pl_area = 0;
+//            bp->pl_area = 0;
+            prec plArea = 0;
 
             for(int k = 0; k < place_st_cnt; k++) {
                 PLACE* pl = &place_st[k];
 //                bp->pl_area += get_common_area(pl->org, pl->end, bp->pmin, bp->pmax);
-                bp->pl_area += pGetCommonAreaXY(pl->org, pl->end, bp->pmin, bp->pmax);
+                plArea += pGetCommonAreaXY(pl->org, pl->end, bp->pmin, bp->pmax);
             }
 
             bp->virt_area =
-                (tier->bin_area - bp->pl_area) * global_macro_area_scale;
+                (tier->bin_area - plArea) * global_macro_area_scale;
         }
     }
 
@@ -455,8 +455,8 @@ void bin_init_2D(int STAGE) {
             continue;   
         }
 
-        int z = term->tier;
-        TIER *tier = &tier_st[z];
+//        int z = term->tier;
+        TIER *tier = &tier_st[0];
 
         // there is no shapes 
         if( shapeMap.find( term-> name ) == shapeMap.end() ) {
@@ -518,8 +518,9 @@ void UpdateTerminalArea( TIER* tier, FPOS* pmin, FPOS* pmax ) {
             INT_DOWN((rect.pmin.y - tier->bin_org.y) * tier->inv_bin_stp.y));
         
         POS bin_pmax( 
-            INT_DOWN((rect.pmax.x - tier->bin_org.x) * tier->inv_bin_stp.x),
-            INT_DOWN((rect.pmax.y - tier->bin_org.y) * tier->inv_bin_stp.y));
+            INT_UP((rect.pmax.x - tier->bin_org.x) * tier->inv_bin_stp.x),
+            INT_UP((rect.pmax.y - tier->bin_org.y) * tier->inv_bin_stp.y));
+
 
         bin_pmin.SetXYProjection( POS(0, 0), POS(tier->dim_bin.x-1, 
                     tier->dim_bin.y-1)); 
@@ -1241,9 +1242,9 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
     b0.y = INT_DOWN ((pmin.y - bin_org.y) * inv_bin_stp.y);
     b0.z = INT_DOWN ((pmin.z - bin_org.z) * inv_bin_stp.z);
 
-    b1.x = INT_DOWN((pmax.x - bin_org.x) * inv_bin_stp.x);
-    b1.y = INT_DOWN((pmax.y - bin_org.y) * inv_bin_stp.y);
-    b1.z = INT_DOWN((pmax.z - bin_org.z) * inv_bin_stp.z);
+    b1.x = INT_UP((pmax.x - bin_org.x) * inv_bin_stp.x);
+    b1.y = INT_UP((pmax.y - bin_org.y) * inv_bin_stp.y);
+    b1.z = INT_UP((pmax.z - bin_org.z) * inv_bin_stp.z);
 
     legal_bin_idx(&b0);
     legal_bin_idx(&b1);
@@ -1305,9 +1306,9 @@ void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt) {
     b0.y = INT_DOWN((pmin.y - bin_org.y) * inv_bin_stp.y);
     b0.z = INT_DOWN((pmin.z - bin_org.z) * inv_bin_stp.z);
 
-    b1.x = INT_DOWN((pmax.x - bin_org.x) * inv_bin_stp.x);
-    b1.y = INT_DOWN((pmax.y - bin_org.y) * inv_bin_stp.y);
-    b1.z = INT_DOWN((pmax.z - bin_org.z) * inv_bin_stp.z);
+    b1.x = INT_UP((pmax.x - bin_org.x) * inv_bin_stp.x);
+    b1.y = INT_UP((pmax.y - bin_org.y) * inv_bin_stp.y);
+    b1.z = INT_UP((pmax.z - bin_org.z) * inv_bin_stp.z);
 
     legal_bin_idx(&b0);
     legal_bin_idx(&b1);
@@ -1750,8 +1751,8 @@ void den_comp_2d_mGP2D(CELLx *cell, TIER *tier) {
     b0.x = INT_DOWN((cell->den_pmin.x - tier->bin_org.x) * tier->inv_bin_stp.x);
     b0.y = INT_DOWN((cell->den_pmin.y - tier->bin_org.y) * tier->inv_bin_stp.y);
 
-    b1.x = INT_DOWN((cell->den_pmax.x - tier->bin_org.x) * tier->inv_bin_stp.x);
-    b1.y = INT_DOWN((cell->den_pmax.y - tier->bin_org.y) * tier->inv_bin_stp.y);
+    b1.x = INT_UP((cell->den_pmax.x - tier->bin_org.x) * tier->inv_bin_stp.x);
+    b1.y = INT_UP((cell->den_pmax.y - tier->bin_org.y) * tier->inv_bin_stp.y);
 
     if(b0.x < 0)
         b0.x = 0;
@@ -1778,10 +1779,20 @@ void den_comp_2d_mGP2D(CELLx *cell, TIER *tier) {
         max_x = min(bpx->pmax.x, cell->den_pmax.x);
         min_x = max(bpx->pmin.x, cell->den_pmin.x);
 
+        // skip for unnecessary calculation
+        if( min_x > max_x || fabs(max_x - min_x) <= numeric_limits<prec>::epsilon() ) {
+            continue;
+        }
+
         for(y = b0.y, bpy = bpx; y <= b1.y; y++, bpy++) {
             max_y = min(bpy->pmax.y, cell->den_pmax.y);
             min_y = max(bpy->pmin.y, cell->den_pmin.y);
 
+            // skip for unnecessary calculation
+            if( min_y > max_y || fabs( max_y - min_y ) <= numeric_limits<prec>::epsilon() ) {
+                continue;
+            }
+                
             area_share = (max_x - min_x) * (max_y - min_y) * cell->size.z *
                          cell->den_scal;
 
@@ -1882,9 +1893,9 @@ void den_comp_3d(int cell_idx) {
     b0.y = INT_DOWN((cell->den_pmin.y - bin_org.y) * inv_bin_stp.y);
     b0.z = INT_DOWN((cell->den_pmin.z - bin_org.z) * inv_bin_stp.z);
 
-    b1.x = INT_DOWN((cell->den_pmax.x - bin_org.x) * inv_bin_stp.x);
-    b1.y = INT_DOWN((cell->den_pmax.y - bin_org.y) * inv_bin_stp.y);
-    b1.z = INT_DOWN((cell->den_pmax.z - bin_org.z) * inv_bin_stp.z);
+    b1.x = INT_UP((cell->den_pmax.x - bin_org.x) * inv_bin_stp.x);
+    b1.y = INT_UP((cell->den_pmax.y - bin_org.y) * inv_bin_stp.y);
+    b1.z = INT_UP((cell->den_pmax.z - bin_org.z) * inv_bin_stp.z);
 
     if(b0.x < 0)
         b0.x = 0;

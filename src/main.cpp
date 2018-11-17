@@ -60,22 +60,37 @@
 #include "opt.h"
 #include "plot.h"
 #include "wlen.h"
+#include "timing.h"
 
 #define compileDate __DATE__
 #define compileTime __TIME__
 
 
+prec netCut;
+prec netWeight;
+prec netWeightMin;
+prec netWeightMax;
+
+prec netWeightBase;
+prec netWeightBound;
+prec netWeightScale;
+
+prec timingClock; 
+int timingUpdateIter;
 PIN *pinInstance;
 MODULE *moduleInstance;
 int pinCNT;
 int moduleCNT;
 
-// for module/term's pinName
+// for moduleInst's pinName
 vector< vector<string> > mPinName;
+
+// for termInst's pinName
 vector< vector<string> > tPinName;
 
 TERM *terminalInstance;
 NET *netInstance;
+dense_hash_map<string, int> netNameMap;
 int terminalCNT;
 int netCNT;
 
@@ -303,7 +318,9 @@ string bmFlagCMD;
 string auxCMD;   // mgwoo
 string defCMD;   // mgwoo
 string verilogCMD; // mgwoo
+vector<string> libStor;   // mgwoo
 string outputCMD;  // mgwoo
+string experimentCMD;  // mgwoo
 vector<string> lefStor;   // mgwoo
 
 int numThread;
@@ -341,9 +358,9 @@ string gRoute_pitch_scalCMD;
 string filleriterCMD;
 
 // for detail Placer
-int dpMode;
-string dpLocation;
-string dpFlag;
+int detailPlacer;
+string detailPlacerLocationCMD;
+string detailPlacerFlagCMD;
 
 prec densityDP;
 bool hasDensityDP;
@@ -364,10 +381,13 @@ bool stnCMD;  // lutong
 bool lambda2CMD;
 bool dynamicStepCMD;
 bool onlyGlobalPlaceCMD;
+bool isTiming;
+bool isNewLayout;
 bool isARbyUserCMD;
 bool thermalAwarePlaceCMD;
 bool trialRunCMD;
 bool autoEvalRC_CMD;
+bool onlyLG_CMD;
 ///////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
@@ -410,6 +430,7 @@ int main(int argc, char *argv[]) {
 
     if(numLayer > 1)
         calcTSVweight();
+    build_data_struct();
     
     net_update_init();
     init_tier();
@@ -418,7 +439,6 @@ int main(int argc, char *argv[]) {
     ///////////////////////////////////////////////////////////////////////
 
     time_start(&tot_cpu);
-
     // Normal cases
     if( !isSkipPlacement ) {
         ///////////////////////////////////////////////////////////////////////
@@ -573,7 +593,6 @@ int main(int argc, char *argv[]) {
         WriteDef( defOutput );
     }
 
-
     printf("\n\n");
     printf(
         "=== SUMMARY "
@@ -613,6 +632,15 @@ int main(int argc, char *argv[]) {
                 string(dir_bnd) 
                 + string("/finalResult") );
     }
+    // for final DP SPEF generating
+    Timing::Timing TimingInst(moduleInstance, terminalInstance,
+            netInstance, netCNT, pinInstance, pinCNT, 
+            mPinName, tPinName, "clk", timingClock);
+
+    TimingInst.BuildSteiner(true);
+
+    string spefName = string(dir_bnd) + "/" + gbch + "_dp.spef";
+    TimingInst.WriteSpef( spefName );
 
 //    ShowPlot( benchName );   
     return 0;
@@ -646,7 +674,7 @@ void init() {
     // sprintf (global_router, "NCTUgr2_fast");
     // sprintf (global_router, "NCTUgr2");
 
-    switch(dpMode) {
+    switch(detailPlacer) {
         case FastPlace:
 #ifdef SA_LG
             sprintf(str_lg, "%s", "_eplace_lg");
@@ -771,15 +799,20 @@ void init() {
         system(mkdir_cmd.c_str());
     }
 
-    // 'experimentXX' -1 checker.
-    for(ver_num = 0;; ver_num++) {
-        sprintf(dir_bnd, "%s/experiment%d", output_dir, ver_num);
+    if( experimentCMD == "" ) {
+        // 'experimentXX' -1 checker.
+        for(ver_num = 0;; ver_num++) {
+            sprintf(dir_bnd, "%s/experiment%03d", output_dir, ver_num);
 
-        // until not exists.
-        struct stat fileStat;
-        if(stat(dir_bnd, &fileStat) < 0) {
-            break;
+            // until not exists.
+            struct stat fileStat;
+            if(stat(dir_bnd, &fileStat) < 0) {
+                break;
+            }
         }
+    }
+    else {
+        sprintf(dir_bnd, "%s/%s", output_dir, experimentCMD.c_str());
     }
 
     // output 'experimentXX' directory generator.
@@ -1000,7 +1033,7 @@ void WriteBookshelf() {
         // call Write Bookshelf function by its tier
         WriteBookshelfWithTier(i, 
             (placementMacroCNT == 0)? STDCELLonly : MIXED,
-            (dpMode == NTUplace3 || shapeMap.size() == 0)? false : true );
+            (detailPlacer == NTUplace3 || shapeMap.size() == 0)? false : true );
     }
 }
 
