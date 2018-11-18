@@ -1,4 +1,4 @@
-SUBDIR = module/lef/5.8-p027 module/def/5.8-p027 module/verilog-parser/src 
+SUBDIR = module/lef/5.8-p027 module/def/5.8-p027 module/verilog-parser/src module/flute/src 
 HASHDIR = module/sparsehash
 OPENSTADIR = module/OpenSTA
 REPLACEDIR = src
