@@ -8,9 +8,11 @@
 ### Pre-requisite
 * Intel MKL and IPP package [Link](https://software.intel.com/en-us/articles/free-ipsxe-tools-and-libraries) >= 2016.3.210
 * GCC compiler and libstdc++ static library >= 5.4.0
-* boost library >= 1.53
+* boost library >= 1.41
+* bison (for verilog parser) >= 3.0.4
+* tcl (for OpenSTA) >= 8.4
 * X11 library (for CImg library to visualize) >= 1.6.5
-* Recommended OS: Centos7 or Ubuntu 16.04
+* Recommended OS: Centos6, Centos7 or Ubuntu 16.04
 
 ### How To Compile
     $ git clone --recursive https://github.com/abk-openroad/RePlAce.git
@@ -64,5 +66,3 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 - Many subsequent improvements were made by Mingyu Woo leading up to the initial release.
 - Paper reference: C.-K. Cheng, A. B. Kahng, I. Kang and L. Wang, "RePlAce: Advancing Solution Quality and Routability Validation in Global Placement", to appear in IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, 2018.  (Digital Object Identifier: 10.1109/TCAD.2018.2859220)
 
-### How to report bugs?
-* [doc/ReportBug.md](doc/ReportBug.md) 

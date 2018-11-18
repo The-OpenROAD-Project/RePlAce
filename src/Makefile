@@ -1,22 +1,18 @@
 CC		=   gcc
 CPPC	=   g++
 LD      =   ld
-OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
-# OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
+# For Multi-thread
+# OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
+OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
 WFLAG 	= 	-W -Wall -Wextra -Wunreachable-code 
 WSTRICT =	-Werror -Wundef -Wpointer-arith 
 
 INCLUDE = 	-I$(CURDIR) -I$(MKLROOT)/include -I$(IPPROOT)/include \
 			-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
 			-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/include \
-		    -I$(FLUTEROOT)/include -I$(BOOSTROOT)/include \
-			-I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT) \
-			-I/home/tool/tcl/tcl8.5.13/include	
+		    -I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
 
-IMATH 	= 	-I$(MKLROOT)/include -I$(IPPROOT)/include
-
-CFLAG   =   -std=c11   $(OPTFLAG)  
-CPPFLAG =   -std=c++14 $(OPTFLAG)
+CPPFLAG =   -std=c++0x $(OPTFLAG)
 
 #Get Only the Internal Structure of SRCDIR Recursively
 SRCDIR	= 	$(CURDIR)
@@ -40,13 +36,11 @@ LEFROOT 		= ../module/lef/5.8-p027
 DEFROOT 		= ../module/def/5.8-p027
 VERILOGROOT 	= ../module/verilog-parser
 FLUTEROOT 		= ../module/flute
-BOOSTROOT 		=  /home/tool/boost/boost_1_66_0/
 
 DEFLIB         	= -L$(DEFROOT)/lib -ldef -ldefzlib -lcdef -lcdefzlib
 LEFLIB         	= -L$(LEFROOT)/lib -llef -llefzlib -lclef -lclefzlib
 VERILOGLIB 		= -L$(VERILOGROOT)/lib -lverilog_parser
 FLUTELIB 		= -L$(FLUTEROOT)/lib -lflute
-BOOSTLIB 		= -L$(BOOSTROOT)/lib
 MKLLIB 			= ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
 					${MKLROOT}/lib/intel64/libmkl_gnu_thread.a \
 					${MKLROOT}/lib/intel64/libmkl_core.a \
@@ -108,7 +102,7 @@ RePlAce	: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
 	$^ 											\
  	-Wl,--start-group ${MKLLIB} ${OPENSTALIB} -Wl,--end-group \
 	-lgomp -lpthread -lm -ldl -lX11 -ltcl8.5 -lz \
-	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} ${BOOSTLIB} -static-libstdc++ 	
+	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} -static-libstdc++ 	
 	@echo " "
 	@echo "  Linking is completed !!"
 	@echo " "

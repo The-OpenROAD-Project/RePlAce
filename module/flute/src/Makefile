@@ -2,8 +2,8 @@ EXE = flute
 
 CXX = g++
 
-CXXOPTS = -m64 -g -ggdb -O3 -fPIC -fno-strict-aliasing -fexceptions -Wno-ctor-dtor-privacy -fno-permissive
-CFLAGS =  -O3 -fPIC -g -ggdb -fno-permissive
+CXXOPTS = -m64 -fPIC -fno-strict-aliasing -fexceptions -Wno-ctor-dtor-privacy -fno-permissive
+CFLAGS =  -O3 -std=c++0x -fPIC -g -ggdb -fno-permissive
 
 PREFIX = ..
 
