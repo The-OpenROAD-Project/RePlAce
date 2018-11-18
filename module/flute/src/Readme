@@ -1,0 +1,34 @@
+-------------- FLUTE - Version 2.2 -----------------
+                       by
+                Chris C.-N. Chu
+       Dept. of ECpE, Iowa State University
+             Copyright (c) - 2005
+  Iowa State University Research Foundation, Inc.
+----------------------------------------------------
+
+This package contains the following files:
+
+ flute.c -- The rectilinear Steiner minimal tree and wirelength estimation
+	    algorithm described in the ICCAD 04 and ISPD 05 papers with
+	    some improvements.
+ flute.h -- The interface to use flute.
+ POWV9.dat -- The lookup-table of optimal POWVs up to degree 9.
+ PORT9.dat -- The lookup-table for optimal routing tree up to degree 9.
+ flute-net.c -- A program to evaluate the wirelength of a net. It takes
+	    input from stdin as a list of points.
+ rand-pts.c -- A program to generate a list of random points.
+ flute-ckt.c -- A program to find FLUTE and half-perimeter wirelength
+	    of a circuit in bookshelf format.
+ bookshelf_IO.[ch] -- Functions for flute-ckt.c to read bookshelf files.
+ memAlloc.[ch] -- Functions for flute-ckt.c to allocate memory.
+ license.txt -- License agreement.
+ ChangeLog.txt
+ Makefile
+ Readme
+
+To run the programs, first do a 'make'. POWV9.dat and PORT9.dat is assume
+to be in the current directory.  Some example commands:
+
+ rand-pts | flute-net
+ rand-pts 20 | flute-net	    // 20-pin nets
+ rand-pts -r 20 | flute-net	    // randomized

@@ -8,6 +8,5 @@ bench_**
 output/*
 logdir/*
 evaluation/*
-module/flute/*
 
 !*.gitignore

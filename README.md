@@ -53,6 +53,7 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 * Eigen
 * CImg
 * Google Dense Hash Map
+* FLUTE
 * NTUPlacer3/4h (Thanks for agreeing with redistribution)
 * Ben Marshall's verilog-parser (Modified by mgwoo)
 * LEF/DEF Parser (Modified by mgwoo)
@@ -63,3 +64,5 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 - Many subsequent improvements were made by Mingyu Woo leading up to the initial release.
 - Paper reference: C.-K. Cheng, A. B. Kahng, I. Kang and L. Wang, "RePlAce: Advancing Solution Quality and Routability Validation in Global Placement", to appear in IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, 2018.  (Digital Object Identifier: 10.1109/TCAD.2018.2859220)
 
+### How to report bugs?
+* [doc/ReportBug.md](doc/ReportBug.md) 

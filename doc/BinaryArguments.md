@@ -18,11 +18,15 @@
 * __-lef__ : \*.lef Location (Multiple lef files supported)
 * __-def__ : \*.def Location (Required)
 * __-verilog__ : \*.v Location (Required)
+* __-output__ : Specify the Location of Output Results
+* __-dpflag__ : Specify which Detailed Placer is Used
+* __-dploc__ : Specify the Location of Detailed Placer
+
+### For Additional Timing-Driven Paramemter
+
 * __-lib__ : \*.lib Location (Multiple lib files supported)
 * __-timing__ : Specify the Timing-Driven Placement Mode
 * __-clock__ : Specify the Clock Frequency. (e.g. 1ns, -clock 1.0e-9)
-* __-dpflag__ : Specify which Detailed Placer is Used
-* __-dploc__ : Specify the Location of Detailed Placer
 
 ## Bookshelf (Academic Format)
     $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -aux <*.aux> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
