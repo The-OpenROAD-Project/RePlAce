@@ -19,6 +19,8 @@ inline string Timing::GetPinName(PIN* curPin) {
     string name = (curPin->term)? 
         string(_terms[curPin->moduleID].name) : string(_modules[curPin->moduleID].name);
 
+    SetEscapedStr(name);
+
     // bookshelf cases, it must be empty
     if( _mPinName.size() == 0 && _tPinName.size() == 0) {
         string pinPrefix = (curPin->IO == 0)? "I" : "O";
@@ -55,9 +57,6 @@ float GetMaxResistor( sta::Sta* sta, Pin* pin ) {
     ParasiticNode* paraNode = parasitics->findNode(parasitic, pin);
 
     if( !paraNode ) {
-//        const char* pinName = sta->cmdNetwork()->pathName(pin);
-//        cout << pinName << endl;
-//        exit(1);
         return 0.0f;
     }
     // Resistor Traverse
@@ -72,8 +71,6 @@ float GetMaxResistor( sta::Sta* sta, Pin* pin ) {
     
         float newRes = parasitics->value( paraDev, ap);
         retRes = (retRes < newRes)? newRes : retRes;
-//        cout << "R: " << newRes << endl; 
-//        paraDev = paraDevIter->next();
     }
     return retRes;
 }
@@ -85,11 +82,8 @@ void TimingPathPrint( sta::Sta* sta, sta::PathEnd* end ) {
     cout << "pathslack: " << end->slack(sta) << " seconds" << endl;
 
     PathExpanded expanded(end->path(), sta);
-//    cout << "iterSize: " << expanded.size() << endl;
     float timeOffset = 0.0f;
-
-
-
+    
     for(int i=0; i<expanded.size(); i++) {
         PathRef *path1 = expanded.path(i);
         TimingArc *prevArc = expanded.prevArc(i);
@@ -210,7 +204,6 @@ void Timing::ExecuteStaFirst(string topCellName,
     evalTclInit(_interp, tcl_inits);
     // initialize TCL commands
     Tcl_Eval(_interp, "sta::show_splash");
-//    Tcl_Eval(_interp, "clear");
     Tcl_Eval(_interp, "sta::define_sta_cmds");
     Tcl_Eval(_interp, "namespace import sta::*");
     
@@ -222,18 +215,7 @@ void Timing::ExecuteStaFirst(string topCellName,
     _sta->setThreadCount(numThread);
    
     // environment settings
-//    string dirPos = "./design/" + topCellName;      // *.v, *.lib
-//    string outPos = dirPos;                         // *.spef
 
-//    string verilogFileName = dirPos + "/" + topCellName + ".v";
-//    string sdcFileName = dirPos + "/" + topCellName + ".sdc";
-//    string spefFileName = outPos + "/" + topCellName + ".spef";
-
-//    string libName= dirPos + "/" + topCellName +"_Late.lib";
-//    string ffLibName= dirPos + "/" + topCellName + "_Early.lib";
-
-//    string clk_name="clk";
-    
     string cornerName="wst";
 //    string cornerNameFF="bst";
 
@@ -247,13 +229,13 @@ void Timing::ExecuteStaFirst(string topCellName,
 //    Corner *corner_FF = _sta->findCorner(cornerNameFF.c_str());
     
     
-    //read_liberty
+    // read_liberty
     for(auto& libName : libStor) {
         _sta->readLiberty(libName.c_str(), corner, MinMaxAll::max(), false);
     }
 
-//    LibertyLibrary *FFlib1 = 
-//        _sta->readLiberty(ffLibName.c_str(), corner_FF, MinMaxAll::min(), false);
+    // LibertyLibrary *FFlib1 = 
+    // _sta->readLiberty(ffLibName.c_str(), corner_FF, MinMaxAll::min(), false);
 
     //read_netlist
     NetworkReader *network = _sta->networkReader();
@@ -354,6 +336,12 @@ void Timing::ExecuteStaLater() {
     cout << "TNS = " << tns << " seconds" << endl;
 }
 
+char* GetNewStr( const char* inp ) {
+    char* ret = new char [ strlen(inp) + 1];
+    strcpy(ret, inp);
+    return ret; 
+}
+
 void Timing::FillSpefForSta() {
     Corner* corner = _sta->corners()->defaultCorner();
     const MinMax *cnst_min_max;
@@ -439,7 +427,11 @@ void Timing::FillSpefForSta() {
         //            char* netName = new char[strlen(curNet->name)+1];
         //            strcpy(netName, curNet->name);
 
-        sta::Net* net = sta::spef_reader->findNet(curNet->name);
+        char* tmpStr = GetEscapedStr(curNet->name);
+        sta::Net* net = sta::spef_reader->findNet(tmpStr);
+//        cout << "SPEF: " << tmpStr << endl;
+        free(tmpStr);
+
         SpefTriple* netCap = new SpefTriple ( lumpedCapStor[i] / CAP_SCALE );
         sta::spef_reader->dspfBegin( net , netCap );
 
@@ -448,14 +440,14 @@ void Timing::FillSpefForSta() {
                 // feed << cnt++ << " " << GetPinName(curSeg.iPin)
                 // << " " << lumped_cap_at_pin[ curSeg.iPin ] / CAP_SCALE<<endl;
                 string pinName = GetPinName(curSeg.iPin);
-                char* pinNamePtr = new char[pinName.length()+1];
-                strcpy( pinNamePtr, pinName.c_str() );
+//                char* pinNamePtr = GetEscapedStr( pinName.c_str() );
+                char* pinNamePtr = GetNewStr( pinName.c_str());
 
                 SpefTriple* pinCap = 
                     new SpefTriple( lumped_cap_at_pin[ curSeg.iPin ]/CAP_SCALE); 
 
+//                cout << "PinPTR: " << pinNamePtr << endl;
                 sta::spef_reader->makeCapacitor(INT_MAX, pinNamePtr, pinCap ); 
-
                 pin_cap_written[ curSeg.iPin ]=true;
             }
             if(!pin_cap_written[ curSeg.oPin ]) {
@@ -463,14 +455,14 @@ void Timing::FillSpefForSta() {
                 // << " " << lumped_cap_at_pin[ curSeg.oPin ] / CAP_SCALE<<endl;
 
                 string pinName = GetPinName(curSeg.oPin);
-                char* pinNamePtr = new char[pinName.length()+1];
-                strcpy( pinNamePtr, pinName.c_str() );
+//                char* pinNamePtr = GetEscapedStr( pinName.c_str() );
+                char* pinNamePtr = GetNewStr( pinName.c_str() );
 
                 SpefTriple* pinCap = 
                     new SpefTriple( lumped_cap_at_pin[ curSeg.oPin ]/CAP_SCALE); 
 
+//                cout << "PinPTR: " << pinNamePtr << endl;
                 sta::spef_reader->makeCapacitor(INT_MAX, pinNamePtr, pinCap ); 
-
                 pin_cap_written[ curSeg.oPin ]=true;
             }
         }
@@ -482,12 +474,12 @@ void Timing::FillSpefForSta() {
             //   * LOCAL_WIRE_RES_PER_MICRON / RES_SCALE << endl;
 
             string pinName1 = GetPinName(curSeg.iPin);
-            char* pinNamePtr1 = new char[pinName1.length()+1];
-            strcpy( pinNamePtr1, pinName1.c_str() );
+//            char* pinNamePtr1 = GetEscapedStr( pinName1.c_str() );
+            char* pinNamePtr1 = GetNewStr( pinName1.c_str() );
 
             string pinName2 = GetPinName(curSeg.oPin);
-            char* pinNamePtr2 = new char[pinName2.length()+1];
-            strcpy( pinNamePtr2, pinName2.c_str() );
+//            char* pinNamePtr2 = GetEscapedStr( pinName2.c_str() );
+            char* pinNamePtr2 = GetNewStr( pinName2.c_str() );
 
             SpefTriple* pinRes = 
                 new SpefTriple( curSeg.length / static_cast<double>(_l2d)
@@ -584,7 +576,6 @@ void Timing::UpdateNetWeightSta() {
 
     // Reported path check based on reportPath5 function (search/ReportPath.cc)
     for( int i=0; i<limintCnt; i++ ) {
-//        cout << "!!" << i << endl;
 //        TimingPathPrint( _sta, end );
         
         PathExpanded expanded(end->path(), _sta);
@@ -612,7 +603,6 @@ void Timing::UpdateNetWeightSta() {
                 continue;
             }
 
-
             if( _sta->network()->isTopLevelPort(pin) ) {
                 continue;
             }
@@ -624,9 +614,6 @@ void Timing::UpdateNetWeightSta() {
             
             Net *higestNet = _sta->network()->highestNetAbove(net);
             string netName = string(_sta->cmdNetwork() ->pathName(higestNet));
-//            ReplaceStringInPlace( netName, "[", "\\[");
-//            ReplaceStringInPlace( netName, "]", "\\]");
-
 
             auto nnPtr = netNameMap.find( netName );
 
@@ -663,9 +650,10 @@ void Timing::UpdateNetWeightSta() {
                 int netDegree = max(2, netInstance[nnPtr->second].pinCNTinObject) ;
                 float netWeight = highRes*(1+criticality) / (netDegree - 1);
                 netInstance[nnPtr->second].timingWeight = netWeight;
-
-                netWeightMin = (netWeightMin < netWeight)? netWeightMin : netWeight;
-                netWeightMax = (netWeightMax > netWeight)? netWeightMax : netWeight;
+                netWeightMin = (netWeightMin < netWeight)? 
+                    netWeightMin : netWeight;
+                netWeightMax = (netWeightMax > netWeight)? 
+                    netWeightMax : netWeight;
 
 //                cout << "netdeg: " << netDegree << endl;
 //                cout << "crit: " << criticality<< endl;
@@ -680,12 +668,6 @@ void Timing::UpdateNetWeightSta() {
         }
         end = pathEndIter.next();
     }
-//    cout << "netWeightMin: " << netWeightMin << endl;
-//    cout << "netWeightMax: " << netWeightMax << endl;
-
-//    for(auto& curName: netNameMap) {
-//        cout << "Map: " << curName.first << endl;
-//    }
 }
 
 
@@ -705,153 +687,6 @@ static std::string ExecuteCommand( const char* cmd ) {
     }
     return result;
 }
-
-///////////////////////////////////////////////////////////////////////
-//
-// for Script usage calling for each iteration
-// global variable : dir_bnd , gbch
-//
-/*
-void Timing::ScriptExecuteSta(string topCellName,
-        string verilogName, vector<string>& libStor, string ffLibName) {
-
-    string iterName = string(dir_bnd) + "/"
-                        + topCellName + "_" + to_string(scriptIterCnt);
-    string spefName = iterName + ".spef";
-    string tclName = iterName + ".tcl";
-    string outName = iterName + ".out";
-    string outCutName = iterName + ".outcut";
-    string slackName = iterName + ".slk";
-//    cout << "spefName " << spefName << endl; 
-//    cout << "tclName " << spefName << endl; 
-
-    WriteSpef( spefName ); 
-    ScriptWriteTcl( tclName, topCellName, verilogName, 
-            libStor, 
-            spefName, outName, slackName);
-
-    ExecuteCommand(
-            string("../module/OpenSTA/bin/sta -f " + tclName).c_str());
-    ExecuteCommand(
-            string("cat " + outName + " | grep '(net)\\|Startpoint:' > " + outCutName).c_str());
-    string pathCntStr = ExecuteCommand(
-            string("cat " + outName + "cut | grep 'Startpoint:' | wc -l").c_str());
-
-    int pathCnt = stoi(pathCntStr);
-    int targetCnt = pathCnt * 0.03;
-    cout << "Path CNT: " << pathCnt << ", and Target CNT: " << targetCnt << endl;
-    
-    ScriptUpdateSta( outCutName, targetCnt );
-
-//    cout << netList << endl;
-
-    scriptIterCnt++;
-//    exit(0); 
-}
-
-// tcl writing function
-void Timing::ScriptWriteTcl(string& tclName, 
-        string& topCellName, string& verilogName, vector<string>& libStor,
-        string& sdcName, string& spefName, string& outName,
-        string& slackName) {
-
-    ofstream tclFile( tclName );
-    if( !tclFile.good() ) {
-        cout << "** ERROR: cannot Open TCL file to write: " << tclName << endl;
-        exit(1); 
-    }
-    
-    stringstream feed;
-    feed << "## Script generated by RePlAce-TD" << endl; 
-    feed << "set list_lib \"";
-    for(auto& curLib : libStor) {
-        feed << curLib << "\\" << endl;
-    }
-    feed << "\""<< endl;
-//    feed << "set log_begin \"opensta.log\"" << endl;
-    feed << "set link_library $list_lib" << endl;
-    feed << "set target_library $list_lib" << endl;
-//    feed << "set netlist " << verilogName << endl;
-    feed << "set sdc " << sdcName << endl;
-    feed << "set spef " << spefName << endl;
-    feed << "define_corners wst" << endl;
-    feed << "foreach lib $list_lib {" << endl;
-    feed << "\tread_liberty -corner wst $lib" << endl;
-    feed << "}" << endl;
-    feed << "read_verilog " << verilogName << endl;
-    feed << "link_design " << topCellName << endl;
-    feed << "current_design " << topCellName << endl;
-    feed << "read_parasitics -keep_capacitive_coupling -max " << spefName << endl;
-    feed << "read_sdc " << sdcName << endl;
-    feed << "find_timing -full_update" << endl;
-    feed << "report_checks -path_delay min_max -sort_by_slack -field net -group_count "
-         << INT_MAX << " > " << outName <<  endl;
-    feed << "report_check_types -format slack_only > " << slackName<<  endl;
-    feed << "exit" << endl;
-//    feed << "exit" << endl;
-
-    tclFile << feed.str();
-    tclFile.close();
-    feed.clear();
-}
-
-void Timing::ScriptUpdateSta(string& outCutName, int targetCnt) {
-
-    // clear all timingWeight in here
-    for(int i=0; i<_netCnt; i++) {
-        _nets[i].timingWeight = 0;
-    }
-
-    // file Iteration up to Path CNT
-    string line;
-    ifstream pathFile( outCutName );
-    int iterCnt = 0;
-    while(getline(pathFile, line)) {
-        // when the string starts with this prefixes;
-        if( line.rfind("Startpoint:", 0) == 0 ) {
-            iterCnt ++;
-            if( iterCnt >= targetCnt ) {
-                break;
-            }
-        }
-        else {
-            auto netName = line.substr(0, line.find(' '));
-            auto nnPtr = netNameMap.find( netName );
-            if( nnPtr == netNameMap.end() ) {
-                cout << "**ERROR: cannot find " << netName 
-                    << " in netNameMap(ScriptUpdateSta)" << endl;
-                exit(1);
-            }
-//            cout << "found Net Idx: " << nnPtr->second << endl; 
-
-            _nets[nnPtr->second].timingWeight++;
-        }
-    }
-    pathFile.close();
-}
-
-void Timing::ExecuteInnovus(string topCellName,
-        string verilogName, vector<string>& libStor, string ffLibName) {
-    
-    Tcl_Interp *interp = Tcl_CreateInterp();
-
-    int res = Tcl_Eval(interp, "set tcl_library \"/usr/share/tcl8.5\"");
-    cout << res << endl;
-    res = Tcl_Eval(interp, "source [file join $tcl_library init.tcl]");
-    cout << res << endl;
-
-    //    cout << res << endl;
-    
-    res = Tcl_Eval(interp, "exec /home/tool/cadence/INNOVUS171/tools/bin/innovus -nowin");
-    cout << res << endl; 
-    cout << Tcl_GetString( Tcl_GetObjResult(interp)) << endl;
-    
-    Tcl_Eval(interp, "exec /bin/ls");
-    cout << Tcl_GetString( Tcl_GetObjResult(interp)) << endl;
-    
-    fflush(stdout);
-}
-*/
 
 TIMING_NAMESPACE_CLOSE
 

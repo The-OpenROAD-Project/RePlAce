@@ -167,7 +167,9 @@ struct PinInfo {
             }
 
             if ( isModule() ) {
-                return string(((MODULE*)ptr)[GetIdx()].name) + ":" + pNameStor[GetIdx()][pNum];
+                string moduleName(((MODULE*)ptr)[GetIdx()].name);
+                SetEscapedStr(moduleName);
+                return moduleName + ":" + pNameStor[GetIdx()][pNum];
             }
             else if( isTerminal() ) {
 //                cout << "data: " << data << endl;
@@ -175,13 +177,15 @@ struct PinInfo {
 //                cout << "pidx: " << pNum  << endl;
 //                cout << "name: " << ((TERM* )ptr)[GetIdx()].name << endl;
 //                cout << "pname: " << pNameStor[GetIdx()][pNum] << endl;
-
+    
                 ///!!!!!!
                 if( ((TERM*)ptr)[GetIdx()].isTerminalNI ) {
                     return pNameStor[GetIdx()][pNum]; 
                 }
                 else {
-                    return string(((TERM*)ptr)[GetIdx()].name) + ":" + pNameStor[GetIdx()][pNum];
+                    string termName(((TERM*)ptr)[GetIdx()].name);
+                    SetEscapedStr(termName);
+                    return termName + ":" + pNameStor[GetIdx()][pNum];
                 }
             }
         }
@@ -194,7 +198,10 @@ struct PinInfo {
             }
 //            return "sp_" + to_string(pNum);
 //            cout << netIdx << endl;
-            return string(netInstance[netIdx].name) + ":" + to_string(pNum);
+            string netStr(netInstance[netIdx].name);
+            SetEscapedStr(netStr);
+
+            return netStr + ":" + to_string(pNum);
         }
 
         bool isTerminal() { return (1 & (data >> 31)) 
@@ -439,5 +446,6 @@ namespace std {
 };
 
 long GetTimingHPWL();
+
 
 #endif 

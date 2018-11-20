@@ -52,6 +52,7 @@
 #include <iomanip>
 #include <google/dense_hash_map>
 #include <cfloat>
+#include <cstring>
 
 #define PI 3.141592653589793238462L
 #define SQRT2 1.414213562373095048801L
@@ -1276,6 +1277,33 @@ inline prec pGetCommonAreaXY( FPOS aLL, FPOS aUR, FPOS bLL, FPOS bUR ) {
     else {
         return (xUR - xLL) * (yUR - yLL);
     }
+}
+
+// for string escape
+inline bool ReplaceStringInPlace( std::string& subject, 
+        const std::string& search,
+        const std::string& replace) {
+    size_t pos = 0;
+    bool isFound = false;
+    while ((pos = subject.find(search, pos)) != std::string::npos) {
+         subject.replace(pos, search.length(), replace);
+         pos += replace.length();
+         isFound = true; 
+    }
+    return isFound; 
+}
+
+inline void SetEscapedStr( std::string& inp ) {
+    if( ReplaceStringInPlace(inp, "/", "\\/" ) ) {
+        ReplaceStringInPlace(inp, "[", "\\[" );
+        ReplaceStringInPlace(inp, "]", "\\]" );
+    }
+}
+
+inline char* GetEscapedStr( const char* name ) {
+    std::string tmp(name);
+    SetEscapedStr(tmp);
+    return strdup( tmp.c_str());
 }
 
 #endif
