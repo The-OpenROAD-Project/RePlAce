@@ -67,6 +67,7 @@
 
 
 prec netCut;
+bool hasNetWeight;
 prec netWeight;
 prec netWeightMin;
 prec netWeightMax;

@@ -720,6 +720,7 @@ enum { STDCELLonly, MIXED };
 
 // for timing
 extern prec netCut;
+extern bool hasNetWeight;
 extern prec netWeight;
 extern prec netWeightMin;
 extern prec netWeightMax;

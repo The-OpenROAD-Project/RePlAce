@@ -221,15 +221,11 @@ prec get_wlen() {
 
     switch(WLEN_MODEL) {
         case WA:
-
             return get_wlen_wa();
-
             break;
 
         case LSE:
-
             return get_wlen_lse();
-
             break;
     }
 
@@ -580,6 +576,24 @@ void wlen_grad_wa(int cell_idx, FPOS *grad) {
             continue;
 
         get_net_wlen_grad_wa(pin->fp, net, pin, &net_grad);
+
+        float curWeight = netInstance[pin->netID].timingWeight;
+        // Timing Control Parts
+        if( curWeight > 0 ) {
+            curWeight = netWeightBase 
+                + min( max(0.0f, netWeightBound - netWeightBase), 
+                    curWeight / netWeightScale);
+            // cout << "calNetWeight: " << curWeight << endl;
+            if( hasNetWeight ) {
+                net_grad.x *= netWeight;
+                net_grad.y *= netWeight;
+            }
+            else {
+                net_grad.x *= curWeight;
+                net_grad.y *= curWeight;
+            }
+        }
+
         grad->x += net_grad.x;
         grad->y += net_grad.y;
     }

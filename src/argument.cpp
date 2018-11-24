@@ -110,6 +110,7 @@ void initArgument(int argc, char *argv[]) {
     isOnlyLGinDP = (routabilityCMD)? true : false;
 
     numThread = 1; // default
+    hasNetWeight = false;
     netWeight = 1.00;
     netWeightBase = 1.2f;
     netWeightBound = 1.8f;
@@ -329,6 +330,7 @@ bool argument(int argc, char *argv[]) {
         else if(!strcmp(argv[i], "-nw")) {
             i++;
             if(argv[i][0] != '-') {
+                hasNetWeight = true;
                 netWeight = atof(argv[i]);
             }
             else {
