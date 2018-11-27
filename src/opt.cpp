@@ -192,6 +192,8 @@ prec get_norm(struct FPOS *st, int n, prec num) {
 void whitespace_init(void) {
     total_termPL_area = 0;
 
+    TIER* tier = &tier_st[0];
+
     // for each Terminal Instance
     for(int i = 0; i < terminalCNT; i++) {
         TERM* curTerminal = &terminalInstance[i];
@@ -213,6 +215,7 @@ void whitespace_init(void) {
                                                    pl->org, pl->end ); 
                 curTerminal->PL_area += commonArea;
                 total_termPL_area += commonArea;
+                tier->term_area += commonArea;
 
 //                if( string(curTerminal->name) == "o859970" ) {
 //                    curTerminal->pmin.Dump("term->pmin");
@@ -242,6 +245,7 @@ void whitespace_init(void) {
 
                     curTerminal->PL_area += commonArea;
                     total_termPL_area += commonArea;
+                    tier->term_area += commonArea;
                     
                 }
 //                cout << curTerminal->name << "/" << shapeStor[curIdx].name<<" : " << curTerminal->PL_area << endl;
@@ -732,15 +736,14 @@ prec get_dis(struct FPOS *a, struct FPOS *b, int N) {
 }
 
 prec get_phi_cof1(prec x) {
-    prec cof = 0;
-    prec bas = /* 1.1 */ UPPER_PCOF;
+    prec retCoef = 0;
+    prec bas = UPPER_PCOF;
 
-    (x < 0) ? cof = bas : cof = bas * pow(bas, x * (-1.0));
+    retCoef = (x < 0)? bas : bas * pow((bas), x * (-1.0));
+    //retCoef = (x < 0)? bas : bas * pow((bas*1.2), x * (-1.0));
+    retCoef = (retCoef < LOWER_PCOF)? LOWER_PCOF: retCoef;
 
-    if(cof < LOWER_PCOF)
-        cof = LOWER_PCOF;
-
-    return cof;
+    return retCoef;
 }
 
 prec get_phi_cof(prec x) {

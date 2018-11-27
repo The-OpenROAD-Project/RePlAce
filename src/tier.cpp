@@ -91,6 +91,18 @@ void tier_init_2D(int STAGE) {
         tier->filler_area =
             (tier->area - tier->virt_area - tier->term_area) * target_cell_den -
             tier->modu_area;
+       
+        // renewed calculation..!! 
+//        tier->filler_area =
+//            (tier->area - tier->virt_area) * target_cell_den -
+//            tier->modu_area;
+
+        cout << fixed << setprecision(0); 
+        cout << "INFO: (tier " << z << ") area: "<< tier->area << endl;
+        cout << "INFO: (tier " << z << ") virt_area: " << tier->virt_area << endl;
+        cout << "INFO: (tier " << z << ") term_area: " << tier->term_area << endl;
+        cout << "INFO: (tier " << z << ") modu_area: " << tier->modu_area << endl;
+        cout << "INFO: (tier " << z << ") filler_area: " << tier->filler_area << endl;
 
         tier->filler_cnt = (int)(tier->filler_area / filler_area + 0.5);
 
@@ -218,8 +230,14 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
                 modu_area = modu->area;
             }
 
-            if((tier->modu_area + modu_area) / tier->ws_area <=
-               target_cell_den - dp_margin_per_tier) {
+//            cout << "tier's modu_area: " << tier->modu_area << endl;
+//            cout << "modu_area: " << modu_area << endl;
+//            cout << "tier's ws_area: " << tier->ws_area << endl;
+//            cout << "target_cell_den: " << target_cell_den << endl;
+//            cout << dp_margin_per_tier << endl;
+
+            if((tier->modu_area + modu_area) / tier->ws_area 
+                <= target_cell_den - dp_margin_per_tier) {
                 modu->center.z = tier->center.z;
                 modu->pmin.z = modu->center.z - modu->half_size.z;
                 modu->pmax.z = modu->center.z + modu->half_size.z;
@@ -316,8 +334,15 @@ void init_tier(void) {
             tier->pl_area += pl_area;
         }
         tier->virt_area = tier->area - tier->pl_area;
+        
+        // this terminal Area calculation can be Wrong!!!
         tier->ws_area = tier->area - tier->term_area - tier->virt_area;
+
+        // renewed!!
+//        tier->ws_area = tier->area - tier->virt_area;
+        cout << "renewed WS_AREA: " << tier->ws_area << endl;
     }
+//    exit(1);
 }
 
 void calc_tier_WS(void) {

@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -37,10 +38,15 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "bin.h"
+#include "bookShelfIO.h"
+#include "global.h"
+#include "initPlacement.h"
+#include "macro.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-//#include        <tgmath.h>
 #include <climits>
 #include <cmath>
 #include <fstream>
@@ -51,19 +57,12 @@
 
 #include <mkl.h>
 
-#include "bookShelfIO.h"
-#include "bin.h"
-#include "global.h"
-#include "initPlacement.h"
-#include "macro.h"
-
 // this is shared with lefdefIO.cpp
 FPOS grow_pmin, grow_pmax;
 FPOS terminal_pmin, terminal_pmax;
 
 int numNonRectangularNodes;
 int totalShapeCount;
-
 
 static FPOS shrunk_ratio;
 
@@ -75,29 +74,38 @@ static POS max_mac_dim;
 static dense_hash_map< string, NODES > nodesMap;
 
 void ParseBookShelf() {
-
     // extract directory
-    char dir[511] = {0, };
+    char dir[511] = {
+        0,
+    };
     extract_dir(bench_aux, dir);
 
-    char fn[511] = {0, };
-    char ffn[511] = {0, };
-    char sfx[511] = {0, };
-    char fn_st[511][511] = {0, };
-
+    char fn[511] = {
+        0,
+    };
+    char ffn[511] = {
+        0,
+    };
+    char sfx[511] = {
+        0,
+    };
+    char fn_st[511][511] = {
+        0,
+    };
 
     // parsing *.aux
-    char buf[511] = {0, };
+    char buf[511] = {
+        0,
+    };
     int buf_size = 511;
 
     FILE *fp_aux = fopen(bench_aux, "r");
 
-    if( fp_aux == NULL ) {
+    if(fp_aux == NULL) {
         cout << "ERROR: Cannot open " << bench_aux << " file." << endl;
         exit(0);
     }
     fgets(buf, buf_size, fp_aux);
-
 
     char *token = NULL;
     token = strtok(buf, " \t\n");
@@ -139,29 +147,28 @@ void ParseBookShelf() {
         }
     }
 
-/*
-    if(flg_3dic) {
-        if(INPUT_FLG == IBM) {
-            // orig: get_ibm_3d_dim by LW
-            get_mms_3d_dim(&tier_min, &tier_max, &tier_row_cnt);
+    /*
+        if(flg_3dic) {
+            if(INPUT_FLG == IBM) {
+                // orig: get_ibm_3d_dim by LW
+                get_mms_3d_dim(&tier_min, &tier_max, &tier_row_cnt);
+            }
+            else {
+                get_mms_3d_dim(&tier_min, &tier_max, &tier_row_cnt);
+            }
+            transform_3d(&tier_min, &tier_max, tier_row_cnt);
+            post_read_3d();
         }
         else {
-            get_mms_3d_dim(&tier_min, &tier_max, &tier_row_cnt);
+            post_read_2d();
         }
-        transform_3d(&tier_min, &tier_max, tier_row_cnt);
-        post_read_3d();
-    }
-    else {
-        post_read_2d();
-    }
-*/
+    */
     POS tier_min, tier_max;
     int tier_row_cnt = 0;
 
     get_mms_3d_dim(&tier_min, &tier_max, &tier_row_cnt);
     transform_3d(&tier_min, &tier_max, tier_row_cnt);
     post_read_3d();
-
 }
 
 void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
@@ -170,10 +177,6 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
     MODULE *curModule = NULL;
 
     int tot_row_cnt = tier_row_cnt * numLayer;
-    // prec site_wid    = 0.0;
-    // prec site_spa    = 0.0;
-    // prec ori         = 0.0;
-    // prec sym         = 0.0;
 
     for(int i = 0; i < terminalCNT; i++) {
         curTerminal = &terminalInstance[i];
@@ -197,59 +200,47 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
         curTerminal->pmax.y = curTerminal->center.y + 0.5 * curTerminal->size.y;
         curTerminal->pmax.z = curTerminal->center.z + 0.5 * curTerminal->size.z;
     }
-   
-   /* 
-    for(int i=0; i<terminalCNT; i++) {
-        if(terminalInstance[i].isTerminalNI) {
-            continue;
-        }   
 
-        if(shapeMap.find( terminalInstance[i].name ) != shapeMap.end() ) {
-            continue;
-        }
+    /*
+     for(int i=0; i<terminalCNT; i++) {
+         if(terminalInstance[i].isTerminalNI) {
+             continue;
+         }
 
-        TERM* curTerminalA = &terminalInstance[i];
+         if(shapeMap.find( terminalInstance[i].name ) != shapeMap.end() ) {
+             continue;
+         }
 
-        for(int j=i+1; j<terminalCNT; j++) {
-            if( terminalInstance[j].isTerminalNI) {
-                continue;
-            }
+         TERM* curTerminalA = &terminalInstance[i];
 
-            if(shapeMap.find( terminalInstance[j].name ) != shapeMap.end() ) {
-                continue;
-            }
+         for(int j=i+1; j<terminalCNT; j++) {
+             if( terminalInstance[j].isTerminalNI) {
+                 continue;
+             }
 
-            TERM* curTerminalB = &terminalInstance[j];
+             if(shapeMap.find( terminalInstance[j].name ) != shapeMap.end() ) {
+                 continue;
+             }
 
-            prec commonArea = pGetCommonAreaXY( curTerminalA->pmin, curTerminalA->pmax, 
-                              curTerminalB->pmin, curTerminalB->pmax );
-            if(commonArea > 0) {
-                cout << "Warning!! " << curTerminalA->name << " , " << curTerminalB->name << " : " << commonArea << endl;
-            }
-        }
-    }
-    cout << "end" << endl;
-    */
+             TERM* curTerminalB = &terminalInstance[j];
 
-/*
-    prec core_min_x = row_st[0].pmin.x;
-    prec core_min_y = row_st[0].pmin.y;
-    prec core_max_x = row_st[0].pmax.x;
-    prec core_max_y = row_st[0].pmax.y;
+             prec commonArea = pGetCommonAreaXY( curTerminalA->pmin,
+                    curTerminalA->pmax, curTerminalB->pmin, 
+                    curTerminalB->pmax );
+             if(commonArea > 0) {
+                 cout << "Warning!! " << curTerminalA->name << " , " <<
+                          curTerminalB->name << " : " << commonArea << endl;
+             }
+         }
+     }
+     cout << "end" << endl;
+     */
 
-    for(int i = 0; i < row_cnt; i++) {
-        core_min_x = min(core_min_x, row_st[i].pmin.x);
-        core_min_y = min(core_min_y, row_st[i].pmin.y);
-        core_max_x = max(core_max_x, row_st[i].pmax.x);
-        core_max_y = max(core_max_y, row_st[i].pmax.y);
-    }
-*/
-    // 
     // mgwoo
     //
-    assert( tot_row_cnt == row_cnt );
+    assert(tot_row_cnt == row_cnt);
 
-//    row_st = (ROW *)realloc(row_st, sizeof(struct ROW) * tot_row_cnt);
+    //    row_st = (ROW *)realloc(row_st, sizeof(struct ROW) * tot_row_cnt);
     tier_st = (TIER *)mkl_malloc(sizeof(struct TIER) * numLayer, 64);
 
     placementMacroCNT = 0;
@@ -277,8 +268,7 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
         tier->term_cnt = 0;
 
         if(terminalCNT > 0) {
-            tier->term_st =
-                (TERM **)malloc(sizeof(TERM *) * terminalCNT);
+            tier->term_st = (TERM **)malloc(sizeof(TERM *) * terminalCNT);
         }
         else {
             tier->term_st = NULL;
@@ -292,41 +282,40 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
         tier->virt_area = 0;
     }
 
-//    int curr_row_hei = tier_min->y;
-    
-//    FPOS pmin;
-//    FPOS pmax;
-//    FPOS size;
+    //    int curr_row_hei = tier_min->y;
+
+    //    FPOS pmin;
+    //    FPOS pmax;
+    //    FPOS size;
 
     // site_wid= row_st[0].site_wid;
     // site_spa= row_st[0].site_spa;
     // ori     = row_st[0].ori;
     // sym     = row_st[0].sym;
-//    pmin = row_st[0].pmin;
-//    pmax = row_st[0].pmax;
-//    size = row_st[0].size;
+    //    pmin = row_st[0].pmin;
+    //    pmax = row_st[0].pmax;
+    //    size = row_st[0].size;
 
-//    for(int i = 0; i < tier_row_cnt; i++) {
-        // for (int j=0; j<numLayer; j++) {
-        // row = &row_st[i + tier_row_cnt*j];
-        // row->site_wid= site_wid; // lutong
-        // row->site_spa= site_spa;
-        // row->ori    = ori;
-        // row->sym    = sym;
-        // row->size.x = tier_max->x - tier_min->x;
-        // row->size.y = rowHeight;
-        // row->size.z = TIER_DEP;
-        // row->pmin.x = tier_min->x;
-        // row->pmin.y = curr_row_hei;
-        // row->pmin.z = (prec)j * TIER_DEP;
-        // row->pmax.x = row->pmin.x + row->size.x;
-        // row->pmax.y = row->pmin.y + row->size.y;
-        // row->pmax.z = row->pmin.z + row->size.z;
-        // row->x_cnt  = tier_max->x - tier_min->x;
-        //}
-//        curr_row_hei += rowHeight;
-//    }
-
+    //    for(int i = 0; i < tier_row_cnt; i++) {
+    // for (int j=0; j<numLayer; j++) {
+    // row = &row_st[i + tier_row_cnt*j];
+    // row->site_wid= site_wid; // lutong
+    // row->site_spa= site_spa;
+    // row->ori    = ori;
+    // row->sym    = sym;
+    // row->size.x = tier_max->x - tier_min->x;
+    // row->size.y = rowHeight;
+    // row->size.z = TIER_DEP;
+    // row->pmin.x = tier_min->x;
+    // row->pmin.y = curr_row_hei;
+    // row->pmin.z = (prec)j * TIER_DEP;
+    // row->pmax.x = row->pmin.x + row->size.x;
+    // row->pmax.y = row->pmin.y + row->size.y;
+    // row->pmax.z = row->pmin.z + row->size.z;
+    // row->x_cnt  = tier_max->x - tier_min->x;
+    //}
+    //        curr_row_hei += rowHeight;
+    //    }
 
     // update global_variable
     row_cnt = tot_row_cnt;
@@ -355,11 +344,12 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
 
     // TIER's term_area update!
     // mgwoo
+    /*
     for(int i = 0; i < terminalCNT; i++) {
         curTerminal = &terminalInstance[i];
         tier = &tier_st[0];
         tier->term_st[tier->term_cnt++] = curTerminal;
-       
+
         // skip for IO pin informations
 //        if( curTerminal->isTerminalNI ) {
 //            continue;
@@ -367,25 +357,38 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
 
         // if there is no shape's information
         if( shapeMap.find( curTerminal->name ) == shapeMap.end() ) {
-            tier->term_area += get_common_area(curTerminal->pmin, curTerminal->pmax,
-                    tier->pmin, tier->pmax);
+            cout << "not found: " << curTerminal->name << " " << place_st_cnt <<
+endl;
+            // tier->term_area += get_common_area(curTerminal->pmin,
+            // curTerminal->pmax, tier->pmin, tier->pmax);
+            for(int j=0; j<place_st_cnt; j++) {
+                PLACE* curPlace = &place_st[j];
+                tier->term_area += get_common_area(curTerminal->pmin,
+                    curTerminal->pmax, curPlace->org, curPlace->end);
+            }
         }
         // if there exist shape's information
         else {
             for(auto& curIdx : shapeMap[curTerminal->name]) {
-                prec llx = shapeStor[curIdx].llx, 
+                cout << "name: " << curTerminal->name << endl;
+                prec llx = shapeStor[curIdx].llx,
                      lly = shapeStor[curIdx].lly,
                      width = shapeStor[curIdx].width,
                      height = shapeStor[curIdx].height;
                 FPOS tmpMin(llx, lly, 0), tmpMax(llx + width, lly + height, 1);
-                
-                tier->term_area += get_common_area(tmpMin, tmpMax,
-                        tier->pmin, tier->pmax);
-//                prec commonArea = get_common_area(tmpMin, tmpMax,
-//                        tier->pmin, tier->pmax);
+                tmpMin.Dump("tmpMin");
+                tmpMax.Dump("tmpMax");
+                // prec commonArea = get_common_area(tmpMin, tmpMax,
+                // tier->pmin, tier->pmax);
+                for(int j=0; j<place_st_cnt; j++) {
+                    PLACE* curPlace = &place_st[j];
+                    tier->term_area += get_common_area(tmpMin, tmpMax,
+                            curPlace->org, curPlace->end);
+                }
             }
         }
     }
+    */
 
     for(int i = 0; i < numLayer; i++) {
         tier = &tier_st[i];
@@ -399,15 +402,42 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
     }
 }
 
+void GetSortedRowStor(ROW *origRowStor, int rowCnt) {
+    // sort the Y-order and X-order
+    vector< ROW > tmpRowStor;
+    for(int i = 0; i < rowCnt; i++) {
+        tmpRowStor.push_back(origRowStor[i]);
+    }
+
+    // sort function
+    sort(tmpRowStor.begin(), tmpRowStor.end(), [](ROW &lhs, ROW &rhs) {
+        if(lhs.pmin.x < rhs.pmin.x) {
+            return true;
+        }
+        if(lhs.pmin.x > rhs.pmin.x) {
+            return false;
+        }
+        return (lhs.pmin.y < rhs.pmin.y);
+    });
+
+    // copy back
+    for(auto &curRow : tmpRowStor) {
+        origRowStor[&curRow - &tmpRowStor[0]] = curRow;
+        //    cout << "SORTED!!" << endl;
+        //    curRow.Dump(to_string(&curRow - &tmpRowStor[0]));
+    }
+}
+
 //
-// update: total_macro_area, 
-//          total_std_area, 
-//          total_PL_area, 
+// update: total_macro_area,
+//          total_std_area,
+//          total_PL_area,
 //          gmov_macro_cnt,
 //
 //          placementStdcellCNT, placementMacroCNT
-//          
-//          gmin, gmax, gwid // global minimum, global maximum, global width (plotting)
+//
+//          gmin, gmax, gwid // global minimum, global maximum, global width
+//          (plotting)
 //
 //  malloc : place_st, place_backup_st // place_st_cnt
 //
@@ -496,7 +526,6 @@ void post_read_3d(void) {
 
     gmov_mac_cnt = placementMacroCNT;
 
-    
     // initial malloc : row_cnt
     place_st_cnt = 0;
     place_st = (PLACE *)malloc(sizeof(struct PLACE) * row_cnt);
@@ -504,12 +533,14 @@ void post_read_3d(void) {
     ROW *last_row = NULL;
     PLACE *curPlace = NULL;
 
-    // 
+    GetSortedRowStor(row_st, row_cnt);
+
+    //
     // Assume, height is equally distributed.
     //
     int place_hei = 0;
     for(int i = 0; i < row_cnt; i++) {
-        ROW* row = &row_st[i];
+        ROW *row = &row_st[i];
         if(i == 0) {
             place_hei = row->size.y;
         }
@@ -538,7 +569,8 @@ void post_read_3d(void) {
             curPlace->cnt.y = curPlace->end.y - curPlace->org.y;
             curPlace->cnt.z = curPlace->end.z - curPlace->org.z;
 
-            curPlace->area = curPlace->cnt.x * curPlace->cnt.y * curPlace->cnt.z;
+            curPlace->area =
+                curPlace->cnt.x * curPlace->cnt.y * curPlace->cnt.z;
 
             curPlace->center.x = 0.5 * (curPlace->org.x + curPlace->end.x);
             curPlace->center.y = 0.5 * (curPlace->org.y + curPlace->end.y);
@@ -576,12 +608,10 @@ void post_read_3d(void) {
     curPlace->center.y = 0.5 * (curPlace->org.y + curPlace->end.y);
     curPlace->center.z = 0.5 * (curPlace->org.z + curPlace->end.z);
 
-//    cout << "current place_st_cnt Final: " << place_st_cnt << endl;
-//    cout << "previous row_cnt: " << row_cnt << endl;
-
-//    for(int i=0; i<place_st_cnt; i++) {
-//        place_st[i].dump(to_string(i));
-//    }
+    //    cout << "current place_st_cnt Final: " << place_st_cnt << endl;
+    //    for(int i=0; i<place_st_cnt; i++) {
+    //        place_st[i].Dump(to_string(i));
+    //    }
 
     // second re-malloc : upto place_st_cnt;
     place_st = (PLACE *)realloc(place_st, sizeof(struct PLACE) * place_st_cnt);
@@ -597,7 +627,7 @@ void post_read_3d(void) {
 
     // global variable 'place' update
     place.stp.x = SITE_SPA;
-    place.stp.y = 1.0; // rowHeight....................????
+    place.stp.y = 1.0;  // rowHeight....................????
     place.stp.z = TIER_DEP;
 
     place.org = place_st[0].org;
@@ -633,46 +663,46 @@ void post_read_3d(void) {
         gmax.y = max(gmax.y, curTerminal->pmax.y);
         gmax.z = max(gmax.z, curTerminal->pmax.z);
     }
-    
+
     gwid.x = gmax.x - gmin.x;
     gwid.y = gmax.y - gmin.y;
     gwid.z = gmax.z - gmin.z;
 
-/*
-// setting additional margin 
-// for plotting.. here It is not required
+    /*
+    // setting additional margin
+    // for plotting.. here It is not required
 
-    gmin.Dump("gmin first");
+        gmin.Dump("gmin first");
 
-    prec lx_mg = place.org.x - gmin.x, 
-         ly_mg = place.org.y - gmin.y,
-         rx_mg = gmax.x - place.end.x,
-         ry_mg = gmax.y - place.end.y;
-    
-//    cout << "lx_mg: " << lx_mg << ", ly_mg: " << ly_mg << endl;
-//    cout << "rx_mg: " << rx_mg << ", ry_mg: " << ry_mg << endl;
+        prec lx_mg = place.org.x - gmin.x,
+             ly_mg = place.org.y - gmin.y,
+             rx_mg = gmax.x - place.end.x,
+             ry_mg = gmax.y - place.end.y;
 
-    prec max_mg = PREC_MIN;
-    max_mg = max(max_mg, lx_mg);
-    max_mg = max(max_mg, ly_mg);
-    max_mg = max(max_mg, rx_mg);
-    max_mg = max(max_mg, ry_mg);
-    
-//    cout << "max_mg: " << max_mg << endl;
+    //    cout << "lx_mg: " << lx_mg << ", ly_mg: " << ly_mg << endl;
+    //    cout << "rx_mg: " << rx_mg << ", ry_mg: " << ry_mg << endl;
 
-    gmin.x = place.org.x - max_mg;
-    gmin.y = place.org.y - max_mg;
-    gmin.z = place.org.z;
+        prec max_mg = PREC_MIN;
+        max_mg = max(max_mg, lx_mg);
+        max_mg = max(max_mg, ly_mg);
+        max_mg = max(max_mg, rx_mg);
+        max_mg = max(max_mg, ry_mg);
 
-    gmax.x = place.end.x + max_mg;
-    gmax.y = place.end.y + max_mg;
-    gmax.z = place.end.z;
-*/
+    //    cout << "max_mg: " << max_mg << endl;
+
+        gmin.x = place.org.x - max_mg;
+        gmin.y = place.org.y - max_mg;
+        gmin.z = place.org.z;
+
+        gmax.x = place.end.x + max_mg;
+        gmax.y = place.end.y + max_mg;
+        gmax.z = place.end.z;
+    */
 
     printf("INFO:  GLOBAL.SPACE.MIN = (%f, %f, %f)\n", gmin.x, gmin.y, gmin.z);
     printf("INFO:  GLOBAL.SPACE.MAX = (%f, %f, %f)\n", gmax.x, gmax.y, gmax.z);
 
-//    gwid.Dump("gwid");
+    //    gwid.Dump("gwid");
 
     printf("INFO:  PLACE.ORIGIN = (%d, %d, %d)\n", (int)(place.org.x + 0.5),
            (int)(place.org.y + 0.5), (int)(place.org.z + 0.5));
@@ -688,8 +718,7 @@ void post_read_3d(void) {
     place.center.z = 0.5 * (place.org.z + place.end.z);
 
     place.area = place.cnt.x * place.cnt.y * place.cnt.z;
-//    place.dump("global variable place");
-    
+    //    place.dump("global variable place");
 }
 /*
 void post_read_2d(void) {
@@ -734,7 +763,7 @@ void post_read_2d(void) {
     int place_hei = 0;
     for(int i = 0; i < row_cnt; i++) {
         row = &row_st[i];
-    
+
         if(i == 0) {
             place_hei = row->size.y;
         }
@@ -1110,10 +1139,10 @@ TERM)*terminalCNT,64);
 */
 
 int read_shapes_3D(char *input) {
-
     FILE *fp = fopen(input, "r");
     if(fp == NULL) {
-        cout << "** ERROR: Cannot open: " << input << " file (bookshelfIO)" << endl;
+        cout << "** ERROR: Cannot open: " << input << " file (bookshelfIO)"
+             << endl;
         exit(1);
     }
 
@@ -1121,14 +1150,16 @@ int read_shapes_3D(char *input) {
     char line[LINESIZE];
 
     bool flag = false;
-//    bool isFirstNode = true;
+    //    bool isFirstNode = true;
 
     int curShapeIdx = 0;
     totalShapeCount = 0;
 
     shapeMap.set_empty_key("!@#!@#");
 
-    char instName[255] = {0,};
+    char instName[255] = {
+        0,
+    };
     while(!feof(fp)) {
         *line = '\0';
         fgets(line, LINESIZE, fp);
@@ -1143,33 +1174,36 @@ int read_shapes_3D(char *input) {
 
             if(strcmp(temp, ":") == 0) {
                 sscanf(line, "%s", instName);
-//                cout << instName << endl;
+                //                cout << instName << endl;
 
                 sscanf(line, "%*s %*s %d", &curShapeCount);
                 totalShapeCount += curShapeCount;
-                curShapeIdx = 0;   
+                curShapeIdx = 0;
             }
             else {
-                char name[255] = {0, };
+                char name[255] = {
+                    0,
+                };
                 double llx, lly, width, height;
 
                 sscanf(line, "%s %lf %lf %lf %lf", name, &llx, &lly, &width,
                        &height);
-                
+
                 auto it = shapeMap.find(instName);
-                if( it == shapeMap.end() ) {
-                    vector<int> tmpStor;
+                if(it == shapeMap.end()) {
+                    vector< int > tmpStor;
                     tmpStor.reserve(curShapeCount);
                     tmpStor.push_back(shapeStor.size());
 
                     shapeMap[instName] = tmpStor;
                 }
-                else{ 
-                    shapeMap[instName].push_back( shapeStor.size() );
+                else {
+                    shapeMap[instName].push_back(shapeStor.size());
                 }
-                
-                shapeStor.push_back( SHAPE(name, instName, curShapeIdx, 
-                                (prec)llx, (prec)lly, (prec)width, (prec)height) );
+
+                shapeStor.push_back(SHAPE(name, instName, curShapeIdx,
+                                          (prec)llx, (prec)lly, (prec)width,
+                                          (prec)height));
 
                 curShapeIdx++;
             }
@@ -1183,20 +1217,19 @@ int read_shapes_3D(char *input) {
         }
     }
 
-/*
- * Check whether SHAPE's are correctly parsed 
-    cout << "shapeMapSize: " << shapeMap.size() << endl;
-    for(auto& curShape : shapeMap) {
-        cout << "instName: " << curShape.first << endl;
-        for(auto& curIdx : curShape.second) {
-            shapeStor[curIdx].dump();
+    /*
+     * Check whether SHAPE's are correctly parsed
+        cout << "shapeMapSize: " << shapeMap.size() << endl;
+        for(auto& curShape : shapeMap) {
+            cout << "instName: " << curShape.first << endl;
+            for(auto& curIdx : curShape.second) {
+                shapeStor[curIdx].dump();
+            }
+            cout << endl;
         }
-        cout << endl;
-    }
-    */
+        */
     return 1;
 }
-
 
 int read_routes_3D(char *input) {
     char name[255];
@@ -1337,7 +1370,7 @@ int read_routes_3D(char *input) {
 }
 
 // Input : .nodes
-// output : moduleInstance, moduleCNT, module_size_max, 
+// output : moduleInstance, moduleCNT, module_size_max,
 // terminalInstance, terminalCNT, terminal_size_max,
 // max_mac_dim ( same as max_cell )
 //
@@ -1358,7 +1391,6 @@ int read_nodes_3D(char *input) {
     MODULE *curModule = NULL;
     TERM *curTerminal = NULL;
 
-    
     int buf_size = 255;
     int idx = 0;
     int totalInstanceCNT = 0;
@@ -1366,7 +1398,6 @@ int read_nodes_3D(char *input) {
     // int isTerminalNI = 0;
     int first_term = 1;
     int first_modu = 1;
-
 
     do {
         fgets(buf, buf_size, fp);
@@ -1404,17 +1435,17 @@ int read_nodes_3D(char *input) {
     // cursor for (module, terminal) Instance
     int moduleCur = 0, terminalCur = 0;
     int cnt = 0;
-    
+
     // max & min initialize
-    FPOS maxCell( PREC_MIN, PREC_MIN, TIER_DEP );
-    FPOS minCell( PREC_MAX, PREC_MAX, TIER_DEP );
-    FPOS maxTerm( PREC_MIN, PREC_MIN, TIER_DEP );
-    FPOS minTerm( PREC_MAX, PREC_MAX, TIER_DEP );
-    
+    FPOS maxCell(PREC_MIN, PREC_MIN, TIER_DEP);
+    FPOS minCell(PREC_MAX, PREC_MAX, TIER_DEP);
+    FPOS maxTerm(PREC_MIN, PREC_MIN, TIER_DEP);
+    FPOS minTerm(PREC_MAX, PREC_MAX, TIER_DEP);
+
     char nodeName[255], line[LINESIZE];
-    
+
     FPOS avgCellSize, avgTerminalSize;
-    
+
     while(!feof(fp)) {
         *line = '\0';
         fgets(line, LINESIZE, fp);
@@ -1652,151 +1683,6 @@ int read_nodes_3D(char *input) {
     return 1;
 }
 
-/*
-int read_nets (char *input) {
-  FILE*fp=fopen(input,"r");
-
-  char*token=NULL;
-
-  char buf[BUF_SZ]// ,buf2[BUF_SZ] ;
-  char name[BUF_SZ];
-  int buf_size=BUF_SZ;
-  int pid=0;
-  int moduleID=0;
-  int lab=0;
-  int io=0;
-
-  int i=0,j=0;
-
-  struct NET*tempNet=NULL;
-  struct MODULE*curModule=NULL;
-  struct TERM*curTerminal=NULL;
-  struct PIN*pin=NULL;
-  struct FPOS offset;
-
-  int   max_net_deg = 0 ;
-
-  do
-    {
-      fgets(buf,buf_size,fp);
-      token=strtok(buf," \t\n") ;
-    }
-  while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
-
-  token = strtok(NULL," \t\n");
-  token = strtok(NULL," \t\n");
-
-  netCNT = atoi(token);
-  netInstance = (struct NET*)mkl_malloc(sizeof(struct NET)*netCNT, 64);
-
-  do
-    {
-      fgets(buf,buf_size,fp);
-      token=strtok(buf," \t\n") ;
-    }
-  while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
-  token = strtok(NULL," \t\n");
-  token = strtok(NULL," \t\n");
-
-  pinCNT = atoi(token);
-
-  pinInstance = (struct PIN*)mkl_malloc(sizeof(struct PIN)*pinCNT, 64);
-
-
-  for(i=0;i<netCNT;i++)
-    {
-      tempNet = & netInstance[i];
-
-      tempNet->idx = i ;
-
-      do
-        {
-          fgets(buf,buf_size,fp);
-          token=strtok(buf," \t\n") ;
-        }
-      while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
-
-      token=strtok(NULL," \t\n");
-      token=strtok(NULL," \t\n");
-      tempNet->pinCNTinObject = atoi(token);
-
-      if(max_net_deg < tempNet->pinCNTinObject)
-        max_net_deg = tempNet->pinCNTinObject ;
-
-      token=strtok(NULL," \t\n");
-      strcpy(tempNet->name,token);
-
-      tempNet->pin = (struct PIN**)mkl_malloc(sizeof(struct
-PIN*)*tempNet->pinCNTinObject, 64);
-
-      for(j=0;j<tempNet->pinCNTinObject;j++)
-        {
-          fgets(buf,buf_size,fp);
-          token=strtok(buf," \t\n");
-
-          strcpy(name,token);
-          name2id(name,&moduleID,&lab);
-
-          if(moduleID < 0 || moduleID > moduleCNT-1)
-            {
-              g_rrr ++ ;
-              printf("ERROR ERROR ERROR!\n");
-              exit(1);
-            }
-
-          token=strtok(NULL," \t\n");
-          if(token[0]=='I')
-            io = 0 ;
-          else if(token[0]=='O')
-            io = 1 ;
-          else // 'B'
-            io = 2 ;
-
-          token=strtok(NULL," \t\n"); // ":"
-          token=strtok(NULL," \t\n"); // "offset_x"
-          offset.x=atof(token);
-          token=strtok(NULL," \t\n"); // "offset_y"
-          offset.y=atof(token);
-
-          offset.z = 0.0;
-
-          pin = & pinInstance[pid];
-
-          tempNet->pin[j] = pin ;
-
-          if(lab==0)
-            {
-              curModule = & moduleInstance[moduleID];
-
-              AddPinInfoForModuleAndTerminal ( & curModule->pin ,
-                       & curModule->pof ,
-                       curModule->pinCNTinObject++,
-                       offset        ,
-                       moduleID        ,
-                       i          ,
-                       j          ,
-                       pid ++     ,
-                       io         ,
-                       lab        );
-            }
-          else
-            {
-              curTerminal = & terminalInstance[moduleID] ;
-              AddPinInfoForModuleAndTerminal (
-&curTerminal->pin,&curTerminal->pof,curTerminal->pinCNTinObject++,offset,moduleID,i,j,pid++,io,lab
-);
-            }
-
-        }
-    }
-
-  printf("MAX_NET_DEG = %d\n",max_net_deg);
-  printf("# NETS = %d\n",netCNT);
-
-  return 1;
-}
-*/
-
 int read_nets_3D(char *input) {
     FILE *fp = fopen(input, "r");
     char *token = NULL;
@@ -1940,98 +1826,7 @@ int read_nets_3D(char *input) {
     return 1;
 }
 
-/*
-int read_pl (char *input) {
-    FILE *fp = fopen(input, "r");
-    char *token = NULL;
-    char buf[BUF_SZ];
-    char name[BUF_SZ];
-    int buf_size=BUF_SZ;
-    int lab=0;
-    int i=0;
-    int moduleID=0;
-    struct MODULE*curModule// ,*tmp=NULL ;
-    struct TERM*curTerminal=NULL;
-
-    for (i=0; i<moduleCNT; i++) {
-        do {
-            fgets (buf, buf_size, fp);
-            token = strtok(buf, " \t\n");
-        }
-        while (!token || token[0]=='#' || !strcmp(token,"UCLA"));
-
-        strcpy (name, token);
-        name2id(name, &moduleID, &lab);
-
-        if (lab!=0) {
-            printf("read_pl: error 1\n");
-            g_rrr++;
-        }
-
-        curModule = & moduleInstance[moduleID] ;
-
-        token = strtok(NULL," \t\n");
-        curModule->pmin.x = atof(token);
-
-        token = strtok(NULL," \t\n");
-        curModule->pmin.y = atof(token);
-
-        curModule->pmin.z = 0.0;
-
-        curModule->center.x = (prec) curModule->pmin.x + (prec)
-curModule->size.x * 0.5 ;
-        curModule->center.y = (prec) curModule->pmin.y + (prec)
-curModule->size.y * 0.5 ;
-        curModule->center.z = (prec) curModule->pmin.z + (prec)
-curModule->size.z * 0.5 ;
-
-        curModule->pmax.x = curModule->pmin.x + curModule->size.x ;
-        curModule->pmax.y = curModule->pmin.y + curModule->size.y ;
-        curModule->pmax.z = curModule->pmin.z + curModule->size.z ;
-    }
-
-
-
-    for(i=0;i<terminalCNT;i++)
-    {
-        do
-        {
-            fgets(buf,buf_size,fp);
-            token=strtok(buf," \t\n") ;
-        }
-        while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
-
-        strcpy (name,token);
-        name2id(name,&moduleID,&lab);
-        curTerminal = & terminalInstance[moduleID] ;
-
-        token = strtok(NULL," \t\n");
-        curTerminal->pmin.x = (prec) atoi(token);
-
-        token = strtok(NULL," \t\n");
-        curTerminal->pmin.y = (prec) atoi(token);
-
-        curTerminal->pmin.z = 0.0;
-
-        curTerminal->center.x = (prec) curTerminal->pmin.x + (prec)
-curTerminal->size.x * 0.5 ;
-        curTerminal->center.y = (prec) curTerminal->pmin.y + (prec)
-curTerminal->size.y * 0.5 ;
-        curTerminal->center.z = (prec) curTerminal->pmin.z + (prec)
-curTerminal->size.z * 0.5 ;
-
-        curTerminal->pmax.x = curTerminal->pmin.x + curTerminal->size.x ;
-        curTerminal->pmax.y = curTerminal->pmin.y + curTerminal->size.y ;
-        curTerminal->pmax.z = curTerminal->pmin.z + curTerminal->size.z ;
-    }
-
-    return 1;
-}
-
-*/
-
-
-// 
+//
 // update terminalInst & moduleInst's Info
 //
 int read_pl2(char *input) {
@@ -2156,7 +1951,7 @@ int read_pl2(char *input) {
     return 1;
 }
 
-// 
+//
 // build the row_st(ROW)
 //
 int read_scl(char *input) {
@@ -2174,15 +1969,15 @@ int read_scl(char *input) {
     token = strtok(NULL, " \t\n");
 
     row_cnt = atoi(token);
-//    row_st = (struct ROW *)malloc(sizeof(struct ROW) * row_cnt);
+    //    row_st = (struct ROW *)malloc(sizeof(struct ROW) * row_cnt);
     // call constructor
-//    row_st = new ROW[row_cnt];
-    row_st = (ROW*) mkl_malloc( sizeof(struct ROW)* row_cnt, 64 );
+    //    row_st = new ROW[row_cnt];
+    row_st = (ROW *)mkl_malloc(sizeof(struct ROW) * row_cnt, 64);
     fgets(buf, buf_size, fp);
 
     for(int i = 0; i < row_cnt; i++) {
-        ROW* row = &row_st[i];
-        new (row) ROW();
+        ROW *row = &row_st[i];
+        new(row) ROW();
 
         fgets(buf, buf_size, fp);
 
@@ -2215,17 +2010,17 @@ int read_scl(char *input) {
         token = strtok(buf, " \t\n");
         token = strtok(NULL, " \t\n");
         token = strtok(NULL, " \t\n");
-//        row->ori = atoi(token);  // Siteorient
+        //        row->ori = atoi(token);  // Siteorient
         row->ori = string(token);  // Siteorient
 
         fgets(buf, buf_size, fp);
         token = strtok(buf, " \t\n");
         token = strtok(NULL, " \t\n");
         token = strtok(NULL, " \t\n");
-//        row->sym = atoi(token);  // Sitesymmetry
-//        row->sym = string(token);  // Sitesymmetry
-        
-        if( string(token) == "Y" ) {
+        //        row->sym = atoi(token);  // Sitesymmetry
+        //        row->sym = string(token);  // Sitesymmetry
+
+        if(string(token) == "Y") {
             row->isYSymmetry = true;
         }
 
@@ -2253,7 +2048,7 @@ int read_scl(char *input) {
             grow_pmax.x = max(grow_pmax.x, (prec)row->pmax.x);
             grow_pmax.y = max(grow_pmax.y, (prec)row->pmax.y);
         }
-        
+
         // For Z handling
         row->size.z = TIER_DEP;
         row->pmin.z = 0;
@@ -2274,35 +2069,15 @@ int read_scl(char *input) {
             exit(0);
         }
     }
-    
+
     // check ROW instance
-//    for(int i=0; i<row_cnt; i++) {
-//        ROW* curRow = &row_st[i];
-//        curRow->Dump(to_string(i));
-//    }
-//
+    //    for(int i=0; i<row_cnt; i++) {
+    //        ROW* curRow = &row_st[i];
+    //        curRow->Dump(to_string(i));
+    //    }
+    //
     return 1;
 }
-
-/*
-
-void name2id (char *name, int *idx,int *lab) {
-    char    a[BUF_SZ];
-    strcpy (a, name+1);
-    int     b = atoi(a);
-    if (b < moduleCNT) {
-        *idx = modu_map[b];
-        *lab = 0;
-    } else {
-        *idx = term_map[b];
-        *lab = 1;
-    }
-}
-*/
-
-// int read_wts() {
-// return  1;
-//}
 
 void output_mGP2D_pl(char *output) {
     FILE *fp = fopen(output, "w");
@@ -2468,135 +2243,6 @@ void output_cGP3D_pl(char *output) {
     fclose(fp);
 }
 
-/*
-void gp_sol_trans_to_dim_one(void) {
-    int i = 0, j = 0;
-    MODULE *modu = NULL;
-    TERM *curTerminal = NULL;
-
-    for(i = 0; i < moduleCNT; i++) {
-        modu = &moduleInstance[i];
-        modu->center.x = (modu->center.x - place_backup.org.x) /
-                         (place_backup.cnt.x * GP_SCAL);
-        modu->center.y = (modu->center.y - place_backup.org.y) /
-                         (place_backup.cnt.y * GP_SCAL);
-        modu->center.z = (modu->center.z - place_backup.org.z) /
-                         (place_backup.cnt.z * GP_SCAL);
-        modu->size.x /= place_backup.cnt.x * GP_SCAL;
-        modu->size.y /= place_backup.cnt.y * GP_SCAL;
-        modu->size.z /= place_backup.cnt.z * GP_SCAL;
-        modu->half_size.x = 0.5 * modu->size.x;
-        modu->half_size.y = 0.5 * modu->size.y;
-        modu->half_size.z = 0.5 * modu->size.z;
-        modu->pmin.x = modu->center.x - modu->half_size.x;
-        modu->pmin.y = modu->center.y - modu->half_size.y;
-        modu->pmin.z = modu->center.z - modu->half_size.z;
-        modu->pmax.x = modu->center.x + modu->half_size.x;
-        modu->pmax.y = modu->center.y + modu->half_size.y;
-        modu->pmax.z = modu->center.z + modu->half_size.z;
-        modu->area = modu->size.x * modu->size.y * modu->size.z;
-
-        for(j = 0; j < modu->pinCNTinObject; j++) {
-            modu->pof[j].x /= place_backup.cnt.x * GP_SCAL;
-            modu->pof[j].y /= place_backup.cnt.y * GP_SCAL;
-            modu->pof[j].z /= place_backup.cnt.z * GP_SCAL;
-        }
-    }
-
-    for(i = 0; i < terminalCNT; i++) {
-        curTerminal = &terminalInstance[i];
-        curTerminal->center.x = (curTerminal->center.x - place_backup.org.x) /
-                                (place_backup.cnt.x * GP_SCAL);
-        curTerminal->center.y = (curTerminal->center.y - place_backup.org.y) /
-                                (place_backup.cnt.y * GP_SCAL);
-        curTerminal->center.z = (curTerminal->center.z - place_backup.org.z) /
-                                (place_backup.cnt.z * GP_SCAL);
-        curTerminal->size.x /= place_backup.cnt.x * GP_SCAL;
-        curTerminal->size.y /= place_backup.cnt.y * GP_SCAL;
-        curTerminal->size.z /= place_backup.cnt.z * GP_SCAL;
-        curTerminal->pmin.x = curTerminal->center.x - 0.5 * curTerminal->size.x;
-        curTerminal->pmin.y = curTerminal->center.y - 0.5 * curTerminal->size.y;
-        curTerminal->pmin.z = curTerminal->center.z - 0.5 * curTerminal->size.z;
-        curTerminal->pmax.x = curTerminal->center.x + 0.5 * curTerminal->size.x;
-        curTerminal->pmax.y = curTerminal->center.y + 0.5 * curTerminal->size.y;
-        curTerminal->pmax.z = curTerminal->center.z + 0.5 * curTerminal->size.z;
-        curTerminal->area =
-            curTerminal->size.x * curTerminal->size.y * curTerminal->size.z;
-
-        for(j = 0; j < curTerminal->pinCNTinObject; j++) {
-            curTerminal->pof[j].x /= place_backup.cnt.x * GP_SCAL;
-            curTerminal->pof[j].y /= place_backup.cnt.y * GP_SCAL;
-            curTerminal->pof[j].z /= place_backup.cnt.z * GP_SCAL;
-        }
-    }
-}
-
-void gp_sol_trans_from_dim_one(void) {
-    int i = 0, j = 0;
-    MODULE *modu = NULL;
-    TERM *curTerminal = NULL;
-
-    for(i = 0; i < moduleCNT; i++) {
-        modu = &moduleInstance[i];
-        modu->center.x = modu->center.x * (place_backup.cnt.x * GP_SCAL) +
-                         place_backup.org.x;
-        modu->center.y = modu->center.y * (place_backup.cnt.y * GP_SCAL) +
-                         place_backup.org.y;
-        modu->center.z = modu->center.z * (place_backup.cnt.z * GP_SCAL) +
-                         place_backup.org.z;
-        modu->size.x *= place_backup.cnt.x * GP_SCAL;
-        modu->size.y *= place_backup.cnt.y * GP_SCAL;
-        modu->size.z *= place_backup.cnt.z * GP_SCAL;
-        modu->half_size.x = 0.5 * modu->size.x;
-        modu->half_size.y = 0.5 * modu->size.y;
-        modu->half_size.z = 0.5 * modu->size.z;
-        modu->pmin.x = modu->center.x - modu->half_size.x;
-        modu->pmin.y = modu->center.y - modu->half_size.y;
-        modu->pmin.z = modu->center.z - modu->half_size.z;
-        modu->pmax.x = modu->center.x + modu->half_size.x;
-        modu->pmax.y = modu->center.y + modu->half_size.y;
-        modu->pmax.z = modu->center.z + modu->half_size.z;
-        modu->area = modu->size.x * modu->size.y * modu->size.z;
-
-        for(j = 0; j < modu->pinCNTinObject; j++) {
-            modu->pof[j].x *= place_backup.cnt.x * GP_SCAL;
-            modu->pof[j].y *= place_backup.cnt.y * GP_SCAL;
-            modu->pof[j].z *= place_backup.cnt.z * GP_SCAL;
-        }
-    }
-
-    for(i = 0; i < terminalCNT; i++) {
-        curTerminal = &terminalInstance[i];
-        curTerminal->center.x =
-            curTerminal->center.x * (place_backup.cnt.x * GP_SCAL) +
-            place_backup.org.x;
-        curTerminal->center.y =
-            curTerminal->center.y * (place_backup.cnt.y * GP_SCAL) +
-            place_backup.org.y;
-        curTerminal->center.z =
-            curTerminal->center.z * (place_backup.cnt.z * GP_SCAL) +
-            place_backup.org.z;
-        curTerminal->size.x *= place_backup.cnt.x * GP_SCAL;
-        curTerminal->size.y *= place_backup.cnt.y * GP_SCAL;
-        curTerminal->size.z *= place_backup.cnt.z * GP_SCAL;
-        curTerminal->pmin.x = curTerminal->center.x - 0.5 * curTerminal->size.x;
-        curTerminal->pmin.y = curTerminal->center.y - 0.5 * curTerminal->size.y;
-        curTerminal->pmin.z = curTerminal->center.z - 0.5 * curTerminal->size.z;
-        curTerminal->pmax.x = curTerminal->center.x + 0.5 * curTerminal->size.x;
-        curTerminal->pmax.y = curTerminal->center.y + 0.5 * curTerminal->size.y;
-        curTerminal->pmax.z = curTerminal->center.z + 0.5 * curTerminal->size.z;
-        curTerminal->area =
-            curTerminal->size.x * curTerminal->size.y * curTerminal->size.z;
-
-        for(j = 0; j < curTerminal->pinCNTinObject; j++) {
-            curTerminal->pof[j].x *= place_backup.cnt.x * GP_SCAL;
-            curTerminal->pof[j].y *= place_backup.cnt.y * GP_SCAL;
-            curTerminal->pof[j].z *= place_backup.cnt.z * GP_SCAL;
-        }
-    }
-}
-*/
-
 void output_pl(char *output) {
     FILE *fp = fopen(output, "w");
     struct MODULE *curModule = NULL;
@@ -2660,12 +2306,11 @@ void output_pl(char *output) {
 // this function will
 // add pin's informations for moduleInstance & terminalInstance
 // once it meets fixed or unfixed pins..
-void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof,
-                                           int currentPinCount, FPOS offset,
-                                           int curModuleIdx, int curNetIdx,
-                                           int curPinIdxInNet, int curPinIdx,
-                                           int curPinDirection,
-                                           int isTerminal) {
+void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
+                                    FPOS offset, int curModuleIdx,
+                                    int curNetIdx, int curPinIdxInNet,
+                                    int curPinIdx, int curPinDirection,
+                                    int isTerminal) {
     // pin : current Pin Object
     // pof : current Pin Offset
     //
@@ -2742,13 +2387,11 @@ void write_new_bench(void) {
     printf("TMP BCH AUX %s NETS %s NODES %s PL %s WTS %s SCL %s\n", sing_fn_aux,
            sing_fn_nets, sing_fn_nodes, sing_fn_pl, sing_fn_wts, sing_fn_scl);
 
-
     PIN *pin = NULL;
     NET *net = NULL;
     MODULE *curModule = NULL;
     TERM *curTerminal = NULL;
     ROW *rwp = NULL;
-
 
     // write aux
     FILE *fp_aux = fopen(gTMP_bch_aux, "w");
@@ -2757,7 +2400,7 @@ void write_new_bench(void) {
 
     fclose(fp_aux);
 
-    // write wts 
+    // write wts
     FILE *fp_wts = fopen(gTMP_bch_wts, "w");
     fputs("UCLA wts 1.0\n", fp_wts);
     fputs("# Created\t:\tDec 27 2004\n", fp_wts);
@@ -3072,46 +2715,49 @@ void link_original_SB_files_to_Dir(char *dir) {
     system(cmd);
 }
 
-
 ///////////////////////////////////////////////////
-//  
+//
 //  bookshelf writing function.
 //  (aux, nodes, shapes, net, pl, scl, wts)
 //
 ///////////////////////////////////////////////////
 
-
 ///////////////////////////////////////////////////
 // *.aux writing
-void WriteAux( char* dir_tier, bool isShapeDrawing ) {
-    char fn_aux[BUF_SZ] = {0, };
+void WriteAux(char *dir_tier, bool isShapeDrawing) {
+    char fn_aux[BUF_SZ] = {
+        0,
+    };
     sprintf(fn_aux, "%s/%s.aux", dir_tier, gbch);
-    FILE* fp_aux = fopen(fn_aux, "w");
+    FILE *fp_aux = fopen(fn_aux, "w");
 
-    if( isShapeDrawing ) {
+    if(isShapeDrawing) {
         fprintf(fp_aux,
-                "RowBasedPlacement : %s.nodes %s.nets %s.wts %s.pl %s.scl %s.shapes\n", gbch,
-                gbch, gbch, gbch, gbch, gbch);
-    } 
+                "RowBasedPlacement : %s.nodes %s.nets %s.wts %s.pl %s.scl "
+                "%s.shapes\n",
+                gbch, gbch, gbch, gbch, gbch, gbch);
+    }
     else {
         fprintf(fp_aux,
-                "RowBasedPlacement : %s.nodes %s.nets %s.wts %s.pl %s.scl\n", gbch,
-                gbch, gbch, gbch, gbch);
+                "RowBasedPlacement : %s.nodes %s.nets %s.wts %s.pl %s.scl\n",
+                gbch, gbch, gbch, gbch, gbch);
     }
 
     fclose(fp_aux);
 }
 
 // *.shape writing - mgwoo
-void WriteShapes( char* dir_tier, bool isShapeDrawing) {
-    if( !isShapeDrawing ) {
+void WriteShapes(char *dir_tier, bool isShapeDrawing) {
+    if(!isShapeDrawing) {
         return;
     }
 
-    char fn_shapes[BUF_SZ] = {0, };
+    char fn_shapes[BUF_SZ] = {
+        0,
+    };
     sprintf(fn_shapes, "%s/%s.shapes", dir_tier, gbch);
-    FILE* fp_shapes = fopen(fn_shapes, "w");
-    
+    FILE *fp_shapes = fopen(fn_shapes, "w");
+
     // file header..
     fputs("shapes 1.0 \n", fp_shapes);
     fputs("# Created	:	Jan  6 2005\n", fp_shapes);
@@ -3121,17 +2767,17 @@ void WriteShapes( char* dir_tier, bool isShapeDrawing) {
         fp_shapes);
     fputs("\n", fp_shapes);
 
+    fprintf(fp_shapes, "NumNonRectangularNodes  :  %d\n\n",
+            numNonRectangularNodes);
 
-    fprintf(fp_shapes, "NumNonRectangularNodes  :  %d\n\n", numNonRectangularNodes);
-    
-    for(auto& curShapeNode : shapeMap) {
-        fprintf(fp_shapes, "%s  :  %ld\n", curShapeNode.first.c_str(), 
-                                           curShapeNode.second.size()); 
-        for(auto& curIdx : curShapeNode.second) {
-            fprintf(fp_shapes, "\t%s\t%d\t%d\t%d\t%d\n", 
-            shapeStor[curIdx].name.c_str(), 
-            (int)shapeStor[curIdx].llx, (int)shapeStor[curIdx].lly, 
-            (int)shapeStor[curIdx].width, (int)shapeStor[curIdx].height ); 
+    for(auto &curShapeNode : shapeMap) {
+        fprintf(fp_shapes, "%s  :  %ld\n", curShapeNode.first.c_str(),
+                curShapeNode.second.size());
+        for(auto &curIdx : curShapeNode.second) {
+            fprintf(fp_shapes, "\t%s\t%d\t%d\t%d\t%d\n",
+                    shapeStor[curIdx].name.c_str(), (int)shapeStor[curIdx].llx,
+                    (int)shapeStor[curIdx].lly, (int)shapeStor[curIdx].width,
+                    (int)shapeStor[curIdx].height);
         }
     }
 
@@ -3139,12 +2785,13 @@ void WriteShapes( char* dir_tier, bool isShapeDrawing) {
 }
 
 // *.weignt writing - nothing to write..
-void WriteWts( char* dir_tier ) {
-    
-    char fn_wts[BUF_SZ] = {0, };
+void WriteWts(char *dir_tier) {
+    char fn_wts[BUF_SZ] = {
+        0,
+    };
     sprintf(fn_wts, "%s/%s.wts", dir_tier, gbch);
-    FILE* fp_wts = fopen(fn_wts, "w");
-    
+    FILE *fp_wts = fopen(fn_wts, "w");
+
     fputs("UCLA wts 1.0\n", fp_wts);
     fputs("# Created\t:\tDec 27 2004\n", fp_wts);
     fputs(
@@ -3156,10 +2803,13 @@ void WriteWts( char* dir_tier ) {
 }
 
 // *.nodes writing
-void WriteNodes( char* dir_tier, int curLayer, int lab, int pin_term_cnt, bool isShapeDrawing ) {
-    char fn_nodes[BUF_SZ] = {0, };
+void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
+                bool isShapeDrawing) {
+    char fn_nodes[BUF_SZ] = {
+        0,
+    };
     sprintf(fn_nodes, "%s/%s.nodes", dir_tier, gbch);
-    FILE* fp_nodes= fopen(fn_nodes, "w");
+    FILE *fp_nodes = fopen(fn_nodes, "w");
 
     fputs("UCLA pl 2.0 \n", fp_nodes);
     fputs("# Created	:	Jan  6 2005\n", fp_nodes);
@@ -3171,17 +2821,18 @@ void WriteNodes( char* dir_tier, int curLayer, int lab, int pin_term_cnt, bool i
 
     TIER *tier = &tier_st[curLayer];
     tier->row_term_cnt = 0;
-    
-    int term_cnt = (lab)? tier->mac_cnt + terminalCNT + pin_term_cnt :
-                          terminalCNT + pin_term_cnt;
 
-    term_cnt = (!isShapeDrawing)? term_cnt + totalShapeCount - numNonRectangularNodes :
-                                  term_cnt;
+    int term_cnt = (lab) ? tier->mac_cnt + terminalCNT + pin_term_cnt
+                         : terminalCNT + pin_term_cnt;
 
-//    if(lab)
-//        term_cnt = tier->mac_cnt + terminalCNT + pin_term_cnt;
-//    else
-//        term_cnt = terminalCNT + pin_term_cnt;
+    term_cnt = (!isShapeDrawing)
+                   ? term_cnt + totalShapeCount - numNonRectangularNodes
+                   : term_cnt;
+
+    //    if(lab)
+    //        term_cnt = tier->mac_cnt + terminalCNT + pin_term_cnt;
+    //    else
+    //        term_cnt = terminalCNT + pin_term_cnt;
 
     int node_cnt = tier->modu_cnt + term_cnt;
 
@@ -3189,44 +2840,52 @@ void WriteNodes( char* dir_tier, int curLayer, int lab, int pin_term_cnt, bool i
     fprintf(fp_nodes, "NumTerminals :  \t%d\n", term_cnt);
 
     for(int i = 0; i < tier->modu_cnt; i++) {
-        MODULE* modu = tier->modu_st[i];
+        MODULE *modu = tier->modu_st[i];
         fprintf(fp_nodes, "%s %d %d\n", modu->name, (int)(modu->size.x + 0.5),
                 (int)(modu->size.y + 0.5));
     }
 
     for(int i = 0; i < terminalCNT; i++) {
-        TERM* curTerminal = &terminalInstance[i];
-        string termString = isShapeDrawing? ((curTerminal->isTerminalNI)? "terminal_NI" : "terminal") : "terminal";
+        TERM *curTerminal = &terminalInstance[i];
+        string termString =
+            isShapeDrawing
+                ? ((curTerminal->isTerminalNI) ? "terminal_NI" : "terminal")
+                : "terminal";
 
-        if( isShapeDrawing ) {
+        if(isShapeDrawing) {
             fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name,
                     (int)(curTerminal->size.x + 0.5),
-                    (int)(curTerminal->size.y + 0.5),
-                    termString.c_str());
+                    (int)(curTerminal->size.y + 0.5), termString.c_str());
         }
         else {
-            // considering shapeMaps - mgwoo 
+            // considering shapeMaps - mgwoo
             auto shapeMapIter = shapeMap.find(curTerminal->name);
             if(shapeMapIter == shapeMap.end()) {
-                int sizeX = (curTerminal->isTerminalNI)? 0 : INT_CONVERT(curTerminal->size.x);
-                int sizeY = (curTerminal->isTerminalNI)? 0 : INT_CONVERT(curTerminal->size.y);
+                int sizeX = (curTerminal->isTerminalNI)
+                                ? 0
+                                : INT_CONVERT(curTerminal->size.x);
+                int sizeY = (curTerminal->isTerminalNI)
+                                ? 0
+                                : INT_CONVERT(curTerminal->size.y);
 
-                fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name,
-                        sizeX, sizeY,
-                        termString.c_str());
+                fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name, sizeX,
+                        sizeY, termString.c_str());
             }
             else {
-                for(auto& curShapeIdx : shapeMap[curTerminal->name]) {
-                    int sizeX = (curTerminal->isTerminalNI)? 0 : INT_CONVERT(shapeStor[curShapeIdx].width);
-                    int sizeY = (curTerminal->isTerminalNI)? 0 : INT_CONVERT(shapeStor[curShapeIdx].height);
+                for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+                    int sizeX = (curTerminal->isTerminalNI)
+                                    ? 0
+                                    : INT_CONVERT(shapeStor[curShapeIdx].width);
+                    int sizeY =
+                        (curTerminal->isTerminalNI)
+                            ? 0
+                            : INT_CONVERT(shapeStor[curShapeIdx].height);
 
-                    fprintf( fp_nodes, "%s %d %d %s\n", 
-                             string( string(curTerminal->name) 
-                                   + string("/") 
-                                   + string(shapeStor[curShapeIdx].name) ).c_str(),
-                             sizeX, sizeY,
-                             termString.c_str() );
-
+                    fprintf(fp_nodes, "%s %d %d %s\n",
+                            string(string(curTerminal->name) + string("/") +
+                                   string(shapeStor[curShapeIdx].name))
+                                .c_str(),
+                            sizeX, sizeY, termString.c_str());
                 }
             }
         }
@@ -3235,14 +2894,14 @@ void WriteNodes( char* dir_tier, int curLayer, int lab, int pin_term_cnt, bool i
     if(lab)  // MMS-3D place
     {
         for(int i = 0; i < tier->mac_cnt; i++) {
-            MODULE* mac = tier->mac_st[i];
+            MODULE *mac = tier->mac_st[i];
             fprintf(fp_nodes, "%s %d %d terminal\n", mac->name,
                     (int)(mac->size.x + 0.5), (int)(mac->size.y + 0.5));
         }
     }
 
     for(int i = 0; i < pinCNT; i++) {
-        PIN* pin = &pinInstance[i];
+        PIN *pin = &pinInstance[i];
         if(pin->tier != curLayer && !pin->term) {
             fprintf(fp_nodes, "fakePin%d %d %d terminal\n", pin->gid, 0, 0);
         }
@@ -3252,10 +2911,11 @@ void WriteNodes( char* dir_tier, int curLayer, int lab, int pin_term_cnt, bool i
 }
 
 // *.nets writing
-void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt,
-        vector<int>& netChk, bool isShapeDrawing) {
-    
-    char fn_nets[BUF_SZ] = {0, };
+void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
+              vector< int > &netChk, bool isShapeDrawing) {
+    char fn_nets[BUF_SZ] = {
+        0,
+    };
     sprintf(fn_nets, "%s/%s.nets", dir_tier, gbch);
     FILE *fp_nets = fopen(fn_nets, "w");
 
@@ -3275,11 +2935,11 @@ void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt,
     int total_pinCNTinObject2 = 0;
 
     for(int i = 0; i < netCNT; i++) {
-        NET* net = &netInstance[i];
+        NET *net = &netInstance[i];
 
         total_pinCNTinObject2 += net->pinCNTinObject2;
 
-        if( netChk[i] != 1 ){
+        if(netChk[i] != 1) {
             continue;
         }
 
@@ -3287,12 +2947,14 @@ void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt,
                 net->name);
 
         for(int j = 0; j < net->pinCNTinObject2; j++) {
-            PIN* pin = net->pin2[j];
+            PIN *pin = net->pin2[j];
 
             int moduleID = pin->moduleID;
             int pinIDinModule = pin->pinIDinModule;
 
-            char io[BUF_SZ] = {0, };
+            char io[BUF_SZ] = {
+                0,
+            };
             if(pin->IO == 0)
                 strcpy(io, "I");
             else if(pin->IO == 1)
@@ -3301,38 +2963,39 @@ void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt,
                 strcpy(io, "B");
 
             if(pin->term) {
-                TERM* curTerminal = &terminalInstance[moduleID];
-                if( isShapeDrawing ) {
-                    fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->name,
-                            io, 
+                TERM *curTerminal = &terminalInstance[moduleID];
+                if(isShapeDrawing) {
+                    fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n",
+                            curTerminal->name, io,
                             curTerminal->pof[pinIDinModule].x,
                             curTerminal->pof[pinIDinModule].y);
                 }
                 else {
-                    if( shapeMap.find(curTerminal->name) == shapeMap.end() ) {
-                        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->name,
-                                io, 
+                    if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
+                        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n",
+                                curTerminal->name, io,
                                 curTerminal->pof[pinIDinModule].x,
                                 curTerminal->pof[pinIDinModule].y);
                     }
                     else {
                         // convert into "o506100/Shape_0"
-                        SHAPE* curShape = &shapeStor[ shapeMap[ curTerminal-> name ][0] ];
-                        string concatedName = string( curTerminal->name ) +
+                        SHAPE *curShape =
+                            &shapeStor[shapeMap[curTerminal->name][0]];
+                        string concatedName = string(curTerminal->name) +
                                               string("/") +
-                                              string( curShape->name );
+                                              string(curShape->name);
 
-                        prec shapeCenterX = curShape->llx + curShape->width/2;
-                        prec shapeCenterY = curShape->lly + curShape->height/2;
-                                               
+                        prec shapeCenterX = curShape->llx + curShape->width / 2;
+                        prec shapeCenterY =
+                            curShape->lly + curShape->height / 2;
+
                         // covert as "o506100/shape_0"'s information
-                        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", 
-                                concatedName.c_str(),
-                                io, 
-                                curTerminal->pof[pinIDinModule].x 
-                                    + (curTerminal->center.x - shapeCenterX),
-                                curTerminal->pof[pinIDinModule].y
-                                    + (curTerminal->center.y - shapeCenterY) );
+                        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n",
+                                concatedName.c_str(), io,
+                                curTerminal->pof[pinIDinModule].x +
+                                    (curTerminal->center.x - shapeCenterX),
+                                curTerminal->pof[pinIDinModule].y +
+                                    (curTerminal->center.y - shapeCenterY));
                     }
                 }
             }
@@ -3342,14 +3005,14 @@ void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt,
             }
             else if(pin->tier == curLayer) {
                 if(pin->term == 0) {
-                    MODULE* modu = &moduleInstance[moduleID];
+                    MODULE *modu = &moduleInstance[moduleID];
 
                     fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", modu->name,
                             io, modu->pof[pinIDinModule].x,
                             modu->pof[pinIDinModule].y);
                 }
                 else {
-                    TERM* curTerminal = &terminalInstance[moduleID];
+                    TERM *curTerminal = &terminalInstance[moduleID];
 
                     fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n",
                             curTerminal->name, io,
@@ -3364,11 +3027,12 @@ void WriteNet( char* dir_tier, int curLayer, int pin_cnt, int net_cnt,
 }
 
 // *.pl writing
-void WritePl( char* dir_tier, int curLayer, int lab, bool isShapeDrawing ) {
-    
-    char fn_pl[BUF_SZ] = {0, };
+void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing) {
+    char fn_pl[BUF_SZ] = {
+        0,
+    };
     sprintf(fn_pl, "%s/%s.pl", dir_tier, gbch);
-    FILE* fp_pl = fopen(fn_pl, "w");
+    FILE *fp_pl = fopen(fn_pl, "w");
 
     fputs("UCLA pl 1.0\n", fp_pl);
     fputs("# Created\t:\tJan  6 2005\n", fp_pl);
@@ -3378,41 +3042,39 @@ void WritePl( char* dir_tier, int curLayer, int lab, bool isShapeDrawing ) {
         fp_pl);
 
     fputs("\n", fp_pl);
-    
+
     TIER *tier = &tier_st[curLayer];
 
     for(int i = 0; i < tier->modu_cnt; i++) {
-        MODULE* modu = tier->modu_st[i];
+        MODULE *modu = tier->modu_st[i];
         fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", modu->name, modu->pmin.x,
                 modu->pmin.y);
     }
 
     for(int i = 0; i < terminalCNT; i++) {
-        TERM* curTerminal = &terminalInstance[i];
-        string fixedStr = (curTerminal->isTerminalNI)? "FIXED_NI" : "FIXED";
+        TERM *curTerminal = &terminalInstance[i];
+        string fixedStr = (curTerminal->isTerminalNI) ? "FIXED_NI" : "FIXED";
 
-        if( isShapeDrawing ) {
+        if(isShapeDrawing) {
             fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
                     prec2int(curTerminal->pmin.x),
-                    prec2int(curTerminal->pmin.y),
-                    fixedStr.c_str());
+                    prec2int(curTerminal->pmin.y), fixedStr.c_str());
         }
         else {
-            if ( shapeMap.find( curTerminal->name ) == shapeMap.end() ) {
+            if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
                 fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
                         prec2int(curTerminal->pmin.x),
-                        prec2int(curTerminal->pmin.y),
-                        fixedStr.c_str());
+                        prec2int(curTerminal->pmin.y), fixedStr.c_str());
             }
             else {
-                for(auto& curShapeIdx : shapeMap[curTerminal->name]) {
-                    fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
-                            string( string(curTerminal->name)
-                                    + string("/")
-                                    + string(shapeStor[curShapeIdx].name) ).c_str(),
+                for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+                    fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n",
+                            string(string(curTerminal->name) + string("/") +
+                                   string(shapeStor[curShapeIdx].name))
+                                .c_str(),
                             prec2int(shapeStor[curShapeIdx].llx),
                             prec2int(shapeStor[curShapeIdx].lly),
-                                fixedStr.c_str());
+                            fixedStr.c_str());
                 }
             }
         }
@@ -3421,28 +3083,27 @@ void WritePl( char* dir_tier, int curLayer, int lab, bool isShapeDrawing ) {
     if(lab)  // MMS-3D place
     {
         for(int i = 0; i < tier->mac_cnt; i++) {
-            MODULE* mac = tier->mac_st[i];
+            MODULE *mac = tier->mac_st[i];
             fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", mac->name,
                     mac->pmin_lg.x, mac->pmin_lg.y);
         }
     }
 
     for(int i = 0; i < pinCNT; i++) {
-        PIN* pin = &pinInstance[i];
+        PIN *pin = &pinInstance[i];
         if(!pin->term && pin->tier != curLayer)
             fprintf(fp_pl, "fakePin%d\t%.6lf\t%.6lf\t: N /FIXED\n", pin->gid,
                     pin->fp.x, pin->fp.y);
     }
 
     fclose(fp_pl);
-
 }
 
 // *.scl writing
-void WriteScl( char* dir_tier, int curLayer ) {
+void WriteScl(char *dir_tier, int curLayer) {
     char fn_scl[BUF_SZ];
     sprintf(fn_scl, "%s/%s.scl", dir_tier, gbch);
-    FILE* fp_scl = fopen(fn_scl, "w");
+    FILE *fp_scl = fopen(fn_scl, "w");
 
     fputs("UCLA scl 1.0\n", fp_scl);
     fputs("# Created\t:\tJan  6 2005\n", fp_scl);
@@ -3458,21 +3119,21 @@ void WriteScl( char* dir_tier, int curLayer ) {
     fputs("\n", fp_scl);
 
     // sort the Y-Order due to limit of DP
-    vector<ROW> tmpRowStor;
-    for(int i=0; i<tier->row_cnt; i++) {
+    vector< ROW > tmpRowStor;
+    for(int i = 0; i < tier->row_cnt; i++) {
         tmpRowStor.push_back(row_st[i]);
     }
-    sort( tmpRowStor.begin(), tmpRowStor.end(), [](ROW& lhs, ROW& rhs) {
-            return (lhs.pmin.y < rhs.pmin.y);});
-    
+    sort(tmpRowStor.begin(), tmpRowStor.end(),
+         [](ROW &lhs, ROW &rhs) { return (lhs.pmin.y < rhs.pmin.y); });
     // iterate based on the sorted order
-    for(auto& curRow : tmpRowStor){ 
+    for(auto &curRow : tmpRowStor) {
         fprintf(fp_scl, "CoreRow Horizontal\n");
         fprintf(fp_scl, "  Coordinate    :   %d\n", curRow.pmin.y);
-        fprintf(fp_scl, "  Height        :   %d\n", (int)(rowHeight+0.5f));
+        fprintf(fp_scl, "  Height        :   %d\n", (int)(rowHeight + 0.5f));
         fprintf(fp_scl, "  Sitewidth     :    %d\n", curRow.site_wid);
         fprintf(fp_scl, "  Sitespacing   :    %d\n", curRow.site_spa);
-        fprintf(fp_scl, "  Siteorient    :    %s\n", (curRow.isYSymmetry)? "Y" : "1");
+        fprintf(fp_scl, "  Siteorient    :    %s\n",
+                (curRow.isYSymmetry) ? "Y" : "1");
         fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
         fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n",
                 curRow.pmin.x, curRow.x_cnt);
@@ -3485,27 +3146,29 @@ void WriteScl( char* dir_tier, int curLayer ) {
 // write bookshelf's output
 // z : current tier's index
 void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
-
     PIN *pin = NULL;
     NET *net = NULL;
 
     // create directory for tier's result
-    char dir_tier[BUF_SZ] = {0, };
+    char dir_tier[BUF_SZ] = {
+        0,
+    };
     sprintf(dir_tier, "%s/tiers/%d", dir_bnd, z);
 
-    char cmd[BUF_SZ] = {0, };
+    char cmd[BUF_SZ] = {
+        0,
+    };
     sprintf(cmd, "mkdir -p %s", dir_tier);
     system(cmd);
-    
 
     /////////////////////////////////////////////////////////////////////////////
-    // count for pin_term_cnt, net_cnt 
+    // count for pin_term_cnt, net_cnt
     // (Required for *.nodes)
     int pin_term_cnt = 0;
     int net_cnt = 0;
 
     // to calculate net_cnt
-    vector<int> netChk( netCNT, -1);
+    vector< int > netChk(netCNT, -1);
 
     for(int i = 0; i < pinCNT; i++) {
         pin = &pinInstance[i];
@@ -3521,17 +3184,17 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
             }
         }
     }
-    
+
     /////////////////////////////////////////////////////////////////////////////
     // count for pin_cnt
     // (Required for *.net)
-    
+
     int pin_cnt = 0;
     for(int i = 0; i < netCNT; i++) {
         net = &netInstance[i];
         net->pinCNTinObject_tier = 0;
 
-        if( netChk[i] != 1 ) {
+        if(netChk[i] != 1) {
             continue;
         }
 
@@ -3546,40 +3209,39 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
         }
     }
 
-    WriteAux( dir_tier, isShapeDrawing );
-//    cout << "aux finish" << endl;
-    WriteShapes( dir_tier, isShapeDrawing );
-//    cout << "shape finish" << endl;
-    WriteNodes( dir_tier, z, lab, pin_term_cnt, isShapeDrawing );
-//    cout << "nodes finish" << endl;
-    WriteNet( dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing );
-//    cout << "net finish" << endl;
-    WritePl( dir_tier, z, lab, isShapeDrawing );
-//    cout << "pl finish" << endl;
-    
+    WriteAux(dir_tier, isShapeDrawing);
+    //    cout << "aux finish" << endl;
+    WriteShapes(dir_tier, isShapeDrawing);
+    //    cout << "shape finish" << endl;
+    WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing);
+    //    cout << "nodes finish" << endl;
+    WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing);
+    //    cout << "net finish" << endl;
+    WritePl(dir_tier, z, lab, isShapeDrawing);
+    //    cout << "pl finish" << endl;
+
     // shapeSupport doesn't affect to below function
-    WriteScl( dir_tier, z ); 
-    WriteWts( dir_tier ); 
+    WriteScl(dir_tier, z);
+    WriteWts(dir_tier);
 }
 
-
-// 
+//
 //
 // read *.pl back to the replace to do some post-processing -- nodesMap
 //
-// See also ReadPlLefDef(const char* fileName) in lefdefIO.cpp 
+// See also ReadPlLefDef(const char* fileName) in lefdefIO.cpp
 //
 void ReadPlBookshelf(const char *fileName) {
     FPOS pof;
     FILE *fp = fopen(fileName, "r");
-    if( !fp ) {
-        runtimeError( fileName + string( " is not Exist!" ) );
+    if(!fp) {
+        runtimeError(fileName + string(" is not Exist!"));
     }
 
     char buf[BUF_SZ], name[BUF_SZ];
     int moduleID = 0;
     while(fgets(buf, BUF_SZ, fp)) {
-        char* token = strtok(buf, " \t\n");
+        char *token = strtok(buf, " \t\n");
         if(!token || token[0] == '#' || !strcmp(token, "UCLA"))
             continue;
 
@@ -3603,7 +3265,7 @@ void ReadPlBookshelf(const char *fileName) {
         }
 
         if(!isTerminal) {
-            MODULE* curModule = &moduleInstance[moduleID];
+            MODULE *curModule = &moduleInstance[moduleID];
 
             if(curModule->flg == Macro)
                 continue;
@@ -3621,7 +3283,7 @@ void ReadPlBookshelf(const char *fileName) {
             curModule->center.y = 0.5 * (curModule->pmin.y + curModule->pmax.y);
 
             for(int i = 0; i < curModule->pinCNTinObject; i++) {
-                PIN* pin = curModule->pin[i];
+                PIN *pin = curModule->pin[i];
                 pof = curModule->pof[i];
                 pin->fp.x = curModule->center.x + pof.x;
                 pin->fp.y = curModule->center.y + pof.y;
@@ -3838,11 +3500,10 @@ void get_3d_dimension(struct POS *tier_min, struct POS *tier_max,
            shrunk_len_int.y);
 }
 
-// 
+//
 // update tier_min, tier_max, and tier_row_cnt
 //
-void get_mms_3d_dim(POS *tier_min, POS *tier_max,
-                    int *tier_row_cnt) {
+void get_mms_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt) {
     int xlen = 0;
     int ylen = 0;
 
@@ -4177,45 +3838,6 @@ void output_final_pl(char *output) {
     fclose(fp);
 }
 
-/*
-void output_hgraph_nofix(char *fn) {
-    int i = 0, j = 0;
-    int moduleID = 0, netCNTinObject = 0;
-    FILE *fp = fopen(fn, "w");
-    struct NET *net = NULL;
-    struct MODULE *modu = NULL;
-
-    for(i = 0; i < netCNT; i++) {
-        net = &netInstance[i];
-        if(net->pinCNTinObject > 1)
-            netCNTinObject++;
-    }
-
-    fprintf(fp, "%d %d 10\n", netCNTinObject, moduleCNT);
-
-    for(i = 0; i < netCNT; i++) {
-        net = &netInstance[i];
-
-        if(net->pinCNTinObject <= 1)
-            continue;
-
-        for(j = 0; j < net->pinCNTinObject; j++) {
-            moduleID = net->pin[j]->moduleID;
-
-            fprintf(fp, "%d ", moduleID);
-        }
-        fprintf(fp, "\n");
-    }
-
-    for(i = 0; i < moduleCNT; i++) {
-        modu = &moduleInstance[i];
-        fprintf(fp, "%d\n", (int)(modu->area + 0.5));
-    }
-
-    fclose(fp);
-}
-*/
-
 void write_3d_bench(void) {
     int i = 0, j = 0, moduleID = 0, pinIDinModule = 0;
 
@@ -4454,4 +4076,3 @@ void extract_sfx(char *f, char *s) {
 
     strcpy(s, &f[last_dot + 1]);
 }
-
