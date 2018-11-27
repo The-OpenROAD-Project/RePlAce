@@ -45,8 +45,9 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
     $ ./execute_bookshelf.py superblue19
 
 ### Manual
-* [doc/ScriptUsage.md](doc/ScriptUsage.md)
-* [doc/BinaryArguments.md](doc/BinaryArguments.md)
+* [How To Execute Python Scripts?](doc/ScriptUsage.md)
+* [RePlAce's arguments](doc/BinaryArguments.md)
+* [How To Report Memory Bugs?](doc/ReportMemoryBug.md)
     
 ### License
 * BSD-3-clause License [[Link]](LICENSE)
