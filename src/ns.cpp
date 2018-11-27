@@ -772,7 +772,7 @@ int myNesterov::DoNesterovOptimization( Timing::Timing& TimingInst) {
         if( isTiming ) {
             int checkIter = INT_CONVERT(it->ovfl*100);
             cout << "checkIter: " << checkIter << endl;
-            if( timingCheck[ checkIter ] == 0 ) { 
+            if( checkIter % 2 == 0 && timingCheck[ checkIter ] == 0 ) { 
                 TimingInst.BuildSteiner(true);
                 TimingInst.ExecuteStaLater();
                 timingCheck[ checkIter ] = 1;
@@ -785,7 +785,7 @@ int myNesterov::DoNesterovOptimization( Timing::Timing& TimingInst) {
 
         // Termination Condition 2
         if(STAGE == cGP2D && i > 50) {
-            if((it->ovfl <= 0.13f && dynamicStepCMD) || (it->ovfl <= 0.05f)) {
+            if((it->ovfl <= 0.13f && dynamicStepCMD) || (it->ovfl <= 0.10f)) {
                 if(minPotn * 1.01 <= it->potn && temp_iter == 0) {
                     temp_iter++;
                 }
