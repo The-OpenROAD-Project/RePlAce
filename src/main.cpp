@@ -501,6 +501,9 @@ int main(int argc, char *argv[]) {
             time_end(&time_mGP2D);
             printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP2D);
             printf("PROC:  END GLOBAL 2D PLACEMENT (mGP2D)\n\n\n");
+            if( inputMode == InputMode::lefdef )  {
+              WriteDef( defGpOutput );
+            }
             ///////////////////////////////////////////////////////////////////////
         }
         time_end(&time_mGP);

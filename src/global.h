@@ -143,6 +143,7 @@ using std::min;
 
 using std::fixed;
 using std::setprecision;
+using std::scientific;
 using std::map;
 using std::to_string;
 
@@ -646,19 +647,19 @@ struct T0 {
 // ROW -> PLACE structure
 struct PLACE {
     FPOS org;
-    prec area;
+    FPOS end;
     FPOS center;
     FPOS stp;
     FPOS cnt;
-    FPOS end;
+    prec area;
     void Dump(string a) {
         cout << a << endl;
         org.Dump("origin");
+        end.Dump("end");
         cout << fixed <<setprecision(0)<<"area: " << area << endl;
         center.Dump("center");
         stp.Dump("stp");
         cnt.Dump("cnt");
-        end.Dump("end");
         cout << endl;
     }
 };
