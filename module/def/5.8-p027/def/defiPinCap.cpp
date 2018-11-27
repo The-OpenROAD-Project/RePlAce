@@ -1121,7 +1121,7 @@ DEF_COPY_CONSTRUCTOR_C( defiPin ) {
 
     DEF_COPY_FUNC( numPorts_ );
     DEF_COPY_FUNC( portsAllocated_ );
-    DEF_MALLOC_FUNC_FOR_2D( pinPort_, defiPinPort, numPorts_, 1 );
+    DEF_MALLOC_FUNC_FOR_2D_MALLOC_NEW( pinPort_, defiPinPort, numPorts_, 1 );
 
     DEF_COPY_FUNC( numAntennaModel_ );
     DEF_COPY_FUNC( antennaModelAllocated_ );
@@ -1209,7 +1209,7 @@ DEF_ASSIGN_OPERATOR_C( defiPin ) {
 
     DEF_COPY_FUNC( numPorts_ );
     DEF_COPY_FUNC( portsAllocated_ );
-    DEF_MALLOC_FUNC_FOR_2D( pinPort_, defiPinPort, numPorts_, 1 );
+    DEF_MALLOC_FUNC_FOR_2D_MALLOC_NEW( pinPort_, defiPinPort, numPorts_, 1 );
 
     DEF_COPY_FUNC( numAntennaModel_ );
     DEF_COPY_FUNC( antennaModelAllocated_ );

@@ -90,16 +90,15 @@
     }                                                                   \
 }
 
-// NEW/DELETE version
-#define DEF_MALLOC_FUNC_FOR_2D_NEW(varname, vartype, length1, length2 ) \
+// MALLOC/DELETE version
+#define DEF_MALLOC_FUNC_FOR_2D_MALLOC_NEW(varname, vartype, length1, length2 ) \
 {                                                                       \
     if(prev.varname) {                                                  \
-        varname = new (vartype*)[length1];                              \
+        varname = (vartype**)malloc( sizeof(vartype*)* length1 );       \
                                                                         \
         for(int i=0; i<length1; i++) {                                  \
             if( prev.varname[i] ) {                                     \
-                varname[i] = (length2 == 1)? new (vartype)              \
-                                             new (vartype)[length2];    \
+                varname[i] = new vartype(defData);                      \
                 *(varname[i]) = *(prev.varname[i]);                     \
             }                                                           \
             else {                                                      \
