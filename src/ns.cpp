@@ -771,7 +771,6 @@ int myNesterov::DoNesterovOptimization( Timing::Timing& TimingInst) {
 
         if( isTiming ) {
             int checkIter = INT_CONVERT(it->ovfl*100);
-            cout << "checkIter: " << checkIter << endl;
             if( checkIter % 2 == 0 && timingCheck[ checkIter ] == 0 ) { 
                 TimingInst.BuildSteiner(true);
                 TimingInst.ExecuteStaLater();

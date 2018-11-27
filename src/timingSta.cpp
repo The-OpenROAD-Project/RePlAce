@@ -299,7 +299,8 @@ void Timing::ExecuteStaFirst(string topCellName,
     cnst_min_max = MinMax::max();
     Slack wns = _sta->worstSlack(cnst_min_max);
     Slack tns = _sta->totalNegativeSlack(cnst_min_max);
-    cout << "timing summary" << endl;
+    cout << std::defaultfloat;
+    cout.precision();
     cout << "WNS = " << wns << " seconds" << endl;
     cout << "TNS = " << tns << " seconds" << endl;
 
