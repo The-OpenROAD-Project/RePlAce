@@ -3177,7 +3177,7 @@ void Circuit::Circuit::DumpDefRow() {
     }
         
     for(auto& curRow : defRowStor) {
-        CIRCUIT_FPRINTF(fout, "ROW %s %s %g %.0f %s ", ignoreRowNames ? "XXX" : curRow.name(),
+        CIRCUIT_FPRINTF(fout, "ROW %s %s %.0f %.0f %s ", ignoreRowNames ? "XXX" : curRow.name(),
                 curRow.macro(), curRow.x(), curRow.y(),
                 orientStr(curRow.orient()));
         if (curRow.hasDo()) {
