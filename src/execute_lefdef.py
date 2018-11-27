@@ -114,9 +114,8 @@ if type(benchName) is list:
         defStr = GetFileStr( dirpos, curBench, 'def', '-def')
         verilogStr = GetFileStr( dirpos, curBench, 'v', '-verilog')
         libStr = GetFileStr( dirpos, curBench, 'lib', '-lib')
-        sdcStr = GetFileStr( dirpos, curBench, 'sdc', '-sdc')
 
-        exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr + sdcStr )
+        exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr )
         exeFormat = "screen -S %s -X stuff \"" + exeFormat + "\n\"" if useScreen else exeFormat
 
         nameList = (nohupFrontStr, valgrindStr, \
@@ -144,9 +143,8 @@ else:
     defStr = GetFileStr( dirpos, benchName, 'def', '-def')
     verilogStr = GetFileStr( dirpos, benchName, 'v', '-verilog')
     libStr = GetFileStr( dirpos, benchName, 'lib', '-lib')
-    sdcStr = GetFileStr( dirpos, benchName, 'sdc', '-sdc')
         
-    exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr + sdcStr )
+    exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr )
     exeFormat = "screen -S %s -X stuff \"" + exeFormat + "\n\"" if useScreen else exeFormat
    
     if useScreen: 
