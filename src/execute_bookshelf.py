@@ -33,6 +33,8 @@ isPlot = False
 ## configure done 
 #####################################
 
+dploc = os.path.abspath(dploc)
+
 def ExecuteCommand( command ):
     print( command )
     sp.call( command, shell=True )
