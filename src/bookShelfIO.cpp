@@ -40,6 +40,7 @@
 
 #include "bin.h"
 #include "bookShelfIO.h"
+#include "lefdefIO.h"
 #include "global.h"
 #include "initPlacement.h"
 #include "macro.h"
@@ -2910,6 +2911,127 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
     fclose(fp_nodes);
 }
 
+// *.nodes writing
+void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
+                bool isShapeDrawing, DummyCellInfo& dummyInst) {
+    char fn_nodes[BUF_SZ] = {
+        0,
+    };
+    sprintf(fn_nodes, "%s/%s.nodes", dir_tier, gbch);
+    FILE *fp_nodes = fopen(fn_nodes, "w");
+
+    fputs("UCLA pl 2.0 \n", fp_nodes);
+    fputs("# Created	:	Jan  6 2005\n", fp_nodes);
+    fputs(
+        "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
+        "Research({gnam, mcan}@us.ibm.com)\n",
+        fp_nodes);
+    fputs("\n", fp_nodes);
+
+    TIER *tier = &tier_st[curLayer];
+    tier->row_term_cnt = 0;
+
+    int term_cnt = (lab) ? tier->mac_cnt + terminalCNT + pin_term_cnt
+                         : terminalCNT + pin_term_cnt;
+
+    term_cnt = (!isShapeDrawing)
+                   ? term_cnt + totalShapeCount - numNonRectangularNodes
+                   : term_cnt;
+    // for Dummy Cell
+    term_cnt += dummyInst.GetTerminalStor()->size(); 
+
+
+    //    if(lab)
+    //        term_cnt = tier->mac_cnt + terminalCNT + pin_term_cnt;
+    //    else
+    //        term_cnt = terminalCNT + pin_term_cnt;
+
+    int node_cnt = tier->modu_cnt + term_cnt; 
+
+    fprintf(fp_nodes, "NumNodes :  \t%d\n", node_cnt);
+    fprintf(fp_nodes, "NumTerminals :  \t%d\n", term_cnt);
+
+    for(int i = 0; i < tier->modu_cnt; i++) {
+        MODULE *modu = tier->modu_st[i];
+        fprintf(fp_nodes, "%s %d %d\n", modu->name, (int)(modu->size.x + 0.5),
+                (int)(modu->size.y + 0.5));
+    }
+
+    for(int i = 0; i < terminalCNT; i++) {
+        TERM *curTerminal = &terminalInstance[i];
+        string termString =
+            isShapeDrawing
+                ? ((curTerminal->isTerminalNI) ? "terminal_NI" : "terminal")
+                : "terminal";
+
+        if(isShapeDrawing) {
+            fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name,
+                    (int)(curTerminal->size.x + 0.5),
+                    (int)(curTerminal->size.y + 0.5), termString.c_str());
+        }
+        else {
+            // considering shapeMaps - mgwoo
+            auto shapeMapIter = shapeMap.find(curTerminal->name);
+            if(shapeMapIter == shapeMap.end()) {
+                int sizeX = (curTerminal->isTerminalNI)
+                                ? 0
+                                : INT_CONVERT(curTerminal->size.x);
+                int sizeY = (curTerminal->isTerminalNI)
+                                ? 0
+                                : INT_CONVERT(curTerminal->size.y);
+
+                fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name, sizeX,
+                        sizeY, termString.c_str());
+            }
+            else {
+                for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+                    int sizeX = (curTerminal->isTerminalNI)
+                                    ? 0
+                                    : INT_CONVERT(shapeStor[curShapeIdx].width);
+                    int sizeY =
+                        (curTerminal->isTerminalNI)
+                            ? 0
+                            : INT_CONVERT(shapeStor[curShapeIdx].height);
+
+                    fprintf(fp_nodes, "%s %d %d %s\n",
+                            string(string(curTerminal->name) + string("/") +
+                                   string(shapeStor[curShapeIdx].name))
+                                .c_str(),
+                            sizeX, sizeY, termString.c_str());
+                }
+            }
+        }
+    }
+    
+    vector<TERM>* termStor = dummyInst.GetTerminalStor();
+
+    // Dummy Cell Drawing
+    for(auto& curTerm : *termStor) {
+        string termString = "terminal";
+            fprintf(fp_nodes, "%s %d %d %s\n", curTerm.name,
+                    (int)(curTerm.size.x + 0.5),
+                    (int)(curTerm.size.y + 0.5), termString.c_str());
+    }
+
+    if(lab)  // MMS-3D place
+    {
+        for(int i = 0; i < tier->mac_cnt; i++) {
+            MODULE *mac = tier->mac_st[i];
+            fprintf(fp_nodes, "%s %d %d terminal\n", mac->name,
+                    (int)(mac->size.x + 0.5), (int)(mac->size.y + 0.5));
+        }
+    }
+
+    for(int i = 0; i < pinCNT; i++) {
+        PIN *pin = &pinInstance[i];
+        if(pin->tier != curLayer && !pin->term) {
+            fprintf(fp_nodes, "fakePin%d %d %d terminal\n", pin->gid, 0, 0);
+        }
+    }
+
+    fclose(fp_nodes);
+}
+
 // *.nets writing
 void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
               vector< int > &netChk, bool isShapeDrawing) {
@@ -3099,6 +3221,87 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing) {
     fclose(fp_pl);
 }
 
+// *.pl writing
+void WritePlWithDummy(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
+    DummyCellInfo& dummyInst) {
+    char fn_pl[BUF_SZ] = {
+        0,
+    };
+    sprintf(fn_pl, "%s/%s.pl", dir_tier, gbch);
+    FILE *fp_pl = fopen(fn_pl, "w");
+
+    fputs("UCLA pl 1.0\n", fp_pl);
+    fputs("# Created\t:\tJan  6 2005\n", fp_pl);
+    fputs(
+        "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
+        "Research({gnam, mcan}@us.ibm.com)\n",
+        fp_pl);
+
+    fputs("\n", fp_pl);
+
+    TIER *tier = &tier_st[curLayer];
+
+    for(int i = 0; i < tier->modu_cnt; i++) {
+        MODULE *modu = tier->modu_st[i];
+        fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", modu->name, modu->pmin.x,
+                modu->pmin.y);
+    }
+
+    for(int i = 0; i < terminalCNT; i++) {
+        TERM *curTerminal = &terminalInstance[i];
+        string fixedStr = (curTerminal->isTerminalNI) ? "FIXED_NI" : "FIXED";
+
+        if(isShapeDrawing) {
+            fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
+                    prec2int(curTerminal->pmin.x),
+                    prec2int(curTerminal->pmin.y), fixedStr.c_str());
+        }
+        else {
+            if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
+                fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
+                        prec2int(curTerminal->pmin.x),
+                        prec2int(curTerminal->pmin.y), fixedStr.c_str());
+            }
+            else {
+                for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+                    fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n",
+                            string(string(curTerminal->name) + string("/") +
+                                   string(shapeStor[curShapeIdx].name))
+                                .c_str(),
+                            prec2int(shapeStor[curShapeIdx].llx),
+                            prec2int(shapeStor[curShapeIdx].lly),
+                            fixedStr.c_str());
+                }
+            }
+        }
+    }
+
+    vector<TERM>* dummyTermStor = dummyInst.GetTerminalStor();
+    for(auto& curTerm: *dummyTermStor) {
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curTerm.name,
+          prec2int(curTerm.pmin.x),
+          prec2int(curTerm.pmin.y));
+    } 
+
+    if(lab)  // MMS-3D place
+    {
+        for(int i = 0; i < tier->mac_cnt; i++) {
+            MODULE *mac = tier->mac_st[i];
+            fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", mac->name,
+                    mac->pmin_lg.x, mac->pmin_lg.y);
+        }
+    }
+
+    for(int i = 0; i < pinCNT; i++) {
+        PIN *pin = &pinInstance[i];
+        if(!pin->term && pin->tier != curLayer)
+            fprintf(fp_pl, "fakePin%d\t%.6lf\t%.6lf\t: N /FIXED\n", pin->gid,
+                    pin->fp.x, pin->fp.y);
+    }
+
+    fclose(fp_pl);
+}
+
 // *.scl writing
 void WriteScl(char *dir_tier, int curLayer) {
     char fn_scl[BUF_SZ];
@@ -3142,6 +3345,238 @@ void WriteScl(char *dir_tier, int curLayer) {
 
     fclose(fp_scl);
 }
+
+// *.scl writing
+void WriteSclWithDummy(char *dir_tier, int curLayer, DummyCellInfo& dummyInst) {
+    char fn_scl[BUF_SZ];
+    sprintf(fn_scl, "%s/%s.scl", dir_tier, gbch);
+    FILE *fp_scl = fopen(fn_scl, "w");
+
+    fputs("UCLA scl 1.0\n", fp_scl);
+    fputs("# Created\t:\tJan  6 2005\n", fp_scl);
+    fputs(
+        "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
+        "Research({gnam, mcan}@us.ibm.com)\n",
+        fp_scl);
+
+    TIER *tier = &tier_st[curLayer];
+
+    fputs("\n", fp_scl);
+    fprintf(fp_scl, "NumRows :  \t%d\n", tier->row_cnt + tier->row_term_cnt);
+    fputs("\n", fp_scl);
+
+    // sort the Y-Order due to limit of DP
+    // iterate based on the sorted order
+    for(auto &curRow : *dummyInst.GetRowStor()) {
+        fprintf(fp_scl, "CoreRow Horizontal\n");
+        fprintf(fp_scl, "  Coordinate    :   %d\n", curRow.pmin.y);
+        fprintf(fp_scl, "  Height        :   %d\n", (int)(rowHeight + 0.5f));
+        fprintf(fp_scl, "  Sitewidth     :    %d\n", curRow.site_wid);
+        fprintf(fp_scl, "  Sitespacing   :    %d\n", curRow.site_spa);
+        fprintf(fp_scl, "  Siteorient    :    %s\n",
+                (curRow.isYSymmetry) ? "Y" : "1");
+        fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
+        fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n",
+                curRow.pmin.x, curRow.x_cnt);
+        fprintf(fp_scl, "End\n");
+    }
+
+    fclose(fp_scl);
+}
+
+///////////////////////////////////////////////////////////////////
+//  Handle Dummy Cell Cases 
+///////////////////////////////////////////////////////////////////
+
+DummyCellInfo::DummyCellInfo() :
+  l2d_(PREC_MAX), unitX_(PREC_MAX), unitY_(PREC_MAX), 
+  siteSizeX_(INT_MAX), siteSizeY_(INT_MAX), 
+  numX_(INT_MAX), numY_(INT_MAX),
+  rowSizeX_(INT_MAX), rowSizeY_(INT_MAX), 
+  arr_(0) {
+
+  SetCircuitInst();
+  SetScaleDownParam();
+  SetLayoutArea();
+  SetEnvironment(); 
+  GenerateDummyCell();
+}
+
+DummyCellInfo::~DummyCellInfo() {
+  delete [] arr_;
+}
+
+void DummyCellInfo::SetEnvironment() {
+  assert( ckt_->defRowStor->size() >= 1 );
+  defiRow* minRow = &ckt_->defRowStor[0];
+  // get the lowest one
+  for(auto curRow : ckt_->defRowStor ){
+    if( minRow->y() < minRow->y() ) {
+      minRow = &curRow;
+    }
+  }
+
+  auto sitePtr = ckt_->lefSiteMap.find( string(minRow->macro()) ) ;
+  if( sitePtr == ckt_->lefSiteMap.end() ) {
+    cout << "\n** ERROR:  Cannot find SITE in lef files: " 
+      << minRow->macro() << endl;
+    exit(1);
+  }
+
+  int siteSizeX= INT_CONVERT( 
+      l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeX() / unitX_ );
+  int siteSizeY= INT_CONVERT(
+      l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeY() / unitY_ );
+
+  SetSiteSize( siteSizeX, siteSizeY);
+
+  int rowCntX = (dieRect_.urx - dieRect_.llx) / siteSizeX; 
+  int rowCntY = (dieRect_.ury - dieRect_.lly) / siteSizeY;
+
+  SetArraySize( rowCntX, rowCntY );
+
+  rowSizeX_ = numX_ * siteSizeX_;
+  rowSizeY_ = siteSizeY_;
+  InitArray();
+  InitRow();
+}
+
+void DummyCellInfo::SetLayoutArea() {
+  dieRect_ = GetDieFromProperty();
+  if( dieRect_.isNotInitialize() ) {
+    dieRect_ = GetDieFromDieArea(); 
+  } 
+  if( dieRect_.isNotInitialize() ) {
+    cout << "ERROR: DIEAREA ERROR" << endl;
+    exit(1);
+  }
+}
+
+void DummyCellInfo::InitArray() {
+  assert( numX_ != INT_MAX && numY_ != INT_MAX);
+  arr_= new CellInfo[numX_* numY_];
+  for(int i=0; i<numX_*numY_; i++) {
+    arr_[i] = CellInfo::Empty;
+  }
+}
+
+void DummyCellInfo::SetSiteSize(int siteSizeX, int siteSizeY) {
+  siteSizeX_ = siteSizeX;
+  siteSizeY_ = siteSizeY;
+}
+
+void DummyCellInfo::SetArraySize(int numX, int numY) {
+  numX_ = numX;
+  numY_ = numY;
+}
+
+void DummyCellInfo::InitRow() {
+  for(int i=0; i<numY_; i++) {
+    ROW curRow;
+
+    curRow.pmin.Set(dieRect_.llx, dieRect_.lly + i * siteSizeY_, 0);
+    curRow.size.Set(rowSizeX_, rowSizeY_, 1);
+    curRow.pmax.Set(dieRect_.llx + rowSizeX_, dieRect_.lly + i * siteSizeY_ + rowSizeY_, 1);
+    if( i == 0 ) {
+      globalRowMin_.Set(curRow.pmin);
+    }
+    else if( i == numY_-1 ) {
+      globalRowMax_.Set(curRow.pmax);
+    }
+
+    curRow.x_cnt = numX_;
+    curRow.site_wid = curRow.site_spa = siteSizeX_;
+//    curRow.Dump(to_string(i));
+    rowStor_.push_back(curRow);
+  }
+}
+
+int DummyCellInfo::GetCoordiX(prec x) {
+//  cout << numX_ << " x: " << x << " " << INT_CONVERT( (x - globalRowMin_.x)/siteSizeX_) << endl;
+  return INT_CONVERT( (x - globalRowMin_.x)/siteSizeX_);
+}
+
+int DummyCellInfo::GetCoordiY(prec y) {
+//  cout << numY_ << " y: " << y << " " << INT_CONVERT( (y - globalRowMin_.y)/siteSizeY_) << endl;
+  return INT_CONVERT( (y - globalRowMin_.y)/siteSizeY_);
+}
+
+void DummyCellInfo::FillRowInst(ROW* curRow) {
+  curRow->pmin.Dump("curRowPmin");
+  curRow->pmax.Dump("curRowPmax");
+
+  cout << GetCoordiX(curRow->pmin.x) << " " 
+    << GetCoordiX(curRow->pmax.x) << endl;
+  cout << GetCoordiY(curRow->pmin.y) << " "
+    << GetCoordiY(curRow->pmax.y) << endl;
+
+  for(int i=GetCoordiX(curRow->pmin.x); 
+      i<GetCoordiX(curRow->pmax.x); i++) {
+    for(int j=GetCoordiY(curRow->pmin.y); 
+        j<GetCoordiY(curRow->pmax.y); j++) {
+//      cout << "[Row] i: " << i << ", j: " << j << endl;
+      arr_[j * numX_ + i] = CellInfo::Row;
+    }
+  }
+}
+void DummyCellInfo::FillFixedCell(TERM* curTerm) {
+  curTerm->pmin.Dump("curTermPmin");
+  curTerm->pmax.Dump("curTermPmax");
+  for(int i=GetCoordiX(curTerm->pmin.x);
+      i<GetCoordiX(curTerm->pmax.x); i++) {
+    for(int j=GetCoordiY(curTerm->pmin.y);
+        j<GetCoordiY(curTerm->pmax.y); j++) {
+//      cout << "[Fixed] i: " << i << ", j: " << j << endl;
+      arr_[j * numX_ + i] = CellInfo::Cell;
+    }
+  }
+}
+
+void DummyCellInfo::GenerateDummyCell() {
+  for(int i=0; i<row_cnt; i++) {
+    ROW* curRow = &row_st[i];
+    FillRowInst(curRow);
+  }
+  for(int i=0; i<terminalCNT; i++) {
+    TERM* curTerm = &terminalInstance[i];
+    if( curTerm->isTerminalNI ) {
+      continue;
+    }
+    FillFixedCell(curTerm);
+  }
+
+  for(int j=0; j<numY_; j++) {
+    for(int i=0; i<numX_; i++) {
+      if( arr_[j* numX_ + i] == CellInfo::Empty) {
+        int startX = i;
+        while( i < numX_ && arr_[j * numX_ + i] == CellInfo::Empty ) {
+          i++;
+        }
+        int endX = i;
+
+        TERM curTerm;
+        strcpy(curTerm.name, string("dummy_inst_" + to_string(terminalStor_.size())).c_str());
+        curTerm.pmin.Set(
+            (prec)(dieRect_.llx + siteSizeX_*startX), 
+            (prec)(dieRect_.lly + j*siteSizeY_), 
+            (prec)0.0);
+        curTerm.pmax.Set(
+            (prec)(dieRect_.llx + siteSizeX_*endX), 
+            (prec)(dieRect_.lly + j*siteSizeY_ + rowSizeY_), 
+            (prec)1.0);
+        curTerm.size.Set( 
+            (prec)((endX-startX)* siteSizeX_), 
+            (prec)(rowSizeY_) , 
+            (prec)1.0);
+        curTerm.isTerminalNI = false;
+        curTerm.area = curTerm.size.GetProduct();
+        // curTerm.Dump();
+        terminalStor_.push_back(curTerm);
+      }
+    }  
+  }
+}
+
 
 // write bookshelf's output
 // z : current tier's index
@@ -3209,20 +3644,26 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
         }
     }
 
+
     WriteAux(dir_tier, isShapeDrawing);
-    //    cout << "aux finish" << endl;
     WriteShapes(dir_tier, isShapeDrawing);
-    //    cout << "shape finish" << endl;
-    WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing);
-    //    cout << "nodes finish" << endl;
     WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing);
-    //    cout << "net finish" << endl;
-    WritePl(dir_tier, z, lab, isShapeDrawing);
-    //    cout << "pl finish" << endl;
+    WriteWts(dir_tier);
+
+    if( inputMode == InputMode::lefdef && isNtuDummyFill ) {
+      DummyCellInfo dummyInst;
+      WriteSclWithDummy(dir_tier, z, dummyInst);
+      WriteNodesWithDummy(dir_tier, z, lab, pin_term_cnt, isShapeDrawing, dummyInst);
+      WritePlWithDummy(dir_tier, z, lab, isShapeDrawing, dummyInst);
+    }
+    else {
+      WriteScl(dir_tier, z);
+      WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing);
+      WritePl(dir_tier, z, lab, isShapeDrawing);
+    }
+
 
     // shapeSupport doesn't affect to below function
-    WriteScl(dir_tier, z);
-    WriteWts(dir_tier);
 }
 
 //

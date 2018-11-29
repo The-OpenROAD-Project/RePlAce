@@ -42,6 +42,7 @@
 
 #include <sparsehash/dense_hash_map>
 #include "global.h"
+#include "lefdefIO.h"
 
 #define BUFFERSIZE 1000
 #define LINESIZE 2000
@@ -94,6 +95,66 @@ struct ROW {
         cout << endl;
     }
 };
+
+enum CellInfo {
+  Empty, Row, Cell
+};
+
+// based on ROW, TERMINAL information, generate dummy cells
+class DummyCellInfo {
+  private:
+    Circuit::Circuit* ckt_;
+    
+    vector<ROW> rowStor_;
+    vector<TERM> terminalStor_;
+
+    // layout boundary
+    DieRect dieRect_;
+
+    // scale down param
+    prec l2d_, unitX_, unitY_; 
+
+    // cellSize
+    int siteSizeX_, siteSizeY_;
+
+    // rowsize
+    int rowSizeX_, rowSizeY_;
+
+    // arraySize
+    int numX_, numY_;
+
+    // array
+    CellInfo* arr_;
+
+    FPOS globalRowMin_, globalRowMax_;
+    
+    void SetEnvironment();
+    void SetLayoutArea();
+    void InitArray();
+    void InitRow();
+
+
+  public:
+    DummyCellInfo();
+    ~DummyCellInfo();
+    vector<ROW>* GetRowStor() { return &rowStor_; };
+    vector<TERM>* GetTerminalStor() { return &terminalStor_; };
+
+    void SetCircuitInst();
+    void SetScaleDownParam();
+    void SetSiteSize(int siteSizeX, int siteSizeY);
+    void SetArraySize(int numX, int numY);
+
+    int GetCoordiX(prec x);
+    int GetCoordiY(prec y);
+
+    void FillRowInst(ROW* curRow);
+    void FillFixedCell(TERM* curTerm);
+    
+    void GenerateDummyCell();
+};
+
+
 
 void runtimeError(string error_text);
 void ParseBookShelf();

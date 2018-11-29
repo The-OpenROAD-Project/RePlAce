@@ -276,7 +276,24 @@ struct NetInfo {
         : macroIdx(_macroIdx), compIdx(_compIdx), pinIdx(_pinIdx) {};
 };
 
+extern Circuit __ckt; 
+
 CIRCUIT_NAMESPACE_CLOSE
+
+struct DieRect {
+  int llx, lly, urx, ury;
+  DieRect() : llx(INT_MAX), lly(INT_MAX), urx(INT_MIN), ury(INT_MIN) {};
+  bool isNotInitialize () {
+    return ( llx == INT_MAX || lly == INT_MAX
+        || urx == INT_MIN || ury == INT_MIN) ;
+  }
+  void Dump() {
+    cout << "(" << llx << ", " << lly << ") - (" << urx << ", " << ury << ")" << endl;
+  }
+};
+
+DieRect GetDieFromProperty();
+DieRect GetDieFromDieArea();
 
 
 void ParseInput();

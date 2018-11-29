@@ -97,12 +97,12 @@ void tier_init_2D(int STAGE) {
 //            (tier->area - tier->virt_area) * target_cell_den -
 //            tier->modu_area;
 
-        cout << fixed << setprecision(0); 
-        cout << "INFO: (tier " << z << ") area: "<< tier->area << endl;
-        cout << "INFO: (tier " << z << ") virt_area: " << tier->virt_area << endl;
-        cout << "INFO: (tier " << z << ") term_area: " << tier->term_area << endl;
-        cout << "INFO: (tier " << z << ") modu_area: " << tier->modu_area << endl;
-        cout << "INFO: (tier " << z << ") filler_area: " << tier->filler_area << endl;
+        printf("INFO: (tier %d) area: %.f\n", z, tier->area);
+        printf("INFO: (tier %d) virt_area: %.f\n", z, tier->virt_area);
+        printf("INFO: (tier %d) term_area: %.f\n", z, tier->term_area);
+        printf("INFO: (tier %d) modu_area: %.f\n", z, tier->modu_area);
+        printf("INFO: (tier %d) filler_area: %.f\n", z, tier->filler_area);
+        fflush(stdout);
 
         tier->filler_cnt = (int)(tier->filler_area / filler_area + 0.5);
 

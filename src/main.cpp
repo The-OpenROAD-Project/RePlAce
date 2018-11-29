@@ -370,6 +370,7 @@ bool isOnlyLGinDP;
 bool isPlot;
 bool isSkipIP;
 bool isBinSet;
+bool isNtuDummyFill;
 
 int conges_eval_methodCMD;
 bool plotCellCMD;
@@ -636,6 +637,8 @@ int main(int argc, char *argv[]) {
                 string(dir_bnd) 
                 + string("/finalResult") );
     }
+
+    
     // for final DP SPEF generating
     Timing::Timing TimingInst(moduleInstance, terminalInstance,
             netInstance, netCNT, pinInstance, pinCNT, 

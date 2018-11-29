@@ -748,26 +748,16 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
 }
 
 
-struct Rect {
-    int llx, lly, urx, ury;
-    Rect() : llx(INT_MAX), lly(INT_MAX), urx(INT_MIN), ury(INT_MIN) {};
-    bool isNotInitialize () {
-        return ( llx == INT_MAX || lly == INT_MAX
-            || urx == INT_MIN || ury == INT_MIN) ;
-    }
-    void Dump() {
-        cout << "(" << llx << ", " << lly << ") - (" << urx << ", " << ury << ")" << endl;
-    }
-};
-
-
-Rect GetDieFromProperty() {
+/////////////////////////////////////////////
+//  DieRect Instances
+//
+DieRect GetDieFromProperty() {
 
     // Set DieArea from PROPERTYDEFINITIONS
     string llxStr = "FE_CORE_BOX_LL_X", urxStr = "FE_CORE_BOX_UR_X";
     string llyStr = "FE_CORE_BOX_LL_Y", uryStr = "FE_CORE_BOX_UR_Y";
 
-    Rect retRect;
+    DieRect retRect;
     for(auto& prop: __ckt.defPropStor) {
         if (strcmp( prop.propType(), "design") != 0) {
             continue;
@@ -789,8 +779,8 @@ Rect GetDieFromProperty() {
     return retRect; 
 }
 
-Rect GetDieFromDieArea() {
-    Rect retRect;
+DieRect GetDieFromDieArea() {
+    DieRect retRect;
     defiPoints points = __ckt.defDieArea.getPoint();
     if( points.numPoints >=2 ) {
         retRect.llx = points.x[0] / unitX;
@@ -806,12 +796,9 @@ Rect GetDieFromDieArea() {
     return retRect;
 }
 
-//////// 
-//
+/////////////////////////////////////////////
 //  Generate RowInstance
-// 
 // defRowStor -> rowInstance
-//
 // this must update grow_pmin / grow_pmax, rowHeight
 void GenerateRow(Circuit::Circuit &__ckt) {
     // Get the sites from ROW statements
@@ -861,8 +848,10 @@ void GenerateRow(Circuit::Circuit &__ckt) {
                     int _rowHeight = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY());
                     cout << endl 
                         << "** ERROR: rowHeight \% unitY is not zero,  " << endl
-                        << "          ( rowHeight : " << _rowHeight << ", unitY : " << INT_CONVERT(unitY) 
-                        << ", rowHeight \% unitY : " << _rowHeight % INT_CONVERT(unitY) << " )" << endl;
+                        << "          ( rowHeight : " 
+                        << _rowHeight << ", unitY : " << INT_CONVERT(unitY) 
+                        << ", rowHeight \% unitY : " 
+                        << _rowHeight % INT_CONVERT(unitY) << " )" << endl;
                     cout << "          so it causes serious problem in RePlACE" << endl << endl;
                     cout << "          Use custom unitY in here using -unitY command, as a divider of rowHeight" << endl;
                     exit(1);
@@ -903,7 +892,7 @@ void GenerateRow(Circuit::Circuit &__ckt) {
     // Newly create the all ROW area for floorplan.
     // In here, I've used DESIGN FE_CORE_BOX_LL_X statements in PROPERTYDEFINITIONS 
     else {
-        Rect dieArea = GetDieFromProperty();
+        DieRect dieArea = GetDieFromProperty();
         if( dieArea.isNotInitialize() ) {
             dieArea = GetDieFromDieArea(); 
         } 
@@ -1022,7 +1011,7 @@ void GenerateRow(Circuit::Circuit &__ckt) {
 
             curRow->x_cnt = rowCntX;
             curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep()/unitX;
-//            curRow->Dump(to_string(i));
+            curRow->Dump(to_string(i));
         }
     }
     
@@ -2058,3 +2047,13 @@ void Timing::UpdateSpefClockNetVerilog() {
 }
 
 TIMING_NAMESPACE_CLOSE
+
+void DummyCellInfo::SetScaleDownParam() {
+  unitX_ = unitX;
+  unitY_ = unitY;
+  l2d_ = l2d;
+}
+
+void DummyCellInfo::SetCircuitInst() {
+  this->ckt_ = &__ckt;
+}

@@ -98,6 +98,7 @@ void initArgument(int argc, char *argv[]) {
     isSkipIP = false;     // bool
     isTiming = false;
     isNewLayout = false;
+    isNtuDummyFill = false;
 
     isARbyUserCMD = false;          // bool
     thermalAwarePlaceCMD = false;   // bool
@@ -730,6 +731,10 @@ bool argument(int argc, char *argv[]) {
         // detail placer with only Legalization modes
         else if(!strcmp(argv[i], "-onlyLG")) {
             isOnlyLGinDP = true;
+        }
+        // Dummy Cell Create For NtuPlacer3
+        else if(!strcmp(argv[i], "-fragmentedRow")) {
+            isNtuDummyFill = true;
         }
         /*
         else if(!strcmp(argv[i], "-CE")) {

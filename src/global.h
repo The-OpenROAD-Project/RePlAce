@@ -142,7 +142,6 @@ using std::max;
 using std::min;
 
 using std::fixed;
-using std::setprecision;
 using std::scientific;
 using std::map;
 using std::to_string;
@@ -398,7 +397,6 @@ struct MODULE {
         pmax_lg.SetZero();
     }
     void Dump(string a) {
-        cout << fixed << setprecision(0) << a << endl;
         cout << idx << ", name: " << name << endl;
         cout << "tier: " << tier << endl;
         cout << "mac_idx: " << mac_idx << endl;
@@ -452,7 +450,6 @@ struct TERM {
         printf("terminal[%d]: name: %s \n",
                idx, name);
         fflush(stdout);
-        cout << fixed << setprecision(0) ;
         cout << "isTerminalNI: " << (isTerminalNI? "YES" : "NO") << endl;
         cout << "IO: " << ((IO==0)? "Input" : "Output") << endl;
 //        cout << "tier: " << tier << endl;
@@ -656,7 +653,6 @@ struct PLACE {
         cout << a << endl;
         org.Dump("origin");
         end.Dump("end");
-        cout << fixed <<setprecision(0)<<"area: " << area << endl;
         center.Dump("center");
         stp.Dump("stp");
         cnt.Dump("cnt");
@@ -772,6 +768,7 @@ extern bool isSkipPlacement;
 extern bool hasDensityDP;
 extern bool isSkipIP;
 extern bool isBinSet;
+extern bool isNtuDummyFill;
 extern prec densityDP ;
 
 
