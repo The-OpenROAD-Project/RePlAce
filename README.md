@@ -44,6 +44,17 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
     $ cd ~/RePlAce/src
     $ ./execute_bookshelf.py superblue19
 
+
+### Verified/supported Technologies
+* TSMC 65
+* Fujitsu 55
+* TSMC 45
+* ST FDSOI 28
+* TSMC 16 (7.5T/9T)
+* GF 14
+* ASAP 7
+
+
 ### Manual
 * [How To Execute Python Scripts?](doc/ScriptUsage.md)
 * [RePlAce's arguments](doc/BinaryArguments.md)
@@ -66,4 +77,4 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 - Ilgweon Kang and Lutong Wang (respective Ph.D. advisors: Chung-Kuan Cheng, Andrew B. Kahng), based on Dr. Jingwei Lu's Fall 2015 code implementing ePlace and ePlace-MS.
 - Many subsequent improvements were made by Mingyu Woo leading up to the initial release.
 - Paper reference: C.-K. Cheng, A. B. Kahng, I. Kang and L. Wang, "RePlAce: Advancing Solution Quality and Routability Validation in Global Placement", to appear in IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, 2018.  (Digital Object Identifier: 10.1109/TCAD.2018.2859220)
-
+- Timing-Driven mode has been implemented by Mingyu Woo.
