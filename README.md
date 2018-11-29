@@ -67,9 +67,10 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 * Eigen
 * CImg
 * Google Dense Hash Map
-* FLUTE
+* [FLUTE](https://github.com/RsynTeam/rsyn-x/tree/master/rsyn/src/rsyn/3rdparty/flute) from [Rsyn-x](https://github.com/RsynTeam/rsyn-x)
+* [OpenSTA](https://github.com/abk-openroad/OpenSTA)
 * NTUPlacer3/4h (Thanks for agreeing with redistribution)
-* Ben Marshall's verilog-parser (Modified by mgwoo)
+* Ben Marshall's [verilog-parser](https://github.com/ben-marshall/verilog-parser) ([Modified version](https://github.com/mgwoo/verilog-parser) by mgwoo)
 * LEF/DEF Parser (Modified by mgwoo)
 
 
