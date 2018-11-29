@@ -904,7 +904,7 @@ void printUsage() {
     cout << "  -bmflag     : Specify which Benchmark is Used" << endl ;
     cout << "  -aux        : *.aux Location" << endl << endl;
     cout << "[Lef/Def/Verilog]"<< endl;
-    cout << " Usage: ./RePlACE -bmflag <mms/ispd/sb/ibm/etc> -lef <*.lef> -def <*.def> [-v <*.v>] -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]" << endl << endl;
+    cout << " Usage: ./RePlACE -bmflag <mms/ispd/sb/ibm/etc> -lef <*.lef> -def <*.def> [-verilog <*.v>] -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]" << endl << endl;
     cout << "  -bmflag     : Specify which Benchmark is Used" << endl ;
     cout << "  -lef        : *.lef Location" << endl ;
     cout << "  -def        : *.def Location" << endl ;
@@ -964,6 +964,19 @@ bool criticalArgumentError() {
         printf("\n** ERROR: Missing output result directory, use -output option.\n");
         printUsage();
         return true;
+    }
+
+    if( isTiming ) {
+        if (libStor.size() == 0) {
+            printf("\n** ERROR: Timing mode must contain at least one liberty file.\n");
+            printUsage();
+            return true;
+        }
+        if( verilogCMD == "") {
+            printf("\n** ERROR: Timing mode must contain verilog.\n");
+            printUsage();
+            return true;
+        }
     }
 
     if(constraintDrivenCMD == false && lambda2CMD == true) {
