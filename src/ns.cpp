@@ -149,17 +149,20 @@ void myNesterov::nesterov_opt() {
     //    congEstimation (x_st);
     //    calcCong_print_detail();
     //}
-    TimingInst.BuildSteiner(true);
-//    TimingInst.PrintNetSteiner();
-    // BU  asked
-    string spefName = string(dir_bnd) + "/" + gbch + "_gp.spef";
-    TimingInst.WriteSpef( spefName );
+    
 
-    if( isTiming ) {
+
+    if( isTiming ) { 
+        TimingInst.BuildSteiner(true);
+        // TimingInst.PrintNetSteiner();
+
+        string spefName = string(dir_bnd) + "/" + gbch + "_gp.spef";
+        TimingInst.WriteSpef( spefName );
         TimingInst.ExecuteStaLater();
     }
     else {
-//        TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, "");
+        // for comparison
+        // TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, "");
     }
     mkl_malloc_free();
 }

@@ -638,16 +638,18 @@ int main(int argc, char *argv[]) {
                 + string("/finalResult") );
     }
 
-    
-    // for final DP SPEF generating
-    Timing::Timing TimingInst(moduleInstance, terminalInstance,
+    // DP Spef Generation 
+    if( inputMode == InputMode::lefdef && isTiming ) {
+        // for final DP SPEF generating
+        Timing::Timing TimingInst(moduleInstance, terminalInstance,
             netInstance, netCNT, pinInstance, pinCNT, 
             mPinName, tPinName, "clk", timingClock);
 
-    TimingInst.BuildSteiner(true);
+        TimingInst.BuildSteiner(true);
 
-    string spefName = string(dir_bnd) + "/" + gbch + "_dp.spef";
-    TimingInst.WriteSpef( spefName );
+        string spefName = string(dir_bnd) + "/" + gbch + "_dp.spef";
+        TimingInst.WriteSpef( spefName );
+    }
 
 //    ShowPlot( benchName );   
     return 0;
