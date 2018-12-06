@@ -1331,13 +1331,23 @@ int HPWL_count() {
         curNet = &netInstance[i];
         tx_HPWL += (curNet->max_x - curNet->min_x);
         ty_HPWL += (curNet->max_y - curNet->min_y);
-        // printf("%.16lf %.16lf\n",(curNet->max_x - curNet->min_x),
-        //        (curNet->max_y - curNet->min_y));
+        
+        if(curNet->max_x - curNet->min_x < 0 ) {
+            cout << "NEGATIVE HPWL ERROR! " 
+              << curNet->name << " " 
+              << curNet->max_x << " " 
+              << curNet->min_x << endl;
+        }
+        if(curNet->max_y - curNet->min_y < 0 ) {
+            cout << "NEGATIVE HPWL ERROR! " 
+              << curNet->name << " " 
+              << curNet->max_y << " " 
+              << curNet->min_y << endl;
+        }
 
         if(tx_HPWL < 0 || ty_HPWL < 0) {
-            printf("ERROR\n");
-            cout << tx_HPWL << " " << ty_HPWL << endl;
-            g_rrr++;
+            printf("NEGATIVE HPWL ERROR! \n");
+            cout << curNet->name << tx_HPWL << " " << ty_HPWL << endl;
             exit(1);
         }
     }
