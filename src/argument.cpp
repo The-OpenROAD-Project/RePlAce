@@ -84,6 +84,7 @@ void initArgument(int argc, char *argv[]) {
     isBinSet = false;
     isSkipIP = false; 
 
+    isVerbose = false;
     isPlot = false;                 // bool
     plotCellCMD = false;            // bool
     plotMacroCMD = false;           // bool
@@ -316,6 +317,9 @@ bool argument(int argc, char *argv[]) {
                        argv[i - 1]);
                 return false;
             }
+        }
+        else if(!strcmp(argv[i], "-verbose")) {
+            isVerbose = true;
         }
         // timing-related param; NetCut
         else if(!strcmp(argv[i], "-nc")) {

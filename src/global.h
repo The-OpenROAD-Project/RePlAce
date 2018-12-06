@@ -1059,6 +1059,7 @@ extern string filleriterCMD;
 extern string refdWLCMD;
 extern int conges_eval_methodCMD;  // grouter | prob
 
+extern bool isVerbose; 
 extern bool isPlot;
 extern bool plotCellCMD;
 extern bool plotMacroCMD;

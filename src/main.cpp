@@ -373,6 +373,7 @@ bool isBinSet;
 bool isNtuDummyFill;
 
 int conges_eval_methodCMD;
+bool isVerbose;
 bool plotCellCMD;
 bool plotMacroCMD;
 bool plotDensityCMD;

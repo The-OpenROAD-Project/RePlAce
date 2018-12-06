@@ -188,9 +188,6 @@ inline static bool IsPrecEqual(prec a, prec b) {
 void SetParameter() {
     // lef 2 def unit info setting
     l2d = __ckt.defUnit;
-    if( __ckt.lefUnit.hasDatabase() ) {
-        cout << "\n** WARNING : LEF unit Info is missing..! (UNITS/DATABASE)" << endl; 
-    }
     cout << "INFO:  DEF SCALE UNIT: " << l2d << endl;
 
     if( __ckt.lefLayerStor.size() == 0) {
@@ -275,12 +272,12 @@ void ParseLefDef() {
     // 
     // Circuit::Circuit __ckt(lefStor, defCMD, "");
     //
-    __ckt.Init(lefStor, defCMD);
+    __ckt.Init(lefStor, defCMD, isVerbose);
 
     SetParameter(); 
 
-    GenerateModuleTerminal(__ckt);
     GenerateRow(__ckt);
+    GenerateModuleTerminal(__ckt);
     if( __ckt.defNetStor.size() > 0 ) {
         cout << "INFO:  EXTRACT NET INFO FROM DEF ONLY" << endl;
         GenerateNetDefOnly(__ckt);
@@ -594,6 +591,9 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
             // size info update from LEF Macro
             curModule->size.Set( l2d * curMacro->sizeX()/unitX, 
                     l2d * curMacro->sizeY()/unitY, 1 );
+            if( fabs(curModule->size.y - rowHeight) > PREC_EPSILON  ) {
+                cout << "MACRO: " << curComp->id() << endl; 
+            }
         }
 
         // set half_size

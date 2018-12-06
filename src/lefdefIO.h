@@ -107,7 +107,7 @@ class Circuit {
         // but verilog is optional
         //
         Circuit(vector<string>& lefStor, 
-                string defFilename, string verilogFilename = "" )
+                string defFilename, bool isVerbose = false )
         : lefManufacturingGrid(DBL_MIN) {
             lefMacroMap.set_empty_key(INIT_STR);
             lefViaMap.set_empty_key(INIT_STR);
@@ -118,16 +118,13 @@ class Circuit {
             defPinMap.set_empty_key(INIT_STR);
             defRowY2OrientMap.set_empty_key(INT_MAX);
 
-            Init( lefStor, defFilename, verilogFilename );
+            Init( lefStor, defFilename, isVerbose );
         }
 
         void Init( vector<string>& lefStor, string defFilename, 
-                   string verilogFilename = "" ) {
-            ParseLef(lefStor);
-            ParseDef(defFilename);
-            if( verilogFilename != "" ) {
-                // ParseVerilog(verilogFilename);   
-            }
+                   bool isVerbose = false) {
+            ParseLef(lefStor, isVerbose);
+            ParseDef(defFilename, isVerbose);
         };
 
         void WriteLef( FILE* _fout );
@@ -201,9 +198,8 @@ class Circuit {
 
     private:
         // Parsing function
-        void ParseLef(vector<string>& lefStor);
-        void ParseDef(string filename);
-        // void ParseVerilog(string filename);
+        void ParseLef(vector<string>& lefStor, bool isVerbose);
+        void ParseDef(string filename, bool isVerbose);
 
 
         /////////////////////////////////////////////////////

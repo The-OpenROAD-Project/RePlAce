@@ -3052,12 +3052,7 @@ void lineNumberCB(long long lineNo) {
         defrSetNLines(lineNo);
         ccr1131444 = 0;
     }
-
-#ifdef _WIN32
-    CIRCUIT_FPRINTF(fout, "Parsed %I64d number of lines!!\n", lineNo);
-#else 
-    CIRCUIT_FPRINTF(fout, "Parsed %lld number of lines!!\n", lineNo);
-#endif
+    cout << "[DEF] Parsed " << lineNo/1000 << "k number of lines!!" << endl;
 }
 
 int unUsedCB(defrCallbackType_e, void*, defiUserData) {
@@ -4421,7 +4416,7 @@ void Circuit::Circuit::DumpDefComponentPinToNet() {
 /////////////////////////////////////////////////////////////////////
 
 
-void Circuit::Circuit::ParseDef(string fileName) {
+void Circuit::Circuit::ParseDef(string fileName, bool isVerbose = false) {
 
 //    int num = 99;
     char* inFile[6];
@@ -4432,7 +4427,6 @@ void Circuit::Circuit::ParseDef(string fileName) {
 //    int numInFile = 0;
     int fileCt = 0;
     int noNetCb = 0;
-    int line_num_print_interval = 50;
 
     //  start_mem = (long)sbrk(0);
 
@@ -4622,9 +4616,9 @@ void Circuit::Circuit::ParseDef(string fileName) {
     defrSetVersionWarnings(3);
     defrSetViaWarnings(3);
 
-    if (! isSessionless) {
+    if( isVerbose ) {
         defrSetLongLineNumberFunction(lineNumberCB);
-        defrSetDeltaNumberLines(line_num_print_interval);
+        defrSetDeltaNumberLines(10000);
     }
 
     (void) defrSetOpenLogFileAppend();

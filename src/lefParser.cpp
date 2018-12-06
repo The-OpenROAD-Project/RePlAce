@@ -1797,8 +1797,7 @@ void freeCB(void* name) {
 }
 
 void lineNumberCB(int lineNo) {
-    CIRCUIT_FPRINTF(fout, "Parsed %d number of lines!!\n", lineNo);
-    return;
+    cout << "[LEF] Parsed " << lineNo << " number of lines!!" << endl;
 }
 
 void printWarning(const char *str)
@@ -2910,7 +2909,7 @@ void Circuit::Circuit::DumpLefPin(lefiPin* pin) {
 
 
 
-void Circuit::Circuit::ParseLef(vector<string>& lefStor) {
+void Circuit::Circuit::ParseLef(vector<string>& lefStor, bool isVerbose = false) {
 //    char* outFile;
 
     FILE* f;
@@ -3036,8 +3035,10 @@ void Circuit::Circuit::ParseLef(vector<string>& lefStor) {
     lefrSetReallocFunction(reallocCB);
     lefrSetFreeFunction(freeCB);
 
-    lefrSetLineNumberFunction(lineNumberCB);
-//    lefrSetDeltaNumberLines(50);
+    if( isVerbose ) {
+        lefrSetLineNumberFunction(lineNumberCB);
+        lefrSetDeltaNumberLines(500);
+    }
 
     lefrSetRegisterUnusedCallbacks();
 
