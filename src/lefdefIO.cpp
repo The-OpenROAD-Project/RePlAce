@@ -1552,7 +1552,11 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 
         int macroIdx = GetLefMacroIdx( __ckt, macroName );
         int compIdx = GetDefComponentIdx( __ckt, compName );
-        
+       
+        if( !innerInst->port_connections ) {
+            cout << "** WARNING:  " << compName << " has empty connection in verilog."<< endl;
+            continue;
+        } 
         pinCNT += innerInst->port_connections->items;
         for(int j=0; j<innerInst->port_connections->items; j++) {
             ast_port_connection* port =
