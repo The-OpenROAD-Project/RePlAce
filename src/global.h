@@ -1046,6 +1046,7 @@ extern string outputCMD;
 extern string experimentCMD;
 extern vector<string> libStor;
 extern string verilogTopModule;
+extern int defMacroCnt;
 
 
 extern string benchName;
@@ -1082,7 +1083,6 @@ extern bool thermalAwarePlaceCMD;
 extern bool onlyGlobalPlaceCMD;
 extern bool isSkipIP;
 extern bool isTiming;
-extern bool isNewLayout;
 extern bool isARbyUserCMD;
 extern bool stnCMD;  // lutong
 extern bool trialRunCMD;

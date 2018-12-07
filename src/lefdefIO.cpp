@@ -271,6 +271,7 @@ void SetParameter() {
 }
 
 void SetVerilogTopModule() {
+  /*
     using namespace verilog;
 
     FILE* verilogInput = fopen(verilogCMD.c_str(), "rb");
@@ -296,9 +297,8 @@ void SetVerilogTopModule() {
 
     // extract the '1st' module
     ast_module_declaration* module = (ast_module_declaration*)ast_list_get(tree->modules, 0);
-
-    verilogTopModule = string(module->identifier->identifier);
-//    verilog_free_source_tree(tree);
+  */
+    verilogTopModule = __ckt.defDesignName; 
 }
 
 
@@ -314,6 +314,10 @@ void ParseLefDef() {
 
     GenerateRow(__ckt);
     GenerateModuleTerminal(__ckt);
+    if( defMacroCnt > 0) {
+        GenerateFullRow(__ckt);
+    }
+
     if( __ckt.defNetStor.size() > 0 ) {
         cout << "INFO:  EXTRACT NET INFO FROM DEF ONLY" << endl;
         GenerateNetDefOnly(__ckt);
@@ -620,8 +624,7 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
 
         if( strcmp( curMacro->macroClass(), "BLOCK") == 0 &&
             __ckt.lefObsStor[macroPtr->second].size() != 0 ) {
-//            cout << "BLOCK/OBS macro dected" << endl;
-
+//            cout << "BLOCK/OBS: " << curMacro->name() << endl; 
             SetSizeForObsMacro(macroPtr->second, curModule);
 //            curModule.size.Set( l2d * curMacro);
         }
@@ -629,9 +632,12 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
             // size info update from LEF Macro
             curModule->size.Set( l2d * curMacro->sizeX()/unitX, 
                     l2d * curMacro->sizeY()/unitY, 1 );
-            if( fabs(curModule->size.y - rowHeight) > PREC_EPSILON  ) {
-                cout << "MACRO: " << curComp->id() << endl; 
-            }
+//            curModule->size.Dump("size");
+        }
+        
+        if( fabs(curModule->size.y - rowHeight) > PREC_EPSILON  ) {
+            defMacroCnt ++;
+            cout << "MACRO: " << curComp->id() << endl; 
         }
 
         // set half_size
@@ -841,221 +847,226 @@ DieRect GetDieFromDieArea() {
 void GenerateRow(Circuit::Circuit &__ckt) {
     // Get the sites from ROW statements
     // usual cases
-    if( !isNewLayout ) {
-        bool isFirst = true;
-        int i=0;
+    bool isFirst = true;
+    int i=0;
     
-        row_cnt = __ckt.defRowStor.size();
-        row_st = (ROW*) mkl_malloc( sizeof(ROW)*row_cnt, 64 );
+    row_cnt = __ckt.defRowStor.size();
+    row_st = (ROW*) mkl_malloc( sizeof(ROW)*row_cnt, 64 );
 
-        for(auto& row : __ckt.defRowStor) {
-            auto sitePtr = __ckt.lefSiteMap.find( string(row.macro()) ) ;
-            if( sitePtr == __ckt.lefSiteMap.end() ) {
-                cout << "\n** ERROR:  Cannot find SITE in lef files: " 
-                    << row.macro() << endl;
-                exit(1);
-            }
-
-            ROW* curRow = &row_st[i];
-    
-            new (curRow) ROW();
-
-            curRow->pmin.Set( (row.x()+offsetX)/unitX, (row.y()+offsetY)/unitY, 0 );
-            curRow->size.Set( 
-                    INT_CONVERT( 
-                        l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX ) 
-                    * row.xNum(),
-                    INT_CONVERT(
-                        l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY ) 
-                    * row.yNum(),
-                    1 );
-
-            curRow->pmax.Set( 
-                    curRow->pmin.x + curRow->size.x,
-                    curRow->pmin.y + curRow->size.y,
-                    1 );
-
-            if( isFirst ) {
-                grow_pmin.Set(curRow->pmin);
-                grow_pmax.Set(curRow->pmax);
-
-                rowHeight = INT_CONVERT( l2d* __ckt.lefSiteStor[sitePtr->second].sizeY()/unitY );
-
-                if( INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY()) % 
-                        INT_CONVERT( unitY ) != 0 ) {
-                    int _rowHeight = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY());
-                    cout << endl 
-                        << "** ERROR: rowHeight \% unitY is not zero,  " << endl
-                        << "          ( rowHeight : " 
-                        << _rowHeight << ", unitY : " << INT_CONVERT(unitY) 
-                        << ", rowHeight \% unitY : " 
-                        << _rowHeight % INT_CONVERT(unitY) << " )" << endl;
-                    cout << "          so it causes serious problem in RePlACE" << endl << endl;
-                    cout << "          Use custom unitY in here using -unitY command, as a divider of rowHeight" << endl;
-                    exit(1);
-                }
-                isFirst = false;
-            }
-            else {
-                grow_pmin.x = min( grow_pmin.x, (prec)curRow->pmin.x);
-                grow_pmin.y = min( grow_pmin.y, (prec)curRow->pmin.y);
-
-                grow_pmax.x = max( grow_pmax.x, (prec)curRow->pmax.x);
-                grow_pmax.y = max( grow_pmax.y, (prec)curRow->pmax.y);
-            }
-
-            curRow->x_cnt = row.xNum();
-
-            // 
-            // this is essential to DetailPlacer
-            //
-            // scale down to 1.
-            //  
-            curRow->site_wid = curRow->site_spa = SITE_SPA = row.xStep()/unitX; 
-
-            curRow->ori = string( orientStr(row.orient()) );
-            curRow->isXSymmetry = (__ckt.lefSiteStor[sitePtr->second].
-                    hasXSymmetry() )? true : false;
-
-            curRow->isYSymmetry = (__ckt.lefSiteStor[sitePtr->second].
-                    hasYSymmetry() )? true : false;
-
-            curRow->isR90Symmetry = (__ckt.lefSiteStor[sitePtr->second].
-                    has90Symmetry() )? true : false;
-
-//            curRow->Dump(to_string(i));
-            i++;
-        }
-    }
-    // Newly create the all ROW area for floorplan.
-    // In here, I've used DESIGN FE_CORE_BOX_LL_X statements in PROPERTYDEFINITIONS 
-    else {
-        DieRect dieArea = GetDieFromProperty();
-        if( dieArea.isNotInitialize() ) {
-            dieArea = GetDieFromDieArea(); 
-        } 
-        if( dieArea.isNotInitialize() ) {
-            cout << "ERROR: DIEAREA ERROR" << endl;
-            exit(1);
-        }
-    
-        cout << "dieArea: " << dieArea.llx << " " << dieArea.lly << endl;
-        cout << "dieArea: " << dieArea.urx << " " << dieArea.ury << endl; 
-       
-        // this portion is somewhat HARD_CODING
-        // it regards there only one SITE definition per each design!
-
-        defiRow* minRow = &__ckt.defRowStor[0];
-    
-        // get the lowest one
-        for(auto curRow : __ckt.defRowStor ){
-            if( minRow->y() < minRow->y() ) {
-                minRow = &curRow;
-            }
-        }
-
-        auto sitePtr = __ckt.lefSiteMap.find( string(minRow->macro()) ) ;
+    for(auto& row : __ckt.defRowStor) {
+        auto sitePtr = __ckt.lefSiteMap.find( string(row.macro()) ) ;
         if( sitePtr == __ckt.lefSiteMap.end() ) {
             cout << "\n** ERROR:  Cannot find SITE in lef files: " 
-                << minRow->macro() << endl;
+                << row.macro() << endl;
             exit(1);
         }
 
-        int siteX = INT_CONVERT( 
-                        l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX );
-        int siteY = INT_CONVERT(
-                        l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY );
-
-        int rowCntX = (dieArea.urx - dieArea.llx) / siteX; 
-        int rowCntY = (dieArea.ury - dieArea.lly) / siteY;
-
-        int rowSizeX = rowCntX * siteX;
-        int rowSizeY = rowHeight = siteY;
-
-        row_cnt = rowCntY;
-        row_st = (ROW*) mkl_malloc( sizeof(ROW)*row_cnt, 64 );
-
-        /////////////////////////
-        // HARD CODE PART!!!!!
-        //
-        // 0 ~ cut : 0 ~ 1640064 
-        // cut ~ 1640064 : 451298 ~ 1640064
-        /*
-        
-        int cut = 635904;
-        int cutY = (1.0*cut / unitY) / siteY;
-        int rowCntX1 = (1.0*(1640064 - 0) / unitX) / siteX;
-        int rowCntX2 = (1.0*(1640064 - 451298) / unitX) / siteX;
-        int rowSizeX1 = rowCntX1 * siteX;
-        int rowSizeX2 = rowCntX2 * siteX;
-        
-//        cout << siteX << endl;
-//        exit(0);
-
-        for(int i=0; i<cutY; i++) {
-            ROW* curRow = &row_st[i];
-            new (curRow) ROW();
-
-            curRow->pmin.Set(llx, lly + i * siteY, 0);
-            curRow->size.Set(rowSizeX1, rowSizeY, 1);
-            curRow->pmax.Set(llx + rowSizeX1, lly + i * siteY + rowSizeY, 1);
-
-            if( i == 0 ) {
-                grow_pmin.Set(curRow->pmin);
-            }
-
-            curRow->x_cnt = rowCntX1;
-            curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep()/unitX;
-            curRow->Dump(to_string(i));
-        } 
-
-        for(int i=cutY; i<row_cnt; i++) {
-            ROW* curRow = &row_st[i];
-            new (curRow) ROW();
-
-            curRow->pmin.Set(451298 / unitX , lly + i * siteY, 0);
-            curRow->size.Set(rowSizeX2, rowSizeY, 1);
-            curRow->pmax.Set(451298 / unitX + rowSizeX2, lly + i * siteY + rowSizeY, 1);
-
-            if( i == row_cnt-1 ) {
-                grow_pmax.Set(curRow->pmax);
-            }
-
-            curRow->x_cnt = rowCntX2;
-            curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep()/unitX;
-            curRow->Dump(to_string(i));
-        }
-
-//        exit(1);
-        */
-        //
-        ///////////////////////////
-        // ORIGINAL!!!
-
-        for(int i=0; i<row_cnt; i++) {
-            ROW* curRow = &row_st[i];
-            new (curRow) ROW();
-
-            curRow->pmin.Set(dieArea.llx, dieArea.lly + i * siteY, 0);
-            curRow->size.Set(rowSizeX, rowSizeY, 1);
-            curRow->pmax.Set(dieArea.llx + rowSizeX, dieArea.lly + i * siteY + rowSizeY, 1);
-
-            if( i == 0 ) {
-                grow_pmin.Set(curRow->pmin);
-            }
-            else if( i == row_cnt-1 ) {
-                grow_pmax.Set(curRow->pmax);
-            }
-
-            curRow->x_cnt = rowCntX;
-            curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep()/unitX;
-            curRow->Dump(to_string(i));
-        }
-    }
+        ROW* curRow = &row_st[i];
     
+        new (curRow) ROW();
+
+        curRow->pmin.Set( (row.x()+offsetX)/unitX, (row.y()+offsetY)/unitY, 0 );
+        curRow->size.Set( 
+                INT_CONVERT( 
+                    l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX ) 
+                * row.xNum(),
+                INT_CONVERT(
+                    l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY ) 
+                * row.yNum(),
+                1 );
+
+        curRow->pmax.Set( 
+                curRow->pmin.x + curRow->size.x,
+                curRow->pmin.y + curRow->size.y,
+                1 );
+
+        if( isFirst ) {
+            grow_pmin.Set(curRow->pmin);
+            grow_pmax.Set(curRow->pmax);
+
+            rowHeight = INT_CONVERT( l2d* __ckt.lefSiteStor[sitePtr->second].sizeY()/unitY );
+
+            if( INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY()) % 
+                    INT_CONVERT( unitY ) != 0 ) {
+                int _rowHeight = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY());
+                cout << endl 
+                    << "** ERROR: rowHeight \% unitY is not zero,  " << endl
+                    << "          ( rowHeight : " 
+                    << _rowHeight << ", unitY : " << INT_CONVERT(unitY) 
+                    << ", rowHeight \% unitY : " 
+                    << _rowHeight % INT_CONVERT(unitY) << " )" << endl;
+                cout << "          so it causes serious problem in RePlACE" << endl << endl;
+                cout << "          Use custom unitY in here using -unitY command, as a divider of rowHeight" << endl;
+                exit(1);
+            }
+            isFirst = false;
+        }
+        else {
+            grow_pmin.x = min( grow_pmin.x, (prec)curRow->pmin.x);
+            grow_pmin.y = min( grow_pmin.y, (prec)curRow->pmin.y);
+
+            grow_pmax.x = max( grow_pmax.x, (prec)curRow->pmax.x);
+            grow_pmax.y = max( grow_pmax.y, (prec)curRow->pmax.y);
+        }
+
+        curRow->x_cnt = row.xNum();
+
+        // 
+        // this is essential to DetailPlacer
+        //
+        // scale down to 1.
+        //  
+        curRow->site_wid = curRow->site_spa = SITE_SPA = row.xStep()/unitX; 
+
+        curRow->ori = string( orientStr(row.orient()) );
+        curRow->isXSymmetry = (__ckt.lefSiteStor[sitePtr->second].
+                hasXSymmetry() )? true : false;
+
+        curRow->isYSymmetry = (__ckt.lefSiteStor[sitePtr->second].
+                hasYSymmetry() )? true : false;
+
+        curRow->isR90Symmetry = (__ckt.lefSiteStor[sitePtr->second].
+                has90Symmetry() )? true : false;
+
+//        curRow->Dump(to_string(i));
+        i++;
+    }
     cout << "INFO:  ROW SIZE: ( " << SITE_SPA << ", " 
         << rowHeight << " ) "<< endl;
     cout << "INFO:  #ROW: " << row_cnt << endl;
+}
+
+// MS-Placement requires this!
+void GenerateFullRow(Circuit::Circuit &__ckt) {
+    cout << "INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) " << endl;
+    mkl_free(row_st);
+    // Newly create the all ROW area for floorplan.
+    // In here, I've used DESIGN FE_CORE_BOX_LL_X statements in PROPERTYDEFINITIONS 
+    DieRect dieArea = GetDieFromProperty();
+    if( dieArea.isNotInitialize() ) {
+        dieArea = GetDieFromDieArea(); 
+    } 
+    if( dieArea.isNotInitialize() ) {
+        cout << "ERROR: DIEAREA ERROR" << endl;
+        exit(1);
+    }
+    
+    cout << "INFO:  DIEAREA: (" << dieArea.llx << " " << dieArea.lly << ") - (" << dieArea.urx << " " << dieArea.ury << ")" << endl; 
+    
+    
+    // this portion is somewhat HARD_CODING
+    // it regards there only one SITE definition per each design!
+
+    defiRow* minRow = &__ckt.defRowStor[0];
+    
+    // get the lowest one
+    for(auto curRow : __ckt.defRowStor ){
+        if( minRow->y() < minRow->y() ) {
+            minRow = &curRow;
+        }
+    }
+
+    auto sitePtr = __ckt.lefSiteMap.find( string(minRow->macro()) ) ;
+    if( sitePtr == __ckt.lefSiteMap.end() ) {
+        cout << "\n** ERROR:  Cannot find SITE in lef files: " 
+            << minRow->macro() << endl;
+        exit(1);
+    }
+
+    int siteX = INT_CONVERT( 
+                    l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX );
+    int siteY = INT_CONVERT(
+                    l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY );
+
+    int rowCntX = (dieArea.urx - dieArea.llx) / siteX; 
+    int rowCntY = (dieArea.ury - dieArea.lly) / siteY;
+
+    int rowSizeX = rowCntX * siteX;
+    int rowSizeY = rowHeight = siteY;
+
+    row_cnt = rowCntY;
+    row_st = (ROW*) mkl_malloc( sizeof(ROW)*row_cnt, 64 );
+
+    /////////////////////////
+    // HARD CODE PART!!!!!
+    //
+    // 0 ~ cut : 0 ~ 1640064 
+    // cut ~ 1640064 : 451298 ~ 1640064
+    /*
+    
+    int cut = 635904;
+    int cutY = (1.0*cut / unitY) / siteY;
+    int rowCntX1 = (1.0*(1640064 - 0) / unitX) / siteX;
+    int rowCntX2 = (1.0*(1640064 - 451298) / unitX) / siteX;
+    int rowSizeX1 = rowCntX1 * siteX;
+    int rowSizeX2 = rowCntX2 * siteX;
+    
+//    cout << siteX << endl;
+//    exit(0);
+
+    for(int i=0; i<cutY; i++) {
+        ROW* curRow = &row_st[i];
+        new (curRow) ROW();
+
+        curRow->pmin.Set(llx, lly + i * siteY, 0);
+        curRow->size.Set(rowSizeX1, rowSizeY, 1);
+        curRow->pmax.Set(llx + rowSizeX1, lly + i * siteY + rowSizeY, 1);
+
+        if( i == 0 ) {
+            grow_pmin.Set(curRow->pmin);
+        }
+
+        curRow->x_cnt = rowCntX1;
+        curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep()/unitX;
+        curRow->Dump(to_string(i));
+    } 
+
+    for(int i=cutY; i<row_cnt; i++) {
+        ROW* curRow = &row_st[i];
+        new (curRow) ROW();
+
+        curRow->pmin.Set(451298 / unitX , lly + i * siteY, 0);
+        curRow->size.Set(rowSizeX2, rowSizeY, 1);
+        curRow->pmax.Set(451298 / unitX + rowSizeX2, lly + i * siteY + rowSizeY, 1);
+
+        if( i == row_cnt-1 ) {
+            grow_pmax.Set(curRow->pmax);
+        }
+
+        curRow->x_cnt = rowCntX2;
+        curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep()/unitX;
+        curRow->Dump(to_string(i));
+    }
+
+//    exit(1);
+    */
+    //
+    ///////////////////////////
+    // ORIGINAL!!!
+
+    for(int i=0; i<row_cnt; i++) {
+        ROW* curRow = &row_st[i];
+        new (curRow) ROW();
+
+        curRow->pmin.Set(dieArea.llx, dieArea.lly + i * siteY, 0);
+        curRow->size.Set(rowSizeX, rowSizeY, 1);
+        curRow->pmax.Set(dieArea.llx + rowSizeX, dieArea.lly + i * siteY + rowSizeY, 1);
+
+        if( i == 0 ) {
+            grow_pmin.Set(curRow->pmin);
+        }
+        else if( i == row_cnt-1 ) {
+            grow_pmax.Set(curRow->pmax);
+        }
+
+        curRow->x_cnt = rowCntX;
+        curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep()/unitX;
+//        curRow->Dump(to_string(i));
+    }
+    
+    cout << "INFO:  NEW ROW SIZE: ( " << SITE_SPA << ", " 
+        << rowHeight << " ) "<< endl;
+    cout << "INFO:  NEW #ROW: " << row_cnt << endl;
 }
 
 

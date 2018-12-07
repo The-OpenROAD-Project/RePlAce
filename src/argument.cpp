@@ -78,6 +78,7 @@ void initArgument(int argc, char *argv[]) {
     outputCMD = "";
     experimentCMD = "";
     verilogTopModule = "";
+    defMacroCnt = 0;
     
    
     isSkipPlacement = false; 
@@ -101,7 +102,6 @@ void initArgument(int argc, char *argv[]) {
     onlyGlobalPlaceCMD = false;     // bool
     isSkipIP = false;     // bool
     isTiming = false;
-    isNewLayout = false;
     isNtuDummyFill = false;
 
     isARbyUserCMD = false;          // bool
@@ -910,9 +910,6 @@ bool argument(int argc, char *argv[]) {
         }
         else if(!strcmp(argv[i], "-timing")) {
             isTiming = true;
-        }
-        else if(!strcmp(argv[i], "-newLayout")) {
-            isNewLayout = true;
         }
         else if(!strcmp(argv[i], "-onlyGP")) {
             onlyGlobalPlaceCMD = true;

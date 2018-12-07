@@ -305,6 +305,7 @@ void WriteDef(const char* defOutput);
 
 void GenerateModuleTerminal(Circuit::Circuit& __ckt);
 void GenerateRow(Circuit::Circuit& __ckt);
+void GenerateFullRow(Circuit::Circuit& __ckt);
 
 void GenerateNetDefOnly(Circuit::Circuit& __ckt);
 void GenerateNetDefVerilog(Circuit::Circuit& __ckt);

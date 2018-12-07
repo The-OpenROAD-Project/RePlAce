@@ -340,7 +340,7 @@ void init_tier(void) {
 
         // renewed!!
 //        tier->ws_area = tier->area - tier->virt_area;
-        cout << "renewed WS_AREA: " << tier->ws_area << endl;
+//        cout << "renewed WS_AREA: " << tier->ws_area << endl;
     }
 //    exit(1);
 }

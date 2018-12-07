@@ -332,6 +332,7 @@ string outputCMD;  // mgwoo
 string experimentCMD;  // mgwoo
 vector<string> lefStor;   // mgwoo
 string verilogTopModule;
+int defMacroCnt;
 
 int numThread;
 InputMode inputMode;
@@ -394,7 +395,6 @@ bool lambda2CMD;
 bool dynamicStepCMD;
 bool onlyGlobalPlaceCMD;
 bool isTiming;
-bool isNewLayout;
 bool isARbyUserCMD;
 bool thermalAwarePlaceCMD;
 bool trialRunCMD;
