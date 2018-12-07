@@ -12,28 +12,22 @@
 * __-dploc__ : Specify the Location of Detailed Placer
 
 ## Timing-Driven mode for Lef/Def/Verilog (Commercial Format)
-    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> -verilog <*.v> -lib lib1.lib -lib lib2.lib ... -timing -clock <clock> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
+    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> -verilog <*.v> -lib lib1.lib -lib lib2.lib ... -sdc <*.sdc> -timing -capPerMicron 0.23e-15 -resPerMicron 70.0 -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
 
-* __-bmflag__ : Specify which Benchmark is used
-* __-lef__ : \*.lef Location (Multiple lef files supported)
-* __-def__ : \*.def Location (Required)
-* __-verilog__ : \*.v Location (Required)
-* __-output__ : Specify the Location of Output Results
-* __-dpflag__ : Specify which Detailed Placer is Used
-* __-dploc__ : Specify the Location of Detailed Placer
-
-### For Additional Timing-Driven Paramemter
-
-* __-lib__ : \*.lib Location (Multiple lib files supported)
+__Timing-Driven__ mode must have same arguments as non-timing mode, but the __differences__ are:
 * __-timing__ : Specify the Timing-Driven Placement Mode
-* __-clock__ : Specify the Clock Frequency. (e.g. 1ns, -clock 1.0e-9)
+* __-verilog__ : \*.v Location (Required for OpenSTA)
+* __-sdc__ : Specify the Synopsys Design Constraint (SDC) file. (Required for OpenSTA)
+* __-lib__ : \*.lib Location (Multiple lib files supported. Required for OpenSTA)
+* __-capPerMicron__ : Capacitance per Micron. Unit: Farad. (Used for Internal RC Extraction)
+* __-resPerMicron__ : Resisance per Micron. Unit: Ohm. (Used for Internal RC Extraction)
+
 
 ## Bookshelf (Academic Format)
     $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -aux <*.aux> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
     
 * __-bmflag__ : Specify which Benchmark is used
 * __-aux__ : \*.aux Location
-
 
 ## Other Options
 ### Flow Control
@@ -42,9 +36,6 @@
 * __-onlyGP__ : Only Global Placement Mode
 * __-onlyDP__ : Only Detailed Placement Mode
 * __-onlyLG__ : Call Detailed Placement in Legalization Mode
-
-### Layout Site Control
-* __-newLayout__ : Generate New Sites Based on Given Floorplanned Bounding Box
 
 ### Nesterov Control
 * __-den__ : Target Density, Floating Number, Default = 1 [0.00,1.00]
