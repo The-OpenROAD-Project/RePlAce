@@ -232,11 +232,11 @@ void Timing::WriteSpef(const string &spefLoc) {
         int cnt=0;
         for(auto& curWireSeg : wireSegStor[i]) {
             lumpedCapStor[i] += curWireSeg.length / (double)(_l2d) 
-                * LOCAL_WIRE_CAP_PER_MICRON;
+                * capPerMicron ;
             lumped_cap_at_pin [ curWireSeg.iPin ] += curWireSeg.length
-                / (double)(_l2d) * LOCAL_WIRE_CAP_PER_MICRON * 0.5;
+                / (double)(_l2d) * capPerMicron * 0.5;
             lumped_cap_at_pin [ curWireSeg.oPin ] += curWireSeg.length
-                / (double)(_l2d) * LOCAL_WIRE_CAP_PER_MICRON * 0.5;
+                / (double)(_l2d) * capPerMicron * 0.5;
             pin_cap_written [ curWireSeg.iPin ] = false;
             pin_cap_written [ curWireSeg.oPin ] = false;
         }
@@ -307,7 +307,7 @@ void Timing::WriteSpef(const string &spefLoc) {
             feed << cnt++ << " " << GetPinName(curSeg.iPin) << " " 
                 << GetPinName(curSeg.oPin) << " " 
                 << curSeg.length / (double)_l2d 
-                * LOCAL_WIRE_RES_PER_MICRON / RES_SCALE << endl;
+                * resPerMicron / RES_SCALE << endl;
         }
 
         feed << "*END" <<endl <<endl;

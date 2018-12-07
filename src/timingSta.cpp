@@ -179,7 +179,7 @@ void TimingPathPrint( sta::Sta* sta, sta::PathEnd* end ) {
 }
 
 void Timing::ExecuteStaFirst(string topCellName,
-        string verilogName, vector<string>& libStor, string ffLibName) {
+        string verilogName, vector<string>& libStor, string sdcName) {
 
     cout << "Execute STA" << endl;
     cout << "topCellName: " << topCellName << endl;
@@ -187,7 +187,7 @@ void Timing::ExecuteStaFirst(string topCellName,
     for(auto& libName : libStor) {
         cout << "liberty    : " << libName << endl;
     }
-    cout << "ffLiberty  : " << ffLibName << endl << endl;
+    cout << "sdcName    : " << sdcName << endl << endl;
 
 
     // STA object create
@@ -285,8 +285,13 @@ void Timing::ExecuteStaFirst(string topCellName,
                 */
     // from search/Sta.cc:readParasitics
     FillSpefForSta();
-    
-    GenerateClockSta();
+   
+    if( isClockGiven ) { 
+        GenerateClockSta();
+    }
+    else {
+        Tcl_Eval(_interp, string( "sta::read_sdc " + sdcName).c_str() );
+    }
 
     //find_timing -full_update (true->full, false-> incremental)
     UpdateTimingSta();
@@ -323,7 +328,7 @@ void Timing::ExecuteStaLater() {
 //    _sta->network()->clear();
 
     FillSpefForSta();
-    GenerateClockSta();
+//    GenerateClockSta();
     UpdateTimingSta();
     UpdateNetWeightSta();
     
@@ -401,11 +406,11 @@ void Timing::FillSpefForSta() {
         int cnt=0;
         for(auto& curWireSeg : wireSegStor[i]) {
             lumpedCapStor[i] += curWireSeg.length / (double)(_l2d) 
-                * LOCAL_WIRE_CAP_PER_MICRON;
+                * capPerMicron;
             lumped_cap_at_pin [ curWireSeg.iPin ] += curWireSeg.length
-                / (double)(_l2d) * LOCAL_WIRE_CAP_PER_MICRON * 0.5;
+                / (double)(_l2d) * capPerMicron * 0.5;
             lumped_cap_at_pin [ curWireSeg.oPin ] += curWireSeg.length
-                / (double)(_l2d) * LOCAL_WIRE_CAP_PER_MICRON * 0.5;
+                / (double)(_l2d) * capPerMicron * 0.5;
             pin_cap_written [ curWireSeg.iPin ] = false;
             pin_cap_written [ curWireSeg.oPin ] = false;
         }
@@ -484,7 +489,7 @@ void Timing::FillSpefForSta() {
 
             SpefTriple* pinRes = 
                 new SpefTriple( curSeg.length / static_cast<double>(_l2d)
-                        * LOCAL_WIRE_RES_PER_MICRON / RES_SCALE );
+                        * resPerMicron / RES_SCALE );
 
 //            cout << pinName1 << " " << pinName2 << " " << pinRes->value(0) << endl;
             sta::spef_reader->makeResistor(cnt++, pinNamePtr1, pinNamePtr2, pinRes );

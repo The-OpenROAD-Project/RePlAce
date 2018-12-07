@@ -726,8 +726,14 @@ extern prec netWeightBase;
 extern prec netWeightBound;
 extern prec netWeightScale;
 
+extern prec capPerMicron;
+extern prec resPerMicron;
 
+extern bool isClockGiven;
 extern prec timingClock;
+extern string clockPinName;
+
+
 extern int timingUpdateIter; 
 extern int pinCNT;
 extern int moduleCNT;
@@ -1034,10 +1040,13 @@ extern string bmFlagCMD;
 extern string auxCMD;
 extern string defCMD;
 extern string verilogCMD;
+extern string sdcCMD;
 extern vector<string> lefStor;
 extern string outputCMD;
 extern string experimentCMD;
 extern vector<string> libStor;
+extern string verilogTopModule;
+
 
 extern string benchName;
 
@@ -1079,6 +1088,7 @@ extern bool stnCMD;  // lutong
 extern bool trialRunCMD;
 extern bool autoEvalRC_CMD;
 extern bool onlyLG_CMD;
+
 
 //////////////////////////////////////////////////////////////////////////
 // Defined in main.cpp ///////////////////////////////////////////////////

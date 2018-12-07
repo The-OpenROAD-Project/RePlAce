@@ -18,8 +18,6 @@
 #define CAP_SCALE 1.0e-12
 #define RES_SCALE 1.0
 
-#define LOCAL_WIRE_CAP_PER_MICRON 0.23e-15
-#define LOCAL_WIRE_RES_PER_MICRON 70.0
 #define MAX_WIRE_SEGMENT_IN_MICRON 20.0
 #define TIMING_PIN_CAP 4e-15 
 
@@ -327,7 +325,7 @@ class Timing {
         Timing( MODULE* modules, TERM* terms, NET* nets, int netCnt,
                 PIN* pins, int pinCnt, 
                 vector< vector<string> >& mPinName, 
-                vector< vector<string> >& tPinName, 
+                vector< vector<string> >& tPinName,
                 string clkName,
                 float clkPeriod ) 
             : _modules(modules), _terms(terms), 
@@ -378,7 +376,7 @@ class Timing {
 //        void ExecuteSta( string topCellName, string verilogName,
 //                vector<string> &libName, string ffLibName);
         void ExecuteStaFirst( string topCellName, string verilogName,
-                vector<string> &libName, string ffLibName);
+                vector<string> &libName, string sdcName);
         void ExecuteStaLater();
 
 };

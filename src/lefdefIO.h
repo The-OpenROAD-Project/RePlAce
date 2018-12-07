@@ -295,6 +295,9 @@ DieRect GetDieFromDieArea();
 void ParseInput();
 void ParseLefDef();
 
+// required for timing
+void SetVerilogTopModule();
+
 void ReadPl(const char* fileName);
 void ReadPlLefDef(const char* fileName);
 

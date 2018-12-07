@@ -65,11 +65,11 @@ void myNesterov::nesterov_opt() {
     int last_iter = 0;
     Timing::Timing TimingInst(moduleInstance, terminalInstance,
             netInstance, netCNT, pinInstance, pinCNT,
-            mPinName, tPinName, "clk", timingClock);
+            mPinName, tPinName, clockPinName, timingClock);
 
     if( isTiming ) {
         TimingInst.BuildSteiner(true);
-        TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, "");
+        TimingInst.ExecuteStaFirst(verilogTopModule, verilogCMD, libStor, sdcCMD);
     }
 
     InitializationCommonVar();

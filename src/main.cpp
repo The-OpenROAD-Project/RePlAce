@@ -76,7 +76,14 @@ prec netWeightBase;
 prec netWeightBound;
 prec netWeightScale;
 
-prec timingClock; 
+prec capPerMicron;
+prec resPerMicron;
+
+bool isClockGiven;
+prec timingClock;
+string clockPinName;
+
+
 int timingUpdateIter;
 PIN *pinInstance;
 MODULE *moduleInstance;
@@ -318,11 +325,13 @@ prec aspectRatio;
 string bmFlagCMD;
 string auxCMD;   // mgwoo
 string defCMD;   // mgwoo
+string sdcCMD; // mgwoo
 string verilogCMD; // mgwoo
 vector<string> libStor;   // mgwoo
 string outputCMD;  // mgwoo
 string experimentCMD;  // mgwoo
 vector<string> lefStor;   // mgwoo
+string verilogTopModule;
 
 int numThread;
 InputMode inputMode;

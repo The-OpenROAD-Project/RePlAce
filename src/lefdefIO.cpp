@@ -162,6 +162,10 @@ void ParseInput() {
         inputMode = InputMode::bookshelf; 
         ParseBookShelf();
     }
+
+    if( verilogCMD != "") {
+        SetVerilogTopModule();
+    }
 }
 
 void SetUnitY(float _unitY) {
@@ -266,6 +270,38 @@ void SetParameter() {
     
 }
 
+void SetVerilogTopModule() {
+    using namespace verilog;
+
+    FILE* verilogInput = fopen(verilogCMD.c_str(), "rb");
+    if( !verilogInput ) {
+        cout << "** ERROR:  Cannot open verilog file: " << verilogCMD << endl;
+        exit(1);
+    }
+
+    verilog::verilog_parser_init();
+    int result = verilog::verilog_parse_file( verilogInput );
+    if( result != 0 ) {
+        cout << "** ERROR:  Verilog Parse Failed: " << verilogCMD << endl;
+        exit(1);
+    }
+
+    verilog::verilog_source_tree* tree = verilog::yy_verilog_source_tree;
+    verilog::verilog_resolve_modules(tree);
+   
+    if( tree->modules->items > 2 ) {
+        cout << "WARNING:  # Modules in Verilog: " << tree->modules->items
+             << ", so only use the 'First' module" << endl;
+    }
+
+    // extract the '1st' module
+    ast_module_declaration* module = (ast_module_declaration*)ast_list_get(tree->modules, 0);
+
+    verilogTopModule = string(module->identifier->identifier);
+//    verilog_free_source_tree(tree);
+}
+
+
 void ParseLefDef() {
     
     // for input parse only
@@ -293,6 +329,8 @@ void ParseLefDef() {
 
         GenerateNetDefVerilog(__ckt);
     }
+
+
     cout << "INFO:  SUCCESSFULLY LEF/DEF PARSED" << endl; 
 
 
@@ -1511,6 +1549,19 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 
             char* netNamePtr = ast_identifier_tostring(
                                 port->expression->primary->value.identifier);
+
+            char* rhs = NULL;
+            if( port->expression->right ) { 
+                rhs = strdup("[");
+                char* cont = ast_expression_tostring(port->expression->right);
+                strcat( rhs , cont );
+                free(cont);
+            }
+
+            if( rhs ) {
+                strcat( netNamePtr, rhs );
+                free(rhs);
+            }
             string netName( netNamePtr );
             free(netNamePtr);
         
@@ -1598,6 +1649,8 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 
     tPinName.resize(terminalCNT);
     mPinName.resize(moduleCNT);
+  
+    netNameMap.set_empty_key(INIT_STR);
 
     // net traverse
     // netMap is silimar with __ckt.defNetStor
@@ -1616,6 +1669,7 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
         }
 //        cout << net.first << endl; 
         NET* curNet = &netInstance[netIdx];
+        netNameMap[ net.first ] = netIdx;
         curNet->idx = netIdx;
 
         curNet->pinCNTinObject = net.second.size();

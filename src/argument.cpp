@@ -73,9 +73,11 @@ void initArgument(int argc, char *argv[]) {
 
     auxCMD = "";
     defCMD = "";
+    sdcCMD = "";
     verilogCMD = "";
     outputCMD = "";
     experimentCMD = "";
+    verilogTopModule = "";
     
    
     isSkipPlacement = false; 
@@ -83,6 +85,7 @@ void initArgument(int argc, char *argv[]) {
     densityDP = 0.0f;
     isBinSet = false;
     isSkipIP = false; 
+
 
     isVerbose = false;
     isPlot = false;                 // bool
@@ -117,6 +120,12 @@ void initArgument(int argc, char *argv[]) {
     netWeightBase = 1.2f;
     netWeightBound = 1.8f;
     netWeightScale = 500.0f;
+    capPerMicron = PREC_MIN;
+    resPerMicron = PREC_MIN;
+
+    isClockGiven = false;
+    timingClock = PREC_MIN;
+    clockPinName = "";
 
     netCut = 1;
     timingUpdateIter = 10;
@@ -252,6 +261,18 @@ bool argument(int argc, char *argv[]) {
                 return false;
             }
         }
+        // for SDC
+        else if(!strcmp(argv[i], "-sdc")) {
+            i++;
+            if(argv[i][0] != '-') {
+                sdcCMD = argv[i];
+            }
+            else {
+                printf("\n**ERROR: Option %s requires *.sdc.\n",
+                       argv[i - 1]);
+                return false;
+            }
+        }
         else if(!strcmp(argv[i], "-verilog")) {
             i++;
             if(argv[i][0] != '-') {
@@ -377,6 +398,27 @@ bool argument(int argc, char *argv[]) {
             i++;
             if(argv[i][0] != '-') {
                 timingClock= atof(argv[i]);
+                isClockGiven = true; 
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; 
+        else if(!strcmp(argv[i], "-capPerMicron")) {
+            i++;
+            if(argv[i][0] != '-') {
+                capPerMicron = atof(argv[i]);
+            }
+            else {
+                return false;
+            }
+        }
+        // timing-related param; 
+        else if(!strcmp(argv[i], "-resPerMicron")) {
+            i++;
+            if(argv[i][0] != '-') {
+                resPerMicron = atof(argv[i]);
             }
             else {
                 return false;
@@ -980,6 +1022,31 @@ bool criticalArgumentError() {
             printf("\n** ERROR: Timing mode must contain verilog.\n");
             printUsage();
             return true;
+        }
+
+        if( sdcCMD == "" && !isClockGiven ) {
+            printf("\n** ERROR: Timing mode must contain sdc file.\n");
+            printUsage();
+            return true; 
+        }
+
+        if( isClockGiven ) {
+            if( clockPinName == "" ) {
+                printf("\n** ERROR: If the clock is given, argv must contain clockPinName\n");
+                printUsage();
+                return true;
+            }
+            if( timingClock == PREC_MIN ) {
+                printf("\n** ERROR: If the clock is given, argv must contain clockPeriod\n");
+                printUsage();
+                return true;
+            }
+        }
+
+        if( capPerMicron == PREC_MIN || resPerMicron == PREC_MIN ) {
+            printf("\n** ERROR: Timing mode must specify Resistor and Cap per micron.\n");
+            printUsage();
+            return true; 
         }
     }
 
