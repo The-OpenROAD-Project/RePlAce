@@ -12,9 +12,9 @@
 * __-dploc__ : Specify the Location of Detailed Placer
 
 ## Timing-Driven mode for Lef/Def/Verilog (Commercial Format)
-    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> -verilog <*.v> -lib lib1.lib -lib lib2.lib ... -timing -clock <clock> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
+    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> -verilog <*.v> -lib lib1.lib -lib lib2.lib ... -sdc <*.sdc> -timing -capPerMicron 0.23e-15 -resPerMicron 70.0 -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
 
-Timing-Driven mode must have same arguments as non-timing mode, but the differences are:
+__Timing-Driven__ mode must have same arguments as non-timing mode, but the __differences__ are:
 * __-timing__ : Specify the Timing-Driven Placement Mode
 * __-verilog__ : \*.v Location (Required for OpenSTA)
 * __-sdc__ : Specify the Synopsys Design Constraint (SDC) file. (Required for OpenSTA)
