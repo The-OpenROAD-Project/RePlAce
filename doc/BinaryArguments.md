@@ -4,7 +4,7 @@
     $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> [-verilog <*.v>] -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
 
 * __-bmflag__ : Specify which Benchmark is used
-* __-lef__ : \*.lef Location (Multiple lef files supported)
+* __-lef__ : \*.lef Location (Multiple lef files supported. __Technology LEF must be ahead of other LEFs.__)
 * __-def__ : \*.def Location (Required due to FloorPlan information)
 * __-verilog__ : \*.v Location (Optional)
 * __-output__ : Specify the Location of Output Results
