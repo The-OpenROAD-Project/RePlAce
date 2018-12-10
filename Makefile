@@ -30,5 +30,5 @@ clean:
 		$(MAKE) -C $$dir clean; \
 	done;
 	cd $(OPENSTADIR) && $(MAKE) distclean && rm -rf install-sp > /dev/null 2>&1; true
-	cd $(HASHDIR) && $(MAKE) distclean && rm -rf install;
+	cd $(HASHDIR) && $(MAKE) distclean && rm -rf install > /dev/null 2&>1; true
 	$(MAKE) -C $(REPLACEDIR) clean;
