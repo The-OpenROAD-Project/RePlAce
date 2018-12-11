@@ -1310,10 +1310,11 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
             clockNetsDef.push_back( &net - &__ckt.defNetStor[0]);
             continue;
         }
-        // skip for Power/Ground/Reset Nets
+        // skip for Power/Ground/Reset/Clock Nets
         if( net.hasUse() && 
             strcmp(net.use(), "CLOCK") == 0 ||
             strcmp(net.use(), "POWER") == 0 ||
+            strcmp(net.use(), "GROUND") == 0 ||
             strcmp(net.use(), "RESET") == 0 ) {
             continue;
         }
