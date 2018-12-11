@@ -1311,7 +1311,10 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
             continue;
         }
         // skip for Power/Ground/Reset Nets
-        if( net.hasUse() ) {
+        if( net.hasUse() && 
+            strcmp(net.use(), "CLOCK") == 0 ||
+            strcmp(net.use(), "POWER") == 0 ||
+            strcmp(net.use(), "RESET") == 0 ) {
             continue;
         }
 
