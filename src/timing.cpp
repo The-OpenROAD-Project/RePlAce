@@ -79,7 +79,7 @@ void Timing::BuildSteiner( bool scaleApplied ) {
             int *mapping = new int[curNet->pinCNTinObject];
 
             // x, y coordi --> pin's index
-            dense_hash_map< pair<DBU, DBU>, PinInfo> pinMap;
+            dense_hash_map< pair<DBU, DBU>, PinInfo, MyHash< pair<DBU, DBU> > > pinMap;
             pinMap.set_empty_key(make_pair(DBU_MAX, DBU_MAX));
 
 //            cout << "pinMapBuilding" << endl; 
@@ -216,8 +216,10 @@ void Timing::WriteSpef(const string &spefLoc) {
     feed<< "*R_UNIT 1 OHM" <<endl;
     feed<< "*L_UNIT 1 UH" <<endl << endl;
 
-    dense_hash_map<PinInfo, bool> pin_cap_written;
-    dense_hash_map<PinInfo, double> lumped_cap_at_pin;              /* map from pin name -> cap */
+    dense_hash_map<PinInfo, bool, MyHash<PinInfo> > pin_cap_written;
+    
+    // map from pin name -> cap 
+    dense_hash_map<PinInfo, double, MyHash<PinInfo> > lumped_cap_at_pin; 
 
     PinInfo tmpPin;
     tmpPin.SetImpossible();

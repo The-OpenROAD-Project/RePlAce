@@ -394,53 +394,29 @@ TIMING_NAMESPACE_CLOSE
 
 // for hash-map enhancement
 // cusom hash -function
-namespace std {
-    template<>
-        struct hash< pair<DBU, DBU> > {
-            std::size_t operator()( const pair<DBU, DBU>& k) const {
-                using boost::hash_combine;
-                size_t seed = 0;
-                hash_combine(seed, k.first);
-                hash_combine(seed, k.second);
+template <class T> struct MyHash;
 
-                return seed;
-            }
-        };
-    
-    template<>
-        struct hash< Timing::PinInfo > {
-            std::size_t operator()( const Timing::PinInfo & k ) const {
-                using boost::hash_combine;
-                size_t seed = 0;
-                hash_combine(seed, k.GetData());
-                hash_combine(seed, k.GetPinNum());
-                return seed;
-            }
-        };
-    namespace tr1 {
-    template<> 
-        struct hash< pair<DBU, DBU> > {
-            std::size_t operator()( const pair<DBU, DBU>& k) const {
-                using boost::hash_combine;
-                size_t seed = 0;
-                hash_combine(seed, k.first);
-                hash_combine(seed, k.second);
+template<>
+struct MyHash< std::pair<DBU, DBU> > {
+  std::size_t operator()( const pair<DBU, DBU>& k) const {
+    using boost::hash_combine;
+    size_t seed = 0;
+    hash_combine(seed, k.first);
+    hash_combine(seed, k.second);
 
-                return seed;
-            }
-        };
+    return seed;
+  }
+};
 
-    template<>
-        struct hash< Timing::PinInfo > {
-            std::size_t operator()( const Timing::PinInfo & k ) const {
-                using boost::hash_combine;
-                size_t seed = 0;
-                hash_combine(seed, k.GetData());
-                hash_combine(seed, k.GetPinNum());
-                return seed;
-            }
-        };
-    }
+template<>
+struct MyHash< Timing::PinInfo > {
+  std::size_t operator()( const Timing::PinInfo & k ) const {
+    using boost::hash_combine;
+    size_t seed = 0;
+    hash_combine(seed, k.GetData());
+    hash_combine(seed, k.GetPinNum());
+    return seed;
+  }
 };
 
 long GetTimingHPWL();

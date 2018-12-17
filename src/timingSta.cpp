@@ -389,9 +389,9 @@ void Timing::FillSpefForSta() {
     sta::spef_reader->setResScale(1, resStr);
     sta::spef_reader->setInductScale(1, inductStr);
 
-    dense_hash_map<PinInfo, bool> pin_cap_written;
+    dense_hash_map<PinInfo, bool, MyHash<PinInfo> > pin_cap_written;
     // map from pin name -> cap
-    dense_hash_map<PinInfo, double> lumped_cap_at_pin;              
+    dense_hash_map<PinInfo, double, MyHash<PinInfo> > lumped_cap_at_pin;              
 
     PinInfo tmpPin;
     tmpPin.SetImpossible();
