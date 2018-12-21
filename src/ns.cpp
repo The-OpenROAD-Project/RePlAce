@@ -162,7 +162,7 @@ void myNesterov::nesterov_opt() {
     }
     else {
         // for comparison
-        // TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, "");
+//        TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, sdcCMD);
     }
     mkl_malloc_free();
 }

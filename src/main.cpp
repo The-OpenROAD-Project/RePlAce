@@ -653,7 +653,7 @@ int main(int argc, char *argv[]) {
         // for final DP SPEF generating
         Timing::Timing TimingInst(moduleInstance, terminalInstance,
             netInstance, netCNT, pinInstance, pinCNT, 
-            mPinName, tPinName, "clk", timingClock);
+            mPinName, tPinName, clockPinName, timingClock);
 
         TimingInst.BuildSteiner(true);
 

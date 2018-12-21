@@ -378,7 +378,7 @@ void WriteDef(const char* defOutput) {
         __ckt.defComponentStor[cmpPtr->second].
             setPlacementLocation( x, y, 
                                     (orientPtr != __ckt.defRowY2OrientMap.end())? 
-                                    orientPtr->second : -1 );
+                                    orientPtr->second : 0 );
 
         // cout << curModule->name << ": " << curModule->pmin.x << " " << curModule->pmin.y << endl;
     }
@@ -1323,7 +1323,8 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
         string netName = string(net.name());
 //        ReplaceStringInPlace(netName, "[", "\\[");
 //        ReplaceStringInPlace(netName, "]", "\\]");
-//        ReplaceStringInPlace(netName, "/", "\\/");
+        ReplaceStringInPlace(netName, "\\[", "[");
+        ReplaceStringInPlace(netName, "\\]", "]");
 
         strcpy( curNet->name, netName.c_str() );
 //        cout << "copied net Name: " << curNet->name << endl;
