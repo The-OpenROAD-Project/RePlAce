@@ -49,7 +49,7 @@ inline string Timing::GetPinName(PinInfo & curPin) {
 void Timing::BuildSteiner( bool scaleApplied ) {
     CleanSteiner();
     using namespace Flute;
-    Flute::readLUT("../module/flute/POWV9.dat", "../module/flute/PORT9.dat");
+    Flute::readLUT("./POWV9.dat", "./PORT9.dat");
 
     uint64_t stnPointCnt = 0;
     long long int totalStnWL = 0;
