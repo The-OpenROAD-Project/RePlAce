@@ -5,7 +5,7 @@ Change below Makefile below:
 
     [RePlAce/Makefile](https://github.com/abk-openroad/RePlAce/blob/15e9f8aeb2b786a0b63419ab876ee222ac252f2c/src/Makefile#L4)
 
-       OPTFLAG= -g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
+       OPTFLAG= -g -ggdb -m64 -O1 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
 
 2) Type below command
 

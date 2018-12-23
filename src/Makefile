@@ -1,18 +1,19 @@
 CC		=   gcc
 CPPC	=   g++
-LD      =   ld
+LD 		=   ld
 # For Multi-thread
-# OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
-OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
-WFLAG 	= 	-W -Wall -Wextra -Wunreachable-code 
+# OPTFLAG = 	 -m64 -O1 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
+OPTFLAG = -m64 -O1 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
+WFLAG 	= -W -Wall -Wextra -Wunreachable-code 
 WSTRICT =	-Werror -Wundef -Wpointer-arith 
 
-INCLUDE = 	-I$(CURDIR) -I$(MKLROOT)/include -I$(IPPROOT)/include \
-			-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
-			-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/include \
-		    -I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
+TCLROOT	= /usr/include/tcl8.6
+INCLUDE = -I$(CURDIR) -I$(TCLROOT) -I$(MKLROOT)/include -I$(IPPROOT)/include \
+					-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
+					-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/src \
+		    	-I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
 
-CPPFLAG =   -std=c++0x $(OPTFLAG)
+CPPFLAG =	-std=c++17 $(OPTFLAG)
 
 #Get Only the Internal Structure of SRCDIR Recursively
 SRCDIR	= 	$(CURDIR)
@@ -26,7 +27,7 @@ ALLSRCs := 	$(wildcard $(ALLSRCs))
 CFILES  		= 	$(filter %.c,$(ALLSRCs))
 CPPFILES		= 	$(filter %.cpp,$(ALLSRCs))
 HFILES 			= 	$(filter %.h,$(ALLSRCs))
-COBJ			= 	$(subst $(SRCDIR),$(CURDIR),$(CFILES:%.c=%.o))
+COBJ				= 	$(subst $(SRCDIR),$(CURDIR),$(CFILES:%.c=%.o))
 CPPOBJ			= 	$(subst $(SRCDIR),$(CURDIR),$(CPPFILES:%.cpp=%.o))
 OBJFILES		= 	$(COBJ) $(CPPOBJ)
 
@@ -34,31 +35,31 @@ DEPENDS			=   $(HFILES)
 
 LEFROOT 		= ../module/lef/5.8-p027
 DEFROOT 		= ../module/def/5.8-p027
-VERILOGROOT 	= ../module/verilog-parser
-FLUTEROOT 		= ../module/flute
+VERILOGROOT	= ../module/0verilog-parser
+FLUTEROOT 	= ../module/flute
 
-DEFLIB         	= -L$(DEFROOT)/lib -ldef -ldefzlib -lcdef -lcdefzlib
-LEFLIB         	= -L$(LEFROOT)/lib -llef -llefzlib -lclef -lclefzlib
-VERILOGLIB 		= -L$(VERILOGROOT)/lib -lverilog_parser
+DEFLIB      = -L$(DEFROOT)/lib -ldef -ldefzlib -lcdef -lcdefzlib
+LEFLIB      = -L$(LEFROOT)/lib -llef -llefzlib -lclef -lclefzlib
+VERILOGLIB 	= -L$(VERILOGROOT)/lib -lverilog_parser
 FLUTELIB 		= -L$(FLUTEROOT)/lib -lflute
 MKLLIB 			= ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
-					${MKLROOT}/lib/intel64/libmkl_gnu_thread.a \
-					${MKLROOT}/lib/intel64/libmkl_core.a \
-					${IPPROOT}/lib/intel64/libippi.a \
-				   	${IPPROOT}/lib/intel64/libipps.a \
-					${IPPROOT}/lib/intel64/libippcore.a \
-				   	${IPPROOT}/lib/intel64/libippvm.a
+							${MKLROOT}/lib/intel64/libmkl_gnu_thread.a \
+							${MKLROOT}/lib/intel64/libmkl_core.a \
+							${IPPROOT}/lib/intel64/libippi.a \
+							${IPPROOT}/lib/intel64/libipps.a \
+							${IPPROOT}/lib/intel64/libippcore.a \
+							${IPPROOT}/lib/intel64/libippvm.a
 
-OPENSTALIB 		= $(OPENSTAROOT)/lib/libliberty.a \
-					$(OPENSTAROOT)/lib/libutil.a \
-					$(OPENSTAROOT)/lib/libsearch.a \
-					$(OPENSTAROOT)/lib/libdcalc.a \
-					$(OPENSTAROOT)/lib/libgraph.a \
-					$(OPENSTAROOT)/lib/libnetwork.a \
-					$(OPENSTAROOT)/lib/libparasitics.a \
-					$(OPENSTAROOT)/lib/libsdc.a \
-					$(OPENSTAROOT)/lib/libsdf.a \
-					$(OPENSTAROOT)/lib/libverilog.a
+OPENSTALIB	= $(OPENSTAROOT)/lib/libliberty.a \
+							$(OPENSTAROOT)/lib/libutil.a \
+							$(OPENSTAROOT)/lib/libsearch.a \
+							$(OPENSTAROOT)/lib/libdcalc.a \
+							$(OPENSTAROOT)/lib/libgraph.a \
+							$(OPENSTAROOT)/lib/libnetwork.a \
+							$(OPENSTAROOT)/lib/libparasitics.a \
+							$(OPENSTAROOT)/lib/libsdc.a \
+							$(OPENSTAROOT)/lib/libsdf.a \
+							$(OPENSTAROOT)/lib/libverilog.a
 
 ifndef	MKLROOT
     MKLROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/mkl
@@ -68,25 +69,25 @@ ifndef	IPPROOT
     IPPROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/ipp
 endif
 
-HASHROOT 		= ../module/sparsehash/install-sp/include
-EIGENROOT 		= ../module/eigen-git-mirror/
-CIMGROOT 		= ../module/CImg/
-OPENSTAROOT 	= ../module/OpenSTA/install-sp/
-OPENSTASRCROOT 	= ../module/OpenSTA/
+HASHROOT			= ../module/sparsehash/install-sp/include
+EIGENROOT 		= ../module/eigen-git-mirror
+CIMGROOT 			= ../module/CImg
+OPENSTAROOT 	= ../module/OpenSTA/install-sp
+OPENSTASRCROOT= ../module/OpenSTA
 
 ### RULES ###############
-%.o:		%.c 	$(DEPENDS)
+%.o: %.c $(DEPENDS)
 	@echo " "
 	@echo "  Building... $@"
 	$(CPPC) $(CPPFLAG) $(IFLUTE) -c -o $@ $< 
 
-%.o:		%.cpp 	$(DEPENDS)
+%.o: %.cpp $(DEPENDS)
 	@touch main.cpp
 	@echo " "
 	@echo "  Building... $@"
 	$(CPPC) $(CPPFLAG) $(INCLUDE) -c -o $@ $< 
 
-RePlAce	: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
+RePlAce: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
 	$(OPENSTASRCROOT)/app/StaMain.o \
 	$(OPENSTASRCROOT)/app/TclInitVar.o
 	@echo " "
@@ -97,12 +98,10 @@ RePlAce	: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
 	@echo "    If you want to replace them into shared libs, do '-L PATH -lippi,' etc."
 	@echo " "
 
-	$(CPPC) -o $@                               \
-	$(CPPFLAG) 					    			\
-	$^ 											\
+	$(CPPC) -o $@ $(CPPFLAG) $^ \
  	-Wl,--start-group ${MKLLIB} ${OPENSTALIB} -Wl,--end-group \
-	-lgomp -lpthread -lm -ldl -lX11 -ltcl8.5 -lz \
-	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} -static-libstdc++ 	
+	-lgomp -lpthread -lm -ldl -lX11 -ltcl8.6 -lz \
+	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} -lc -lstdc++ 	
 	@echo " "
 	@echo "  Linking is completed !!"
 	@echo " "
