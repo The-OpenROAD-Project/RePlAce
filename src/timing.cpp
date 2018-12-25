@@ -1,6 +1,6 @@
 #include "global.h"
 #include "timing.h"
-//#include <sstream>
+#include <sstream>
 #include <fstream>
 
 using std::ofstream;
