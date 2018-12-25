@@ -1567,23 +1567,25 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
             ast_port_connection* port =
                 (ast_port_connection*) ast_list_get( innerInst->port_connections, j );
 
+            char tmpNetName[256] = {0, };
             char* netNamePtr = ast_identifier_tostring(
                                 port->expression->primary->value.identifier);
+            strcpy( tmpNetName, netNamePtr );
+            free(netNamePtr);
 
-            char* rhs = NULL;
+            char rhs[256] = {0, };
             if( port->expression->right ) { 
-                rhs = strdup("[");
+                strcpy(rhs, "[");
                 char* cont = ast_expression_tostring(port->expression->right);
                 strcat( rhs , cont );
                 free(cont);
             }
 
-            if( rhs ) {
-                strcat( netNamePtr, rhs );
+            if( strlen(rhs) > 0 ) {
+                strcat( tmpNetName, rhs );
                 free(rhs);
             }
-            string netName( netNamePtr );
-            free(netNamePtr);
+            string netName( tmpNetName );
         
 //            if( !warnIccadClk && netName == "iccad_clk" ) {
 //                cout << "** WARNING:  iccad_clk is detected. It'll be automatically excluded"
