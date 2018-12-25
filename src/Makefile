@@ -35,7 +35,7 @@ DEPENDS			=   $(HFILES)
 
 LEFROOT 		= ../module/lef/5.8-p027
 DEFROOT 		= ../module/def/5.8-p027
-VERILOGROOT	= ../module/0verilog-parser
+VERILOGROOT	= ../module/verilog-parser
 FLUTEROOT 	= ../module/flute
 
 DEFLIB      = -L$(DEFROOT)/lib -ldef -ldefzlib -lcdef -lcdefzlib
