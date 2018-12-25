@@ -1583,7 +1583,6 @@ void GenerateNetDefVerilog(Circuit::Circuit &__ckt) {
 
             if( strlen(rhs) > 0 ) {
                 strcat( tmpNetName, rhs );
-                free(rhs);
             }
             string netName( tmpNetName );
         
