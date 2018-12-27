@@ -14,18 +14,26 @@
 * X11 library (for CImg library to visualize) >= 1.6.5
 * Recommended OS: Centos6, Centos7 or Ubuntu 16.04
 
-### How To Compile
-    $ git clone --recursive https://github.com/abk-openroad/RePlAce.git
+### Clone repo and submodules
     
-Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths in [src/Makefile](src/Makefile)
-
-    $ cd ~/RePlAce
-    $ make clean
+    $ git clone https://github.com/abk-openroad/RePlAce.git
+    $ git submodule update --init --recursive
+   
+### Installation
+   
     $ ./prerequisite/install_centos7.sh   // for centos 7
     $ ./prerequisite/install_ubuntu16.sh  // for ubuntu 16
-    $ make 
+    
+    Install MKL and IPP of the same version, e.g 2019.1, and add the following lines to your .bashrc:    
+    source /opt/intel/ipp/bin/ippvars.sh intel64
+    source /opt/intel/mkl/bin/mklvars.sh intel64  
+    
+    $ source ~/.bashrc
+    $ make -j4    
+    $ sudo make install
     
 ### How To Execute
+
     // download lefdef benchmarks
     $ cd ~/RePlAce/bench/lefdef
     $ ./download_ispd18.sh
