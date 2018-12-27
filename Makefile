@@ -2,7 +2,7 @@ SUBDIR = module/lef/5.8-p027 module/def/5.8-p027 module/verilog-parser/src modul
 HASHDIR = module/sparsehash
 OPENSTADIR = module/OpenSTA
 REPLACEDIR = src
-
+INSTDIR=/usr/local/bin
 
 all: prep hash sta
 	$(MAKE) -C $(REPLACEDIR);
@@ -25,6 +25,10 @@ sta:
 		$(MAKE) && \
 		$(MAKE)	install;
 
+install:
+	@cp src/RePlAce $(INSTDIR)
+	@echo "Installation Successful"
+
 clean:
 	for dir in $(SUBDIR); do \
 		$(MAKE) -C $$dir clean; \
@@ -32,3 +36,4 @@ clean:
 	cd $(OPENSTADIR) && $(MAKE) distclean && rm -rf install-sp > /dev/null 2>&1; true
 	cd $(HASHDIR) && $(MAKE) distclean && rm -rf install > /dev/null 2&>1; true
 	$(MAKE) -C $(REPLACEDIR) clean;
+	rm -f $(INSTDIR)/RePlAce

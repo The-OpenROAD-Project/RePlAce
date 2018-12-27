@@ -1,27 +1,31 @@
-CC		=   gcc
-CPPC	=   g++
-LD 		=   ld
-# For Multi-thread
-# OPTFLAG = 	 -m64 -O1 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
-OPTFLAG = -m64 -O1 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
-WFLAG 	= -W -Wall -Wextra -Wunreachable-code 
-WSTRICT =	-Werror -Wundef -Wpointer-arith 
+CC					=	gcc
+CXX					=	g++
+WFLAG 			= -W -Wall -Wextra -Wunreachable-code
+WSTRICT 		=	-Werror -Wundef -Wpointer-arith
 
-TCLROOT	= /usr/include/tcl8.6
-INCLUDE = -I$(CURDIR) -I$(TCLROOT) -I$(MKLROOT)/include -I$(IPPROOT)/include \
-					-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
-					-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/src \
-		    	-I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
+TCLROOT			= /usr/include/tcl8.6
+INCLUDE 		= -I$(CURDIR) -I$(TCLROOT) -I$(MKLROOT)/include -I$(IPPROOT)/include \
+							-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
+							-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/src \
+		    			-I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
 
-CPPFLAG =	-std=c++17 $(OPTFLAG)
+DEBUG				= -g -ggdb ${WFLAG} ${WSTRICT}
+
+FLAGS 			= -c -O3 -ffast-math -fPIC -DNDEBUG -Dcimg_display=1
+CFLAGS	 		= ${FLAGS} -std=c99
+CXXFLAGS 		=	${FLAGS} -std=c++17
+
+LDFLAGS 		= -Wl,--start-group ${MKLLIB} ${OPENSTALIB} -Wl,--end-group \
+							-lgomp -lpthread -lm -ldl -lX11 -ltcl8.6 -lz \
+							${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} -lc -lstdc++ 	
 
 #Get Only the Internal Structure of SRCDIR Recursively
-SRCDIR	= 	$(CURDIR)
-STRUCT	=   $(shell find $(SRCDIR) -type d)
+SRCDIR			=	$(CURDIR)
+STRUCT			= $(shell find $(SRCDIR) -type d)
 
 #Get All Files inside the STRUCTURE Variable
-ALLSRCs =   $(addsuffix /*,$(STRUCT))
-ALLSRCs := 	$(wildcard $(ALLSRCs))
+ALLSRCs 		=   $(addsuffix /*,$(STRUCT))
+ALLSRCs 		:= 	$(wildcard $(ALLSRCs))
 
 #Filter Only Specific Files                                
 CFILES  		= 	$(filter %.c,$(ALLSRCs))
@@ -79,13 +83,14 @@ OPENSTASRCROOT= ../module/OpenSTA
 %.o: %.c $(DEPENDS)
 	@echo " "
 	@echo "  Building... $@"
-	$(CPPC) $(CPPFLAG) $(IFLUTE) -c -o $@ $< 
+	$(CC) $(CFLAGS) $(INCLUDE) -o $@ $< 
 
 %.o: %.cpp $(DEPENDS)
 	@touch main.cpp
 	@echo " "
 	@echo "  Building... $@"
-	$(CPPC) $(CPPFLAG) $(INCLUDE) -c -o $@ $< 
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ $< 
+
 
 RePlAce: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
 	$(OPENSTASRCROOT)/app/StaMain.o \
@@ -98,10 +103,7 @@ RePlAce: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
 	@echo "    If you want to replace them into shared libs, do '-L PATH -lippi,' etc."
 	@echo " "
 
-	$(CPPC) -o $@ $(CPPFLAG) $^ \
- 	-Wl,--start-group ${MKLLIB} ${OPENSTALIB} -Wl,--end-group \
-	-lgomp -lpthread -lm -ldl -lX11 -ltcl8.6 -lz \
-	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} -lc -lstdc++ 	
+	$(CXX) -o $@ $(CPPFLAG) $^ ${LDFLAGS}
 	@echo " "
 	@echo "  Linking is completed !!"
 	@echo " "
