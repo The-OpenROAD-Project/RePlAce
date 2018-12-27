@@ -27,6 +27,7 @@ sta:
 
 install:
 	@cp src/RePlAce $(INSTDIR)
+	@cp ntuplace/ntuplace* /$(INSTDIR)
 	@echo "Installation Successful"
 
 clean:
