@@ -32,6 +32,14 @@
     $ make -j4    
     $ sudo make install
     
+### Check your installation
+    To make sure your installation is correct and the current tool version is stable enough, 
+    run a Hello World application:
+
+    $ cd ./test
+    $ ./run.sh
+    
+    
 ### How To Execute
 
     // download lefdef benchmarks
