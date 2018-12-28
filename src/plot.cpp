@@ -249,6 +249,7 @@ void DrawGcell(CImgObj& img, const unsigned char fillerColor[],
                 (curGCell->flg == FillerCell)? fillerColor: cellColor, opacity );
         if( curGCell->flg == Macro) {
             img.draw_rectangle( x1, y1, x3, y3, black, opacity, ~0U);
+            // img.draw_text((x1+x3)/2, (y1+y3)/2, curGCell->name, black, NULL, 1, 20);
         }
     }
 }
@@ -364,7 +365,7 @@ void DrawArrowDensity(CImgObj& img, float opacity) {
     int binMaxY = (STAGE==cGP2D)? dim_bin_cGP2D.y : 
         (STAGE==mGP2D)? dim_bin_mGP2D.y : INT_MIN;
     
-    int arrowSpacing = binMaxX/16;
+    int arrowSpacing = (binMaxX/16 <= 0)? 1 : binMaxX/16;
 
     // below is essential for extracting e?Max
     prec exMax = PREC_MIN, eyMax = PREC_MIN, ezMax = PREC_MIN;
