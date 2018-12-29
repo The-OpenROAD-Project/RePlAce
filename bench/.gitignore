@@ -1,7 +1,9 @@
-lefdef/**/*.lef
-lefdef/**/*.def
-lefdef/**/*.v
-lefdef/**/*.guide
+lefdef/ispd18_*/*.lef
+lefdef/ispd18_*/*.def
+lefdef/ispd18_*/*.v
+lefdef/ispd18_*/*.guide
+lefdef/*.tar.bz2
+lefdef/tar
 bookshelf/**/*.aux
 bookshelf/**/*.scl
 bookshelf/**/*.nodes
@@ -10,4 +12,6 @@ bookshelf/**/*.nets
 bookshelf/**/*.wts
 bookshelf/**/*.shapes
 bookshelf/**/*.pl
+bookshelf/*.tar.bz2
+bookshelf/tar
 
