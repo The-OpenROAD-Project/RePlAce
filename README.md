@@ -14,7 +14,7 @@
 * X11 library (for CImg library to visualize) >= 1.6.5
 * Recommended OS: Centos6, Centos7 or Ubuntu 16.04
 
-### How To Compile
+### Clone repo and submodules 
     $ git clone --recursive https://github.com/abk-openroad/RePlAce.git
     
 Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths in [src/Makefile](src/Makefile)
@@ -24,7 +24,16 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
     $ ./prerequisite/install_centos7.sh   // for centos 7
     $ ./prerequisite/install_ubuntu16.sh  // for ubuntu 16
     $ make 
-    
+    $ make install
+
+   
+### Check your installation
+    To make sure your installation is correct and the current tool version is stable enough, 
+    run a Hello World application:
+
+    $ cd ./test
+    $ ./run.sh
+ 
 ### How To Execute
     // download lefdef benchmarks
     $ cd ~/RePlAce/bench/lefdef

@@ -9,10 +9,10 @@ DETAIL_PLACER_FLAG="NTU3"
 LEF="a2a_wb_dma_top/contest.lef"
 DEF="a2a_wb_dma_top/wb_dma_top_soce.def"
 VERILOG="a2a_wb_dma_top/wb_dma_top_soce.v"
-OUT="out"
+OUT="a2a_wb_dma_top_out"
 DETAIL_PLACE_LOC=$(get_abs_filename "/usr/local/bin/ntuplace3")
 
-RePlAce -bmflag etc \
+../src/RePlAce -bmflag etc \
   -lef $LEF -def $DEF -verilog $VERILOG \
   -output $OUT \
   -dpflag $DETAIL_PLACER_FLAG -dploc $DETAIL_PLACE_LOC \
