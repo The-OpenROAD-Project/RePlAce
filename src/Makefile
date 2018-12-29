@@ -3,14 +3,14 @@ CPPC	=   g++
 LD      =   ld
 # For Multi-thread
 # OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
-OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
-WFLAG 	= 	-W -Wall -Wextra -Wunreachable-code 
+OPTFLAG = -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
+WFLAG 	= -W -Wall -Wextra -Wunreachable-code 
 WSTRICT =	-Werror -Wundef -Wpointer-arith 
 
-INCLUDE = 	-I$(CURDIR) -I$(MKLROOT)/include -I$(IPPROOT)/include \
+INCLUDE = -I$(CURDIR) -I$(MKLROOT)/include -I$(IPPROOT)/include \
 			-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
 			-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/include \
-		    -I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
+			-I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
 
 CPPFLAG =   -std=c++0x $(OPTFLAG)
 
@@ -61,11 +61,11 @@ OPENSTALIB 		= $(OPENSTAROOT)/lib/libliberty.a \
 					$(OPENSTAROOT)/lib/libverilog.a
 
 ifndef	MKLROOT
-    MKLROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/mkl
+    MKLROOT		=	/opt/intel/mkl
 endif
 
 ifndef	IPPROOT
-    IPPROOT		=	/home/tool/intel/MKL/2018_0_128/compilers_and_libraries_2018.0.128/linux/ipp
+    IPPROOT		=	/opt/intel/ipp
 endif
 
 HASHROOT 		= ../module/sparsehash/install-sp/include
@@ -97,9 +97,7 @@ RePlAce	: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
 	@echo "    If you want to replace them into shared libs, do '-L PATH -lippi,' etc."
 	@echo " "
 
-	$(CPPC) -o $@                               \
-	$(CPPFLAG) 					    			\
-	$^ 											\
+	$(CPPC) -o $@ $(CPPFLAG) $^ \
  	-Wl,--start-group ${MKLLIB} ${OPENSTALIB} -Wl,--end-group \
 	-lgomp -lpthread -lm -ldl -lX11 -ltcl8.5 -lz \
 	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} -static-libstdc++ 	
