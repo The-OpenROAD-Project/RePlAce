@@ -161,15 +161,16 @@ void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
     cout << cmd << endl;
     system(cmd);
 
-    if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
-        sprintf(cmd, "cd %s && ./ntuplace3 -aux %s -loadpl %s -util %.2lf -noglobal \n",
-                tier_dir, tier_aux, tier_pl,
-                target_cell_den);
-    }
-    else {
-        sprintf(cmd, "cd %s && ./ntuplace3 -aux %s -loadpl %s -noglobal \n",
-                tier_dir, tier_aux, tier_pl);
-    }
+//    if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
+    sprintf(cmd, "cd %s && ./ntuplace3 -aux %s -loadpl %s -util %.2lf -noglobal \n",
+        tier_dir, tier_aux, tier_pl,
+        (hasDensityDP)? densityDP : target_cell_den);
+
+//    }
+//    else {
+//        sprintf(cmd, "cd %s && ./ntuplace3 -aux %s -loadpl %s -noglobal \n",
+//                tier_dir, tier_aux, tier_pl);
+//    }
 
     // call
     cout << "Call NtuPlacer3" << endl;
