@@ -88,3 +88,10 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 - Many subsequent improvements were made by Mingyu Woo leading up to the initial release.
 - Paper reference: C.-K. Cheng, A. B. Kahng, I. Kang and L. Wang, "RePlAce: Advancing Solution Quality and Routability Validation in Global Placement", to appear in IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, 2018.  (Digital Object Identifier: 10.1109/TCAD.2018.2859220)
 - Timing-Driven mode has been implemented by Mingyu Woo.
+
+### Limitations
+* RePlAce scales down the design from LEF/DEF/Verilog inputs for internal numerical stability reason, and scales back up for outputs. The scaling parameters XXX/YYY must be integer and must result in integer units after scaling down. This limitation will be removed in a future release (-unitY solve this problem temporary).
+* RePlAce does not support verilog files with certain string delimiters (e.g. '/', '[', ']' with starting character backslash('\\')).
+* RePlAce does not support rouability-driven mode using the LEF/DEF/Verilog interface. This will be enabled in a future release.
+* Mixed-sized RePlAce with (LEF/DEF/Verilog) interface does not generate legalized placement.
+* RePlAce does not support rectilinear layout regions.
