@@ -442,7 +442,6 @@ int main(int argc, char *argv[]) {
 
     if(numLayer > 1)
         calcTSVweight();
-    build_data_struct();
     
     net_update_init();
     init_tier();
