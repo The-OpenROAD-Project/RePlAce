@@ -116,7 +116,13 @@ static vector<defiVia>* defViaStorPtr = 0;
 static defiComponentMaskShiftLayer* defComponentMaskShiftLayerPtr = 0;
 static vector<defiComponent>* defComponentStorPtr = 0;
 static vector<defiNet>* defNetStorPtr = 0;
+
 static vector<defiNet>* defSpecialNetStorPtr = 0;
+// 0 for SpecialNet, 1 for SpecialPartialPath
+#define DEF_SPECIALNET_ORIGINAL 0
+#define DEF_SPECIALNET_PARTIAL_PATH 1 
+static vector<int> defSpecialNetType;
+
 static vector<defiPin>* defPinStorPtr = 0;
 
 static double* defUnitPtr = 0;
@@ -723,6 +729,8 @@ int snetpath(defrCallbackType_e c, defiNet* ppath, defiUserData ud) {
     CIRCUIT_FPRINTF (fout, "SPECIALNET partial data\n");
 
     CIRCUIT_FPRINTF(fout, "- %s ", ppath->name());
+    defSpecialNetStorPtr->push_back( *ppath );
+    defSpecialNetType.push_back( DEF_SPECIALNET_PARTIAL_PATH );
 
     count = 0;
     // compName & pinName
@@ -1573,6 +1581,7 @@ int snetf(defrCallbackType_e c, defiNet* net, defiUserData ud) {
 
     CIRCUIT_FPRINTF (fout, ";\n");
     defSpecialNetStorPtr->push_back( *net );
+    defSpecialNetType.push_back( DEF_SPECIALNET_ORIGINAL );
     --numObjs;
     if (numObjs <= 0)
         CIRCUIT_FPRINTF(fout, "END SPECIALNETS\n");
@@ -3742,378 +3751,706 @@ void Circuit::Circuit::DumpDefPin() {
 }
 
 void Circuit::Circuit::DumpDefSpecialNet() {
-    if( defSpecialNetStor.size() == 0 ) {
-        return;
+  if( defSpecialNetStor.size() == 0 ) {
+    return;
+  }
+
+
+  // Check SpecialNetCnt
+  int sNetCnt = 0;
+  for(auto& curNetType: defSpecialNetType) {
+    if( curNetType == DEF_SPECIALNET_ORIGINAL) {
+      sNetCnt ++;
     }
+  }
+  CIRCUIT_FPRINTF(fout, "SPECIALNETS %d ;\n", sNetCnt);
 
-    // For net and special net.
-    int         i, j, x, y, z, count, newLayer;
-    char*       layerName;
-    double      dist, left, right;
-    defiPath*   p;
-    defiSubnet  *s;
-    int         path;
-    defiShield* shield;
-    defiWire*   wire;
-    int         numX, numY, stepX, stepY;
 
-    CIRCUIT_FPRINTF(fout, "SPECIALNETS %d ;\n", defSpecialNetStor.size());
+  bool objectChange = true;
+  for(auto& curNet : defSpecialNetStor) {
+    int netType = defSpecialNetType[ &curNet - &defSpecialNetStor[0]];
 
-    for(auto& curNet : defSpecialNetStor) {
-        // 5/6/2004 - don't need since I have a callback for the name
+    if (netType == DEF_SPECIALNET_ORIGINAL ) {
+
+      // For net and special net.
+      int         i, j, x, y, z, count, newLayer;
+      char*       layerName;
+      double      dist, left, right;
+      defiPath*   p;
+      defiSubnet  *s;
+      int         path;
+      defiShield* shield;
+      defiWire*   wire;
+      int         numX, numY, stepX, stepY;
+
+      // 5/6/2004 - don't need since I have a callback for the name
+      if( objectChange ) {
         CIRCUIT_FPRINTF(fout, "- %s ", curNet.name());
 
         count = 0;
         // compName & pinName
         for (i = 0; i < curNet.numConnections(); i++) {
-            // set the limit of only 5 items print out in one line
-            count++;
-            if (count >= 5) {
+          // set the limit of only 5 items print out in one line
+          count++;
+          if (count >= 5) {
+            CIRCUIT_FPRINTF(fout, "\n");
+            count = 0;
+          }
+          CIRCUIT_FPRINTF (fout, "( %s %s ) ", curNet.instance(i),
+              curNet.pin(i));
+          if (curNet.pinIsSynthesized(i))
+            CIRCUIT_FPRINTF(fout, "+ SYNTHESIZED ");
+        }
+      }
+
+      // specialWiring
+      if (curNet.numWires()) {
+        for (i = 0; i < curNet.numWires(); i++) {
+          newLayer = ( objectChange )? 0 : 1;
+          wire = curNet.wire(i);
+          if( objectChange ) {
+            CIRCUIT_FPRINTF(fout, "\n  + %s ", wire->wireType());
+            if (strcmp (wire->wireType(), "SHIELD") == 0)
+              CIRCUIT_FPRINTF(fout, "%s ", wire->wireShieldNetName());
+          }
+          for (j = 0; j < wire->numPaths(); j++) {
+            p = wire->path(j);
+            p->initTraverse();
+            if (testDebugPrint) {
+              p->print(fout);
+            } else {
+              while ((path = (int)p->next()) != DEFIPATH_DONE) {
+                count++;
+                // Don't want the line to be too long
+                if (count >= 5) {
+                  CIRCUIT_FPRINTF(fout, "\n");
+                  count = 0;
+                }
+                switch (path) {
+                  case DEFIPATH_LAYER:
+                    if ( newLayer == 0) {
+                      CIRCUIT_FPRINTF(fout, "%s ", p->getLayer());
+                      newLayer = 1;
+                    } else
+                      CIRCUIT_FPRINTF(fout, "NEW %s ", p->getLayer());
+                    break;
+                  case DEFIPATH_VIA:
+                    CIRCUIT_FPRINTF(fout, "%s ", ignoreViaNames ? "XXX" : p->getVia());
+                    break;
+                  case DEFIPATH_VIAROTATION:
+                    CIRCUIT_FPRINTF(fout, "%s ", 
+                        orientStr(p->getViaRotation()));
+                    break;
+                  case DEFIPATH_VIADATA:
+                    p->getViaData(&numX, &numY, &stepX, &stepY);
+                    CIRCUIT_FPRINTF(fout, "DO %d BY %d STEP %d %d ", numX, numY,
+                        stepX, stepY);
+                    break;
+                  case DEFIPATH_WIDTH:
+                    CIRCUIT_FPRINTF(fout, "%d ", p->getWidth());
+                    break;
+                  case DEFIPATH_MASK:
+                    CIRCUIT_FPRINTF(fout, "MASK %d ", p->getMask());
+                    break;
+                  case DEFIPATH_VIAMASK:
+                    CIRCUIT_FPRINTF(fout, "MASK %d%d%d ", 
+                        p->getViaTopMask(), 
+                        p->getViaCutMask(),
+                        p->getViaBottomMask());
+                    break;
+                  case DEFIPATH_POINT:
+                    p->getPoint(&x, &y);
+                    CIRCUIT_FPRINTF(fout, "( %d %d ) ", x, y);
+                    break;
+                  case DEFIPATH_FLUSHPOINT:
+                    p->getFlushPoint(&x, &y, &z);
+                    CIRCUIT_FPRINTF(fout, "( %d %d %d ) ", x, y, z);
+                    break;
+                  case DEFIPATH_TAPER:
+                    CIRCUIT_FPRINTF(fout, "TAPER ");
+                    break;
+                  case DEFIPATH_SHAPE:
+                    CIRCUIT_FPRINTF(fout, "+ SHAPE %s ", p->getShape());
+                    break;
+                  case DEFIPATH_STYLE:
+                    CIRCUIT_FPRINTF(fout, "+ STYLE %d ", p->getStyle());
+                    break;
+                }
+              }
+            }
+          }
+          CIRCUIT_FPRINTF(fout, "\n");
+          count = 0;
+        }
+      }
+
+      // POLYGON
+      if (curNet.numPolygons()) {
+        struct defiPoints points;
+
+        for (i = 0; i < curNet.numPolygons(); i++) {
+          if (curVer >= 5.8 ) {
+            if (strcmp(curNet.polyRouteStatus(i), "") != 0) {
+              CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.polyRouteStatus(i));
+              if (strcmp(curNet.polyRouteStatus(i), "SHIELD") == 0) {
+                CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.polyRouteStatusShieldName(i));
+              }
+            }
+            if (strcmp(curNet.polyShapeType(i), "") != 0) {
+              CIRCUIT_FPRINTF(fout, "\n  + SHAPE %s ", curNet.polyShapeType(i));
+            }
+          }
+          if (curNet.polyMask(i)) {
+            CIRCUIT_FPRINTF(fout, "\n  + MASK %d + POLYGON % s ", curNet.polyMask(i),
+                curNet.polygonName(i));
+          } else {
+            CIRCUIT_FPRINTF(fout, "\n  + POLYGON %s ", curNet.polygonName(i));
+          }
+          points = curNet.getPolygon(i);
+          for (j = 0; j < points.numPoints; j++)
+            CIRCUIT_FPRINTF(fout, "%d %d ", points.x[j], points.y[j]);
+        }
+      }
+      // RECT
+      if (curNet.numRectangles()) {
+
+        for (i = 0; i < curNet.numRectangles(); i++) {
+          if (curVer >= 5.8 ) {
+            if (strcmp(curNet.rectRouteStatus(i), "") != 0) {
+              CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.rectRouteStatus(i));
+              if (strcmp(curNet.rectRouteStatus(i), "SHIELD") == 0) {
+                CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.rectRouteStatusShieldName(i));
+              }
+            }
+            if (strcmp(curNet.rectShapeType(i), "") != 0) {
+              CIRCUIT_FPRINTF(fout, "\n  + SHAPE %s ", curNet.rectShapeType(i));
+            }
+          }
+          if (curNet.rectMask(i)) {
+            CIRCUIT_FPRINTF(fout, "\n  + MASK %d + RECT %s %d %d %d %d", 
+                curNet.rectMask(i), curNet.rectName(i),
+                curNet.xl(i), curNet.yl(i), curNet.xh(i),
+                curNet.yh(i));
+          } else {
+            CIRCUIT_FPRINTF(fout, "\n  + RECT %s %d %d %d %d", 
+                curNet.rectName(i),
+                curNet.xl(i), 
+                curNet.yl(i), 
+                curNet.xh(i),
+                curNet.yh(i));
+          }
+        }
+      }
+      // VIA
+      if (curVer >= 5.8 && curNet.numViaSpecs()) {
+        for (i = 0; i < curNet.numViaSpecs(); i++) {
+          if (strcmp(curNet.viaRouteStatus(i), "") != 0) {
+            CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.viaRouteStatus(i));
+            if (strcmp(curNet.viaRouteStatus(i), "SHIELD") == 0) {
+              CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.viaRouteStatusShieldName(i));
+            }
+          }
+          if (strcmp(curNet.viaShapeType(i), "") != 0) {
+            CIRCUIT_FPRINTF(fout, "\n  + SHAPE %s ", curNet.viaShapeType(i));
+          }
+          if (curNet.topMaskNum(i) || curNet.cutMaskNum(i) || curNet.bottomMaskNum(i)) {
+            CIRCUIT_FPRINTF(fout, "\n  + MASK %d%d%d + VIA %s ", curNet.topMaskNum(i), 
+                curNet.cutMaskNum(i),
+                curNet.bottomMaskNum(i),
+                curNet.viaName(i));
+          } else {
+            CIRCUIT_FPRINTF(fout, "\n  + VIA %s ", curNet.viaName(i));
+          }
+          CIRCUIT_FPRINTF(fout, " %s", curNet.viaOrientStr(i));
+
+          defiPoints points = curNet.getViaPts(i);
+
+          for (int j = 0; j < points.numPoints; j++) {
+            CIRCUIT_FPRINTF(fout, " %d %d", points.x[j], points.y[j]);
+          }
+          CIRCUIT_FPRINTF(fout, ";\n"); 
+
+        }
+      }
+
+      if (curNet.hasSubnets()) {
+        for (i = 0; i < curNet.numSubnets(); i++) {
+          s = curNet.subnet(i);
+          if (s->numConnections()) {
+            if (s->pinIsMustJoin(0)) {
+              CIRCUIT_FPRINTF(fout, "- MUSTJOIN ");
+            }
+            else {
+              CIRCUIT_FPRINTF(fout, "- %s ", s->name());
+            }
+            for (j = 0; j < s->numConnections(); j++) {
+              CIRCUIT_FPRINTF(fout, " ( %s %s )\n", s->instance(j),
+                  s->pin(j));
+            }
+          }
+
+          // regularWiring
+          if (s->numWires()) {
+            for (i = 0; i < s->numWires(); i++) {
+              wire = s->wire(i);
+              CIRCUIT_FPRINTF(fout, "  + %s ", wire->wireType());
+              for (j = 0; j < wire->numPaths(); j++) {
+                p = wire->path(j);
+                p->print(fout);
+              }
+            }
+          }
+        }
+      }
+
+      if (curNet.numProps()) {
+        for (i = 0; i < curNet.numProps(); i++) {
+          if (curNet.propIsString(i))
+            CIRCUIT_FPRINTF(fout, "  + PROPERTY %s %s ", curNet.propName(i),
+                curNet.propValue(i));
+          if (curNet.propIsNumber(i))
+            CIRCUIT_FPRINTF(fout, "  + PROPERTY %s %g ", curNet.propName(i),
+                curNet.propNumber(i));
+          switch (curNet.propType(i)) {
+            case 'R': CIRCUIT_FPRINTF(fout, "REAL ");
+                      break;
+            case 'I': CIRCUIT_FPRINTF(fout, "INTEGER ");
+                      break;
+            case 'S': CIRCUIT_FPRINTF(fout, "STRING ");
+                      break;
+            case 'Q': CIRCUIT_FPRINTF(fout, "QUOTESTRING ");
+                      break;
+            case 'N': CIRCUIT_FPRINTF(fout, "NUMBER ");
+                      break;
+          }
+          CIRCUIT_FPRINTF(fout, "\n");
+        }
+      }
+
+      // SHIELD
+      count = 0;
+      // testing the SHIELD for 5.3, obsolete in 5.4
+      if (curNet.numShields()) {
+        for (i = 0; i < curNet.numShields(); i++) {
+          shield = curNet.shield(i);
+          CIRCUIT_FPRINTF(fout, "\n  + SHIELD %s ", shield->shieldName());
+          newLayer = 0;
+          for (j = 0; j < shield->numPaths(); j++) {
+            p = shield->path(j);
+            p->initTraverse();
+            while ((path = (int)p->next()) != DEFIPATH_DONE) {
+              count++;
+              // Don't want the line to be too long
+              if (count >= 5) {
                 CIRCUIT_FPRINTF(fout, "\n");
                 count = 0;
+              } 
+              switch (path) {
+                case DEFIPATH_LAYER:
+                  if (newLayer == 0) {
+                    CIRCUIT_FPRINTF(fout, "%s ", p->getLayer());
+                    newLayer = 1;
+                  } else
+                    CIRCUIT_FPRINTF(fout, "NEW %s ", p->getLayer());
+                  break;
+                case DEFIPATH_VIA:
+                  CIRCUIT_FPRINTF(fout, "%s ", ignoreViaNames ? "XXX" : p->getVia());
+                  break;
+                case DEFIPATH_VIAROTATION:
+                  CIRCUIT_FPRINTF(fout, "%s ", 
+                      orientStr(p->getViaRotation()));
+                  break;
+                case DEFIPATH_WIDTH:
+                  CIRCUIT_FPRINTF(fout, "%d ", p->getWidth());
+                  break;
+                case DEFIPATH_MASK:
+                  CIRCUIT_FPRINTF(fout, "MASK %d ", p->getMask());
+                  break;
+                case DEFIPATH_VIAMASK:
+                  CIRCUIT_FPRINTF(fout, "MASK %d%d%d ", 
+                      p->getViaTopMask(), 
+                      p->getViaCutMask(),
+                      p->getViaBottomMask());
+                  break;
+                case DEFIPATH_POINT:
+                  p->getPoint(&x, &y);
+                  CIRCUIT_FPRINTF(fout, "( %d %d ) ", x, y);
+                  break;
+                case DEFIPATH_FLUSHPOINT:
+                  p->getFlushPoint(&x, &y, &z);
+                  CIRCUIT_FPRINTF(fout, "( %d %d %d ) ", x, y, z);
+                  break;
+                case DEFIPATH_TAPER:
+                  CIRCUIT_FPRINTF(fout, "TAPER ");
+                  break;
+                case DEFIPATH_SHAPE:
+                  CIRCUIT_FPRINTF(fout, "+ SHAPE %s ", p->getShape());
+                  break;
+                case DEFIPATH_STYLE:
+                  CIRCUIT_FPRINTF(fout, "+ STYLE %d ", p->getStyle());
+                  break;
+              }
             }
-            CIRCUIT_FPRINTF (fout, "( %s %s ) ", curNet.instance(i),
-                    curNet.pin(i));
-            if (curNet.pinIsSynthesized(i))
-                CIRCUIT_FPRINTF(fout, "+ SYNTHESIZED ");
+          }
         }
+      }
 
-        // specialWiring
-        if (curNet.numWires()) {
-            newLayer = 0;
-            for (i = 0; i < curNet.numWires(); i++) {
-                newLayer = 0;
-                wire = curNet.wire(i);
-                CIRCUIT_FPRINTF(fout, "\n  + %s ", wire->wireType());
-                if (strcmp (wire->wireType(), "SHIELD") == 0)
-                    CIRCUIT_FPRINTF(fout, "%s ", wire->wireShieldNetName());
-                for (j = 0; j < wire->numPaths(); j++) {
-                    p = wire->path(j);
-                    p->initTraverse();
-                    if (testDebugPrint) {
-                        p->print(fout);
-                    } else {
-                        while ((path = (int)p->next()) != DEFIPATH_DONE) {
-                            count++;
-                            // Don't want the line to be too long
-                            if (count >= 5) {
-                                CIRCUIT_FPRINTF(fout, "\n");
-                                count = 0;
-                            }
-                            switch (path) {
-                                case DEFIPATH_LAYER:
-                                    if (newLayer == 0) {
-                                        CIRCUIT_FPRINTF(fout, "%s ", p->getLayer());
-                                        newLayer = 1;
-                                    } else
-                                        CIRCUIT_FPRINTF(fout, "NEW %s ", p->getLayer());
-                                    break;
-                                case DEFIPATH_VIA:
-                                    CIRCUIT_FPRINTF(fout, "%s ", ignoreViaNames ? "XXX" : p->getVia());
-                                    break;
-                                case DEFIPATH_VIAROTATION:
-                                    CIRCUIT_FPRINTF(fout, "%s ", 
-                                            orientStr(p->getViaRotation()));
-                                    break;
-                                case DEFIPATH_VIADATA:
-                                    p->getViaData(&numX, &numY, &stepX, &stepY);
-                                    CIRCUIT_FPRINTF(fout, "DO %d BY %d STEP %d %d ", numX, numY,
-                                            stepX, stepY);
-                                    break;
-                                case DEFIPATH_WIDTH:
-                                    CIRCUIT_FPRINTF(fout, "%d ", p->getWidth());
-                                    break;
-                                case DEFIPATH_MASK:
-                                    CIRCUIT_FPRINTF(fout, "MASK %d ", p->getMask());
-                                    break;
-                                case DEFIPATH_VIAMASK:
-                                    CIRCUIT_FPRINTF(fout, "MASK %d%d%d ", 
-                                            p->getViaTopMask(), 
-                                            p->getViaCutMask(),
-                                            p->getViaBottomMask());
-                                    break;
-                                case DEFIPATH_POINT:
-                                    p->getPoint(&x, &y);
-                                    CIRCUIT_FPRINTF(fout, "( %d %d ) ", x, y);
-                                    break;
-                                case DEFIPATH_FLUSHPOINT:
-                                    p->getFlushPoint(&x, &y, &z);
-                                    CIRCUIT_FPRINTF(fout, "( %d %d %d ) ", x, y, z);
-                                    break;
-                                case DEFIPATH_TAPER:
-                                    CIRCUIT_FPRINTF(fout, "TAPER ");
-                                    break;
-                                case DEFIPATH_SHAPE:
-                                    CIRCUIT_FPRINTF(fout, "+ SHAPE %s ", p->getShape());
-                                    break;
-                                case DEFIPATH_STYLE:
-                                    CIRCUIT_FPRINTF(fout, "+ STYLE %d ", p->getStyle());
-                                    break;
-                            }
-                        }
-                    }
-                }
-                CIRCUIT_FPRINTF(fout, "\n");
-                count = 0;
-            }
+      // layerName width
+      if (curNet.hasWidthRules()) {
+        for (i = 0; i < curNet.numWidthRules(); i++) {
+          curNet.widthRule(i, &layerName, &dist);
+          CIRCUIT_FPRINTF (fout, "\n  + WIDTH %s %g ", layerName, dist);
         }
+      }
 
-        // POLYGON
-        if (curNet.numPolygons()) {
-            struct defiPoints points;
-
-            for (i = 0; i < curNet.numPolygons(); i++) {
-                if (curVer >= 5.8 ) {
-                    if (strcmp(curNet.polyRouteStatus(i), "") != 0) {
-                        CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.polyRouteStatus(i));
-                        if (strcmp(curNet.polyRouteStatus(i), "SHIELD") == 0) {
-                            CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.polyRouteStatusShieldName(i));
-                        }
-                    }
-                    if (strcmp(curNet.polyShapeType(i), "") != 0) {
-                        CIRCUIT_FPRINTF(fout, "\n  + SHAPE %s ", curNet.polyShapeType(i));
-                    }
-                }
-                if (curNet.polyMask(i)) {
-                    CIRCUIT_FPRINTF(fout, "\n  + MASK %d + POLYGON % s ", curNet.polyMask(i),
-                            curNet.polygonName(i));
-                } else {
-                    CIRCUIT_FPRINTF(fout, "\n  + POLYGON %s ", curNet.polygonName(i));
-                }
-                points = curNet.getPolygon(i);
-                for (j = 0; j < points.numPoints; j++)
-                    CIRCUIT_FPRINTF(fout, "%d %d ", points.x[j], points.y[j]);
-            }
+      // layerName spacing
+      if (curNet.hasSpacingRules()) {
+        for (i = 0; i < curNet.numSpacingRules(); i++) {
+          curNet.spacingRule(i, &layerName, &dist, &left, &right);
+          if (left == right) {
+            CIRCUIT_FPRINTF (fout, "\n  + SPACING %s %g ", layerName, dist);
+          }
+          else {
+            CIRCUIT_FPRINTF (fout, "\n  + SPACING %s %g RANGE %g %g ",
+                layerName, dist, left, right);
+          }
         }
-        // RECT
-        if (curNet.numRectangles()) {
+      }
 
-            for (i = 0; i < curNet.numRectangles(); i++) {
-                if (curVer >= 5.8 ) {
-                    if (strcmp(curNet.rectRouteStatus(i), "") != 0) {
-                        CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.rectRouteStatus(i));
-                        if (strcmp(curNet.rectRouteStatus(i), "SHIELD") == 0) {
-                            CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.rectRouteStatusShieldName(i));
-                        }
-                    }
-                    if (strcmp(curNet.rectShapeType(i), "") != 0) {
-                        CIRCUIT_FPRINTF(fout, "\n  + SHAPE %s ", curNet.rectShapeType(i));
-                    }
-                }
-                if (curNet.rectMask(i)) {
-                    CIRCUIT_FPRINTF(fout, "\n  + MASK %d + RECT %s %d %d %d %d", 
-                            curNet.rectMask(i), curNet.rectName(i),
-                            curNet.xl(i), curNet.yl(i), curNet.xh(i),
-                            curNet.yh(i));
-                } else {
-                    CIRCUIT_FPRINTF(fout, "\n  + RECT %s %d %d %d %d", 
-                            curNet.rectName(i),
-                            curNet.xl(i), 
-                            curNet.yl(i), 
-                            curNet.xh(i),
-                            curNet.yh(i));
-                }
-            }
-        }
-        // VIA
-        if (curVer >= 5.8 && curNet.numViaSpecs()) {
-            for (i = 0; i < curNet.numViaSpecs(); i++) {
-                if (strcmp(curNet.viaRouteStatus(i), "") != 0) {
-                    CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.viaRouteStatus(i));
-                    if (strcmp(curNet.viaRouteStatus(i), "SHIELD") == 0) {
-                        CIRCUIT_FPRINTF(fout, "\n  + %s ", curNet.viaRouteStatusShieldName(i));
-                    }
-                }
-                if (strcmp(curNet.viaShapeType(i), "") != 0) {
-                    CIRCUIT_FPRINTF(fout, "\n  + SHAPE %s ", curNet.viaShapeType(i));
-                }
-                if (curNet.topMaskNum(i) || curNet.cutMaskNum(i) || curNet.bottomMaskNum(i)) {
-                    CIRCUIT_FPRINTF(fout, "\n  + MASK %d%d%d + VIA %s ", curNet.topMaskNum(i), 
-                            curNet.cutMaskNum(i),
-                            curNet.bottomMaskNum(i),
-                            curNet.viaName(i));
-                } else {
-                    CIRCUIT_FPRINTF(fout, "\n  + VIA %s ", curNet.viaName(i));
-                }
-                CIRCUIT_FPRINTF(fout, " %s", curNet.viaOrientStr(i));
+      if (curNet.hasFixedbump())
+        CIRCUIT_FPRINTF(fout, "\n  + FIXEDBUMP ");
+      if (curNet.hasFrequency())
+        CIRCUIT_FPRINTF(fout, "\n  + FREQUENCY %g ", curNet.frequency());
+      if (curNet.hasVoltage())
+        CIRCUIT_FPRINTF(fout, "\n  + VOLTAGE %g ", curNet.voltage());
+      if (curNet.hasWeight())
+        CIRCUIT_FPRINTF(fout, "\n  + WEIGHT %d ", curNet.weight());
+      if (curNet.hasCap())
+        CIRCUIT_FPRINTF(fout, "\n  + ESTCAP %g ", curNet.cap());
+      if (curNet.hasSource())
+        CIRCUIT_FPRINTF(fout, "\n  + SOURCE %s ", curNet.source());
+      if (curNet.hasPattern())
+        CIRCUIT_FPRINTF(fout, "\n  + PATTERN %s ", curNet.pattern());
+      if (curNet.hasOriginal())
+        CIRCUIT_FPRINTF(fout, "\n  + ORIGINAL %s ", curNet.original());
+      if (curNet.hasUse())
+        CIRCUIT_FPRINTF(fout, "\n  + USE %s ", curNet.use());
 
-                defiPoints points = curNet.getViaPts(i);
+      CIRCUIT_FPRINTF (fout, ";\n");
 
-                for (int j = 0; j < points.numPoints; j++) {
-                    CIRCUIT_FPRINTF(fout, " %d %d", points.x[j], points.y[j]);
-                }
-                CIRCUIT_FPRINTF(fout, ";\n"); 
-
-            }
-        }
-
-        if (curNet.hasSubnets()) {
-            for (i = 0; i < curNet.numSubnets(); i++) {
-                s = curNet.subnet(i);
-                if (s->numConnections()) {
-                    if (s->pinIsMustJoin(0)) {
-                        CIRCUIT_FPRINTF(fout, "- MUSTJOIN ");
-                    }
-                    else {
-                        CIRCUIT_FPRINTF(fout, "- %s ", s->name());
-                    }
-                    for (j = 0; j < s->numConnections(); j++) {
-                        CIRCUIT_FPRINTF(fout, " ( %s %s )\n", s->instance(j),
-                                s->pin(j));
-                    }
-                }
-
-                // regularWiring
-                if (s->numWires()) {
-                    for (i = 0; i < s->numWires(); i++) {
-                        wire = s->wire(i);
-                        CIRCUIT_FPRINTF(fout, "  + %s ", wire->wireType());
-                        for (j = 0; j < wire->numPaths(); j++) {
-                            p = wire->path(j);
-                            p->print(fout);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (curNet.numProps()) {
-            for (i = 0; i < curNet.numProps(); i++) {
-                if (curNet.propIsString(i))
-                    CIRCUIT_FPRINTF(fout, "  + PROPERTY %s %s ", curNet.propName(i),
-                            curNet.propValue(i));
-                if (curNet.propIsNumber(i))
-                    CIRCUIT_FPRINTF(fout, "  + PROPERTY %s %g ", curNet.propName(i),
-                            curNet.propNumber(i));
-                switch (curNet.propType(i)) {
-                    case 'R': CIRCUIT_FPRINTF(fout, "REAL ");
-                              break;
-                    case 'I': CIRCUIT_FPRINTF(fout, "INTEGER ");
-                              break;
-                    case 'S': CIRCUIT_FPRINTF(fout, "STRING ");
-                              break;
-                    case 'Q': CIRCUIT_FPRINTF(fout, "QUOTESTRING ");
-                              break;
-                    case 'N': CIRCUIT_FPRINTF(fout, "NUMBER ");
-                              break;
-                }
-                CIRCUIT_FPRINTF(fout, "\n");
-            }
-        }
-
-        // SHIELD
-        count = 0;
-        // testing the SHIELD for 5.3, obsolete in 5.4
-        if (curNet.numShields()) {
-            for (i = 0; i < curNet.numShields(); i++) {
-                shield = curNet.shield(i);
-                CIRCUIT_FPRINTF(fout, "\n  + SHIELD %s ", shield->shieldName());
-                newLayer = 0;
-                for (j = 0; j < shield->numPaths(); j++) {
-                    p = shield->path(j);
-                    p->initTraverse();
-                    while ((path = (int)p->next()) != DEFIPATH_DONE) {
-                        count++;
-                        // Don't want the line to be too long
-                        if (count >= 5) {
-                            CIRCUIT_FPRINTF(fout, "\n");
-                            count = 0;
-                        } 
-                        switch (path) {
-                            case DEFIPATH_LAYER:
-                                if (newLayer == 0) {
-                                    CIRCUIT_FPRINTF(fout, "%s ", p->getLayer());
-                                    newLayer = 1;
-                                } else
-                                    CIRCUIT_FPRINTF(fout, "NEW %s ", p->getLayer());
-                                break;
-                            case DEFIPATH_VIA:
-                                CIRCUIT_FPRINTF(fout, "%s ", ignoreViaNames ? "XXX" : p->getVia());
-                                break;
-                            case DEFIPATH_VIAROTATION:
-                                CIRCUIT_FPRINTF(fout, "%s ", 
-                                        orientStr(p->getViaRotation()));
-                                break;
-                            case DEFIPATH_WIDTH:
-                                CIRCUIT_FPRINTF(fout, "%d ", p->getWidth());
-                                break;
-                            case DEFIPATH_MASK:
-                                CIRCUIT_FPRINTF(fout, "MASK %d ", p->getMask());
-                                break;
-                            case DEFIPATH_VIAMASK:
-                                CIRCUIT_FPRINTF(fout, "MASK %d%d%d ", 
-                                        p->getViaTopMask(), 
-                                        p->getViaCutMask(),
-                                        p->getViaBottomMask());
-                                break;
-                            case DEFIPATH_POINT:
-                                p->getPoint(&x, &y);
-                                CIRCUIT_FPRINTF(fout, "( %d %d ) ", x, y);
-                                break;
-                            case DEFIPATH_FLUSHPOINT:
-                                p->getFlushPoint(&x, &y, &z);
-                                CIRCUIT_FPRINTF(fout, "( %d %d %d ) ", x, y, z);
-                                break;
-                            case DEFIPATH_TAPER:
-                                CIRCUIT_FPRINTF(fout, "TAPER ");
-                                break;
-                            case DEFIPATH_SHAPE:
-                                CIRCUIT_FPRINTF(fout, "+ SHAPE %s ", p->getShape());
-                                break;
-                            case DEFIPATH_STYLE:
-                                CIRCUIT_FPRINTF(fout, "+ STYLE %d ", p->getStyle());
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // layerName width
-        if (curNet.hasWidthRules()) {
-            for (i = 0; i < curNet.numWidthRules(); i++) {
-                curNet.widthRule(i, &layerName, &dist);
-                CIRCUIT_FPRINTF (fout, "\n  + WIDTH %s %g ", layerName, dist);
-            }
-        }
-
-        // layerName spacing
-        if (curNet.hasSpacingRules()) {
-            for (i = 0; i < curNet.numSpacingRules(); i++) {
-                curNet.spacingRule(i, &layerName, &dist, &left, &right);
-                if (left == right) {
-                    CIRCUIT_FPRINTF (fout, "\n  + SPACING %s %g ", layerName, dist);
-                }
-                else {
-                    CIRCUIT_FPRINTF (fout, "\n  + SPACING %s %g RANGE %g %g ",
-                            layerName, dist, left, right);
-                }
-            }
-        }
-
-        if (curNet.hasFixedbump())
-            CIRCUIT_FPRINTF(fout, "\n  + FIXEDBUMP ");
-        if (curNet.hasFrequency())
-            CIRCUIT_FPRINTF(fout, "\n  + FREQUENCY %g ", curNet.frequency());
-        if (curNet.hasVoltage())
-            CIRCUIT_FPRINTF(fout, "\n  + VOLTAGE %g ", curNet.voltage());
-        if (curNet.hasWeight())
-            CIRCUIT_FPRINTF(fout, "\n  + WEIGHT %d ", curNet.weight());
-        if (curNet.hasCap())
-            CIRCUIT_FPRINTF(fout, "\n  + ESTCAP %g ", curNet.cap());
-        if (curNet.hasSource())
-            CIRCUIT_FPRINTF(fout, "\n  + SOURCE %s ", curNet.source());
-        if (curNet.hasPattern())
-            CIRCUIT_FPRINTF(fout, "\n  + PATTERN %s ", curNet.pattern());
-        if (curNet.hasOriginal())
-            CIRCUIT_FPRINTF(fout, "\n  + ORIGINAL %s ", curNet.original());
-        if (curNet.hasUse())
-            CIRCUIT_FPRINTF(fout, "\n  + USE %s ", curNet.use());
-
-        CIRCUIT_FPRINTF (fout, ";\n");
+      objectChange = true;
     }
-    
-    CIRCUIT_FPRINTF(fout, "END SPECIALNETS\n\n");
+    else if( netType == DEF_SPECIALNET_PARTIAL_PATH ) {
+      int         i, j, x, y, z, count, newLayer;
+      char*       layerName;
+      double      dist, left, right;
+      defiPath*   p;
+      defiSubnet  *s;
+      int         path;
+      defiShield* shield;
+      defiWire*   wire;
+      int         numX, numY, stepX, stepY;
+
+//      if (c != defrSNetPartialPathCbkType)
+//        return 1;
+//      if (ud != userData) dataError();
+
+//      CIRCUIT_FPRINTF (fout, "SPECIALNET partial data\n");
+
+      count = 0;
+      if( objectChange  ) {
+        CIRCUIT_FPRINTF(fout, "- %s ", curNet.name());
+
+        // compName & pinName
+        for (i = 0; i < curNet.numConnections(); i++) {
+          // set the limit of only 5 items print out in one line
+          count++;
+          if (count >= 5) {
+            CIRCUIT_FPRINTF(fout, "\n");
+            count = 0;
+          }
+          CIRCUIT_FPRINTF (fout, "( %s %s ) ", curNet.instance(i),
+              curNet.pin(i));
+          if (curNet.pinIsSynthesized(i))
+            CIRCUIT_FPRINTF(fout, "+ SYNTHESIZED ");
+        }
+      }
+
+      // specialWiring
+      // POLYGON
+      if (curNet.numPolygons()) {
+        struct defiPoints points;
+        for (i = 0; i < curNet.numPolygons(); i++) {
+          CIRCUIT_FPRINTF(fout, "\n  + POLYGON %s ", curNet.polygonName(i));
+          points = curNet.getPolygon(i);
+          for (j = 0; j < points.numPoints; j++)
+            CIRCUIT_FPRINTF(fout, "%d %d ", points.x[j], points.y[j]);
+        }
+      }
+      // RECT
+      if (curNet.numRectangles()) {
+        for (i = 0; i < curNet.numRectangles(); i++) {
+          CIRCUIT_FPRINTF(fout, "\n  + RECT %s %d %d %d %d", curNet.rectName(i),
+              curNet.xl(i), curNet.yl(i),
+              curNet.xh(i), curNet.yh(i));
+        }
+      }
+
+      // COVER, FIXED, ROUTED or SHIELD
+      if (curNet.numWires()) {
+        for (i = 0; i < curNet.numWires(); i++) {
+          newLayer = ( objectChange )? 0 : 1;
+          wire = curNet.wire(i);
+          if( objectChange ) {
+            CIRCUIT_FPRINTF(fout, "\n  + %s ", wire->wireType());
+            if (strcmp (wire->wireType(), "SHIELD") == 0)
+              CIRCUIT_FPRINTF(fout, "%s ", wire->wireShieldNetName());
+          }
+          for (j = 0; j < wire->numPaths(); j++) {
+            p = wire->path(j);
+            p->initTraverse();
+            while ((path = (int)p->next()) != DEFIPATH_DONE) {
+              count++;
+              // Don't want the line to be too long
+              if (count >= 5) {
+                CIRCUIT_FPRINTF(fout, "\n");
+                count = 0;
+              }
+              switch (path) {
+                case DEFIPATH_LAYER:
+                  if ( newLayer == 0) {
+                    CIRCUIT_FPRINTF(fout, "%s ", p->getLayer());
+                    newLayer = 1;
+                  } else
+                    CIRCUIT_FPRINTF(fout, "NEW %s ", p->getLayer());
+                  break;
+                case DEFIPATH_VIA:
+                  CIRCUIT_FPRINTF(fout, "%s ", ignoreViaNames ? "XXX" : p->getVia());
+                  break;
+                case DEFIPATH_VIAROTATION:
+                  CIRCUIT_FPRINTF(fout, "%s ",
+                      orientStr(p->getViaRotation()));
+                  break;
+                case DEFIPATH_VIADATA:
+                  p->getViaData(&numX, &numY, &stepX, &stepY);
+                  CIRCUIT_FPRINTF(fout, "DO %d BY %d STEP %d %d ", numX, numY,
+                      stepX, stepY);
+                  break;
+                case DEFIPATH_WIDTH:
+                  CIRCUIT_FPRINTF(fout, "%d ", p->getWidth());
+                  break;
+                case DEFIPATH_MASK:
+                  CIRCUIT_FPRINTF(fout, "MASK %d ", p->getMask());
+                  break;
+                case DEFIPATH_VIAMASK:
+                  CIRCUIT_FPRINTF(fout, "MASK %d%d%d ", 
+                      p->getViaTopMask(), 
+                      p->getViaCutMask(),
+                      p->getViaBottomMask());
+                  break;
+                case DEFIPATH_POINT:
+                  p->getPoint(&x, &y);
+                  CIRCUIT_FPRINTF(fout, "( %d %d ) ", x, y);
+                  break;
+                case DEFIPATH_FLUSHPOINT:
+                  p->getFlushPoint(&x, &y, &z);
+                  CIRCUIT_FPRINTF(fout, "( %d %d %d ) ", x, y, z);
+                  break;
+                case DEFIPATH_TAPER:
+                  CIRCUIT_FPRINTF(fout, "TAPER ");
+                  break;
+                case DEFIPATH_SHAPE:
+                  CIRCUIT_FPRINTF(fout, "+ SHAPE %s ", p->getShape());
+                  break;
+                case DEFIPATH_STYLE:
+                  CIRCUIT_FPRINTF(fout, "+ STYLE %d ", p->getStyle());
+                  break;
+              }
+            }
+          }
+          CIRCUIT_FPRINTF(fout, "\n");
+          count = 0;
+        }
+      }
+
+      if (curNet.hasSubnets()) {
+        for (i = 0; i < curNet.numSubnets(); i++) {
+          s = curNet.subnet(i);
+          if (s->numConnections()) {
+            if (s->pinIsMustJoin(0)) {
+              CIRCUIT_FPRINTF(fout, "- MUSTJOIN ");
+            }
+            else {
+              CIRCUIT_FPRINTF(fout, "- %s ", s->name());
+            }
+            for (j = 0; j < s->numConnections(); j++) {
+              CIRCUIT_FPRINTF(fout, " ( %s %s )\n", s->instance(j),
+                  s->pin(j));
+            }
+          }
+
+          // regularWiring
+          if (s->numWires()) {
+            for (i = 0; i < s->numWires(); i++) {
+              wire = s->wire(i);
+              CIRCUIT_FPRINTF(fout, "  + %s ", wire->wireType());
+              for (j = 0; j < wire->numPaths(); j++) {
+                p = wire->path(j);
+                p->print(fout);
+              }
+            }
+          }
+        }
+      }
+
+      if (curNet.numProps()) {
+        for (i = 0; i < curNet.numProps(); i++) {
+          if (curNet.propIsString(i))
+            CIRCUIT_FPRINTF(fout, "  + PROPERTY %s %s ", curNet.propName(i),
+                curNet.propValue(i));
+          if (curNet.propIsNumber(i))
+            CIRCUIT_FPRINTF(fout, "  + PROPERTY %s %g ", curNet.propName(i),
+                curNet.propNumber(i));
+          switch (curNet.propType(i)) {
+            case 'R': CIRCUIT_FPRINTF(fout, "REAL ");
+                      break;
+            case 'I': CIRCUIT_FPRINTF(fout, "INTEGER ");
+                      break;
+            case 'S': CIRCUIT_FPRINTF(fout, "STRING ");
+                      break;
+            case 'Q': CIRCUIT_FPRINTF(fout, "QUOTESTRING ");
+                      break;
+            case 'N': CIRCUIT_FPRINTF(fout, "NUMBER ");
+                      break;
+          }
+          CIRCUIT_FPRINTF(fout, "\n");
+        }
+      }
+
+      // SHIELD
+      count = 0;
+      // testing the SHIELD for 5.3, obsolete in 5.4
+      if (curNet.numShields()) {
+        for (i = 0; i < curNet.numShields(); i++) {
+          shield = curNet.shield(i);
+          CIRCUIT_FPRINTF(fout, "\n  + SHIELD %s ", shield->shieldName());
+          newLayer = 0;
+          for (j = 0; j < shield->numPaths(); j++) {
+            p = shield->path(j);
+            p->initTraverse();
+            while ((path = (int)p->next()) != DEFIPATH_DONE) {
+              count++;
+              // Don't want the line to be too long
+              if (count >= 5) {
+                CIRCUIT_FPRINTF(fout, "\n");
+                count = 0;
+              }
+              switch (path) {
+                case DEFIPATH_LAYER:
+                  if (newLayer == 0) {
+                    CIRCUIT_FPRINTF(fout, "%s ", p->getLayer());
+                    newLayer = 1;
+                  } else
+                    CIRCUIT_FPRINTF(fout, "NEW %s ", p->getLayer());
+                  break;
+                case DEFIPATH_VIA:
+                  CIRCUIT_FPRINTF(fout, "%s ", ignoreViaNames ? "XXX" : p->getVia());
+                  break;
+                case DEFIPATH_VIAROTATION:
+                  if (newLayer) {
+                    CIRCUIT_FPRINTF(fout, "%s ",
+                        orientStr(p->getViaRotation()));
+                  }
+                  else {
+                    CIRCUIT_FPRINTF(fout, "Str %s ",
+                        p->getViaRotationStr());
+                  }
+                  break;
+                case DEFIPATH_WIDTH:
+                  CIRCUIT_FPRINTF(fout, "%d ", p->getWidth());
+                  break;
+                case DEFIPATH_MASK:
+                  CIRCUIT_FPRINTF(fout, "MASK %d ", p->getMask());
+                  break;
+                case DEFIPATH_VIAMASK:
+                  CIRCUIT_FPRINTF(fout, "MASK %d%d%d ", 
+                      p->getViaTopMask(), 
+                      p->getViaCutMask(),
+                      p->getViaBottomMask());
+                  break;
+                case DEFIPATH_POINT:
+                  p->getPoint(&x, &y);
+                  CIRCUIT_FPRINTF(fout, "( %d %d ) ", x, y);
+                  break;
+                case DEFIPATH_FLUSHPOINT:
+                  p->getFlushPoint(&x, &y, &z);
+                  CIRCUIT_FPRINTF(fout, "( %d %d %d ) ", x, y, z);
+                  break;
+                case DEFIPATH_TAPER:
+                  CIRCUIT_FPRINTF(fout, "TAPER ");
+                  break;
+                case DEFIPATH_SHAPE:
+                  CIRCUIT_FPRINTF(fout, "+ SHAPE %s ", p->getShape());
+                  break;
+                case DEFIPATH_STYLE:
+                  CIRCUIT_FPRINTF(fout, "+ STYLE %d ", p->getStyle());
+              }
+            }
+          }
+        }
+      }
+
+      // layerName width
+      if (curNet.hasWidthRules()) {
+        for (i = 0; i < curNet.numWidthRules(); i++) {
+          curNet.widthRule(i, &layerName, &dist);
+          CIRCUIT_FPRINTF (fout, "\n  + WIDTH %s %g ", layerName, dist);
+        }
+      }
+
+      // layerName spacing
+      if (curNet.hasSpacingRules()) {
+        for (i = 0; i < curNet.numSpacingRules(); i++) {
+          curNet.spacingRule(i, &layerName, &dist, &left, &right);
+          if (left == right) {
+            CIRCUIT_FPRINTF (fout, "\n  + SPACING %s %g ", layerName, dist);
+          }
+          else {
+            CIRCUIT_FPRINTF (fout, "\n  + SPACING %s %g RANGE %g %g ",
+                layerName, dist, left, right);
+          }
+        }
+      }
+
+      if (curNet.hasFixedbump())
+        CIRCUIT_FPRINTF(fout, "\n  + FIXEDBUMP ");
+      if (curNet.hasFrequency())
+        CIRCUIT_FPRINTF(fout, "\n  + FREQUENCY %g ", curNet.frequency());
+      if (curNet.hasVoltage())
+        CIRCUIT_FPRINTF(fout, "\n  + VOLTAGE %g ", curNet.voltage());
+      if (curNet.hasWeight())
+        CIRCUIT_FPRINTF(fout, "\n  + WEIGHT %d ", curNet.weight());
+      if (curNet.hasCap())
+        CIRCUIT_FPRINTF(fout, "\n  + ESTCAP %g ", curNet.cap());
+      if (curNet.hasSource())
+        CIRCUIT_FPRINTF(fout, "\n  + SOURCE %s ", curNet.source());
+      if (curNet.hasPattern())
+        CIRCUIT_FPRINTF(fout, "\n  + PATTERN %s ", curNet.pattern());
+      if (curNet.hasOriginal())
+        CIRCUIT_FPRINTF(fout, "\n  + ORIGINAL %s ", curNet.original());
+      if (curNet.hasUse())
+        CIRCUIT_FPRINTF(fout, "\n  + USE %s ", curNet.use());
+
+      CIRCUIT_FPRINTF(fout, "\n");
+
+      if( objectChange ) {
+        objectChange = false;
+      }
+    }
+
+  }
+
+  CIRCUIT_FPRINTF(fout, "END SPECIALNETS\n\n");
 }
 
 void Circuit::Circuit::DumpDefNet() {
