@@ -572,9 +572,9 @@ void SetSizeForObsMacro( int macroIdx, MODULE* curModule )  {
 //
 // terminal_pmin & terminal_pmax must be updated...
 void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
-    
+  
     moduleInstance = (MODULE*) mkl_malloc( sizeof(MODULE)* 
-                                __ckt.defComponentStor.size(), 64 );
+        __ckt.defComponentStor.size(), 64 );
 
     // to fast traverse when building TerminalInstance
     vector<int> fixedComponent;
@@ -637,7 +637,7 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
         
         if( fabs(curModule->size.y - rowHeight) > PREC_EPSILON  ) {
             defMacroCnt ++;
-            cout << "MACRO: " << curComp->id() << endl; 
+            cout << "MACRO: " << curComp->id() << " " << curModule->size.y << endl;   
         }
 
         // set half_size
@@ -680,10 +680,21 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
     // 
     // Terminal Update
     //
+    
+    // Check the Blockage 
+    vector<int> blockageIdxStor;  
+    for(auto& curBlockage: __ckt.defBlockageStor) {
+      int idx = &curBlockage - &__ckt.defBlockageStor[0];
+      if( curBlockage.hasPlacement() ||
+          curBlockage.hasLayer() && curBlockage.layerName() == metal1Name ) {
+        blockageIdxStor.push_back(idx); 
+      }
+    }
+    
     TERM* curTerm = NULL;
     terminalCNT = 0;
     terminalInstance = (TERM*) mkl_malloc( sizeof(TERM)*
-        ( fixedComponent.size() + __ckt.defPinStor.size() ), 64);
+        ( blockageIdxStor.size() + fixedComponent.size() + __ckt.defPinStor.size() ), 64);
 
     // for fixed cells.
     for(auto& curIdx : fixedComponent) {
@@ -786,6 +797,45 @@ void GenerateModuleTerminal(Circuit::Circuit &__ckt) {
                 make_pair( false, terminalCNT ); 
 
 //        curTerm->Dump();
+        terminalCNT++;
+    }
+
+    int blockageCnt = 0;
+    for(auto& curBlockIdx : blockageIdxStor) {
+        string blockName = "replace_blockage_" + to_string(blockageCnt++);
+        curTerm = &terminalInstance[terminalCNT];
+        new (curTerm) TERM();
+
+        strcpy( curTerm->name, blockName.c_str() );
+        
+        curTerm->idx = terminalCNT;
+        curTerm->IO = 2;
+        
+        defiBlockage* curBlockage = &__ckt.defBlockageStor[curBlockIdx];
+        if( curBlockage->numRectangles() > 0 ) {
+          curTerm->pmin.Set( (curBlockage->xl(0) + offsetX)/unitX,
+             ( curBlockage->yl(0) + offsetY)/unitY, 0 );
+          curTerm->pmax.Set( (curBlockage->xh(0) + offsetX)/unitX,
+             ( curBlockage->yh(0) + offsetY)/unitY, 1 );
+          curTerm->center.Set( (curTerm->pmin.x + curTerm->pmax.x)/2.0,
+             ( curTerm->pmin.y + curTerm->pmax.y)/2.0, 0 );
+        }
+        else {
+          cout << "** ERROR: RePlAce requires RECT in BLOCKAGES (DEF) " << endl;
+          exit(1);
+        }
+        curTerm->isTerminalNI = false;
+        curTerm->size.Set( curTerm->pmax.x - curTerm->pmin.x, 
+            curTerm->pmax.y - curTerm->pmin.y, 1 );
+        curTerm->area = curTerm->size.GetProduct();
+        // since size == 0, pmin == center == pmax; 
+        // curTerm->pmax.Set(curTerm->pmin);
+        // curTerm->center.Set(curTerm->pmin);
+        
+        moduleTermMap[ blockName ] = 
+                make_pair( false, terminalCNT ); 
+
+        curTerm->Dump();
         terminalCNT++;
     }
     cout << "INFO:  #MODULE: " << moduleCNT << ", #TERMINAL: " << terminalCNT << endl;
@@ -1325,6 +1375,7 @@ void GenerateNetDefOnly(Circuit::Circuit &__ckt) {
 //        ReplaceStringInPlace(netName, "]", "\\]");
         ReplaceStringInPlace(netName, "\\[", "[");
         ReplaceStringInPlace(netName, "\\]", "]");
+        ReplaceStringInPlace(netName, "\\/", "/");
 
         strcpy( curNet->name, netName.c_str() );
 //        cout << "copied net Name: " << curNet->name << endl;

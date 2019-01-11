@@ -116,6 +116,7 @@ static vector<defiVia>* defViaStorPtr = 0;
 static defiComponentMaskShiftLayer* defComponentMaskShiftLayerPtr = 0;
 static vector<defiComponent>* defComponentStorPtr = 0;
 static vector<defiNet>* defNetStorPtr = 0;
+static vector<defiBlockage>* defBlockageStorPtr = 0;
 
 static vector<defiNet>* defSpecialNetStorPtr = 0;
 // 0 for SpecialNet, 1 for SpecialPartialPath
@@ -2840,6 +2841,7 @@ static int cls(defrCallbackType_e c, void* cl, defiUserData ud) {
             break;
         case defrBlockageCbkType :
             block = (defiBlockage*)cl;
+            defBlockageStorPtr->push_back(*block);
             if (testDebugPrint) {
                 block->print(fout);
             } else {
@@ -3271,7 +3273,8 @@ void Circuit::Circuit::DumpDefVia() {
     CIRCUIT_FPRINTF(fout, "VIAS %d ; \n", defViaStor.size());
     for(auto& curVia : defViaStor) {
 
-        if (testDebugPrint) {
+
+      if (testDebugPrint) {
             curVia.print(fout);
         } else {
             CIRCUIT_FPRINTF(fout, "- %s \n", curVia.name());
@@ -3476,6 +3479,70 @@ void Circuit::Circuit::DumpDefComponent() {
         }
     }
     CIRCUIT_FPRINTF(fout, "END COMPONENTS\n\n");
+}
+
+void Circuit::Circuit::DumpDefBlockage() {
+  if( defBlockageStor.size() == 0 ) {
+    return;
+  }
+  int i=0, j=0;
+  defiPoints points;
+
+  CIRCUIT_FPRINTF( fout, "BLOCKAGES %d ;\n", defBlockageStor.size());
+
+  for(auto& curBlockage: defBlockageStor) {
+    if (curBlockage.hasLayer()) {
+      CIRCUIT_FPRINTF(fout, "- LAYER %s\n", curBlockage.layerName());
+      if (curBlockage.hasComponent())
+        CIRCUIT_FPRINTF(fout, "   + COMPONENT %s\n",
+            curBlockage.layerComponentName());
+      if (curBlockage.hasSlots())
+        CIRCUIT_FPRINTF(fout, "   + SLOTS\n");
+      if (curBlockage.hasFills())
+        CIRCUIT_FPRINTF(fout, "   + FILLS\n");
+      if (curBlockage.hasPushdown())
+        CIRCUIT_FPRINTF(fout, "   + PUSHDOWN\n");
+      if (curBlockage.hasExceptpgnet())
+        CIRCUIT_FPRINTF(fout, "   + EXCEPTPGNET\n");
+      if (curBlockage.hasMask())
+        CIRCUIT_FPRINTF(fout, "   + MASK %d\n", curBlockage.mask());
+      if (curBlockage.hasSpacing())
+        CIRCUIT_FPRINTF(fout, "   + SPACING %d\n",
+            curBlockage.minSpacing());
+      if (curBlockage.hasDesignRuleWidth())
+        CIRCUIT_FPRINTF(fout, "   + DESIGNRULEWIDTH %d\n",
+            curBlockage.designRuleWidth());
+    }
+    else if (curBlockage.hasPlacement()) {
+      CIRCUIT_FPRINTF(fout, "- PLACEMENT\n");
+      if (curBlockage.hasSoft())
+        CIRCUIT_FPRINTF(fout, "   + SOFT\n");
+      if (curBlockage.hasPartial())
+        CIRCUIT_FPRINTF(fout, "   + PARTIAL %g\n",
+            curBlockage.placementMaxDensity());
+      if (curBlockage.hasComponent())
+        CIRCUIT_FPRINTF(fout, "   + COMPONENT %s\n",
+            curBlockage.placementComponentName());
+      if (curBlockage.hasPushdown())
+        CIRCUIT_FPRINTF(fout, "   + PUSHDOWN\n");
+    }
+
+    for (i = 0; i < curBlockage.numRectangles(); i++) {
+      CIRCUIT_FPRINTF(fout, "   RECT ( %d %d ) ( %d %d ) \n", 
+          curBlockage.xl(i), curBlockage.yl(i),
+          curBlockage.xh(i), curBlockage.yh(i));
+    } 
+
+    for (i = 0; i < curBlockage.numPolygons(); i++) {
+      CIRCUIT_FPRINTF(fout, "   POLYGON ");
+      points = curBlockage.getPolygon(i);
+      for (j = 0; j < points.numPoints; j++)
+        CIRCUIT_FPRINTF(fout, "%d %d ", points.x[j], points.y[j]);
+      CIRCUIT_FPRINTF(fout, "\n");
+    }
+    CIRCUIT_FPRINTF(fout, ";\n");
+  }
+  CIRCUIT_FPRINTF(fout, "END BLOCKAGES\n\n");
 }
 
 void Circuit::Circuit::DumpDefPin() {
@@ -4790,6 +4857,7 @@ void Circuit::Circuit::ParseDef(string fileName, bool isVerbose = false) {
     defNetStorPtr = &(this->defNetStor);
     defSpecialNetStorPtr = &(this->defSpecialNetStor);
     defPinStorPtr = &(this->defPinStor);
+    defBlockageStorPtr = &(this->defBlockageStor);
 
     defComponentMapPtr = &(this->defComponentMap);
     defPinMapPtr = &(this->defPinMap);
@@ -5143,7 +5211,8 @@ void Circuit::Circuit::WriteDef( FILE* _fout ) {
     DumpDefComponentMaskShiftLayer();
     DumpDefComponent();
     fflush(fout);
-    
+   
+    DumpDefBlockage(); 
     DumpDefPin();
     DumpDefSpecialNet();
     fflush(fout);

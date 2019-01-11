@@ -67,6 +67,76 @@ void defiBlockage::Init() {
   polygons_ = 0;
 }
 
+DEF_COPY_CONSTRUCTOR_C( defiBlockage ) {
+  this->Init();
+  DEF_COPY_FUNC( hasLayer_ );
+  DEF_MALLOC_FUNC( layerName_, char, sizeof(char) * 
+      (strlen(prev.layerName_) +1));
+
+  DEF_COPY_FUNC( layerNameLength_ );
+  DEF_COPY_FUNC( hasPlacement_ );
+  DEF_COPY_FUNC( hasComponent_ );
+  DEF_MALLOC_FUNC( componentName_, char, sizeof(char) * 
+      (strlen(prev.componentName_) +1));
+  
+  DEF_COPY_FUNC( componentNameLength_ );
+  DEF_COPY_FUNC( hasSlots_ );
+  DEF_COPY_FUNC( hasFills_ );
+  DEF_COPY_FUNC( hasPushdown_ );
+  DEF_COPY_FUNC( hasExceptpgnet_ );
+  DEF_COPY_FUNC( hasSoft_ );
+  DEF_COPY_FUNC( maxDensity_ );
+  DEF_COPY_FUNC( minSpacing_ );
+  DEF_COPY_FUNC( width_ );
+  DEF_COPY_FUNC( numRectangles_ );
+  DEF_COPY_FUNC( rectsAllocated_ );
+  DEF_COPY_FUNC( mask_ );
+  
+  DEF_MALLOC_FUNC( xl_, int, sizeof(int) * numRectangles_ );
+  DEF_MALLOC_FUNC( yl_, int, sizeof(int) * numRectangles_ );
+  DEF_MALLOC_FUNC( xh_, int, sizeof(int) * numRectangles_ );
+  DEF_MALLOC_FUNC( yh_, int, sizeof(int) * numRectangles_ );
+  
+  DEF_COPY_FUNC( numPolys_ );
+  DEF_COPY_FUNC( polysAllocated_ );
+  DEF_MALLOC_FUNC_FOR_2D_POINT ( polygons_, numPolys_ );
+}
+
+DEF_ASSIGN_OPERATOR_C( defiBlockage ) {
+  this->Init();
+  DEF_COPY_FUNC( hasLayer_ );
+  DEF_MALLOC_FUNC( layerName_, char, sizeof(char) * 
+      (strlen(prev.layerName_) +1));
+
+  DEF_COPY_FUNC( layerNameLength_ );
+  DEF_COPY_FUNC( hasPlacement_ );
+  DEF_COPY_FUNC( hasComponent_ );
+  DEF_MALLOC_FUNC( componentName_, char, sizeof(char) * 
+      (strlen(prev.componentName_) +1));
+  
+  DEF_COPY_FUNC( componentNameLength_ );
+  DEF_COPY_FUNC( hasSlots_ );
+  DEF_COPY_FUNC( hasFills_ );
+  DEF_COPY_FUNC( hasPushdown_ );
+  DEF_COPY_FUNC( hasExceptpgnet_ );
+  DEF_COPY_FUNC( hasSoft_ );
+  DEF_COPY_FUNC( maxDensity_ );
+  DEF_COPY_FUNC( minSpacing_ );
+  DEF_COPY_FUNC( width_ );
+  DEF_COPY_FUNC( numRectangles_ );
+  DEF_COPY_FUNC( rectsAllocated_ );
+  DEF_COPY_FUNC( mask_ );
+  
+  DEF_MALLOC_FUNC( xl_, int, sizeof(int) * numRectangles_ );
+  DEF_MALLOC_FUNC( yl_, int, sizeof(int) * numRectangles_ );
+  DEF_MALLOC_FUNC( xh_, int, sizeof(int) * numRectangles_ );
+  DEF_MALLOC_FUNC( yh_, int, sizeof(int) * numRectangles_ );
+  
+  DEF_COPY_FUNC( numPolys_ );
+  DEF_COPY_FUNC( polysAllocated_ );
+  DEF_MALLOC_FUNC_FOR_2D_POINT ( polygons_, numPolys_ );
+
+}
 
 defiBlockage::~defiBlockage() {
   Destroy();

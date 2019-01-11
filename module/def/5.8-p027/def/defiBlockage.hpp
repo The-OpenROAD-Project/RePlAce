@@ -45,6 +45,9 @@ public:
   void Destroy();
   ~defiBlockage();
 
+  DEF_COPY_CONSTRUCTOR_H( defiBlockage );
+  DEF_ASSIGN_OPERATOR_H( defiBlockage );
+
   void clear();
   void clearPoly();
 

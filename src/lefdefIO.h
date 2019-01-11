@@ -179,6 +179,7 @@ class Circuit {
         defiComponentMaskShiftLayer defComponentMaskShiftLayer;
         vector<defiComponent> defComponentStor;
         vector<defiPin> defPinStor;
+        vector<defiBlockage> defBlockageStor;
         vector<defiNet> defNetStor;
         vector<defiNet> defSpecialNetStor;
 
@@ -248,6 +249,7 @@ class Circuit {
         void DumpDefSpecialNet();
         void DumpDefNet();
         void DumpDefDone();
+        void DumpDefBlockage();
 
         void DumpDefComponentPinToNet();
 

@@ -153,7 +153,7 @@ void lefVia(lefiVia *via) {
                             via->lefiVia::xl(i, j), via->lefiVia::yl(i, j),
                             via->lefiVia::xh(i, j), via->lefiVia::yh(i, j));
                 } else {
-                    fprintf(fout, "    RECT ( %f %f ) ( %f %f ) ;\n",
+                    fprintf(fout, "    RECT  %f %f  %f %f  ;\n",
                             via->lefiVia::xl(i, j), via->lefiVia::yl(i, j),
                             via->lefiVia::xh(i, j), via->lefiVia::yh(i, j));
                 }
@@ -240,7 +240,7 @@ void lefViaRuleLayer(lefiViaRuleLayer* vLayer) {
                 vLayer->lefiViaRuleLayer::spacingStepX(),
                 vLayer->lefiViaRuleLayer::spacingStepY());
     if (vLayer->lefiViaRuleLayer::hasRect())
-        fprintf(fout, "    RECT ( %f %f ) ( %f %f ) ;\n",
+        fprintf(fout, "    RECT  %f %f %f %f ;\n",
                 vLayer->lefiViaRuleLayer::xl(), vLayer->lefiViaRuleLayer::yl(),
                 vLayer->lefiViaRuleLayer::xh(), vLayer->lefiViaRuleLayer::yh());
     return;
@@ -317,7 +317,7 @@ void prtGeometry(lefiGeometries *geometry) {
                             rect->colorMask, rect->xl,
                             rect->yl, rect->xh, rect->yh);
                 } else {
-                    fprintf(fout, "      RECT ( %f %f ) ( %f %f ) ;\n", rect->xl,
+                    fprintf(fout, "      RECT %f %f %f %f ;\n", rect->xl,
                             rect->yl, rect->xh, rect->yh);
                 }
                 break;
@@ -344,10 +344,10 @@ void prtGeometry(lefiGeometries *geometry) {
                 }
                 for (j = 0; j < polygon->numPoints; j++) {
                     if (j + 1 == polygon->numPoints) // last one on the list
-                        fprintf(fout, "      ( %g %g ) ;\n", polygon->x[j],
+                        fprintf(fout, "      %g %g ;\n", polygon->x[j],
                                 polygon->y[j]);
                     else
-                        fprintf(fout, "      ( %g %g )\n", polygon->x[j],
+                        fprintf(fout, "      %g %g \n", polygon->x[j],
                                 polygon->y[j]);
                 }
                 break;
@@ -359,7 +359,7 @@ void prtGeometry(lefiGeometries *geometry) {
                     fprintf(fout, "      POLYGON ITERATE");
                 }
                 for (j = 0; j < polygonIter->numPoints; j++)
-                    fprintf(fout, "      ( %g %g )\n", polygonIter->x[j],
+                    fprintf(fout, "       %g %g \n", polygonIter->x[j],
                             polygonIter->y[j]);
                 fprintf(fout, "      DO %g BY %g STEP %g %g ;\n",
                         polygonIter->xStart, polygonIter->yStart,
@@ -1307,7 +1307,7 @@ int macroClassTypeCB(lefrCallbackType_e c, const char* macroClassType,
         lefiUserData) {
     checkType(c);
     // if ((long)ud != userData) dataError();
-    fprintf(fout, "MACRO CLASS %s\n",  macroClassType);
+//    fprintf(fout, "  CLASS %s ;\n",  macroClassType);
     return 0;
 }
 
@@ -1406,7 +1406,7 @@ int macroCB(lefrCallbackType_e c, lefiMacro* macro, lefiUserData) {
         }
     }
     if (macro->lefiMacro::hasOrigin())
-        fprintf(fout, "  ORIGIN ( %g %g ) ;\n", macro->lefiMacro::originX(),
+        fprintf(fout, "  ORIGIN %g %g ;\n", macro->lefiMacro::originX(),
                 macro->lefiMacro::originY());
     if (macro->lefiMacro::hasPower())
         fprintf(fout, "  POWER %g ;\n", macro->lefiMacro::power());
@@ -2400,8 +2400,8 @@ main(int argc, char** argv) {
         lefrSetReallocFunction(reallocCB);
         lefrSetFreeFunction(freeCB);
 
-        lefrSetLineNumberFunction(lineNumberCB);
-        lefrSetDeltaNumberLines(50);
+//        lefrSetLineNumberFunction(lineNumberCB);
+//        lefrSetDeltaNumberLines(50);
 
         lefrSetRegisterUnusedCallbacks();
 
