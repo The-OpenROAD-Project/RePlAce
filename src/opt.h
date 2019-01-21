@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -57,38 +58,38 @@ extern prec MIN_PRE;
 extern FPOS avg80p_cell_dim;
 
 struct DST {
-    int idx;
-    prec dxy;
+  int idx;
+  prec dxy;
 };
 
 struct ABC {
-    int idx;
-    prec val;
-    struct FPOS p;
+  int idx;
+  prec val;
+  struct FPOS p;
 };
 
 struct ITER {
-    struct FPOS wlen;
-    struct FPOS hpwl;
-    struct FPOS lc_dim;
-    struct FPOS wcof;
-    prec grad;
-    prec tot_wlen;
-    prec tot_hpwl;
-    prec tot_stnwl;  // lutong
-    prec tot_wwl;    // lutong
-    prec potn;
-    prec ovfl;
-    prec pcof;
-    int idx;
-    prec beta;
-    prec dis00;
-    prec alpha00;
-    prec lc;
-    prec lc_w;
-    prec lc_p;
-    double cpu_curr, cpu_cost;
-    struct FPOS alpha_dim;
+  struct FPOS wlen;
+  struct FPOS hpwl;
+  struct FPOS lc_dim;
+  struct FPOS wcof;
+  prec grad;
+  prec tot_wlen;
+  prec tot_hpwl;
+  prec tot_stnwl;  // lutong
+  prec tot_wwl;    // lutong
+  prec potn;
+  prec ovfl;
+  prec pcof;
+  int idx;
+  prec beta;
+  prec dis00;
+  prec alpha00;
+  prec lc;
+  prec lc_w;
+  prec lc_p;
+  double cpu_curr, cpu_cost;
+  struct FPOS alpha_dim;
 };
 
 // routability
@@ -206,12 +207,12 @@ void cg_input(struct FPOS *x_st, int N, int input);
 int area_sort(const void *a, const void *b);
 
 enum {
-    NONE_INPUT,
-    QWL_ISOL,
-    ISOL_INPUT,
-    WL_SOL_INPUT,
-    IP_CEN_SQR,
-    RANDOM_INPUT
+  NONE_INPUT,
+  QWL_ISOL,
+  ISOL_INPUT,
+  WL_SOL_INPUT,
+  IP_CEN_SQR,
+  RANDOM_INPUT
 };
 
 enum { NONE_OUTPUT, QWL_OUTPUT, ISOL_OUTPUT, WL_SOL_OUTPUT, IP_CEN_SQR_OUTPUT };
@@ -268,7 +269,7 @@ void cell_init_2D(void);
 //#define LC_REF_DIS
 #define ref_yz_dis 50.0  // empirical from adaptec1, need deep tuning
 #define z_ref_alpha      /* 0.0001 */ \
-    0.01 /* 100.0 */     // empirical from adaptec1, need tuning
+  0.01 /* 100.0 */       // empirical from adaptec1, need tuning
 
 #define BACKTRACK
 
@@ -276,7 +277,7 @@ void cell_init_2D(void);
 
 #define PRECON
 //#define DEN_ONLY_PRECON  // prevents fillers from spreading // only SB uses
-//DEN_ONLY_PRECON
+// DEN_ONLY_PRECON
 // too fast in 3D-IC placement
 
 #define MAX_BKTRK_CNT 10
@@ -311,28 +312,28 @@ void cell_init_2D(void);
 //}
 
 inline prec fastPow(prec a, prec b) {
-    union {
-        prec d;
-        int x[2];
-    } u = {a};
-    u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
-    u.x[0] = 0;
-    return u.d;
+  union {
+    prec d;
+    int x[2];
+  } u = {a};
+  u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
+  u.x[0] = 0;
+  return u.d;
 }
 
 inline prec fastExp(prec a) {
-    a = 1.0 + a / 1024.0;
-    a *= a;
-    a *= a;
-    a *= a;
-    a *= a;
-    a *= a;
-    a *= a;
-    a *= a;
-    a *= a;
-    a *= a;
-    a *= a;
-    return a;
+  a = 1.0 + a / 1024.0;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  return a;
 }
 
 #endif

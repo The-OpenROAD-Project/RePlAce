@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -49,11 +50,10 @@ extern prec inv_bin_area;
 extern prec global_macro_area_scale;
 
 extern BIN *bin_mat;
-//extern prec *bin_share_x_st;
-//extern prec *bin_share_y_st;
-//extern prec *bin_share_z_st;
-//extern prec *bin_share_st;
-
+// extern prec *bin_share_x_st;
+// extern prec *bin_share_y_st;
+// extern prec *bin_share_z_st;
+// extern prec *bin_share_st;
 
 extern FPOS bin_org;
 extern FPOS bin_stp;
@@ -63,52 +63,51 @@ extern FPOS bin_stp_mGP2D;
 extern FPOS bin_stp_cGP2D;
 extern POS max_bin;
 
-//extern BIN **bin_list;
-//extern int bin_list_cnt;
+// extern BIN **bin_list;
+// extern int bin_list_cnt;
 
-//extern POS *bin_st;
+// extern POS *bin_st;
 
 struct BIN {
-    FPOS e;
-    ////igkang
-    //  FPOS    e_local;
-    POS p;
-    FPOS pmin;
-    FPOS pmax;
-    FPOS center;
-    prec cell_area;
-    prec cell_area2;
+  FPOS e;
+  ////igkang
+  //  FPOS    e_local;
+  POS p;
+  FPOS pmin;
+  FPOS pmax;
+  FPOS center;
+  prec cell_area;
+  prec cell_area2;
 
-    prec virt_area;
-    long term_area; // mgwoo
+  prec virt_area;
+  long term_area;  // mgwoo
 
-    prec filler_area;
-    prec phi;
-    int flg;
-    prec pl_area;
-    prec macro_area;
-    prec macro_area2;
-    prec den;
-    prec den2;
-    prec no_mac_den;
-    void dump(string a) {
-        cout << a << endl;
-        e.Dump("e");
-        p.Dump("p");
-        pmin.Dump("pmin");
-        pmax.Dump("pmax");
-        center.Dump("center");
-        cout << endl;
-    }
+  prec filler_area;
+  prec phi;
+  int flg;
+  prec pl_area;
+  prec macro_area;
+  prec macro_area2;
+  prec den;
+  prec den2;
+  prec no_mac_den;
+  void dump(string a) {
+    cout << a << endl;
+    e.Dump("e");
+    p.Dump("p");
+    pmin.Dump("pmin");
+    pmax.Dump("pmax");
+    center.Dump("center");
+    cout << endl;
+  }
 };
-
 
 int idx_in_bin_rect(POS *p, POS pmin, POS pmax);
 
 void bin_init();
 void bin_init_2D(int);
 
-void UpdateTerminalArea( TIER* tier, FPOS* pmin, FPOS* pmax); 
+void UpdateTerminalArea(TIER *tier, FPOS *pmin, FPOS *pmax);
 void bin_update(int N);
 void bin_update7(int N);
 
@@ -119,9 +118,9 @@ void bin_delete(void);
 
 void get_bin_grad(BIN **bin, int max_x, int max_y);
 
-//int wthin(prec a, prec min_a, prec max_a);
-//prec get_int_line(prec min_x1, prec max_x1, prec min_x2, prec max_x2);
-//FPOS get_int_rgn(FPOS min1, FPOS max1, FPOS min2, FPOS max2);
+// int wthin(prec a, prec min_a, prec max_a);
+// prec get_int_line(prec min_x1, prec max_x1, prec min_x2, prec max_x2);
+// FPOS get_int_rgn(FPOS min1, FPOS max1, FPOS min2, FPOS max2);
 
 void legal_bin_idx(POS *p);
 POS get_bin_pt_from_point(FPOS p);
@@ -130,40 +129,40 @@ POS get_bin_pt_from_point(FPOS p);
 // using current da & half_size.
 //
 inline prec valid_coor2(prec da, prec half_size, int lab) {
-    prec min_a = da - half_size;
-    prec max_a = da + half_size;
+  prec min_a = da - half_size;
+  prec max_a = da + half_size;
 
-    // according to X
-    if(lab == 0) {
-        if(min_a < place.org.x)
-            da += place.org.x - min_a;
-        if(max_a > place.end.x)
-            da -= max_a - place.end.x;
-    }
-    // accroding to Y
-    else if(lab == 1) {
-        if(min_a < place.org.y)
-            da += place.org.y - min_a;
-        if(max_a > place.end.y)
-            da -= max_a - place.end.y;
-    }
-    // mgwoo
-    // accroding to Z
-//    else if(lab == 2) {
-//        if(min_a < place.org.z)
-//            da += place.org.z - min_a;
-//        if(max_a > place.end.z)
-//            da -= max_a - place.end.z;
-//    }
-    return da;
+  // according to X
+  if(lab == 0) {
+    if(min_a < place.org.x)
+      da += place.org.x - min_a;
+    if(max_a > place.end.x)
+      da -= max_a - place.end.x;
+  }
+  // accroding to Y
+  else if(lab == 1) {
+    if(min_a < place.org.y)
+      da += place.org.y - min_a;
+    if(max_a > place.end.y)
+      da -= max_a - place.end.y;
+  }
+  // mgwoo
+  // accroding to Z
+  //    else if(lab == 2) {
+  //        if(min_a < place.org.z)
+  //            da += place.org.z - min_a;
+  //        if(max_a > place.end.z)
+  //            da -= max_a - place.end.z;
+  //    }
+  return da;
 }
 
 inline FPOS valid_coor00(FPOS v, FPOS half_size) {
-//    FPOS v1 = zeroFPoint;
-    FPOS v1;
-    v1.x = valid_coor2(v.x, half_size.x, 0);
-    v1.y = valid_coor2(v.y, half_size.y, 1);
-    return v1;
+  //    FPOS v1 = zeroFPoint;
+  FPOS v1;
+  v1.x = valid_coor2(v.x, half_size.x, 0);
+  v1.y = valid_coor2(v.y, half_size.y, 1);
+  return v1;
 }
 
 prec valid_coor(prec a, int xy);
@@ -204,10 +203,10 @@ prec get_den2(prec area_num, prec area_denom);
 
 // return bin_mat's pointer
 inline BIN *get_bin_from_idx(POS p) {
-    int idx = 0;
-    (flg_3dic == 1) ? idx = p.x *max_bin.y *max_bin.z + p.y *max_bin.z + p.z
-                    : idx = p.x * max_bin.y + p.y;
-    return &bin_mat[idx];
+  int idx = 0;
+  (flg_3dic == 1) ? idx = p.x *max_bin.y *max_bin.z + p.y *max_bin.z + p.z
+                  : idx = p.x * max_bin.y + p.y;
+  return &bin_mat[idx];
 };
 
 void add_net_to_bins(NET *ntp);

@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -67,9 +68,9 @@ extern FPOS wlen_cof;
 extern FPOS wlen_cof_inv;
 
 struct EXP_ST {
-    prec x;
-    prec val;
-    prec y_h;
+  prec x;
+  prec val;
+  prec y_h;
 };
 
 extern EXP_ST *exp_st;
@@ -79,59 +80,57 @@ prec get_wlen_wa();
 prec get_wlen_lse(void);
 void SetMAX_EXP_wlen();
 
-FPOS get_net_wlen_wa( NET *net);
-FPOS get_net_wlen_lse( NET *net);
+FPOS get_net_wlen_wa(NET *net);
+FPOS get_net_wlen_lse(NET *net);
 
-void wlen_grad(int cell_idx,  FPOS *grad);
-void wlen_grad_lse(int cell_idx,  FPOS *grad);
-inline void wlen_grad_wa(int cell_idx,  FPOS *grad);
-void get_net_wlen_grad_lse( NET *net,  PIN *pin,  FPOS *grad);
-inline void get_net_wlen_grad_wa( FPOS obj,  NET *net,
-                                  PIN *pin,  FPOS *grad);
+void wlen_grad(int cell_idx, FPOS *grad);
+void wlen_grad_lse(int cell_idx, FPOS *grad);
+inline void wlen_grad_wa(int cell_idx, FPOS *grad);
+void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad);
+inline void get_net_wlen_grad_wa(FPOS obj, NET *net, PIN *pin, FPOS *grad);
 
-inline void wlen_pre(int cell_idx,  FPOS *wpre) {
-    *wpre = zeroFPoint;
+inline void wlen_pre(int cell_idx, FPOS *wpre) {
+  *wpre = zeroFPoint;
 
 #ifdef NO_WLEN
-    return;
+  return;
 #endif
 
-     CELLx *cell = &gcell_st[cell_idx];
+  CELLx *cell = &gcell_st[cell_idx];
 
-    switch(WLEN_PRE) {
-        case NoneWpre:
+  switch(WLEN_PRE) {
+    case NoneWpre:
 
-            *wpre = zeroFPoint;
-            break;
+      *wpre = zeroFPoint;
+      break;
 
-        case PcntWpre:
+    case PcntWpre:
 
-            if(flg_3dic) {
-                wpre->x = wpre->y = wpre->z = (prec)(cell->pinCNTinObject);
-            }
-            else {
-                wpre->x = wpre->y = (prec)(cell->pinCNTinObject);
-            }
+      if(flg_3dic) {
+        wpre->x = wpre->y = wpre->z = (prec)(cell->pinCNTinObject);
+      }
+      else {
+        wpre->x = wpre->y = (prec)(cell->pinCNTinObject);
+      }
 
-            break;
-    }
+      break;
+  }
 
-    wpre->x *= gp_wlen_weight.x /* / 2000.0 */;
-    wpre->y *= gp_wlen_weight.y /* / 2000.0 */;
+  wpre->x *= gp_wlen_weight.x /* / 2000.0 */;
+  wpre->y *= gp_wlen_weight.y /* / 2000.0 */;
 }
 
-void wlen_grad2(int cell_idx,  FPOS *grad2);
-void wlen_grad2_lse(int cell_idx,  FPOS *grad2);
-void wlen_grad2_wa( FPOS *grad);
-void get_net_wlen_grad2_lse( NET *net,  PIN *pin,
-                             FPOS *grad2);
+void wlen_grad2(int cell_idx, FPOS *grad2);
+void wlen_grad2_lse(int cell_idx, FPOS *grad2);
+void wlen_grad2_wa(FPOS *grad);
+void get_net_wlen_grad2_lse(NET *net, PIN *pin, FPOS *grad2);
 
 FPOS get_wlen_cof(prec ovf);
 FPOS get_wlen_cof1(prec ovf);
 FPOS get_wlen_cof2(prec ovf);
 FPOS get_wlen_cof3(prec ovf);
 
-void wlen_grad_debug( FPOS grad);
+void wlen_grad_debug(FPOS grad);
 
 //#define MAX_EXP 300 //300 //40 // 10
 #define EXP_RES 16           // 4
@@ -139,17 +138,17 @@ void wlen_grad_debug( FPOS grad);
 #define exp_interval 0.0625  // 0.25 // MAX_EXP / exp_st_cnt
 
 inline prec get_exp(prec a) {
-    return fastExp(a);
+  return fastExp(a);
 }
 void wlen_init(void);
 void wlen_init_mGP2D(void);
 void wlen_init_cGP2D(void);
-void wcof_init( FPOS bstp);
+void wcof_init(FPOS bstp);
 
 void net_update_init(void);
-void net_update( FPOS *st);
-void net_update_lse( FPOS *st);
-void net_update_wa( FPOS *st);
+void net_update(FPOS *st);
+void net_update_lse(FPOS *st);
+void net_update_wa(FPOS *st);
 
 prec GetHpwl();
 prec UpdateNetAndGetHpwl();

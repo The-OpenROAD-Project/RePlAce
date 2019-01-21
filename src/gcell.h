@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -37,63 +38,62 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef         __GCELL__
-#define         __GCELL__
+#ifndef __GCELL__
+#define __GCELL__
 
-#include        "global.h"
+#include "global.h"
 
 class mypos {
-  public:
+ public:
   float x;
   float y;
 };
 
-struct  TILE {
-    struct  FPOS    pmin;
-    struct  FPOS    pmax;
-    struct  FPOS    center;
-    struct  POS     p;
-    prec            h_usage;
-    prec            v_usage;
-    prec            tmp_h_usage;
-    prec            tmp_v_usage;
-    int             pincnt;
-    std::vector<int> cap; // new
-    std::vector<int> blkg; // new
-    //std::vector<std::vector<struct FPOS> > block_interval; // new
-    std::vector<std::vector<mypos> > block_interval; // new
-    std::vector<int> route; // new
-    prec            infl_ratio; // new
-    std::vector<int> h_gr_usage_per_layer_l;
-    std::vector<int> h_gr_usage_per_layer_r;
-    std::vector<int> v_gr_usage_per_layer_l;
-    std::vector<int> v_gr_usage_per_layer_r;
-    int             h_gr_usage_total;
-    int             v_gr_usage_total;
-    // igkang
-    // leftedge = 1
-    // rightedge = 2
-    prec            h_supply2;
-    prec            v_supply2;
-    prec            h_supply;
-    prec            v_supply;
-    prec            area;
-    prec            h_inflation_ratio;
-    prec            v_inflation_ratio;
-    prec            inflation_area_thisTile;
-    prec            inflation_area_delta_thisTile;
-    prec            cell_area_befo_bloating_thisTile;
-    prec            inflatedRatio_thisTile;
-    bool            is_macro_included;
-
+struct TILE {
+  struct FPOS pmin;
+  struct FPOS pmax;
+  struct FPOS center;
+  struct POS p;
+  prec h_usage;
+  prec v_usage;
+  prec tmp_h_usage;
+  prec tmp_v_usage;
+  int pincnt;
+  std::vector< int > cap;   // new
+  std::vector< int > blkg;  // new
+  // std::vector<std::vector<struct FPOS> > block_interval; // new
+  std::vector< std::vector< mypos > > block_interval;  // new
+  std::vector< int > route;                            // new
+  prec infl_ratio;                                     // new
+  std::vector< int > h_gr_usage_per_layer_l;
+  std::vector< int > h_gr_usage_per_layer_r;
+  std::vector< int > v_gr_usage_per_layer_l;
+  std::vector< int > v_gr_usage_per_layer_r;
+  int h_gr_usage_total;
+  int v_gr_usage_total;
+  // igkang
+  // leftedge = 1
+  // rightedge = 2
+  prec h_supply2;
+  prec v_supply2;
+  prec h_supply;
+  prec v_supply;
+  prec area;
+  prec h_inflation_ratio;
+  prec v_inflation_ratio;
+  prec inflation_area_thisTile;
+  prec inflation_area_delta_thisTile;
+  prec cell_area_befo_bloating_thisTile;
+  prec inflatedRatio_thisTile;
+  bool is_macro_included;
 };
 
-void tile_init_cGP2D ();
+void tile_init_cGP2D();
 void get_blockage();
 void get_interval_length();
 void adjust_edge_cap();
-void tile_clear ();
-void tile_reset_gr_usages ();
-void get_gr_usages_total ();
+void tile_clear();
+void tile_reset_gr_usages();
+void get_gr_usages_total();
 
-#endif 
+#endif

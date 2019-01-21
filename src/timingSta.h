@@ -78,17 +78,16 @@ using namespace sta;
 
 // to import Swig
 extern "C" {
-    extern int Sta_Init(Tcl_Interp *interp);
+extern int Sta_Init(Tcl_Interp *interp);
 }
 
 // to import TCL functions
-namespace sta { 
-    extern const char *tcl_inits[];
+namespace sta {
+extern const char *tcl_inits[];
 }
 
-//void evalTclInitForLibrary(Tcl_Interp *interp, 
+// void evalTclInitForLibrary(Tcl_Interp *interp,
 //        const char *inits[]);
-void parasiticsChangedAfter(sta::Sta* sta); 
-
+void parasiticsChangedAfter(sta::Sta *sta);
 
 #endif

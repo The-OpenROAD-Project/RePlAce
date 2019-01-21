@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -45,13 +46,12 @@
 
 using Eigen::VectorXf;
 typedef Eigen::SparseMatrix< prec, Eigen::RowMajor > SMatrix;
-typedef Eigen::Triplet< prec > T; 
+typedef Eigen::Triplet< prec > T;
 
 void initial_placement();
 
-void CreateSparseMatrix(VectorXf &xcg_x, VectorXf &xcg_b, 
-                        VectorXf &ycg_x, VectorXf &ycg_b,
-                        SMatrix &eMatX, SMatrix &eMatY);
+void CreateSparseMatrix(VectorXf &xcg_x, VectorXf &xcg_b, VectorXf &ycg_x,
+                        VectorXf &ycg_b, SMatrix &eMatX, SMatrix &eMatY);
 
 void update_module(VectorXf &xcg_x, VectorXf &ycg_x);
 void build_data_struct(bool initCoordi = true);

@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -37,64 +38,62 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include        <cstdio>
-#include        <cstdlib>
-#include        <cstring>
-#include        <cmath>
-#include        <ctime>
-#include        <sys/time.h>
-#include        <error.h>
-#include        <unistd.h>
-#include        <sys/stat.h>
-#include        <sys/types.h>
-#include        <vector>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cmath>
+#include <ctime>
+#include <sys/time.h>
+#include <error.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <vector>
 
-#include        "mkl.h"
-#include        "ipp.h"
+#include "mkl.h"
+#include "ipp.h"
 
-#ifndef         __INTEL_LIBS__
-#define         __INTEL_LIBS__
+#ifndef __INTEL_LIBS__
+#define __INTEL_LIBS__
 
 class myBin {
-    public:
-        prec        density;
-        prec        potential;
-        myBin () {
-            density = (prec  )rand() / RAND_MAX * 100.000;
-        };
-        // For the test purpose
-        myBin (prec   den) {
-            density = den;
-        };
-        ~myBin ();
+ public:
+  prec density;
+  prec potential;
+  myBin() {
+    density = (prec)rand() / RAND_MAX * 100.000;
+  };
+  // For the test purpose
+  myBin(prec den) {
+    density = den;
+  };
+  ~myBin();
 };
 
-
 namespace ooura {
-    int main (std::vector < std::vector < myBin* > > &);
+int main(std::vector< std::vector< myBin* > >&);
 }
 
-
 namespace intelLIB {
-    int main (std::vector < std::vector < myBin* > > &);
-    void precompute_coefficients (float*, float*, float*, MKL_INT);
-    void scaling (float*, MKL_INT);
-    void print (const float*, const string, MKL_INT);
+int main(std::vector< std::vector< myBin* > >&);
+void precompute_coefficients(float*, float*, float*, MKL_INT);
+void scaling(float*, MKL_INT);
+void print(const float*, const string, MKL_INT);
 
-    /// Intel IPP may malfunction if we use non-IPP data type.
-    /// Please be careful if we want to change data types for IPP functions.
-    namespace IPP {
-        int fwdDCT2D (const Ipp32f*, Ipp32f*, const MKL_INT);
-        int invDCT2D (const Ipp32f*, Ipp32f*, const MKL_INT);
-    }
+/// Intel IPP may malfunction if we use non-IPP data type.
+/// Please be careful if we want to change data types for IPP functions.
+namespace IPP {
+int fwdDCT2D(const Ipp32f*, Ipp32f*, const MKL_INT);
+int invDCT2D(const Ipp32f*, Ipp32f*, const MKL_INT);
+}
 
-    /// Intel MKL can digest general C data types as well as IPP data types.
-    /// E.g., we can use Ipp32f instead of float.
-    namespace MKL {
-        int DCT1D (float*, const int, MKL_INT);
-        int DST1D (float*, const int, MKL_INT);
-        int transpose (const float*, float*, MKL_INT);
-    }
+/// Intel MKL can digest general C data types as well as IPP data types.
+/// E.g., we can use Ipp32f instead of float.
+namespace MKL {
+int DCT1D(float*, const int, MKL_INT);
+int DST1D(float*, const int, MKL_INT);
+int transpose(const float*, float*, MKL_INT);
+}
 }
 
 #endif

@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -49,8 +50,8 @@ void mkdirPlot();
 void plotFinalLayout();
 
 struct PLOT_MATRIX {
-    prec val;
-    int color;
+  prec val;
+  int color;
 };
 
 void plot(string fn, int idx, prec scale, int lab);
@@ -60,7 +61,6 @@ void xfig_gp_3d(prec x_stp, prec y_stp, char *file, int lab);
 void plot_bin(string fn, int idx, prec scale, int lab);
 void xfig_cGP2D(prec x_stp, prec y_stp, char *file, int lab);
 void xfig_cGP2D_3d(prec x_stp, prec y_stp, char *file, int lab);
-
 
 void get_bin_color(struct BIN *bp, int *color, int *power);
 void get_bin_power(struct BIN *bp, int *color, int *power, int lab);
@@ -79,45 +79,33 @@ void SaveArrowPlotAsJPEG(string imgName, string imgPosition);
 void SavePlot(string imgName = "", bool isGCell = false);
 void ShowPlot(string circuitName = "");
 
-
-enum {
-    BLACK,
-    BLUE,
-    GREEN,
-    CYAN,
-    RED,
-    MAGENTA,
-    YELLOW,
-    WHITE
-};
-
+enum { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE };
 
 // for X11 drawing
-class PlotEnv { 
-    public:
-        int minLength;
-        int imageWidth;
-        int imageHeight;
-        int xMargin;
-        int yMargin;
-        float origWidth;
-        float origHeight;
-        float unitX;
-        float unitY;
+class PlotEnv {
+ public:
+  int minLength;
+  int imageWidth;
+  int imageHeight;
+  int xMargin;
+  int yMargin;
+  float origWidth;
+  float origHeight;
+  float unitX;
+  float unitY;
 
-        // for showPlot
-        float dispWidth;
-        float dispHeight;
+  // for showPlot
+  float dispWidth;
+  float dispHeight;
 
-        PlotEnv();
-        void Init();
-        int GetTotalImageWidth();
-        int GetTotalImageHeight();
-        int GetX( FPOS& coord );
-        int GetX( prec coord );
-        int GetY( FPOS& coord );
-        int GetY( prec coord );
-}; 
-
+  PlotEnv();
+  void Init();
+  int GetTotalImageWidth();
+  int GetTotalImageHeight();
+  int GetX(FPOS &coord);
+  int GetX(prec coord);
+  int GetY(FPOS &coord);
+  int GetY(prec coord);
+};
 
 #endif

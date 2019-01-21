@@ -27,7 +27,8 @@
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE
 // DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
 // FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 // DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -53,108 +54,114 @@ using std::tuple;
 
 // for *.nodes files
 struct NODES {
-    long index;
-    bool isTerminal;
-    bool isTerminalNI;
-    NODES(long _index, bool _isTerminal, bool _isTerminalNI)
-        : index(_index), isTerminal(_isTerminal), isTerminalNI(_isTerminalNI){};
-    NODES() : index(0), isTerminal(false), isTerminalNI(false){};
+  long index;
+  bool isTerminal;
+  bool isTerminalNI;
+  NODES(long _index, bool _isTerminal, bool _isTerminalNI)
+      : index(_index), isTerminal(_isTerminal), isTerminalNI(_isTerminalNI){};
+  NODES() : index(0), isTerminal(false), isTerminalNI(false){};
 };
 
 // for *.scl files
 struct ROW {
-    int site_wid; // SiteWidth
-    int site_spa; // SiteSpacing 
-    
-    string ori;
-//    string sym;
-    bool isXSymmetry;
-    bool isYSymmetry;
-    bool isR90Symmetry;
-    
-    int x_cnt; // NumSites
-    POS pmin;
-    POS pmax;
-    POS size;
-   
-    ROW() : site_wid(0), site_spa(0), ori(""), isXSymmetry(false),
-            isYSymmetry(false), isR90Symmetry(false), 
-            x_cnt(0) {
-                pmin.SetZero(); pmax.SetZero(); size.SetZero();            
-            }
+  int site_wid;  // SiteWidth
+  int site_spa;  // SiteSpacing
 
-    void Dump(string a) {
-        cout << a << endl;
-        cout << "site_wid: " << site_wid << endl;
-        cout << "site_spa: " << site_spa << endl;
-        cout << "ori: " << ori << endl;
-        cout << "x_cnt: " << x_cnt << endl;
-        pmin.Dump("pmin");
-        pmax.Dump("pmax");
-        size.Dump("size");
-        cout << endl;
-    }
+  string ori;
+  //    string sym;
+  bool isXSymmetry;
+  bool isYSymmetry;
+  bool isR90Symmetry;
+
+  int x_cnt;  // NumSites
+  POS pmin;
+  POS pmax;
+  POS size;
+
+  ROW()
+      : site_wid(0),
+        site_spa(0),
+        ori(""),
+        isXSymmetry(false),
+        isYSymmetry(false),
+        isR90Symmetry(false),
+        x_cnt(0) {
+    pmin.SetZero();
+    pmax.SetZero();
+    size.SetZero();
+  }
+
+  void Dump(string a) {
+    cout << a << endl;
+    cout << "site_wid: " << site_wid << endl;
+    cout << "site_spa: " << site_spa << endl;
+    cout << "ori: " << ori << endl;
+    cout << "x_cnt: " << x_cnt << endl;
+    pmin.Dump("pmin");
+    pmax.Dump("pmax");
+    size.Dump("size");
+    cout << endl;
+  }
 };
 
-enum CellInfo {
-  Empty, Row, Cell
-};
+enum CellInfo { Empty, Row, Cell };
 
 // based on ROW, TERMINAL information, generate dummy cells
 class DummyCellInfo {
-  private:
-    Circuit::Circuit* ckt_;
-    
-    vector<ROW> rowStor_;
-    vector<TERM> terminalStor_;
+ private:
+  Circuit::Circuit *ckt_;
 
-    // layout boundary
-    DieRect dieRect_;
+  vector< ROW > rowStor_;
+  vector< TERM > terminalStor_;
 
-    // scale down param
-    prec l2d_, unitX_, unitY_; 
+  // layout boundary
+  DieRect dieRect_;
 
-    // cellSize
-    int siteSizeX_, siteSizeY_;
+  // scale down param
+  prec l2d_, unitX_, unitY_;
 
-    // rowsize
-    int rowSizeX_, rowSizeY_;
+  // cellSize
+  int siteSizeX_, siteSizeY_;
 
-    // arraySize
-    int numX_, numY_;
+  // rowsize
+  int rowSizeX_, rowSizeY_;
 
-    // array
-    CellInfo* arr_;
+  // arraySize
+  int numX_, numY_;
 
-    FPOS globalRowMin_, globalRowMax_;
-    
-    void SetEnvironment();
-    void SetLayoutArea();
-    void InitArray();
-    void InitRow();
+  // array
+  CellInfo *arr_;
 
+  FPOS globalRowMin_, globalRowMax_;
 
-  public:
-    DummyCellInfo();
-    ~DummyCellInfo();
-    vector<ROW>* GetRowStor() { return &rowStor_; };
-    vector<TERM>* GetTerminalStor() { return &terminalStor_; };
+  void SetEnvironment();
+  void SetLayoutArea();
+  void InitArray();
+  void InitRow();
 
-    void SetCircuitInst();
-    void SetScaleDownParam();
-    void SetSiteSize(int siteSizeX, int siteSizeY);
-    void SetArraySize(int numX, int numY);
+ public:
+  DummyCellInfo();
+  ~DummyCellInfo();
+  vector< ROW > *GetRowStor() {
+    return &rowStor_;
+  };
+  vector< TERM > *GetTerminalStor() {
+    return &terminalStor_;
+  };
 
-    int GetCoordiX(prec x);
-    int GetCoordiY(prec y);
+  void SetCircuitInst();
+  void SetScaleDownParam();
+  void SetSiteSize(int siteSizeX, int siteSizeY);
+  void SetArraySize(int numX, int numY);
 
-    void FillRowInst(ROW* curRow);
-    void FillFixedCell(TERM* curTerm);
-    
-    void GenerateDummyCell();
+  int GetCoordiX(prec x);
+  int GetCoordiY(prec y);
+
+  void FillRowInst(ROW *curRow);
+  void FillFixedCell(TERM *curTerm);
+
+  void GenerateDummyCell();
 };
-
-
 
 void runtimeError(string error_text);
 void ParseBookShelf();
@@ -165,7 +172,7 @@ int read_nets_3D(char *input);
 int read_pl2(char *input);
 int read_scl(char *input);
 
-//void post_read_2d(void);
+// void post_read_2d(void);
 void post_read_3d(void);
 void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt);
 
@@ -177,20 +184,20 @@ void output_cGP3D_pl(char *output);
 void output_mGP2D_pl(char *output);
 void output_cGP2D_pl(char *output);
 
-void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof,
-                                           int currentPinCount, FPOS offset,
-                                           int curModuleIdx, int curNetIdx,
-                                           int curPinIdxInNet, int curPinIdx,
-                                           int curPinDirection, int isTerminal);
+void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
+                                    FPOS offset, int curModuleIdx,
+                                    int curNetIdx, int curPinIdxInNet,
+                                    int curPinIdx, int curPinDirection,
+                                    int isTerminal);
 
 void get_mms_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt);
 void get_ibm_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt);
 
 void write_new_bench(void);
-void write_3d_bench(void); // useless
+void write_3d_bench(void);  // useless
 
 void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing = true);
-void ReadPlBookshelf(const char *fileName );
+void ReadPlBookshelf(const char *fileName);
 
 void output_tier_pl_global_router(char *dir, int z, int lab);
 void copy_original_SB_files_to_Dir(char *dir);
@@ -198,10 +205,10 @@ void link_original_SB_files_to_Dir(char *dir);
 void delete_input_files_in(char *dir);
 void read_routing_file(char *dir);
 
-//void gp_sol_trans_to_dim_one(void);
-//void gp_sol_trans_from_dim_one(void);
+// void gp_sol_trans_to_dim_one(void);
+// void gp_sol_trans_from_dim_one(void);
 void output_final_pl(char *output);
-//void output_net_hpwl(char *fn);
-//void output_hgraph_nofix(char *fn);
+// void output_net_hpwl(char *fn);
+// void output_hgraph_nofix(char *fn);
 
 #endif
