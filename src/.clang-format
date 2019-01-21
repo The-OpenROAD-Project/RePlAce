@@ -1,5 +1,5 @@
 BasedOnStyle: Google 
-IndentWidth: 4
+IndentWidth: 2
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
@@ -7,7 +7,8 @@ SpaceBeforeAssignmentOperators: true
 SpacesInAngles: true
 SpacesInParentheses: false 
 SpaceBeforeParens: Never
-BreakBeforeBraces: Custom 
+BreakBeforeBraces: Custom
+SortIncludes: false 
 BraceWrapping: 
     IndentBraces:          false 
     AfterNamespace:        false 
