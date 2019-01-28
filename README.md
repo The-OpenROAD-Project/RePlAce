@@ -5,7 +5,7 @@
 |:--:| 
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |
 
-# Getting Started
+## Getting Started
 
 ## Run using Docker
 * Install Docker on [Windows](https://docs.docker.com/docker-for-windows/), [Mac](https://docs.docker.com/docker-for-mac/) or [Linux](https://docs.docker.com/install/).

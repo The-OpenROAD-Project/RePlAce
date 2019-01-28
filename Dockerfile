@@ -31,6 +31,5 @@ RUN cd RePlAce && \
     make install
 
 # test installation
-RUN yum install -y  && \
-    cd RePlAce/test && \
+RUN cd RePlAce/test && \
     ./run.sh
