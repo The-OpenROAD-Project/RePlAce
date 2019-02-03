@@ -12,11 +12,11 @@
 2. Navigate to the directory where you have the input files.
 3. Run RePlAce container:
 
-        docker run -it -v $(pwd):/data openroad/replace bash
+       docker run -it -v $(pwd):/data openroad/replace bash
 
 4. From the interactive bash terminal, use RePlAce scripts which reside under `/RePlAce`. You can read input files from `/data` directory inside the docker container - which mirrors the host machine directory you are in. 
 
-The Docker image is self-contained and includes everything that RePlAce needs to work properly.
+* The Docker image is self-contained and includes everything that RePlAce needs to work properly.
 
 ## Install on a bare-metal machine
 
