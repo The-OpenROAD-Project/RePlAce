@@ -8,12 +8,11 @@
 ## Getting Started
 
 ## Run using Docker
-* Install Docker on [Windows](https://docs.docker.com/docker-for-windows/), [Mac](https://docs.docker.com/docker-for-mac/) or [Linux](https://docs.docker.com/install/).
-* Navigate to the directory where you have the input files.
-* Run RePlAce container:
-````
-docker run -it -v $(pwd):/data openroad/replace bash
-````
+1. Install Docker on [Windows](https://docs.docker.com/docker-for-windows/), [Mac](https://docs.docker.com/docker-for-mac/) or [Linux](https://docs.docker.com/install/).
+2. Navigate to the directory where you have the input files.
+3. Run RePlAce container:
+
+        docker run -it -v $(pwd):/data openroad/replace bash
 
 4. From the interactive bash terminal, use RePlAce scripts which reside under `/RePlAce`. You can read input files from `/data` directory inside the docker container - which mirrors the host machine directory you are in. 
 
