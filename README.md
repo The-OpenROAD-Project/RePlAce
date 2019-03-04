@@ -5,6 +5,21 @@
 |:--:| 
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |
 
+## Getting Started
+
+## Run using Docker
+1. Install Docker on [Windows](https://docs.docker.com/docker-for-windows/), [Mac](https://docs.docker.com/docker-for-mac/) or [Linux](https://docs.docker.com/install/).
+2. Navigate to the directory where you have the input files.
+3. Run RePlAce container:
+
+       docker run -it -v $(pwd):/data openroad/replace bash
+
+4. From the interactive bash terminal, use RePlAce scripts which reside under `/RePlAce`. You can read input files from `/data` directory inside the docker container - which mirrors the host machine directory you are in. 
+
+* The Docker image is self-contained and includes everything that RePlAce needs to work properly.
+
+## Install on a bare-metal machine
+
 ### Pre-requisite
 * Intel MKL and IPP package [Link](https://software.intel.com/en-us/articles/free-ipsxe-tools-and-libraries) >= 2016.3.210
 * GCC compiler and libstdc++ static library >= 5.4.0
