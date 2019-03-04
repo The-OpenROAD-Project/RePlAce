@@ -46,6 +46,7 @@
 #include <sys/time.h>
 #include <sys/stat.h>
 #include <error.h>
+#include <fstream>
 
 #include "global.h"
 #include "opt.h"
@@ -54,15 +55,256 @@
 #include "fft.h"
 #include "wlen.h"
 #include "bookShelfIO.h"
+#include "routeOpt.h"
 
-// void FLUTE_init() {
-//    readLUT();
-//    struct  NET     *net = NULL;
-//    for (int i=0; i<netCNT; i++) {
-//        net = &netInstance[i];
-//        net->stn_cof = 1;
-//    }
-//}
+// global variable due to weird structure
+RouteInstance routeInst;
+using std::ifstream;
+
+void RouteInstance::Init(){
+  _layerMap.set_empty_key(INIT_STR);
+  SetReplaceStructure(); 
+  SetScaleFactor();
+  SetCircuitInst();
+
+  FillLayerStor();
+  FillGCellXY(); 
+  FillTrack(); 
+  FillGridXY();
+
+  // for Bookshelf's route
+  FillForReducedTrackStor();
+}
+
+void RouteInstance::SetReplaceStructure() {
+
+}
+
+void RouteInstance::FillLayerStor() {
+  if( _ckt->lefLayerStor.size() == 0) {
+    cout << "ERROR: RouteInst failed to get LAYER information from LEF" << endl;
+    exit(0);
+  }
+  for(auto& curLayer : _ckt->lefLayerStor) {
+    if( !curLayer.hasType() ) {
+      continue;
+    }
+    if(strcmp(curLayer.type(), "ROUTING") != 0) {
+      continue;
+    }
+
+    string layerName = string(curLayer.name());
+
+    if( !curLayer.hasDirection() ) {
+      cout << "ERROR: Layer: " << layerName 
+        << " does not have direction" << endl;
+      exit(0);
+    }
+    
+    LayerDirection layerDir;
+    if( string(curLayer.direction()) == "HORIZONTAL") {
+      layerDir = Horizontal;  
+    }
+    else if( string(curLayer.direction()) == "VERTICAL") {
+      layerDir = Vertical;
+    }
+    else {
+      cout << "ERROR: Layer " << layerName 
+        << " have weird direction: " << curLayer.direction() << endl;
+      exit(0);
+    }
+
+    float pitchX = FLT_MIN, pitchY = FLT_MIN;
+    if(curLayer.hasPitch()) {
+      pitchX = pitchY = curLayer.pitch();
+    }
+
+    if(curLayer.hasXYPitch()) {
+      pitchX = curLayer.pitchX();
+      pitchY = curLayer.pitchY();
+    }
+
+    if( !curLayer.hasPitch() && !curLayer.hasXYPitch() ) {
+      cout << "ERROR: Layer: " << layerName 
+        << " does not have PITCH info" << endl;
+      exit(0);
+    }
+    
+    float width = FLT_MIN;
+    if( !curLayer.hasWidth() ) {
+      cout << "ERROR: Layer: " << layerName 
+        << " does not have WIDTH info" << endl;
+      exit(0);
+    }
+    width = curLayer.width();
+
+    _layerMap[ layerName ] = _layerStor.size();
+    _layerStor.push_back( Layer( layerName, pitchX, pitchY, width, layerDir) );
+  }
+//  for(auto& curLayer : _layerStor) {
+//    curLayer.Dump();
+//  }
+}
+
+void RouteInstance::FillGCellXY() {
+  if( _layerStor.size() < 2) {
+    cout << "ERROR: The # LAYERs must be at least 2, current Size: " << _layerStor.size() << endl;
+    exit(0);
+  }
+  // metal2's height and width
+//  _gCellSizeX = 15 * _layerStor[1].layerPitchX;
+//  _gCellSizeY = 15 * _layerStor[1].layerPitchY;
+  _gCellSizeX = 15 * _layerStor[2].layerPitchY;
+  _gCellSizeY = 15 * _layerStor[2].layerPitchX;
+//  _gCellSizeX = _ckt->lefSiteStor[0].sizeY();
+//  _gCellSizeY = _ckt->lefSiteStor[0].sizeY();
+
+  _tileSizeX = INT_CONVERT( _defDbu * _gCellSizeX / _unitX );
+  _tileSizeY = INT_CONVERT( _defDbu * _gCellSizeY / _unitY );
+
+  cout << "INFO: TILE SIZE for GRouter in Micron: " << _gCellSizeX << " x " << _gCellSizeY << endl;
+  cout << "INFO: SCALED TILE SIZE for GRouter: " << _tileSizeX
+    << " x " << _tileSizeY << endl << endl;
+
+}
+
+void RouteInstance::FillLayerCapacityRatio( string fileName ) {
+  _layerCapacityMap.set_empty_key(INIT_STR);
+  ifstream inputFile( fileName );
+  if( !inputFile.is_open() ) {
+    cout << "INFO: FILE: " << fileName << " DOES NOT EXIST" << endl;
+    exit(1);
+  }
+
+  string metalName = "";
+  float metalResource = 0.0f;
+  cout << "Metal Resource Control" << endl;
+  while(inputFile >> metalName >> metalResource)  {
+    cout << metalName << " : " << metalResource << endl;
+    _layerCapacityMap[ metalName ] = metalResource;
+  }
+  inputFile.close();
+}
+
+void RouteInstance::FillTrack() {
+  for(auto& curLayer : _layerStor) {
+    auto lcPtr = _layerCapacityMap.find(curLayer.layerName);
+
+    // control the track resources from M3~M9
+    // M1 and M2 is required for pin access
+    float currentCapRatio = (lcPtr == _layerCapacityMap.end())? 
+      (&curLayer - &_layerStor[0] <= 1)? 
+        1.00 : globalRouterCapRatio 
+      : lcPtr->second;
+    _trackCount.push_back( 
+        (curLayer.layerDirection == Horizontal)? 
+        floor( 100.0 * currentCapRatio * _gCellSizeX / (curLayer.layerPitchY) ) :
+        floor( 100.0 * currentCapRatio * _gCellSizeY / (curLayer.layerPitchX) ));
+    cout << "INFO: LAYER " << curLayer.layerName << " #TRACK: " 
+      << _trackCount[_trackCount.size()-1] << endl;
+  }
+  // M1 have NO routability
+//  if( _trackCount.size() > 1) {
+//    _trackCount[0] = 0;
+//  }
+}
+
+
+// update 
+// _gridOriginX, _gridOriginY, _gridCountX, _gridCountY,
+// _gridInnerCountX, _gridInnerCountY, 
+// _bsReducedTrackStor
+void RouteInstance::FillGridXY() {
+  defiPoints points = _ckt->defDieArea.getPoint();
+  float lx = FLT_MIN, ly = FLT_MIN, 
+        ux = FLT_MIN, uy = FLT_MIN;
+  if( points.numPoints >= 2) {
+    lx = (points.x[0] + _offsetX) / _unitX;
+    ly = (points.y[0] + _offsetY) / _unitY; 
+    ux = (points.x[1] + _offsetX) / _unitX;
+    uy = (points.y[1] + _offsetY) / _unitY;
+    cout << lx << " " << ly << " " << ux << " " << uy << endl;
+  }
+
+  _gridOriginX = lx;
+  _gridOriginY = ly;
+  
+  _gridCountX = ceil( (ux - lx+1) / _tileSizeX );
+  _gridCountY = ceil( (uy - ly+1) / _tileSizeY );
+
+  _gridInnerCountX = floor( (ux - lx) / _tileSizeX );
+  _gridInnerCountY = floor( (uy - ly) / _tileSizeY );
+
+}
+
+void RouteInstance::FillForReducedTrackStor() {
+  defiPoints points = _ckt->defDieArea.getPoint();
+  float lx = FLT_MIN, ly = FLT_MIN, 
+        ux = FLT_MIN, uy = FLT_MIN;
+  if( points.numPoints >= 2) {
+    lx = (points.x[0] + _offsetX) / _unitX;
+    ly = (points.y[0] + _offsetY) / _unitY; 
+    ux = (points.x[1] + _offsetX) / _unitX;
+    uy = (points.y[1] + _offsetY) / _unitY;
+    cout << lx << " " << ly << " " << ux << " " << uy << endl;
+  }
+
+  // normal cases
+  if( _gridInnerCountX != _gridCountX && _gridInnerCountY != _gridCountY ) { 
+    float diffX = (ux - lx) - _tileSizeX * _gridInnerCountX;
+    float diffY = (uy - ly) - _tileSizeY * _gridInnerCountY;
+    cout << "diffX: " << diffX << ", diffY: " << diffY << endl;
+
+    // for Vertical Stripe in terms of horizontal coordinate
+    for(auto& curLayer: _layerStor) {
+      int layerIdx = &curLayer - &_layerStor[0];
+      // only for Vertical Routing Layer
+      if( curLayer.layerDirection == Horizontal ) {
+        continue;
+      }
+      _bsReducedTrackStor.push_back( 
+        ReducedTrack( 
+          layerIdx, 
+          _gridInnerCountX, 0, 
+          _gridCountX, _gridInnerCountY, 
+         INT_CONVERT( _trackCount[layerIdx] * diffX / _tileSizeX ) ) );
+    }
+
+    // for Horizontal Stripe in terms of vertical coordinate
+    for(auto& curLayer: _layerStor) {
+      int layerIdx = &curLayer - &_layerStor[0];
+      // only for Horizontal Routing Layer
+      if( curLayer.layerDirection == Vertical ) {
+        continue;
+      }
+      _bsReducedTrackStor.push_back( 
+        ReducedTrack( 
+          layerIdx, 
+          0, _gridInnerCountY, 
+          _gridInnerCountX, _gridCountY, 
+         INT_CONVERT( _trackCount[layerIdx] * diffY / _tileSizeY ) ) );
+    }
+
+    // for the Intersection of horizontal and vertical stripes.
+    for(auto& curLayer: _layerStor) {
+      int layerIdx = &curLayer - &_layerStor[0];
+      _bsReducedTrackStor.push_back( 
+        ReducedTrack( 
+          layerIdx, 
+          _gridInnerCountX, _gridInnerCountY,
+          _gridCountX, _gridCountY,
+          (curLayer.layerDirection == Horizontal)? 
+            INT_CONVERT( _trackCount[layerIdx] * diffY / _tileSizeY ) :
+            INT_CONVERT( _trackCount[layerIdx] * diffX / _tileSizeX )
+          ) );
+    }
+  }
+
+
+//  for(auto& rTrack: _bsReducedTrackStor) { 
+//    rTrack.Dump();
+//  }
+}
 
 void est_congest_global_router(char *dir) {
   run_global_router(dir);
@@ -75,17 +317,22 @@ void get_intermediate_pl_sol(char *dir, int tier) {
   sprintf(cmd, "mkdir -p %s", dir);
   system(cmd);
 
-  output_tier_pl_global_router(dir, tier, 0);
-  link_original_SB_files_to_Dir(dir);
-  preprocess_SB_inputs(dir);
+  output_tier_pl_global_router(dir, tier, 0, true);
+  LinkConvertedBookshelf(dir);
+//  link_original_SB_files_to_Dir(dir);
+//  preprocess_SB_inputs(dir);
 }
 
 void run_global_router(char *dir) {
   char cmd[BUFFERSIZE];
 
-  sprintf(cmd, "%s/%s ICCAD %s/%s.aux %s/%s.pl %s/ICCAD12.NCTUgr.set %s/%s.est",
-          currentDir, global_router, dir, gbch, dir, gbch, currentDir, dir,
-          gbch);
+  sprintf(cmd, "%s ICCAD %s/%s.aux %s/%s.pl %s %s/%s.est",
+          globalRouterPosition.c_str(), 
+          dir, gbch, dir, 
+          gbch, 
+          globalRouterSetPosition.c_str(), 
+          dir, gbch); // est
+  cout << cmd << endl;
   system(cmd);
 
   if(autoEvalRC_CMD)
@@ -93,15 +340,50 @@ void run_global_router(char *dir) {
 }
 
 void evaluate_RC_by_official_script(char *dir) {
-  char cmd[BUFFERSIZE];
+  /*
 
-  sprintf(cmd, "%s/iccad2012_evaluate_solution.pl %s/%s.aux %s/%s.pl %s/%s.est",
-          currentDir, dir, gbch, dir, gbch, dir, gbch);
-  // sprintf (cmd, "%s/scripts/iccad2012_evaluate_solution_plot.pl -p %s/%s.aux
-  // %s/%s.pl %s/%s.est %s/%s",
-  //               currentDir,
-  //               dir, gbch, dir, gbch, dir, gbch, dir, gbch);
+  char evalPos[PATH_MAX] = {0, };
+  sprintf(evalPos, "%s/../router/iccad2012_evaluate_solution.pl", currentDir);
+
+  char evalDirPos[PATH_MAX] = {0, };
+  sprintf( evalDirPos, "%s/../router/");
+
+  char fullEvalPos[PATH_MAX] = {0, };
+  char* ptr = realpath( evalPos, fullEvalPos );
+  
+  char fullEvalDirPos[PATH_MAX] = {0, };
+  ptr = realpath( evalDirPos, fullEvalDirPos );
+
+
+//  sprintf(cmd, "ln -snf %s %s", fullEvalPos, fullDir); 
+//  cout << cmd << endl;
+//  system(cmd);
+*/
+  char cmd[BUFFERSIZE] = {0, };
+  
+  char realDirBnd[PATH_MAX] = {0, };
+  char* ptr = realpath(dir_bnd, realDirBnd);
+  
+  char realCurDir[PATH_MAX] = {0, };
+  ptr = realpath(currentDir, realCurDir);
+  
+  char fullDir[PATH_MAX] = {0, }; 
+  ptr = realpath( dir, fullDir );
+
+  sprintf( cmd, "ln -s %s/../router/*.pl %s/", realCurDir, fullDir); 
+  cout << cmd << endl;
   system(cmd);
+  
+//  sprintf(cmd, "cd %s && perl iccad2012_evaluate_solution.pl -p %s.aux %s.pl %s.est",
+  sprintf(cmd, "cd %s && perl iccad2012_evaluate_solution.pl %s.aux %s.pl %s.est",
+          fullDir, gbch, gbch, gbch);
+  cout << cmd << endl;
+  system(cmd);
+
+  // draw plot  
+//  sprintf(cmd, "cd %s && gnuplot *.plt",fullDir);
+//  cout << cmd << endl;
+//  system(cmd);
 }
 
 void clean_routing_tracks_in_net() {
@@ -218,7 +500,7 @@ void congEstimation(struct FPOS *st) {
     if (conges_eval_methodCMD == prob_ripple_based) {
         cout << "INFO:  Your congestion est. method is based on probabilistic." << endl;
         for (inflation_index=0; inflation_index<100; inflation_index++){
-            sprintf (dir, "%s/prob/tier%d/inflarion_iter%d", dir_bnd, 0, inflation_index);
+            sprintf (dir, "%s/prob/tier%d/inflation_iter%d", dir_bnd, 0, inflation_index);
             struct  stat    infl;
             if (stat(dir, &infl) < 0) break;
         }
@@ -236,7 +518,7 @@ void congEstimation(struct FPOS *st) {
             "(NCTUgr)."
          << endl;
     for(inflation_index = 0; inflation_index < 100; inflation_index++) {
-      sprintf(dir, "%s/router/tier%d/inflarion_iter%d", dir_bnd, 0,
+      sprintf(dir, "%s/router/tier%d/inflation_iter%d", dir_bnd, 0,
               inflation_index);
       struct stat infl;
       if(stat(dir, &infl) < 0)
@@ -588,7 +870,10 @@ void calcCongPerNet_grouter_based(struct NET *net) {
     // if (bm1.y < 0)                   flag = false;
     // if (bm1.y > tier->dim_tile.y-1)  flag = false;
 
+
     idx = b0.x * tier->dim_tile.y + b0.y;
+//    cout << "idx: " << idx << endl;
+//    cout << "tileCnt: " << tier->tot_tile_cnt << endl; 
     bpx = &tier->tile_mat[idx];
     if(isH_layer)
       bpx->h_gr_usage_per_layer_r[metLayer]++;

@@ -49,7 +49,8 @@ class mypos {
   float y;
 };
 
-struct TILE {
+class TILE {
+  public:
   struct FPOS pmin;
   struct FPOS pmax;
   struct FPOS center;

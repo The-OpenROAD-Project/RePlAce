@@ -205,14 +205,18 @@ void SetParameter() {
     cout << "\n** ERROR : LAYER statements not exists in lef file!" << endl;
     exit(1);
   }
+
+  metal1Name = "";
   // Metal1 Name extract
   for(auto& curLayer : __ckt.lefLayerStor) {
     if(!curLayer.hasType()) {
       continue;
     }
     if(strcmp(curLayer.type(), "ROUTING") == 0) {
-      metal1Name = string(curLayer.name());
-      break;
+      if( metal1Name == "" ) {
+        metal1Name = string(curLayer.name());
+        break;
+      }
     }
   }
   cout << "INFO:  METAL1 NAME IN LEF: " << metal1Name << endl;
@@ -252,8 +256,6 @@ void SetParameter() {
     }
   }
 
-  //    unitY *= 1.5;
-
   cout << "INFO:  SCALE DOWN UNIT: ( " << unitX << ", " << unitY << " )"
        << endl;
 
@@ -277,6 +279,7 @@ void SetParameter() {
   cout << "INFO:  OFFSET COORDINATE: ( " << offsetX << ", " << offsetY << " )"
        << endl
        << endl;
+
 }
 
 void SetVerilogTopModule() {
@@ -322,7 +325,7 @@ void ParseLefDef() {
 
   GenerateRow(__ckt);
   GenerateModuleTerminal(__ckt);
-  if(defMacroCnt > 0) {
+  if(defMacroCnt > 0 || isNtuDummyFill ) {
     GenerateFullRow(__ckt);
   }
 
@@ -688,8 +691,7 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
   vector< int > blockageIdxStor;
   for(auto& curBlockage : __ckt.defBlockageStor) {
     int idx = &curBlockage - &__ckt.defBlockageStor[0];
-    if(curBlockage.hasPlacement() ||
-       curBlockage.hasLayer() && curBlockage.layerName() == metal1Name) {
+    if(curBlockage.hasPlacement()) {
       blockageIdxStor.push_back(idx);
     }
   }
@@ -1129,50 +1131,6 @@ void GenerateFullRow(Circuit::Circuit& __ckt) {
   cout << "INFO:  NEW #ROW: " << row_cnt << endl;
 }
 
-// return Component Index
-inline int GetDefComponentIdx(Circuit::Circuit& __ckt, string& compName) {
-  auto dcPtr = __ckt.defComponentMap.find(compName);
-  if(dcPtr == __ckt.defComponentMap.end()) {
-    cout << "** ERROR:  Net Instance ( " << compName
-         << " ) does not exist in COMPONENT statement (defComponentMap) "
-         << endl;
-    exit(1);
-  }
-  return dcPtr->second;
-}
-
-// return Macro Index
-inline int GetLefMacroIdx(Circuit::Circuit& __ckt, string& macroName) {
-  auto mcPtr = __ckt.lefMacroMap.find(macroName);
-  if(mcPtr == __ckt.lefMacroMap.end()) {
-    cout << "** ERROR:  Macro Instance ( " << macroName
-         << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
-    exit(1);
-  }
-  return mcPtr->second;
-}
-
-// return Pin Index
-inline int GetLefMacroPinIdx(Circuit::Circuit& __ckt, int macroIdx,
-                             string& pinName) {
-  auto pinPtr = __ckt.lefPinMapStor[macroIdx].find(pinName);
-  if(pinPtr == __ckt.lefPinMapStor[macroIdx].end()) {
-    cout << "** ERROR:  Pin Instance ( " << pinName
-         << " ) does not exist in MACRO statement (lefPinMapStor) " << endl;
-    exit(1);
-  }
-  return pinPtr->second;
-}
-
-inline int GetDefPinIdx(Circuit::Circuit& __ckt, string& pinName) {
-  auto pinPtr = __ckt.defPinMap.find(pinName);
-  if(pinPtr == __ckt.defPinMap.end()) {
-    cout << "** ERROR:  Pin Instance ( " << pinName
-         << " ) does not exist in PINS statement (defPinMap) " << endl;
-    exit(1);
-  }
-  return pinPtr->second;
-}
 
 //
 // helper function for building Net Instance; Get IO info
@@ -1368,6 +1326,7 @@ void GenerateNetDefOnly(Circuit::Circuit& __ckt) {
     }
 
     curNet = &netInstance[netIdx];
+    new(curNet) NET();
     string netName = string(net.name());
     //        ReplaceStringInPlace(netName, "[", "\\[");
     //        ReplaceStringInPlace(netName, "]", "\\]");
@@ -1996,6 +1955,12 @@ void ReadPlLefDef(const char* fileName) {
   fclose(fp);
 }
 
+
+/////////////////////////////////////////////////////////
+//
+// Timing Part
+//
+/////////////////////////////////////////////////////////
 TIMING_NAMESPACE_OPEN
 
 // copy scale down parameter into Timing Instance
@@ -2160,6 +2125,13 @@ void Timing::UpdateSpefClockNetVerilog() {
 
 TIMING_NAMESPACE_CLOSE
 
+
+////////////////////////////////////////////////
+//
+// Dummy Cell Filler Part
+//
+////////////////////////////////////////////////
+
 void DummyCellInfo::SetScaleDownParam() {
   unitX_ = unitX;
   unitY_ = unitY;
@@ -2168,4 +2140,22 @@ void DummyCellInfo::SetScaleDownParam() {
 
 void DummyCellInfo::SetCircuitInst() {
   this->ckt_ = &__ckt;
+}
+
+////////////////////////////////////////////////
+//
+// Routability Part 
+//
+////////////////////////////////////////////////
+
+void RouteInstance::SetScaleFactor() {
+  this->_unitX = (float)unitX;
+  this->_unitY = (float)unitY;
+  this->_offsetX = (float)offsetX;
+  this->_offsetY = (float)offsetY;
+  this->_defDbu = (float)l2d;
+}
+
+void RouteInstance::SetCircuitInst() {
+  this->_ckt = &__ckt;
 }

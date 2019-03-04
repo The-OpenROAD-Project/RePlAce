@@ -319,4 +319,49 @@ void GenerateNetDefVerilog(Circuit::Circuit& __ckt);
 void SetUnitY(float _unitY);
 void SetUnitY(double _unitY);
 
+// return Component Index
+inline int GetDefComponentIdx(Circuit::Circuit& __ckt, string& compName) {
+  auto dcPtr = __ckt.defComponentMap.find(compName);
+  if(dcPtr == __ckt.defComponentMap.end()) {
+    cout << "** ERROR:  Component Instance ( " << compName
+         << " ) does not exist in COMPONENT statement (defComponentMap) "
+         << endl;
+    exit(1);
+  }
+  return dcPtr->second;
+}
+
+// return Macro Index
+inline int GetLefMacroIdx(Circuit::Circuit& __ckt, string& macroName) {
+  auto mcPtr = __ckt.lefMacroMap.find(macroName);
+  if(mcPtr == __ckt.lefMacroMap.end()) {
+    cout << "** ERROR:  Macro Instance ( " << macroName
+         << " ) does not exist in COMPONENT statement (lefMacroMap) " << endl;
+    exit(1);
+  }
+  return mcPtr->second;
+}
+
+// return Pin Index
+inline int GetLefMacroPinIdx(Circuit::Circuit& __ckt, int macroIdx,
+                             string& pinName) {
+  auto pinPtr = __ckt.lefPinMapStor[macroIdx].find(pinName);
+  if(pinPtr == __ckt.lefPinMapStor[macroIdx].end()) {
+    cout << "** ERROR:  Pin Instance ( " << pinName
+         << " ) does not exist in MACRO statement (lefPinMapStor) " << endl;
+    exit(1);
+  }
+  return pinPtr->second;
+}
+
+inline int GetDefPinIdx(Circuit::Circuit& __ckt, string& pinName) {
+  auto pinPtr = __ckt.defPinMap.find(pinName);
+  if(pinPtr == __ckt.defPinMap.end()) {
+    cout << "** ERROR:  Pin Instance ( " << pinName
+         << " ) does not exist in PINS statement (defPinMap) " << endl;
+    exit(1);
+  }
+  return pinPtr->second;
+}
+
 #endif

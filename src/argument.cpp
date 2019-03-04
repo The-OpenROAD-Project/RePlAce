@@ -53,6 +53,7 @@
 #include "global.h"
 #include "opt.h"
 #include "lefdefIO.h"
+#include "routeOpt.h"
 
 void initArgument(int argc, char *argv[]) {
   ///////////////////////////////////////////////////////
@@ -83,6 +84,7 @@ void initArgument(int argc, char *argv[]) {
   isSkipPlacement = false;
   hasDensityDP = false;
   densityDP = 0.0f;
+  routeMaxDensity = 0.99f;
   isBinSet = false;
   isSkipIP = false;
 
@@ -93,7 +95,7 @@ void initArgument(int argc, char *argv[]) {
   plotDensityCMD = false;       // bool
   plotFieldCMD = false;         // bool
   constraintDrivenCMD = false;  // bool
-  routabilityCMD = false;       // bool
+  isRoutability = false;       // bool
   stnCMD = false;               // lutong
   lambda2CMD = false;           // bool
   dynamicStepCMD = false;       // bool
@@ -109,7 +111,7 @@ void initArgument(int argc, char *argv[]) {
 
   detailPlacerFlagCMD = "";  // mgwoo
   detailPlacerLocationCMD = "";
-  isOnlyLGinDP = (routabilityCMD) ? true : false;
+  isOnlyLGinDP = (isRoutability) ? true : false;
 
   numThread = 1;  // default
   hasNetWeight = false;
@@ -127,8 +129,14 @@ void initArgument(int argc, char *argv[]) {
   netCut = 1;
   timingUpdateIter = 10;
 
+  globalRouterPosition = "../router/NCTUgr.ICCAD2012";
+  globalRouterSetPosition = "../router/ICCAD12.NCTUgr.set";
+  globalRouterCapRatio = 1.0;
+
   conges_eval_methodCMD =
       global_router_based;  // int (enum: defined in global.h)
+  onlyLG_CMD = (isRoutability) ? true : false;
+
 
   // parse all argument here.
   if(argument(argc, argv) == false) {
@@ -141,14 +149,13 @@ void initArgument(int argc, char *argv[]) {
   }
 
   // density & overflowMin settings
-  denCMD = (denCMD == "NULL") ? ((routabilityCMD) ? "0.9" : "1.0") : denCMD;
+  denCMD = (denCMD == "NULL") ? ((isRoutability) ? "0.9" : "1.0") : denCMD;
   overflowMinCMD = (overflowMinCMD == "NULL")
-                       ? ((routabilityCMD) ? "0.17" : "0.1")
+                       ? ((isRoutability) ? "0.17" : "0.1")
                        : overflowMinCMD;
   overflowMin = overflowMin_initial = atof(overflowMinCMD.c_str());
 
   DEN_ONLY_PRECON = false;
-  onlyLG_CMD = (routabilityCMD) ? true : false;
 
   numLayer = 1;
 
@@ -177,6 +184,9 @@ void initArgument(int argc, char *argv[]) {
   inflation_ratio_coef = atof(inflcoefCMD.c_str());  // lutong
   NUM_ITER_FILLER_PLACE = atoi(filleriterCMD.c_str());
   inflation_max_cnt = atof(racntiCMD.c_str());  // lutong
+
+  globalRouterPosition = GetRealPath( globalRouterPosition );
+  globalRouterSetPosition = GetRealPath( globalRouterSetPosition );
 
   ref_dwl0 = atof(refdWLCMD.c_str());
   ExtraWSfor3D = 0;     //.12; //0.1;
@@ -328,6 +338,16 @@ bool argument(int argc, char *argv[]) {
         return false;
       }
     }
+    else if(!strcmp(argv[i], "-routeMaxDensity")) {
+      i++;
+      if(argv[i][0] != '-') {
+        routeMaxDensity = atof(argv[i]);
+      }
+      else {
+        printf("\n**ERROR: Option %s requires density (FLT).\n", argv[i - 1]);
+        return false;
+      }
+    }
     else if(!strcmp(argv[i], "-verbose")) {
       isVerbose = true;
     }
@@ -423,6 +443,43 @@ bool argument(int argc, char *argv[]) {
         return false;
       }
     }
+    else if(!strcmp(argv[i], "-gr_cap_ratio")) {
+      i++;
+      if(argv[i][0] != '-') {
+        globalRouterCapRatio = atof(argv[i]);
+      }
+      else {
+        return false;
+      }
+    }
+    else if(!strcmp(argv[i], "-gr_cap_ratio_file")) {
+      i++;
+      if(argv[i][0] != '-') {
+        routeInst.FillLayerCapacityRatio( string(argv[i]) );
+      }
+      else {
+        return false;
+      }
+    }
+    else if(!strcmp(argv[i], "-gr_binary")) {
+      i++;
+      if(argv[i][0] != '-') {
+        globalRouterPosition = argv[i];
+      }
+      else {
+        return false;
+      }
+    }
+    else if(!strcmp(argv[i], "-gr_set")) {
+      i++;
+      if(argv[i][0] != '-') {
+        globalRouterSetPosition = argv[i];
+      }
+      else {
+        return false;
+      }
+    }
+
     /*
     else if(!strcmp(argv[i], "-numLayer")) {
         i++;
@@ -774,6 +831,7 @@ bool argument(int argc, char *argv[]) {
     // detail placer with only Legalization modes
     else if(!strcmp(argv[i], "-onlyLG")) {
       isOnlyLGinDP = true;
+      onlyLG_CMD = true;
     }
     // Dummy Cell Create For NtuPlacer3
     else if(!strcmp(argv[i], "-fragmentedRow")) {
@@ -884,8 +942,8 @@ bool argument(int argc, char *argv[]) {
       constraintDrivenCMD = true;
       lambda2CMD = true;
     }
-    else if(!strcmp(argv[i], "-R")) {
-      routabilityCMD = true;
+    else if(!strcmp(argv[i], "-routability")) {
+      isRoutability = true;
     }
     /*
     else if(!strcmp(argv[i], "-stn")) {
@@ -902,9 +960,6 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-TR")) {
         trialRunCMD = true;
     }*/
-    else if(!strcmp(argv[i], "-skipIP")) {
-      isSkipIP = true;
-    }
     else if(!strcmp(argv[i], "-timing")) {
       isTiming = true;
     }
@@ -917,9 +972,6 @@ bool argument(int argc, char *argv[]) {
     }*/
     else if(!strcmp(argv[i], "-auto_eval_RC")) {
       autoEvalRC_CMD = true;
-    }
-    else if(!strcmp(argv[i], "-onlyLG")) {
-      onlyLG_CMD = true;
     }
     else {
       printf("\n**ERROR: Option %s is NOT available.\n", argv[i]);
@@ -1090,7 +1142,7 @@ bool criticalArgumentError() {
  * replaced with one-line declariation - mgwoo
 void SetDefault_denCMD() {
     if(denCMD == "NULL") {
-        if(routabilityCMD) {
+        if(isRoutability) {
             denCMD = "0.9";
         }
         else {
@@ -1101,7 +1153,7 @@ void SetDefault_denCMD() {
 
 void SetDefault_overflowCMD() {
     if(overflowMinCMD == "NULL") {
-        if(routabilityCMD) {
+        if(isRoutability) {
             overflowMinCMD = "0.17";
         }
         else {

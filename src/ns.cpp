@@ -60,11 +60,13 @@
 #include "plot.h"
 #include "wlen.h"
 #include "timing.h"
+#include "routeOpt.h"
 
 static int backtrack_cnt = 0;
 
 void myNesterov::nesterov_opt() {
   int last_iter = 0;
+
   Timing::Timing TimingInst(moduleInstance, terminalInstance, netInstance,
                             netCNT, pinInstance, pinCNT, mPinName, tPinName,
                             clockPinName, timingClock);
@@ -144,7 +146,7 @@ void myNesterov::nesterov_opt() {
   SummarizeNesterovOpt(last_iter);
 
   // LW 06/01/17  Block the last evaluation.
-  // if (routabilityCMD == true) {
+  // if (isRoutability == true) {
   //    cell_update (x_st, N_org);
   //    modu_copy ();
   //    congEstimation (x_st);
@@ -182,7 +184,7 @@ void myNesterov::InitializationCommonVar() {
     max_iter = 2500;
 
   // debug : mgwoo
-  //    max_iter = 3;
+//  max_iter = 3;
 
   last_ra_iter = 0;
   a = 0;
@@ -254,7 +256,7 @@ void myNesterov::InitializationCommonVar() {
   // alphaArrCD  =(prec*)mkl_malloc(sizeof(prec)*100, 64);
   // deltaArrCD  =(prec*)mkl_malloc(sizeof(prec)*100, 64);
   // IK 05/08/17
-  // if (routabilityCMD) MIN_PRE = 1E-15;
+  // if (isRoutability) MIN_PRE = 1E-15;
   // else                MIN_PRE = 1;
   MIN_PRE = 1;
 }
@@ -284,9 +286,9 @@ void myNesterov::InitializationCellStatus() {
 }
 
 void myNesterov::InitializationCoefficients() {
-  if(routabilityCMD)
+  if(isRoutability)
     INIT_LAMBDA_COF_GP = 0.001;
-  // if (routabilityCMD) INIT_LAMBDA_COF_GP = 0.1;
+  // if (isRoutability) INIT_LAMBDA_COF_GP = 0.1;
   else {
     //        INIT_LAMBDA_COF_GP = 0.0001;
     INIT_LAMBDA_COF_GP = 0.00008;
@@ -366,7 +368,7 @@ void myNesterov::InitializationCoefficients() {
     wlen_cof = fp_mul(base_wcof, wcof);
     wlen_cof_inv = fp_inv(wlen_cof);
     // IK
-    if(!routabilityCMD)
+    if(!isRoutability)
       overflowMin = 0.07;
   }
 
@@ -510,7 +512,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
     if(timeon)
       time_start(&time);
 
-    if(isTrial == false && routabilityCMD == true &&
+    if(isTrial == false && isRoutability == true &&
        isRoutabilityInit == false) {
       routability_init();
     }
@@ -561,7 +563,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
       }
     }
 
-    // if (routabilityCMD && post_filler_route == 0) {
+    // if (isRoutability && post_filler_route == 0) {
     //    if (i < last_route_iter + NUM_ITER_FILLER_PLACE) {
     //        FILLER_PLACE = 1;
     //        post_filler_route = 0;
@@ -723,7 +725,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
       }
     }
 
-    if(routabilityCMD == true && STAGE == cGP2D) {
+    if(isRoutability == true && STAGE == cGP2D) {
       // LW mod 10/20/16 temp_con_orig = 0.12+
       // igkang
       // LW 05/30/17
@@ -731,6 +733,9 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
       if(DEN_ONLY_PRECON) {
         temp_con = 0.15 + bloating_max_count / 10.0 - bloatCNT / 10.0;
       }
+
+      // for DEBUG
+//      temp_con = 1.00;
 
       if((it->ovfl < temp_con) && (i - last_ra_iter > 10)) {
         // UPPER_PCOF = 1.01;
@@ -1304,12 +1309,14 @@ void myNesterov::z_init() {
       zx = y_st[j].x + z_ref_alpha * y_dst[j].x;
       zy = y_st[j].y + z_ref_alpha * y_dst[j].y;
       //            zz = y_st[j].z + z_ref_alpha * y_dst[j].z;
+//      y_st[j].Dump("y_st_test");
     }
 
     z_st[j].x = valid_coor2(zx, half_densize.x, 0);
     z_st[j].y = valid_coor2(zy, half_densize.y, 1);
     //        z_st[j].z = valid_coor2(zz, half_densize.z, 2);
   }
+//  exit(1);
 }
 
 void myNesterov::UpdateNesterovOptStatus() {
@@ -1372,7 +1379,7 @@ void myNesterov::UpdateNesterovIter(int iter, struct ITER *it,
         (1.0 - opt_w_cof) * it->tot_hpwl + opt_w_cof * it->tot_stnwl;  // lutong
     it->hpwl = total_hpwl;
     // IK 05/09/17
-    // if (routabilityCMD) {
+    // if (isRoutability) {
     //    if (it->ovfl <= 0.215) {
     //        UPPER_PCOF = 1.01;
     //    }

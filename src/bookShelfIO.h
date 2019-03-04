@@ -44,6 +44,7 @@
 #include <sparsehash/dense_hash_map>
 #include "global.h"
 #include "lefdefIO.h"
+#include "routeOpt.h"
 
 #define BUFFERSIZE 1000
 #define LINESIZE 2000
@@ -149,6 +150,8 @@ class DummyCellInfo {
     return &terminalStor_;
   };
 
+  void Init();
+
   void SetCircuitInst();
   void SetScaleDownParam();
   void SetSiteSize(int siteSizeX, int siteSizeY);
@@ -161,6 +164,34 @@ class DummyCellInfo {
   void FillFixedCell(TERM *curTerm);
 
   void GenerateDummyCell();
+};
+
+
+class BookshelfNameMap {
+  public:
+    // bs means Bookshelf
+    dense_hash_map<string, string> moduleToBsMap, bsToModuleMap;
+    dense_hash_map<string, string> terminalToBsMap, bsToTerminalMap;
+    dense_hash_map<string, string> netToBsMap, bsToNetMap;
+    int bsModuleCnt, bsTerminalCnt, bsNetCnt;
+    void Init();
+    void InitWithDummyCell( DummyCellInfo& dummyInst );
+
+    const char* GetBsModuleName( const char* name );
+    const char* GetBsTerminalName( const char* name );
+    const char* GetBsNetName( const char* name );
+};
+
+extern BookshelfNameMap _bsMap;
+
+// Due to sorting in *.nets!!!
+struct BsNetInfo {
+  string name, io;
+  prec x, y;
+  BsNetInfo(string _name, string _io, prec _x, prec _y):
+    name(_name), io(_io), x(_x), y(_y) {};
+
+  void Print( FILE* file );
 };
 
 void runtimeError(string error_text);
@@ -196,12 +227,14 @@ void get_ibm_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt);
 void write_new_bench(void);
 void write_3d_bench(void);  // useless
 
-void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing = true);
+void WriteBookshelfWithTier(char* targetDir, int z, int lab, bool isShapeDrawing = true, 
+    bool isNameConvert = false, bool isMetal1Removed = false);
 void ReadPlBookshelf(const char *fileName);
 
-void output_tier_pl_global_router(char *dir, int z, int lab);
-void copy_original_SB_files_to_Dir(char *dir);
+void output_tier_pl_global_router(char *dir, int z, int lab, bool isNameConvert = false);
+//void copy_original_SB_files_to_Dir(char *dir);
 void link_original_SB_files_to_Dir(char *dir);
+void LinkConvertedBookshelf(char* newDir);
 void delete_input_files_in(char *dir);
 void read_routing_file(char *dir);
 
@@ -210,5 +243,6 @@ void read_routing_file(char *dir);
 void output_final_pl(char *output);
 // void output_net_hpwl(char *fn);
 // void output_hgraph_nofix(char *fn);
+
 
 #endif

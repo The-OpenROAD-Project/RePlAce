@@ -578,7 +578,7 @@ void wlen_grad_wa(int cell_idx, FPOS *grad) {
 
     float curWeight = netInstance[pin->netID].timingWeight;
     // Timing Control Parts
-    if(curWeight > 0) {
+    if(isTiming && curWeight > 0) {
       curWeight = netWeightBase + min(max(0.0f, netWeightBound - netWeightBase),
                                       curWeight / netWeightScale);
       // cout << "calNetWeight: " << curWeight << endl;

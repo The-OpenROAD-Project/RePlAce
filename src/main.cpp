@@ -89,6 +89,10 @@ MODULE *moduleInstance;
 int pinCNT;
 int moduleCNT;
 
+string globalRouterPosition;
+string globalRouterSetPosition;
+prec globalRouterCapRatio;
+
 // for moduleInst's pinName
 vector< vector< string > > mPinName;
 
@@ -371,6 +375,7 @@ string detailPlacerLocationCMD;
 string detailPlacerFlagCMD;
 
 prec densityDP;
+prec routeMaxDensity; 
 bool hasDensityDP;
 bool isSkipPlacement;
 bool isOnlyLGinDP;
@@ -386,7 +391,7 @@ bool plotMacroCMD;
 bool plotDensityCMD;
 bool plotFieldCMD;
 bool constraintDrivenCMD;
-bool routabilityCMD;
+bool isRoutability;
 bool stnCMD;  // lutong
 bool lambda2CMD;
 bool dynamicStepCMD;
@@ -400,6 +405,7 @@ bool onlyLG_CMD;
 ///////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) {
+
   double tot_cpu = 0;
   double time_ip = 0;
   double time_tp = 0;
@@ -417,6 +423,7 @@ int main(int argc, char *argv[]) {
 
   time(&rawtime);
   timeinfo = localtime(&rawtime);
+  total_hpwl.SetZero();
 
   printCMD(argc, argv);
   cout << "INFO:  VERSION, Compiled at " << compileDate << " " << compileTime
@@ -517,15 +524,15 @@ int main(int argc, char *argv[]) {
     if(placementMacroCNT > 0 /*&& INPUT_FLG != ISPD*/) {
       ///////////////////////////////////////////////////////////////////////
       ///// mLG:  MACRO_LEGALIZATION ////////////////////////////////////////
-      printf("PROC:  BEGIN MACRO LEGALIZATION IN EACH TIER\n");
-      printf("PROC:  SA-based Macro Legalization (mLG)\n");
+      cout << "PROC:  BEGIN MACRO LEGALIZATION IN EACH TIER" << endl;
+      cout << "PROC:  SA-based Macro Legalization (mLG)" << endl;
       time_start(&time_lg);
       // mgwoo
       bin_init();
       macroLegalization_main();
       time_end(&time_lg);
       printf("   RUNTIME(s) : %.4f\n\n\n", time_lg);
-      printf("PROC:  END MACRO LEGALIZATION (mLG)\n\n\n");
+      cout << "PROC:  END MACRO LEGALIZATION (mLG)" << endl << endl;
       ///////////////////////////////////////////////////////////////////////
     }
 
@@ -561,6 +568,7 @@ int main(int argc, char *argv[]) {
     //    ShowPlot( benchName );
   }
   else {
+    routeInst.Init();
     build_data_struct(false);
     tier_assign(STDCELLonly);
     setup_before_opt();
@@ -568,8 +576,6 @@ int main(int argc, char *argv[]) {
 
   // Write BookShelf format
   WriteBookshelf();
-  printf("PROC:  END WRITE BOOKSHELF\n\n");
-  fflush(stdout);
 
   if(isPlot) {
     SaveCellPlotAsJPEG("Final Global Placement Result", false,
@@ -822,6 +828,8 @@ void init() {
     system(mkdir_cmd.c_str());
   }
 
+  // experiment folder could be given by user.
+  // original settings
   if(experimentCMD == "") {
     // 'experimentXX' -1 checker.
     for(ver_num = 0;; ver_num++) {
@@ -834,6 +842,7 @@ void init() {
       }
     }
   }
+  // follow user settings
   else {
     sprintf(dir_bnd, "%s/%s", output_dir, experimentCMD.c_str());
   }
@@ -1042,16 +1051,62 @@ void macroLegalization_main() {
   post_mac_tier();
 }
 
-void WriteBookshelf() {
+void WriteBookshelfForGR() {
+  printf("INFO:  WRITE BOOKSHELF...");
   // temporary update net->pin2 to write bookshelf
   update_pin2();
+
+  char targetDir[BUF_SZ] = {0, };
+  sprintf( targetDir, "%s/router_base/", dir_bnd);
+  cout << targetDir << endl;
+
+  char cmd[BUF_SZ] = {0, };
+  sprintf( cmd, "mkdir -p %s", targetDir);
+  system(cmd);
 
   for(int i = 0; i < numLayer; i++) {
     // call Write Bookshelf function by its tier
     WriteBookshelfWithTier(
-        i, (placementMacroCNT == 0) ? STDCELLonly : MIXED,
-        (detailPlacer == NTUplace3 || shapeMap.size() == 0) ? false : true);
+        targetDir, 
+        // tier number
+        i, 
+        // writing modes
+        (placementMacroCNT == 0) ? STDCELLonly : MIXED,
+        // *.shape support
+//        (detailPlacer == NTUplace3 || shapeMap.size() == 0) ? false : true);
+        true, true, true);
   }
+  printf("PROC:  END WRITE BOOKSHELF\n\n");
+  fflush(stdout);
+}
+
+void WriteBookshelf() {
+  printf("INFO:  WRITE BOOKSHELF...");
+  // temporary update net->pin2 to write bookshelf
+  update_pin2();
+  
+  char targetDir[BUF_SZ] = {0, };
+  sprintf( targetDir, "%s/tiers/0", dir_bnd);
+  cout << targetDir << endl;
+
+  char cmd[BUF_SZ] = {0, };
+  sprintf( cmd, "mkdir -p %s", targetDir);
+  system(cmd);
+
+  for(int i = 0; i < numLayer; i++) {
+    // call Write Bookshelf function by its tier
+    WriteBookshelfWithTier(
+        targetDir,
+        // tier number
+        i, 
+        // writing modes
+        (placementMacroCNT == 0) ? STDCELLonly : MIXED,
+        // *.shape support
+        (detailPlacer == NTUplace3) ? false : true,
+        false);
+  }
+  printf("PROC:  END WRITE BOOKSHELF\n\n");
+  fflush(stdout);
 }
 
 void free_trial_mallocs() {

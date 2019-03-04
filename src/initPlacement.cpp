@@ -69,7 +69,7 @@ void initial_placement() {
 
   double time_s = 0;
 
-  int max_ip = (routabilityCMD) ? 1 : 30;
+  int max_ip = (isRoutability) ? 1 : 30;
   // debug : mgwoo
   //    max_ip = 0;
 

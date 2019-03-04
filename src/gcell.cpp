@@ -280,7 +280,7 @@ void tile_init_temp() {
   struct TILE *bp = tier->tile_mat;
 
   // cout <<endl;
-  // cout <<"resizing block_interval..." << endl;
+  cout <<"resizing block_interval..." << endl;
 
   std::vector< int > cap(nMetLayers, 0);
   std::vector< int > blkg(nMetLayers, 0);
@@ -296,6 +296,7 @@ void tile_init_temp() {
 
   for(int i = 0; i < tier->tot_tile_cnt; i++) {
     bp = &tier->tile_mat[i];
+
     bp->block_interval.resize(nMetLayers);
     bp->cap = cap;
     bp->route = route;
@@ -354,6 +355,8 @@ void tile_init_cGP2D() {
       (struct TILE *)mkl_malloc(sizeof(struct TILE) * tier->tot_tile_cnt, 64);
   tier->tile_mat = tile_mat;
   for(int i = 0; i < tier->tot_tile_cnt; i++) {
+    new(&tier->tile_mat[i]) TILE();
+
     p.x = i / tier->dim_tile.y;
     p.y = i % tier->dim_tile.y;
     bp = &tier->tile_mat[i];

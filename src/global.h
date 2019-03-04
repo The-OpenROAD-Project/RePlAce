@@ -86,6 +86,8 @@ typedef double prec;
 #define INT_UP(a) (int)(a) + 1
 #define UNSIGNED_CONVERT(a) (unsigned)(1.0 * (a) + 0.5f)
 
+#define IS_PRECISION_EQUAL(a, b) (fabs((a)-(b)) <= PREC_EPSILON)
+
 #define TSV_CAP 30.0  // fF
 // data from M. Jung et al. "How to Reduce Power in 3D IC Designs:
 // A Case Study with OpenSPARC T2 Core", CICC 2013, Section 2.B
@@ -616,19 +618,23 @@ class ROUTRACK {
   struct FPOS to;
   int layer;  // 1:M_Layer1, 2:M_Layer2, ..., etc.
   int netIdx;
-  ROUTRACK(struct FPOS f, struct FPOS t, int lay, int idx) {
-    from.x = f.x;
-    from.y = f.y;
-    from.z = f.z;
-    to.x = t.x;
-    to.y = t.y;
-    to.z = t.z;
-    layer = lay;
-    netIdx = idx;
+  ROUTRACK() : layer(INT_MAX), netIdx(INT_MAX) { from.SetZero(); to.SetZero(); };
+  ROUTRACK(struct FPOS _from, struct FPOS _to, int _layer, int _netIdx) {
+    from.Set(_from);
+    to.Set(_to);
+    layer = _layer;
+    netIdx = _netIdx;
   };
+  void Dump() {
+    from.Dump("from"); 
+    to.Dump("to"); 
+    cout << "layer: " << layer << endl;
+    cout << "netIdx: " << netIdx << endl << endl;
+  }
 };
 
-struct NET {
+class NET {
+  public:
   char name[255];
   std::map< int, UFPin > mUFPin;
   vector< TwoPinNets > two_pin_nets;
@@ -662,6 +668,22 @@ struct NET {
   prec timingWeight;  // mgwoo
   prec stn_cof;       // lutong
   prec wl_rsmt;       // lutong
+
+  NET() : name(""), min_x(PREC_MAX), min_y(PREC_MAX), 
+  min_z(PREC_MAX), max_x(PREC_MIN), max_y(PREC_MIN), max_z(PREC_MIN),
+  pin(0), pin2(0), hpwl_x(PREC_MIN), hpwl_y(PREC_MIN), hpwl_z(PREC_MIN), 
+  outPinIdx(INT_MAX), pinCNTinObject(INT_MAX), pinCNTinObject2(INT_MAX),
+  pinCNTinObject_tier(INT_MAX), idx(INT_MAX), mod_idx(INT_MAX), 
+  timingWeight(0.0f), 
+  stn_cof(0.0f),
+  wl_rsmt(0.0f) { 
+    sum_num1.SetZero();
+    sum_num2.SetZero();
+    sum_denom1.SetZero();
+    sum_denom2.SetZero();
+    terminalMin.SetZero();
+    terminalMax.SetZero();
+  };
 };
 
 struct T0 {
@@ -767,6 +789,10 @@ extern int pinCNT;
 extern int moduleCNT;
 extern int gcell_cnt;
 
+extern string globalRouterPosition;
+extern string globalRouterSetPosition;
+extern prec globalRouterCapRatio;
+
 enum { FillerCell, StdCell, Macro };
 extern int terminalCNT;
 extern int netCNT;
@@ -804,6 +830,7 @@ extern bool isSkipIP;
 extern bool isBinSet;
 extern bool isNtuDummyFill;
 extern prec densityDP;
+extern prec routeMaxDensity;
 
 extern int placementStdcellCNT;
 extern int gfiller_cnt;
@@ -876,6 +903,7 @@ extern prec curr_filler_area;
 extern prec adjust_ratio;
 extern bool is_inflation_h;
 extern bool flg_noroute;
+
 
 extern prec ALPHAmGP;
 extern prec ALPHAcGP;
@@ -1100,7 +1128,7 @@ extern bool plotMacroCMD;
 extern bool plotDensityCMD;
 extern bool plotFieldCMD;
 extern bool constraintDrivenCMD;
-extern bool routabilityCMD;
+extern bool isRoutability;
 extern bool lambda2CMD;
 extern bool dynamicStepCMD;
 extern bool thermalAwarePlaceCMD;
@@ -1256,6 +1284,7 @@ inline prec getStepSizefromEPs(prec hpwl, prec hpwlEP, prec hpwlSTD,
 
 // writing Bookshelf function
 void WriteBookshelf();
+void WriteBookshelfForGR();
 void CallDetailPlace();
 
 // useful function
@@ -1331,5 +1360,12 @@ inline char *GetEscapedStr(const char *name) {
   SetEscapedStr(tmp);
   return strdup(tmp.c_str());
 }
+
+inline string GetRealPath(string path ) {
+  char tmp[PATH_MAX] = {0, };
+  char* ptr = realpath(path.c_str(), tmp);
+  return string(tmp);
+}
+
 
 #endif

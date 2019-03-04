@@ -44,6 +44,7 @@
 #include "global.h"
 #include "initPlacement.h"
 #include "macro.h"
+#include "gcell.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -56,6 +57,9 @@
 #include <string>
 #include <vector>
 
+#include <sparsehash/dense_hash_map>
+using google::dense_hash_map;
+
 #include <mkl.h>
 
 // this is shared with lefdefIO.cpp
@@ -64,6 +68,7 @@ FPOS terminal_pmin, terminal_pmax;
 
 int numNonRectangularNodes;
 int totalShapeCount;
+BookshelfNameMap _bsMap;
 
 static FPOS shrunk_ratio;
 
@@ -73,6 +78,9 @@ static FPOS module_size_max;
 static POS max_mac_dim;
 
 static dense_hash_map< string, NODES > nodesMap;
+
+static bool isDummyCellInfoInit = false;
+static DummyCellInfo _dummyInst;
 
 void ParseBookShelf() {
   // extract directory
@@ -1709,6 +1717,7 @@ int read_nets_3D(char *input) {
   int pid = 0;
   for(int i = 0; i < netCNT; i++) {
     curNet = &netInstance[i];
+    new(curNet) NET();
     curNet->idx = i;
 
     do {
@@ -2547,18 +2556,23 @@ void runtimeError(string error_text) {
 }
 
 void read_routing_file(char *dir) {
+  cout << "INFO:  READ BACK ROUTING FILE..." << endl;
+  cout << "INFO:  netCNT: " << netCNT << endl;
   char route_file[BUFFERSIZE];
   char temp[BUFFERSIZE];
   char cmd[BUFFERSIZE];
   char netName[BUFFERSIZE];
-  int netIdx;
-  int fromX, fromY, fromL, toX, toY, toL, layer;
-  char line[LINESIZE];
+  int netIdx = 0;
+  int fromX = 0, fromY = 0, fromL = 0, toX = 0, toY = 0, toL = 0, layer = 0;
+  char line[LINESIZE] = {0, };
   bool flag = false;
-  struct NET *net_tmp = NULL;
+  struct NET *curNet= NULL;
   struct FPOS from, to;
+  from.SetZero();
+  to.SetZero();
 
   sprintf(route_file, "%s/%s.est", dir, gbch);
+  cout << "INFO:  ROUTING FILE LOCATION: " << route_file << endl;
   FILE *fp = fopen(route_file, "r");
 
   if((fp = fopen(route_file, "r")) == NULL) {
@@ -2598,13 +2612,13 @@ void read_routing_file(char *dir) {
         to.y = toY;
         to.z = toL;
         layer = fromL;
-        net_tmp = &netInstance[netIdx];
-        net_tmp->routing_tracks.push_back(ROUTRACK(from, to, layer, netIdx));
+        curNet= &netInstance[netIdx];
+        curNet->routing_tracks.push_back(ROUTRACK(from, to, layer, netIdx));
+//        curNet->routing_tracks[curNet->routing_tracks.size()-1].Dump();
       }
     }
   }
-  sprintf(cmd, "rm -rf %s", route_file);
-  system(cmd);
+  cout << "INFO:  READ ESTIMATED ROUTING SUCCESS!" << endl;
 }
 
 void delete_input_files_in(char *dir) {
@@ -2628,6 +2642,7 @@ void delete_input_files_in(char *dir) {
   sprintf(cmd, "rm -rf %s/%s.pl", dir, gbch);
   system(cmd);
 }
+/*
 void copy_original_SB_files_to_Dir(char *dir) {
   char cmd[BUF_SZ];
   char SBorigDirFile[BUF_SZ];
@@ -2654,6 +2669,42 @@ void copy_original_SB_files_to_Dir(char *dir) {
   sprintf(cmd, "cp -rf %s.route %s/.", SBorigDirFile, dir);
   system(cmd);
 }
+*/
+
+void LinkConvertedBookshelf(char* newDir) {
+  char cmd[BUF_SZ] = {0, };
+  // Bookshelf Position
+  char bsPosition[BUF_SZ] = {0, };
+
+  // Assume only first layer
+  sprintf(bsPosition, "%s/router_base", dir_bnd);
+//  std::filesystem::path bsPath = bsPosition;
+//  sprintf(bsPosition, "%s", std::filesystem::absolute(bsPath).c_str());
+//  cout << bsPosition << endl;
+//  exit(0);
+
+  char fullBsPosition[PATH_MAX] = {0, };
+  char* ptr= realpath( bsPosition, fullBsPosition );
+  if( ptr == NULL) {
+    cout << "ERROR: realpath function caused null return. Cannot find absolute path: " << bsPosition << endl;
+    exit(0);
+  }
+
+  sprintf(cmd, "ln -snf %s/%s.aux %s/.", fullBsPosition, gbch, newDir);
+  system(cmd);
+  sprintf(cmd, "ln -snf %s/%s.nodes %s/.", fullBsPosition, gbch, newDir);
+  system(cmd);
+  sprintf(cmd, "ln -snf %s/%s.nets %s/.", fullBsPosition, gbch, newDir);
+  system(cmd);
+  sprintf(cmd, "ln -snf %s/%s.scl %s/.", fullBsPosition, gbch, newDir);
+  system(cmd);
+  sprintf(cmd, "ln -snf %s/%s.wts %s/.", fullBsPosition, gbch, newDir);
+  system(cmd);
+  sprintf(cmd, "ln -snf %s/%s.route %s/.", fullBsPosition, gbch, newDir);
+  system(cmd);
+  sprintf(cmd, "ln -snf %s/%s.shapes %s/.", fullBsPosition, gbch, newDir);
+  system(cmd);
+}
 
 void link_original_SB_files_to_Dir(char *dir) {
   char cmd[BUF_SZ];
@@ -2670,8 +2721,8 @@ void link_original_SB_files_to_Dir(char *dir) {
   system(cmd);
   sprintf(cmd, "ln -snf %s.nets %s/.", SBorigDirFile, dir);
   system(cmd);
-  sprintf(cmd, "cp -rf %s.pl %s/%s_orig.pl", SBorigDirFile, dir, gbch);
-  system(cmd);
+//  sprintf(cmd, "cp -rf %s.pl %s/%s_orig.pl", SBorigDirFile, dir, gbch);
+//  system(cmd);
   sprintf(cmd, "ln -snf %s.scl %s/.", SBorigDirFile, dir);
   system(cmd);
   sprintf(cmd, "ln -snf %s.wts %s/.", SBorigDirFile, dir);
@@ -2701,20 +2752,20 @@ void WriteAux(char *dir_tier, bool isShapeDrawing) {
   if(isShapeDrawing) {
     fprintf(fp_aux,
             "RowBasedPlacement : %s.nodes %s.nets %s.wts %s.pl %s.scl "
-            "%s.shapes\n",
-            gbch, gbch, gbch, gbch, gbch, gbch);
+            "%s.shapes %s.route\n",
+            gbch, gbch, gbch, gbch, gbch, gbch, gbch);
   }
   else {
     fprintf(fp_aux,
-            "RowBasedPlacement : %s.nodes %s.nets %s.wts %s.pl %s.scl\n", gbch,
-            gbch, gbch, gbch, gbch);
+            "RowBasedPlacement : %s.nodes %s.nets %s.wts %s.pl %s.scl %s.route\n", gbch,
+            gbch, gbch, gbch, gbch, gbch);
   }
 
   fclose(fp_aux);
 }
 
 // *.shape writing - mgwoo
-void WriteShapes(char *dir_tier, bool isShapeDrawing) {
+void WriteShapes(char *dir_tier, bool isShapeDrawing, bool isNameConvert) {
   if(!isShapeDrawing) {
     return;
   }
@@ -2738,7 +2789,8 @@ void WriteShapes(char *dir_tier, bool isShapeDrawing) {
           numNonRectangularNodes);
 
   for(auto &curShapeNode : shapeMap) {
-    fprintf(fp_shapes, "%s  :  %ld\n", curShapeNode.first.c_str(),
+    fprintf(fp_shapes, "%s  :  %ld\n", 
+        _bsMap.GetBsTerminalName( curShapeNode.first.c_str() ), 
             curShapeNode.second.size());
     for(auto &curIdx : curShapeNode.second) {
       fprintf(fp_shapes, "\t%s\t%d\t%d\t%d\t%d\n",
@@ -2769,20 +2821,248 @@ void WriteWts(char *dir_tier) {
   fclose(fp_wts);
 }
 
+vector<int> GetBlockageLayers(Circuit::Circuit* _ckt, 
+    RouteInstance& routeInst, int macroIdx) {
+  vector<int> retVec;
+ 
+  // The M1 layer always assumes to be blocked.  
+  retVec.push_back(0);
+
+  bool isRoutingLayer = false;
+  for(auto& curObs : _ckt->lefObsStor[macroIdx]) {
+    lefiGeometries* curGeom = curObs.geometries();
+
+    bool isLayerFound = false;
+    int foundLayerIdx = INT_MAX;
+    for(int j = 0; j < curGeom->numItems(); j++) {
+      // Only deals with GeomLayer
+      if(curGeom->itemType(j) == lefiGeomLayerE) {
+        string layerName = curGeom->getLayer(j);
+        if( !routeInst.IsRoutingLayer(layerName) ) {
+          continue;
+        }
+        isLayerFound = true;
+        foundLayerIdx = routeInst.GetRoutingLayerIdx( layerName ); 
+        continue;
+      }
+      else {
+        if( !isLayerFound ) {
+          continue;
+        }
+
+        // 
+        isLayerFound = false;
+        if( curGeom->itemType(j) != lefiGeomLayerMinSpacingE) {
+          retVec.push_back( foundLayerIdx );
+        }
+        foundLayerIdx = INT_MAX;
+      }
+    }
+  }
+  retVec.erase( unique( retVec.begin(), retVec.end() ), retVec.end() );
+
+  return retVec;
+}
+
+// *.route writing.
+// this is assumed that LEF/DEF inputs were used
+void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst, 
+    bool isMetal1Removed) {
+  char fn_route[BUF_SZ] = {
+      0,
+  };
+  sprintf(fn_route, "%s/%s.route", dir_tier, gbch);
+  FILE *fp_route = fopen(fn_route, "w");
+
+  fputs("route 1.0\n", fp_route);
+  fputs("# Created\t:\tMay 25 2012\n", fp_route);
+  fputs(
+      "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
+      "Research({gnam, mcan}@us.ibm.com)\n",
+      fp_route);
+
+  fprintf( fp_route, "Grid               : %d %d %d\n", 
+      routeInst.GetGridCountX(), routeInst.GetGridCountY(),
+      routeInst.GetLayerCount());
+  
+  int space = 8; 
+  fprintf( fp_route, "VerticalCapacity   : ");
+  for(auto& curLayer: routeInst.GetLayerStor() ) {
+    int layerIdx = &curLayer - &routeInst.GetLayerStor()[0];
+    if( isMetal1Removed && layerIdx == 0 ){
+      fprintf( fp_route, "%*d", space, 0 );
+    }
+    else {
+      fprintf( fp_route, "%*d", space, 
+          (curLayer.layerDirection == LayerDirection::Vertical)? 
+          routeInst.GetTrackCount(layerIdx) : 0 );
+    }
+  } 
+  fprintf(fp_route, "\n");
+  
+  fprintf( fp_route, "HorizontalCapacity : ");
+  for(auto& curLayer: routeInst.GetLayerStor() ) {
+    int layerIdx = &curLayer - &routeInst.GetLayerStor()[0];
+    if( isMetal1Removed && layerIdx == 0 ){
+      fprintf( fp_route, "%*d", space, 0 );
+    }
+    else {
+      fprintf( fp_route, "%*d", space, 
+          (curLayer.layerDirection == LayerDirection::Horizontal)? 
+          routeInst.GetTrackCount(layerIdx) : 0 );
+    }
+  } 
+  fprintf(fp_route, "\n");
+
+  fprintf( fp_route, "MinWireWidth       : ");
+  for(int i=0; i<routeInst.GetLayerCount(); i++) {
+    fprintf( fp_route, "%*d", space, 100);
+  }
+  fprintf(fp_route, "\n");
+  
+  fprintf( fp_route, "MinWireSpacing     : ");  
+  for(int i=0; i<routeInst.GetLayerCount(); i++) {
+    fprintf( fp_route, "%*d", space, 0);
+  }
+  fprintf(fp_route, "\n");
+  
+  fprintf( fp_route, "ViaSpacing         : ");
+  for(int i=0; i<routeInst.GetLayerCount(); i++) {
+    fprintf( fp_route, "%*d", space, 0);
+  }
+  fprintf(fp_route, "\n");
+  
+  fprintf( fp_route, "GridOrigin         : %d %d\n", 
+      INT_CONVERT( routeInst.GetGridOriginX() ),
+      INT_CONVERT( routeInst.GetGridOriginY() ));
+  fprintf( fp_route, "TileSize           : %d %d\n", 
+      routeInst.GetTileSizeX(), 
+      routeInst.GetTileSizeY());
+  fprintf( fp_route, "BlockagePorosity   : 0\n\n");
+ 
+  
+  fflush( fp_route );
+ 
+  Circuit::Circuit* _ckt = routeInst.GetCircuitInst();
+  fprintf( fp_route, "NumNiTerminals     : %d\n", _ckt->defPinStor.size() );
+  
+  for(auto& curPin : _ckt->defPinStor) {
+    // skip for GROUND/POWER pins
+    if( curPin.hasUse() ) {
+      if( strcmp(curPin.use(), "GROUND") == 0 ||
+          strcmp(curPin.use(), "POWER") == 0 ) {
+        continue;
+      }
+    }
+    if( !curPin.hasLayer() ) {
+      cout << "ERROR: " << curPin.pinName() << " pin have no LAYER assignment!" << endl;
+      exit(0);
+    }
+    if( curPin.numLayer() > 2) {
+      cout << "WARNING: " << curPin.pinName() << " have multiple layer assignment: (" 
+        << curPin.numLayer() 
+        << "), but Global Router will use the first layer info only!" << endl;
+    }
+    auto lmPtr = routeInst.GetLayerMap().find( string(curPin.layer(0)) );
+    if( lmPtr == routeInst.GetLayerMap().end()) {
+      cout << "ERROR: " << curPin.pinName() << " have layer as " << curPin.layer(0)
+        << ", but not exists in LEF" << endl;
+      exit(0);
+    }
+
+    fprintf( fp_route, "  %s %d\n", 
+        (isNameConvert)? _bsMap.GetBsTerminalName( curPin.pinName() ) : 
+        curPin.pinName(), lmPtr->second+1);
+  }
+
+  int blockageCnt = 0;
+  for(int i=0; i<terminalCNT; i++) {
+    TERM* curTerminal = &terminalInstance[i];
+    if( !curTerminal -> isTerminalNI ) {
+      blockageCnt ++;
+    }
+  }
+
+  fprintf( fp_route, "NumBlockageNodes   : %d\n", blockageCnt);
+  dense_hash_map<int, vector<int>> macroBlockageMap;
+  macroBlockageMap.set_empty_key(INT_MAX);
+
+  string blockagePrefix = "replace_blockage_";
+  for(int i=0; i<terminalCNT; i++) {
+    TERM* curTerminal = &terminalInstance[i];
+    if( curTerminal -> isTerminalNI ) {
+      continue;
+    }
+
+    string termNameStr = curTerminal->name; 
+    vector<int>* layerIdx = NULL;
+
+    bool isBlockage = false;
+
+    // If termNameStr has a prefix as blockagePrefix, then use defBlockageStor's information
+    if( termNameStr.compare( 0, blockagePrefix.length(), blockagePrefix) == 0 ) {
+      isBlockage = true;
+      layerIdx = new vector<int>;
+      // HARDCODE: All of layers 
+      for(int i=0; i<routeInst.GetLayerStor().size(); i++) {
+        layerIdx->push_back(i);
+      }
+    }
+    // else, then It should reference from MACRO in LEF files
+    else {
+      int compIdx = GetDefComponentIdx( *_ckt, termNameStr );
+      string macroNameStr = _ckt->defComponentStor[compIdx].name();
+      int macroIdx = GetLefMacroIdx( *_ckt, macroNameStr );
+
+
+      auto mbPtr = macroBlockageMap.find( macroIdx );
+      if( mbPtr == macroBlockageMap.end() ) {
+        macroBlockageMap[ macroIdx ] = 
+          GetBlockageLayers(_ckt, routeInst, macroIdx);
+      }
+      layerIdx = &macroBlockageMap[ macroIdx ]; 
+    }
+
+
+    fprintf( fp_route, " %s ", 
+        (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name ) : curTerminal->name );
+    fprintf( fp_route, " %d ", layerIdx->size());
+    for(int i=0; i<layerIdx->size()-1; i++) {
+      fprintf( fp_route, "%d ", layerIdx->at(i)+1);
+    }
+    fprintf( fp_route, "%d\n", layerIdx->at(layerIdx->size()-1)+1);
+    
+    if( isBlockage ) {
+      delete layerIdx;  
+    }
+  }
+
+  /*
+  fprintf( fp_route, "NumEdgeCapacityAdjustments  : %d\n", routeInst.GetReducedTrackCount());
+  for(auto& rTrack : routeInst.GetReducedTrackStor()) {
+    fprintf( fp_route, "  %d %d %d %d %d %d %d\n", 
+        rTrack.lx, rTrack.ly, rTrack.layerIdx+1, 
+        rTrack.ux, rTrack.uy, rTrack.layerIdx+1, 
+        rTrack.trackCnt );
+  }*/
+  fprintf( fp_route, "NumEdgeCapacityAdjustments  : 0\n");
+  fclose(fp_route);
+}
+
 // *.nodes writing
 void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
-                bool isShapeDrawing) {
+                bool isShapeDrawing, bool isNameConvert) {
   char fn_nodes[BUF_SZ] = {
       0,
   };
   sprintf(fn_nodes, "%s/%s.nodes", dir_tier, gbch);
   FILE *fp_nodes = fopen(fn_nodes, "w");
 
-  fputs("UCLA pl 2.0 \n", fp_nodes);
-  fputs("# Created	:	Jan  6 2005\n", fp_nodes);
+  fputs("UCLA nodes 1.0 \n", fp_nodes);
+  fputs("# Created  :  Jan  6 2005\n", fp_nodes);
   fputs(
-      "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
+        "# User     :  Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
+        "Research({gnam, mcan}@us.ibm.com)\n",
       fp_nodes);
   fputs("\n", fp_nodes);
 
@@ -2803,13 +3083,14 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
 
   int node_cnt = tier->modu_cnt + term_cnt;
 
-  fprintf(fp_nodes, "NumNodes :  \t%d\n", node_cnt);
-  fprintf(fp_nodes, "NumTerminals :  \t%d\n", term_cnt);
+  fprintf(fp_nodes, "NumNodes      :  %d\n", node_cnt);
+  fprintf(fp_nodes, "NumTerminals  :  %d\n\n", term_cnt);
 
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
-    fprintf(fp_nodes, "%s %d %d\n", modu->name, (int)(modu->size.x + 0.5),
-            (int)(modu->size.y + 0.5));
+    fprintf(fp_nodes, "%*s %*d %*d\n", 15, (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+        14, (int)(modu->size.x + 0.5),
+        14, (int)(modu->size.y + 0.5));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
@@ -2820,9 +3101,11 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
             : "terminal";
 
     if(isShapeDrawing) {
-      fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name,
-              (int)(curTerminal->size.x + 0.5),
-              (int)(curTerminal->size.y + 0.5), termString.c_str());
+      fprintf(fp_nodes, "%*s %*d %*d %*s\n", 
+          15, (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+          14, (int)(curTerminal->size.x + 0.5),
+          14, (int)(curTerminal->size.y + 0.5), 
+          15, termString.c_str());
     }
     else {
       // considering shapeMaps - mgwoo
@@ -2833,8 +3116,10 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
         int sizeY =
             (curTerminal->isTerminalNI) ? 0 : INT_CONVERT(curTerminal->size.y);
 
-        fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name, sizeX, sizeY,
-                termString.c_str());
+        fprintf(fp_nodes, "%*s %*d %*d %*s\n", 
+            15, (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, 
+            14, sizeX, 14, sizeY,
+            15, termString.c_str());
       }
       else {
         for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
@@ -2845,11 +3130,13 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
                           ? 0
                           : INT_CONVERT(shapeStor[curShapeIdx].height);
 
-          fprintf(fp_nodes, "%s %d %d %s\n",
-                  string(string(curTerminal->name) + string("/") +
+          fprintf(fp_nodes, "%*s %*d %*d %*s\n",
+              15, string(string((isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) + string("/") +
                          string(shapeStor[curShapeIdx].name))
                       .c_str(),
-                  sizeX, sizeY, termString.c_str());
+              14, sizeX, 
+              14, sizeY, 
+              15, termString.c_str());
         }
       }
     }
@@ -2877,6 +3164,7 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
 // *.nodes writing
 void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
                          int pin_term_cnt, bool isShapeDrawing,
+                         bool isNameConvert, 
                          DummyCellInfo &dummyInst) {
   char fn_nodes[BUF_SZ] = {
       0,
@@ -2884,7 +3172,7 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
   sprintf(fn_nodes, "%s/%s.nodes", dir_tier, gbch);
   FILE *fp_nodes = fopen(fn_nodes, "w");
 
-  fputs("UCLA pl 2.0 \n", fp_nodes);
+  fputs("UCLA nodes 1.0 \n", fp_nodes);
   fputs("# Created	:	Jan  6 2005\n", fp_nodes);
   fputs(
       "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
@@ -2911,12 +3199,12 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
 
   int node_cnt = tier->modu_cnt + term_cnt;
 
-  fprintf(fp_nodes, "NumNodes :  \t%d\n", node_cnt);
-  fprintf(fp_nodes, "NumTerminals :  \t%d\n", term_cnt);
+  fprintf(fp_nodes, "NumNodes      :  \t%d\n", node_cnt);
+  fprintf(fp_nodes, "NumTerminals  :  \t%d\n\n", term_cnt);
 
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
-    fprintf(fp_nodes, "%s %d %d\n", modu->name, (int)(modu->size.x + 0.5),
+    fprintf(fp_nodes, "%s %d %d\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, (int)(modu->size.x + 0.5),
             (int)(modu->size.y + 0.5));
   }
 
@@ -2928,7 +3216,9 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
             : "terminal";
 
     if(isShapeDrawing) {
-      fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name,
+      fprintf(fp_nodes, "%s %d %d %s\n",
+              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : 
+              curTerminal->name,
               (int)(curTerminal->size.x + 0.5),
               (int)(curTerminal->size.y + 0.5), termString.c_str());
     }
@@ -2940,8 +3230,9 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
             (curTerminal->isTerminalNI) ? 0 : INT_CONVERT(curTerminal->size.x);
         int sizeY =
             (curTerminal->isTerminalNI) ? 0 : INT_CONVERT(curTerminal->size.y);
-
-        fprintf(fp_nodes, "%s %d %d %s\n", curTerminal->name, sizeX, sizeY,
+        fprintf(fp_nodes, "%s %d %d %s\n", 
+            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+            sizeX, sizeY,
                 termString.c_str());
       }
       else {
@@ -2954,7 +3245,9 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
                           : INT_CONVERT(shapeStor[curShapeIdx].height);
 
           fprintf(fp_nodes, "%s %d %d %s\n",
-                  string(string(curTerminal->name) + string("/") +
+                  string(string((isNameConvert)? 
+                        _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) 
+                      + string("/") +
                          string(shapeStor[curShapeIdx].name))
                       .c_str(),
                   sizeX, sizeY, termString.c_str());
@@ -2968,7 +3261,8 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
   // Dummy Cell Drawing
   for(auto &curTerm : *termStor) {
     string termString = "terminal";
-    fprintf(fp_nodes, "%s %d %d %s\n", curTerm.name,
+    fprintf(fp_nodes, "%s %d %d %s\n",  
+            (isNameConvert)? _bsMap.GetBsTerminalName( curTerm.name) : curTerm.name,
             (int)(curTerm.size.x + 0.5), (int)(curTerm.size.y + 0.5),
             termString.c_str());
   }
@@ -2992,25 +3286,58 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
   fclose(fp_nodes);
 }
 
+// for Net sorting
+void BsNetInfo::Print( FILE* file ) {
+  fprintf(file, "%*s%*s  :%*.4lf%*.4lf\n", 
+      15, name.c_str(), 
+      4, io.c_str(), 
+      12, x, 
+      12, y);
+}
+
+// net name sorting function
+bool CompareBsNetInfo( BsNetInfo& a, BsNetInfo& b) {
+  char prefixA = a.name.c_str()[0];
+  char prefixB = b.name.c_str()[0];
+  int idxA = atoi( a.name.substr(1, a.name.length()).c_str()); 
+  int idxB = atoi( b.name.substr(1, b.name.length()).c_str());
+ 
+//  if ( a.io < b.io ) {
+//    return true; 
+//  }
+//  else if ( a.io > b.io ) {
+//    return false;
+//  }
+
+  if( prefixA < prefixB ) {
+    return true;
+  }
+  else if( prefixA > prefixB ) {
+    return false;
+  }
+  
+  return (idxA > idxB);
+}
+
 // *.nets writing
 void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
-              vector< int > &netChk, bool isShapeDrawing) {
+              vector< int > &netChk, bool isShapeDrawing, bool isNameConvert ) {
   char fn_nets[BUF_SZ] = {
       0,
   };
   sprintf(fn_nets, "%s/%s.nets", dir_tier, gbch);
   FILE *fp_nets = fopen(fn_nets, "w");
 
-  fputs("UCLA pl 2.0 \n", fp_nets);
-  fputs("# Created	:	Jan  6 2005\n", fp_nets);
+  fputs("UCLA nets 1.0 \n", fp_nets);
+  fputs("# Created  :  Jan  6 2005\n", fp_nets);
   fputs(
-      "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
+      "# User     :  Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
       "Research({gnam, mcan}@us.ibm.com)\n",
       fp_nets);
   fputs("\n", fp_nets);
 
-  fprintf(fp_nets, "NumNets : %d\n", net_cnt);
-  fprintf(fp_nets, "NumPins : %d\n", pin_cnt);
+  fprintf(fp_nets, "NumNets  :  %d\n", net_cnt);
+  fprintf(fp_nets, "NumPins  :  %d\n", pin_cnt);
 
   fputs("\n", fp_nets);
 
@@ -3025,8 +3352,11 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
       continue;
     }
 
-    fprintf(fp_nets, "NetDegree : %d   %s\n", net->pinCNTinObject_tier,
-            net->name);
+    fprintf(fp_nets, "NetDegree  :  %d    %s\n", 
+         net->pinCNTinObject_tier,
+        (isNameConvert)?  _bsMap.GetBsNetName( net->name ) : net->name);
+ 
+    vector<BsNetInfo> bsNetInfoStor;
 
     for(int j = 0; j < net->pinCNTinObject2; j++) {
       PIN *pin = net->pin2[j];
@@ -3047,31 +3377,39 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
       if(pin->term) {
         TERM *curTerminal = &terminalInstance[moduleID];
         if(isShapeDrawing) {
-          fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->name, io,
-                  curTerminal->pof[pinIDinModule].x,
-                  curTerminal->pof[pinIDinModule].y);
+          //          fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n",
+          bsNetInfoStor.push_back(
+            BsNetInfo( 
+              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, io,
+              curTerminal->pof[pinIDinModule].x,
+              curTerminal->pof[pinIDinModule].y )
+            );
         }
         else {
           if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
-            fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->name, io,
-                    curTerminal->pof[pinIDinModule].x,
-                    curTerminal->pof[pinIDinModule].y);
+            bsNetInfoStor.push_back(
+              BsNetInfo( 
+                (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, io,
+                curTerminal->pof[pinIDinModule].x,
+                curTerminal->pof[pinIDinModule].y )
+              );
           }
           else {
             // convert into "o506100/Shape_0"
             SHAPE *curShape = &shapeStor[shapeMap[curTerminal->name][0]];
-            string concatedName = string(curTerminal->name) + string("/") +
+            string concatedName = string((isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) + string("/") +
                                   string(curShape->name);
 
             prec shapeCenterX = curShape->llx + curShape->width / 2;
             prec shapeCenterY = curShape->lly + curShape->height / 2;
 
             // covert as "o506100/shape_0"'s information
-            fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", concatedName.c_str(),
-                    io, curTerminal->pof[pinIDinModule].x +
-                            (curTerminal->center.x - shapeCenterX),
-                    curTerminal->pof[pinIDinModule].y +
-                        (curTerminal->center.y - shapeCenterY));
+            bsNetInfoStor.push_back(
+              BsNetInfo( 
+                concatedName, io,
+                curTerminal->pof[pinIDinModule].x + (curTerminal->center.x - shapeCenterX),
+                curTerminal->pof[pinIDinModule].y + (curTerminal->center.y - shapeCenterY))
+              );
           }
         }
       }
@@ -3082,18 +3420,27 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
       else if(pin->tier == curLayer) {
         if(pin->term == 0) {
           MODULE *modu = &moduleInstance[moduleID];
-
-          fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", modu->name, io,
-                  modu->pof[pinIDinModule].x, modu->pof[pinIDinModule].y);
+          bsNetInfoStor.push_back(
+            BsNetInfo( 
+              (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, io,
+              modu->pof[pinIDinModule].x,
+              modu->pof[pinIDinModule].y)
+            );
         }
         else {
           TERM *curTerminal = &terminalInstance[moduleID];
-
-          fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->name, io,
-                  curTerminal->pof[pinIDinModule].x,
-                  curTerminal->pof[pinIDinModule].y);
+          bsNetInfoStor.push_back(
+            BsNetInfo( 
+              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, io,
+              curTerminal->pof[pinIDinModule].x,
+              curTerminal->pof[pinIDinModule].y )
+            );
         }
       }
+    }
+    sort( bsNetInfoStor.begin(), bsNetInfoStor.end(), CompareBsNetInfo);
+    for(auto& curSubNet: bsNetInfoStor) {
+      curSubNet.Print( fp_nets );
     }
   }
 
@@ -3101,7 +3448,8 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
 }
 
 // *.pl writing
-void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing) {
+void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
+    bool isNameConvert) {
   char fn_pl[BUF_SZ] = {
       0,
   };
@@ -3121,7 +3469,7 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing) {
 
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
-    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", modu->name, modu->pmin.x,
+    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, modu->pmin.x,
             modu->pmin.y);
   }
 
@@ -3130,20 +3478,20 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing) {
     string fixedStr = (curTerminal->isTerminalNI) ? "FIXED_NI" : "FIXED";
 
     if(isShapeDrawing) {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
               prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y),
               fixedStr.c_str());
     }
     else {
       if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
-        fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
+        fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
                 prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y),
                 fixedStr.c_str());
       }
       else {
         for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
           fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n",
-                  string(string(curTerminal->name) + string("/") +
+                  string(string((isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) + string("/") +
                          string(shapeStor[curShapeIdx].name))
                       .c_str(),
                   prec2int(shapeStor[curShapeIdx].llx),
@@ -3174,7 +3522,8 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing) {
 
 // *.pl writing
 void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
-                      bool isShapeDrawing, DummyCellInfo &dummyInst) {
+                      bool isShapeDrawing, bool isNameConvert, 
+                      DummyCellInfo &dummyInst) {
   char fn_pl[BUF_SZ] = {
       0,
   };
@@ -3194,8 +3543,8 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
 
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
-    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", modu->name, modu->pmin.x,
-            modu->pmin.y);
+    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+        modu->pmin.x, modu->pmin.y);
   }
 
   for(int i = 0; i < terminalCNT; i++) {
@@ -3203,20 +3552,20 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
     string fixedStr = (curTerminal->isTerminalNI) ? "FIXED_NI" : "FIXED";
 
     if(isShapeDrawing) {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
               prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y),
               fixedStr.c_str());
     }
     else {
       if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
-        fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", curTerminal->name,
+        fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
                 prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y),
                 fixedStr.c_str());
       }
       else {
         for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
           fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n",
-                  string(string(curTerminal->name) + string("/") +
+                  string(string((isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) + string("/") +
                          string(shapeStor[curShapeIdx].name))
                       .c_str(),
                   prec2int(shapeStor[curShapeIdx].llx),
@@ -3228,7 +3577,8 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
 
   vector< TERM > *dummyTermStor = dummyInst.GetTerminalStor();
   for(auto &curTerm : *dummyTermStor) {
-    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curTerm.name,
+    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
+        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.name) : curTerm.name,
             prec2int(curTerm.pmin.x), prec2int(curTerm.pmin.y));
   }
 
@@ -3266,9 +3616,6 @@ void WriteScl(char *dir_tier, int curLayer) {
 
   TIER *tier = &tier_st[curLayer];
 
-  fputs("\n", fp_scl);
-  fprintf(fp_scl, "NumRows :  \t%d\n", tier->row_cnt + tier->row_term_cnt);
-  fputs("\n", fp_scl);
 
   // sort the Y-Order due to limit of DP
   vector< ROW > tmpRowStor;
@@ -3277,6 +3624,10 @@ void WriteScl(char *dir_tier, int curLayer) {
   }
   sort(tmpRowStor.begin(), tmpRowStor.end(),
        [](ROW &lhs, ROW &rhs) { return (lhs.pmin.y < rhs.pmin.y); });
+  
+  fputs("\n", fp_scl);
+  fprintf(fp_scl, "NumRows :  \t%d\n", tmpRowStor.size() );
+  fputs("\n", fp_scl);
   // iterate based on the sorted order
   for(auto &curRow : tmpRowStor) {
     fprintf(fp_scl, "CoreRow Horizontal\n");
@@ -3347,7 +3698,9 @@ DummyCellInfo::DummyCellInfo()
       numY_(INT_MAX),
       rowSizeX_(INT_MAX),
       rowSizeY_(INT_MAX),
-      arr_(0) {
+      arr_(0) { }
+
+void DummyCellInfo::Init() {
   SetCircuitInst();
   SetScaleDownParam();
   SetLayoutArea();
@@ -3458,13 +3811,13 @@ int DummyCellInfo::GetCoordiY(prec y) {
 }
 
 void DummyCellInfo::FillRowInst(ROW *curRow) {
-  curRow->pmin.Dump("curRowPmin");
-  curRow->pmax.Dump("curRowPmax");
+//  curRow->pmin.Dump("curRowPmin");
+//  curRow->pmax.Dump("curRowPmax");
 
-  cout << GetCoordiX(curRow->pmin.x) << " " << GetCoordiX(curRow->pmax.x)
-       << endl;
-  cout << GetCoordiY(curRow->pmin.y) << " " << GetCoordiY(curRow->pmax.y)
-       << endl;
+//  cout << GetCoordiX(curRow->pmin.x) << " " << GetCoordiX(curRow->pmax.x)
+//       << endl;
+//  cout << GetCoordiY(curRow->pmin.y) << " " << GetCoordiY(curRow->pmax.y)
+//       << endl;
 
   for(int i = GetCoordiX(curRow->pmin.x); i < GetCoordiX(curRow->pmax.x); i++) {
     for(int j = GetCoordiY(curRow->pmin.y); j < GetCoordiY(curRow->pmax.y);
@@ -3475,8 +3828,8 @@ void DummyCellInfo::FillRowInst(ROW *curRow) {
   }
 }
 void DummyCellInfo::FillFixedCell(TERM *curTerm) {
-  curTerm->pmin.Dump("curTermPmin");
-  curTerm->pmax.Dump("curTermPmax");
+//  curTerm->pmin.Dump("curTermPmin");
+//  curTerm->pmax.Dump("curTermPmax");
   for(int i = GetCoordiX(curTerm->pmin.x); i < GetCoordiX(curTerm->pmax.x);
       i++) {
     for(int j = GetCoordiY(curTerm->pmin.y); j < GetCoordiY(curTerm->pmax.y);
@@ -3530,21 +3883,22 @@ void DummyCellInfo::GenerateDummyCell() {
 
 // write bookshelf's output
 // z : current tier's index
-void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
+void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing, 
+    bool isNameConvert, bool isMetal1Removed) {
   PIN *pin = NULL;
   NET *net = NULL;
 
   // create directory for tier's result
-  char dir_tier[BUF_SZ] = {
-      0,
-  };
-  sprintf(dir_tier, "%s/tiers/%d", dir_bnd, z);
-
-  char cmd[BUF_SZ] = {
-      0,
-  };
-  sprintf(cmd, "mkdir -p %s", dir_tier);
-  system(cmd);
+//  char dir_tier[BUF_SZ] = {
+//      0,
+//  };
+//  sprintf(dir_tier, "%s/tiers/%d", dir_bnd, z);
+//
+//  char cmd[BUF_SZ] = {
+//      0,
+//  };
+//  sprintf(cmd, "mkdir -p %s", dir_tier);
+//  system(cmd);
 
   /////////////////////////////////////////////////////////////////////////////
   // count for pin_term_cnt, net_cnt
@@ -3594,25 +3948,123 @@ void WriteBookshelfWithTier(int z, int lab, bool isShapeDrawing) {
     }
   }
 
+
   WriteAux(dir_tier, isShapeDrawing);
-  WriteShapes(dir_tier, isShapeDrawing);
-  WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing);
   WriteWts(dir_tier);
 
   if(inputMode == InputMode::lefdef && isNtuDummyFill) {
-    DummyCellInfo dummyInst;
-    WriteSclWithDummy(dir_tier, z, dummyInst);
+    if( !isDummyCellInfoInit ) {
+      _dummyInst.Init();
+      isDummyCellInfoInit = true;
+    }
+    _bsMap.InitWithDummyCell( _dummyInst );
+    
+    // _bsMap is used to below functions.
+    WriteShapes(dir_tier, isShapeDrawing, isNameConvert);  
+    WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing, isNameConvert);
+
+    WriteSclWithDummy(dir_tier, z, _dummyInst);
     WriteNodesWithDummy(dir_tier, z, lab, pin_term_cnt, isShapeDrawing,
-                        dummyInst);
-    WritePlWithDummy(dir_tier, z, lab, isShapeDrawing, dummyInst);
+                        isNameConvert, _dummyInst);
+    WritePlWithDummy(dir_tier, z, lab, isShapeDrawing, isNameConvert, _dummyInst);
   }
   else {
+    _bsMap.Init(); 
+    WriteShapes(dir_tier, isShapeDrawing, isNameConvert);  
+    WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing, isNameConvert);
+
     WriteScl(dir_tier, z);
-    WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing);
-    WritePl(dir_tier, z, lab, isShapeDrawing);
+    WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing, isNameConvert);
+    WritePl(dir_tier, z, lab, isShapeDrawing, isNameConvert );
   }
 
+//  if( isRoutability ) {
+    WriteRoute( dir_tier, isNameConvert, routeInst, isMetal1Removed);
+//  }
+
+
   // shapeSupport doesn't affect to below function
+}
+
+void BookshelfNameMap::Init() {
+  moduleToBsMap.set_empty_key(INIT_STR);
+  bsToModuleMap.set_empty_key(INIT_STR);
+  terminalToBsMap.set_empty_key(INIT_STR);
+  bsToTerminalMap.set_empty_key(INIT_STR);
+  netToBsMap.set_empty_key(INIT_STR);
+  bsToNetMap.set_empty_key(INIT_STR); 
+
+  bsModuleCnt = 0;
+  for(int i=0; i<moduleCNT; i++) {
+    MODULE* curModule = &moduleInstance[i];
+    string bsModuleName = "o" + to_string(bsModuleCnt++);
+    moduleToBsMap[ curModule->name ] = bsModuleName;
+    bsToModuleMap[ bsModuleName ] = curModule->name;
+  }
+
+  bsTerminalCnt = 0;
+  for(int i=0; i<terminalCNT; i++) {
+    TERM* curTerminal = &terminalInstance[i];
+    if( curTerminal->isTerminalNI == false ) {
+      string bsTerminalName = "o" + to_string(bsModuleCnt++);
+      terminalToBsMap[ curTerminal ->name ] = bsTerminalName;
+      bsToTerminalMap[ bsTerminalName ] = curTerminal->name;
+    }
+    else { 
+      string bsTerminalName = "p" + to_string(bsTerminalCnt++);
+      terminalToBsMap[ curTerminal ->name ] = bsTerminalName;
+      bsToTerminalMap[ bsTerminalName ] = curTerminal->name;
+    }
+  }
+
+  bsNetCnt = 0;
+  for(int i=0; i<netCNT; i++) {
+    NET* curNet = &netInstance[i]; 
+    string bsNetName = "n" + to_string(bsNetCnt++);
+    netToBsMap[ curNet->name ] = bsNetName;
+    bsToNetMap[ bsNetName ] = curNet->name;
+  }
+}
+void BookshelfNameMap::InitWithDummyCell( DummyCellInfo& dummyInst ) {
+  Init();
+  vector< TERM > *dummyTermStor = dummyInst.GetTerminalStor();
+  for(auto& curTerm : *dummyTermStor ) {
+    string bsTerminalName = "o" + to_string(bsModuleCnt++);
+    terminalToBsMap[ curTerm.name ] = bsTerminalName;
+    bsToTerminalMap[ bsTerminalName ] = curTerm.name;
+  }
+}
+
+const char* BookshelfNameMap::GetBsModuleName( const char* name ) {
+  auto mtPtr = moduleToBsMap.find(string(name)); 
+  if( mtPtr != moduleToBsMap.end()) {
+    return mtPtr->second.c_str();
+  }
+  else {
+    cout << "ERROR: Cannot find " << name << " in bookshelf name map!" << endl;
+    exit(1);
+  }
+}
+const char* BookshelfNameMap::GetBsTerminalName( const char* name ) {
+  auto tPtr = terminalToBsMap.find(string(name)); 
+  if( tPtr != terminalToBsMap.end()) {
+    return tPtr->second.c_str();
+  }
+  else {
+    cout << "ERROR: Cannot find " << name << " in bookshelf name map!" << endl;
+    exit(1);
+  }
+}
+
+const char* BookshelfNameMap::GetBsNetName( const char* name ){
+  auto netPtr = netToBsMap.find(string(name)); 
+  if( netPtr != netToBsMap.end()) {
+    return netPtr->second.c_str();
+  }
+  else {
+    cout << "ERROR: Cannot find " << name << " in bookshelf name map!" << endl;
+    exit(1);
+  }
 }
 
 //
@@ -3687,7 +4139,7 @@ void ReadPlBookshelf(const char *fileName) {
   fclose(fp);
 }
 
-void output_tier_pl_global_router(char *dir, int z, int lab) {
+void output_tier_pl_global_router(char *dir, int z, int lab, bool isNameConvert) {
   char fn_pl[BUF_SZ];
   // char            dir_router[BUF_SZ];
   // char            cmd[BUF_SZ];
@@ -3723,20 +4175,27 @@ void output_tier_pl_global_router(char *dir, int z, int lab) {
 
   for(int i = 0; i < tier->modu_cnt; i++) {
     modu = tier->modu_st[i];
-    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", modu->name, modu->pmin.x,
+    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, modu->pmin.x,
             modu->pmin.y);
   }
 
   for(int i = 0; i < terminalCNT; i++) {
     curTerminal = &terminalInstance[i];
     if(!curTerminal->isTerminalNI) {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curTerminal->name,
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
               prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
     }
     else {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED_NI\n", curTerminal->name,
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED_NI\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
               prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
     }
+  }
+  
+  vector< TERM > *dummyTermStor = _dummyInst.GetTerminalStor();
+  for(auto &curTerm : *dummyTermStor) {
+    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
+        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.name) : curTerm.name,
+            prec2int(curTerm.pmin.x), prec2int(curTerm.pmin.y));
   }
 
   if(lab) {  // MMS-3D place

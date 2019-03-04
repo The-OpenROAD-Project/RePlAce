@@ -168,11 +168,9 @@ void bin_init() {
 
   // for each allocated bin_mat
   for(int i = 0; i < tot_bin_cnt; i++) {
-    // ???????? not working
     p = get_bin_idx(i);
-    exit(1);
-    //        cout << i << ", " ;
-    //        p.Dump();
+    // cout << i << ", " ;
+    // p.Dump();
 
     BIN *binp = &bin_mat[i];
 
@@ -319,7 +317,7 @@ void bin_init_2D(int STAGE) {
   if(STAGE == mGP2D) {
     // LW 05/30/17
     // IK 05/08/17
-    // if (routabilityCMD == true) {
+    // if (isRoutability == true) {
     //    if (placementMacroCNT == 0) {
     //        dim_bin_mGP2D.x *= 2;
     //        dim_bin_mGP2D.y *= 2;
@@ -334,7 +332,7 @@ void bin_init_2D(int STAGE) {
   else if(STAGE == cGP2D) {
     // LW 05/30/17
     // IK 05/08/17
-    // if (routabilityCMD == true && tier_st[0].modu_den < 0.32) {
+    // if (isRoutability == true && tier_st[0].modu_den < 0.32) {
     //    if (placementMacroCNT == 0) {
     //        dim_bin_cGP2D.x *= 2;
     //        dim_bin_cGP2D.y *= 2;
@@ -1212,7 +1210,8 @@ void get_term_den(prec *den) {
 }
 
 prec get_den2(prec area_num, prec area_denom) {
-  return area_denom < MIN_AREA3 ? area_num / MIN_AREA3 : area_num / area_denom;
+  return area_denom < MIN_AREA3 ? 
+    area_num / MIN_AREA3 : area_num / area_denom;
 }
 
 int is_IO_block(TERM *term) {
@@ -1258,19 +1257,31 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
 
     max_x = min(bpx->pmax.x, pmax.x);
     min_x = max(bpx->pmin.x, pmin.x);
+    if( max_x < min_x ) {
+      continue;
+    }
 
     for(y = b0.y, bpy = bpx; y <= b1.y; y++, bpy += msh.z) {
       max_y = min(bpy->pmax.y, pmax.y);
       min_y = max(bpy->pmin.y, pmin.y);
+    
+      if( max_y < min_y ) {
+        continue;
+      }
 
       for(z = b0.z, bpz = bpy; z <= b1.z; z++, bpz++) {
         max_z = min(bpz->pmax.z, pmax.z);
         min_z = max(bpz->pmin.z, pmin.z);
+      
+        if( max_z < min_z ) {
+          continue;
+        }
 
         area_share = (max_x - min_x) * (max_y - min_y) * (max_z - min_z);
         // cell->den_scal;
 
         cost += area_share * bpz->no_mac_den;
+//        cout << "bpz->no_mac_den: " << bpz->no_mac_den << endl;
       }
     }
   }
@@ -1604,6 +1615,7 @@ void bin_den_mac_update(void) {
         bp->cell_area + bp->macro_area + bp->virt_area + bp->term_area;
     prec area_num2 = bp->cell_area + bp->virt_area + bp->term_area;
     prec area_denom = bin_area;
+
     bp->den = get_den2(area_num, area_denom);
     bp->no_mac_den = get_den2(area_num2, area_denom);
   }
@@ -1680,6 +1692,7 @@ prec get_all_macro_den(void) {
     mac = macro_st[mdp->mac_idx];
     half_size = mac->half_size;
     den_cost += get_bins_mac(center, mac);
+    cout << get_bins_mac(center,mac) << endl;
   }
   return den_cost;
 }

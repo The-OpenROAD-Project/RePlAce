@@ -173,8 +173,8 @@ ITER mLG: %d\n\
       mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
       mac->pmax.z = mac->center.z + 0.5 * mac->size.z;
     }
-    cell_copy();
-    plot("S3-LG3-macro", 9999, 1.0, 1);
+//    cell_copy();
+//    plot("S3-LG3-macro", 9999, 1.0, 1);
   }
   return ovlp_free_flg;
 }
@@ -206,9 +206,8 @@ void sa_mac_leg(int iter) {
       mac->pmax.z = mac->center.z + 0.5 * mac->size.z;
     }
 
-    cell_copy();
-
-    plot("S3-LG2-macro", 0, 1.0, 1);
+//    cell_copy();
+//    plot("S3-LG2-macro", 0, 1.0, 1);
   }
   cur_acc_cnt = 0;
   cur_rej_cnt = 0;
@@ -944,7 +943,7 @@ int get_mac_ovlp_3d_top(void) {
   int mac_ovlp_3d = 0;
 
   real_mac_area = get_all_macro_ovlp_3d();
-  mac_ovlp_3d = (tot_mac_area - real_mac_area) * TIER_DEP;
+  mac_ovlp_3d = (tot_mac_area - real_mac_area);
 
   return mac_ovlp_3d;
 }

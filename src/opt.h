@@ -109,7 +109,6 @@ void cell_calc_new_area_per_Cell(struct CELLx *cell, struct TILE *bp);
 void shrink_filler_cells(prec);
 void calc_Total_inflate_ratio();
 void calc_Total_inflated_cell_area();
-void congEstimation(struct FPOS *st);
 void buildRSMT_FLUTE(struct FPOS *st);                          // lutong
 void buildRSMT_FLUTE_PerNet(struct FPOS *st, struct NET *net);  // lutong
 void buildRMST(struct FPOS *st);

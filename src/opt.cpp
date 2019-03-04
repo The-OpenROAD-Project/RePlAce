@@ -121,9 +121,17 @@ int setup_before_opt_mGP2D(void) {
 int setup_before_opt_cGP2D(void) {
   tier_init_2D(cGP2D);
   bin_init_2D(cGP2D);
+
   // routability
-  if(routabilityCMD == true)
-    tile_init_cGP2D();
+  routeInst.Init();
+  WriteBookshelfForGR();
+  char routeLoc[BUF_SZ] = {0, };
+  sprintf(routeLoc, "%s/router_base/%s.route", dir_bnd, gbch);
+
+  if(isRoutability == true) {
+    read_routes_3D( routeLoc );
+    tile_init_cGP2D(); 
+  }
 
   charge_fft_init(dim_bin_cGP2D, bin_stp_cGP2D, 0);
   wcof_init(bin_stp_cGP2D);
@@ -557,6 +565,7 @@ void cell_init(void) {
   gcell_cnt = moduleCNT;
   gcell_st = (struct CELLx *)mkl_malloc(sizeof(struct CELLx) * gcell_cnt, 64);
 
+  // pin2 copy loop 
   for(i = 0; i < netCNT; i++) {
     net = &netInstance[i];
     net->mod_idx = -1;
@@ -741,7 +750,7 @@ prec get_phi_cof1(prec x) {
   prec bas = UPPER_PCOF;
 
   retCoef = (x < 0)? bas : bas * pow((bas), x * (-1.0));
-  // retCoef = (x < 0) ? bas : bas * pow((bas * 1.2), x * (-1.0));
+  //retCoef = (x < 0) ? bas : bas * pow((bas * 1.2), x * (-1.0));
   retCoef = (retCoef < LOWER_PCOF) ? LOWER_PCOF : retCoef;
 
   return retCoef;
@@ -1265,6 +1274,11 @@ void gp_opt(void) {
   filler_adj();
 #endif
 
+//  if( isRoutability ) {
+//    routeInst.Init();
+//    WriteBookshelf(); 
+//  }
+
   printf("PROC:  Start NESTEROV's Optimization\n");
   if(constraintDrivenCMD == false) {
     printf("PROC:    Global Lagrangian Multiplier is Applied\n");
@@ -1304,6 +1318,7 @@ void routability() {
     cout << "total_filler_area = " << total_filler_area << endl;
     curr_cell_area = total_cell_area;
   }
+
   bool print = false;
   while(1) {  // adjust_inflation()
     bloat_prep();
@@ -1346,13 +1361,13 @@ void routability() {
   target_cell_den = curr_cell_area / total_WS_area;
   // mod LW 10/29/16
   global_macro_area_scale = target_cell_den;
-  if(target_cell_den > 0.99) {
-    prec area_to_shrink = curr_cell_area - 0.99 * total_WS_area;
-    target_cell_den = 0.99;
+  if(target_cell_den > routeMaxDensity) {
+    prec area_to_shrink = curr_cell_area - routeMaxDensity * total_WS_area;
+    target_cell_den = routeMaxDensity;
     // mod LW 10/29/16
     global_macro_area_scale = target_cell_den;
     shrink_filler_cells(area_to_shrink);
-    curr_cell_area = 0.99 * total_WS_area;
+    curr_cell_area = routeMaxDensity * total_WS_area;
     curr_WS_area = curr_WS_area - (currTotalInflation - area_to_shrink);
   }
   cout << "DEN_NEW = " << target_cell_den << endl;
@@ -1421,7 +1436,7 @@ void cell_init_2D(void) {
   //                          target_cell_den == 0.80f ||
   //                          target_cell_den == 1.00 ||
   //                          target_cell_den == 0.80)) ||
-  //    (routabilityCMD == true && tier_st[0].modu_den < 0.32)) {
+  //    (isRoutability == true && tier_st[0].modu_den < 0.32)) {
   if((INPUT_FLG == MMS &&
       (target_cell_den == 1.00f || target_cell_den == 0.80f ||
        target_cell_den == 1.00 || target_cell_den == 0.80))) {

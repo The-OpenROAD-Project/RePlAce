@@ -182,33 +182,54 @@ void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
           tier_dir, tier_aux, tier_pl,
           (hasDensityDP) ? densityDP : target_cell_den);
 
-  //    }
-  //    else {
-  //        sprintf(cmd, "cd %s && ./ntuplace3 -aux %s -loadpl %s -noglobal \n",
-  //                tier_dir, tier_aux, tier_pl);
-  //    }
-
   // call
-  cout << "Call NtuPlacer3" << endl;
+  cout << "[INFO] Call NtuPlacer3" << endl;
+  cout << cmd << endl;
+  system(cmd);
+ /* 
+
+  // Below is for checking additional RC
+  sprintf( cmd, "ln -s /home/mgwoo/01_placement/RePlAce/router/convert.py  %s/", tier_dir);
   cout << cmd << endl;
   system(cmd);
 
-  /*
-  // mv All generated pl files
-  cout << "Move to " << tier_dir << "..." << endl;
-  sprintf(cmd,"mv ./%s.ntup.pl %s", gbch, tier_dir);
+  char realDirBnd[PATH_MAX] = {0, };
+  char* ptr = realpath(dir_bnd, realDirBnd);
+  
+  char realCurDir[PATH_MAX] = {0, };
+  ptr = realpath(currentDir, realCurDir);
+
+  sprintf( cmd, "ln -s %s/router_base/%s.route %s/", realDirBnd, gbch, tier_dir);
+  cout << cmd << endl;
+  system(cmd);
+  
+  sprintf( cmd, "ln -s %s/../router/*.dat %s/", realCurDir, tier_dir);
   cout << cmd << endl;
   system(cmd);
 
-  sprintf(cmd,"mv ./%s.ntup.plt %s", gbch, tier_dir);
+  sprintf( cmd, "cd %s && python ./convert.py %s.aux", tier_dir, gbch); 
+  cout << cmd << endl;
+  system(cmd);
+  
+  sprintf( cmd, "cd %s && %s/../router/%s ICCAD %s_mapped.aux %s_mapped.pl %s/../router/ICCAD12.NCTUgr.set %s_gp.est", tier_dir, currentDir, global_router, gbch, gbch, 
+      currentDir, gbch);
   cout << cmd << endl;
   system(cmd);
 
-  sprintf(cmd,"mv ./%s.lg.pl %s", gbch, tier_dir);
+  sprintf( cmd, "cd %s && %s/../router/%s ICCAD %s_mapped.aux %s_mapped.ntup.pl %s/../router/ICCAD12.NCTUgr.set %s_dp.est", tier_dir, currentDir, global_router, gbch, gbch, 
+      currentDir, gbch);
+  cout << cmd << endl;
+  system(cmd);
+  
+  sprintf( cmd, "ln -s %s/../router/*.pl %s/", realCurDir, tier_dir); 
+  cout << cmd << endl;
+  system(cmd);
+  
+  sprintf( cmd, "cd %s && perl iccad2012_evaluate_solution.pl -p %s_mapped.aux %s_mapped.pl %s_gp.est", tier_dir, gbch, gbch, gbch); 
   cout << cmd << endl;
   system(cmd);
 
-  sprintf(cmd,"mv ./%s.lg.plt %s", gbch, tier_dir);
+  sprintf( cmd, "cd %s && perl iccad2012_evaluate_solution.pl -p %s_mapped.aux %s_mapped.ntup.pl %s_dp.est", tier_dir, gbch, gbch, gbch); 
   cout << cmd << endl;
   system(cmd);
   */
@@ -218,29 +239,71 @@ void CallNtuPlacer4h(char *tier_dir, char *tier_aux, char *tier_pl) {
   char cmd[BUF_SZ] = {
       0,
   };
-  sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
-          detailPlacerLocationCMD.c_str(), tier_dir, tier_aux, tier_dir,
-          tier_pl);
 
-  cout << "INFO:  Execute NTUPlacer4h" << endl;
+  sprintf(cmd, "ln -s %s %s/", detailPlacerLocationCMD.c_str(), tier_dir);
   cout << cmd << endl;
-
   system(cmd);
-  //    chdir(currentDir);
-  // sprintf (cmd,"mv ./%s.ntup.pl %s", gbch, tier_dir);
-  // system (cmd);
-  // sprintf (cmd,"mv ./%s.ntup.plt %s", gbch, tier_dir);
-  // system (cmd);
 
-  // sprintf (cmd,"mv ./%s.lg.pl %s", gbch, tier_dir);
-  // system (cmd);
-  // sprintf (cmd,"mv ./%s.lg.plt %s", gbch, tier_dir);
-  // system (cmd);
+  //    if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
+  sprintf(cmd,
+          "cd %s && ./ntuplace4h -aux %s -loadpl %s -noglobal \n",
+          tier_dir, tier_aux, tier_pl);
 
-  // sprintf (cmd,"mv ./%s.init.plt %s", gbch, tier_dir);
-  // system (cmd);
-  // sprintf (cmd,"mv ./%s.dp.plt %s", gbch, tier_dir);
-  // system (cmd);
+  // call
+  cout << "[INFO] Call NtuPlacer4h" << endl;
+  cout << cmd << endl;
+  system(cmd);
+
+  
+
+  // Below is for checking additional RC
+  char realDirBnd[PATH_MAX] = {0, };
+  char* ptr = realpath(dir_bnd, realDirBnd);
+  
+  char realCurDir[PATH_MAX] = {0, };
+  ptr = realpath(currentDir, realCurDir);
+
+//  sprintf( cmd, "ln -s %s/router_base/%s.route %s/", realDirBnd, gbch, tier_dir);
+//  cout << cmd << endl;
+//  system(cmd);
+
+/*  
+  sprintf( cmd, "ln -s %s/../router/convert.py  %s/", realCurDir, tier_dir);
+  cout << cmd << endl;
+  system(cmd);
+  
+  sprintf( cmd, "ln -s %s/../router/*.dat %s/", realCurDir, tier_dir);
+  cout << cmd << endl;
+  system(cmd);
+
+  sprintf( cmd, "cd %s && python ./convert.py %s.aux", tier_dir, gbch); 
+  cout << cmd << endl;
+  system(cmd);
+  
+  sprintf( cmd, "cd %s && %s ICCAD %s_mapped.aux %s_mapped.pl %s %s_gp.est", tier_dir, globalRouterPosition.c_str(), gbch, gbch, 
+      globalRouterSetPosition.c_str(), gbch);
+  cout << cmd << endl;
+  system(cmd);
+
+  sprintf( cmd, "cd %s && %s ICCAD %s_mapped.aux %s_mapped.ntup.pl %s %s_dp.est", tier_dir, globalRouterPosition.c_str(), gbch, gbch, 
+      globalRouterSetPosition.c_str(), gbch);
+  cout << cmd << endl;
+  system(cmd);
+  
+  sprintf( cmd, "ln -s %s/../router/*.pl %s/", realCurDir, tier_dir); 
+  cout << cmd << endl;
+  system(cmd);
+  
+//  sprintf( cmd, "cd %s && perl iccad2012_evaluate_solution.pl -p %s_mapped.aux %s_mapped.pl %s_gp.est", tier_dir, gbch, gbch, gbch); 
+  sprintf( cmd, "cd %s && perl iccad2012_evaluate_solution.pl %s_mapped.aux %s_mapped.pl %s_gp.est", tier_dir, gbch, gbch, gbch); 
+  cout << cmd << endl;
+  system(cmd);
+
+//  sprintf( cmd, "cd %s && perl iccad2012_evaluate_solution.pl -p %s_mapped.aux %s_mapped.ntup.pl %s_dp.est", tier_dir, gbch, gbch, gbch); 
+  sprintf( cmd, "cd %s && perl iccad2012_evaluate_solution.pl %s_mapped.aux %s_mapped.ntup.pl %s_dp.est", tier_dir, gbch, gbch, gbch); 
+  cout << cmd << endl;
+  system(cmd);
+  */
 }
 
 /*
