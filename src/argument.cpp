@@ -801,6 +801,17 @@ bool argument(int argc, char *argv[]) {
         return false;
       }
     }
+    // custom scaledown input parameter setting
+    else if(!strcmp(argv[i], "-unitX")) {
+      if(i + 1 >= argc || argv[i + 1][0] == '-') {
+        printf(
+            "\n**ERROR: Option %s requires your custom scale-down parameter; "
+            "unitX\n",
+            argv[i]);
+        return false;
+      }
+      SetUnitX(atof(argv[++i]));
+    }
     // custom scaledown input parameter setting; (like ASAP-N7 library)
     else if(!strcmp(argv[i], "-unitY")) {
       if(i + 1 >= argc || argv[i + 1][0] == '-') {
@@ -811,6 +822,28 @@ bool argument(int argc, char *argv[]) {
         return false;
       }
       SetUnitY(atof(argv[++i]));
+    }
+    // custom scaledown input parameter setting; (like ASAP-N7 library)
+    else if(!strcmp(argv[i], "-offsetX")) {
+      if(i + 1 >= argc || argv[i + 1][0] == '-') {
+        printf(
+            "\n**ERROR: Option %s requires your custom offset parameter; "
+            "offsetX\n",
+            argv[i]);
+        return false;
+      }
+      SetOffsetX(atof(argv[++i]));
+    }
+    // custom scaledown input parameter setting; (like ASAP-N7 library)
+    else if(!strcmp(argv[i], "-offsetY")) {
+      if(i + 1 >= argc || argv[i + 1][0] == '-') {
+        printf(
+            "\n**ERROR: Option %s requires your custom offset parameter; "
+            "offsetY\n",
+            argv[i]);
+        return false;
+      }
+      SetOffsetY(atof(argv[++i]));
     }
     else if(!strcmp(argv[i], "-onlyDP")) {
       isSkipPlacement = true;

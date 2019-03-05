@@ -316,7 +316,10 @@ void GenerateNetDefOnly(Circuit::Circuit& __ckt);
 void GenerateNetDefVerilog(Circuit::Circuit& __ckt);
 
 // custom scale down parameter setting during the stage
+void SetUnitX(float _unitX);
 void SetUnitY(float _unitY);
+void SetOffsetX(float _offsetX);
+void SetOffsetY(float _offsetY);
 void SetUnitY(double _unitY);
 
 // return Component Index

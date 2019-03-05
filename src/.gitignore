@@ -4,3 +4,4 @@
 *.nfs*
 RePlAce
 tags
+.gdb_history

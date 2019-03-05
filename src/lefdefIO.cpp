@@ -108,8 +108,8 @@ static prec unitY = 0.0f;
 //
 // To prevent mis-matching in ROW offset.
 //
-static prec offsetX = 0.0f;
-static prec offsetY = 0.0f;
+static prec offsetX = PREC_MAX;
+static prec offsetY = PREC_MAX;
 
 // module & terminal Makp
 //
@@ -176,12 +176,24 @@ void ParseInput() {
   }
 }
 
+void SetUnitX(float _unitX) {
+  unitX = _unitX;
+}
+
 void SetUnitY(float _unitY) {
   unitY = _unitY;
 }
 
 void SetUnitY(double _unitY) {
   unitY = _unitY;
+}
+
+void SetOffsetX(float _offsetX) { 
+  offsetX = _offsetX;
+}
+
+void SetOffsetY(float _offsetY) {
+  offsetY = _offsetY;
 }
 
 inline static bool IsPrecEqual(prec a, prec b) {
@@ -228,13 +240,15 @@ void SetParameter() {
   moduleTermMap.set_empty_key(INIT_STR);
 
   // unitX setting : CORE SITE's Width
-  for(auto& curSite : __ckt.lefSiteStor) {
-    if(!curSite.hasClass() || !curSite.hasSize()) {
-      continue;
-    }
-    if(strcmp(curSite.siteClass(), "CORE") == 0) {
-      unitX = l2d * curSite.sizeX();
-      break;
+  if(IsPrecEqual(unitX, 0.0f)) {
+    for(auto& curSite : __ckt.lefSiteStor) {
+      if(!curSite.hasClass() || !curSite.hasSize()) {
+        continue;
+      }
+      if(strcmp(curSite.siteClass(), "CORE") == 0) {
+        unitX = l2d * curSite.sizeX();
+        break;
+      }
     }
   }
 
@@ -260,21 +274,23 @@ void SetParameter() {
        << endl;
 
   // offsetX & offsetY : Minimum coordinate of ROW's x/y
-  offsetX = offsetY = PREC_MAX;
-  for(auto& curRow : __ckt.defRowStor) {
-    offsetX = (offsetX > curRow.x()) ? curRow.x() : offsetX;
-    offsetY = (offsetY > curRow.y()) ? curRow.y() : offsetY;
+  if(IsPrecEqual(offsetX, PREC_MAX)) {
+    for(auto& curRow : __ckt.defRowStor) {
+      offsetX = (offsetX > curRow.x()) ? curRow.x() : offsetX;
+    }
+    offsetX = (INT_CONVERT(offsetX) % INT_CONVERT(unitX) == 0)
+      ? 0
+      : unitX - (INT_CONVERT(offsetX) % (INT_CONVERT(unitX)));
   }
-  //    cout << INT_CONVERT(offsetX) << endl;
-  //    cout << INT_CONVERT(offsetY) << endl;
 
-  offsetX = (INT_CONVERT(offsetX) % INT_CONVERT(unitX) == 0)
-                ? 0
-                : unitX - (INT_CONVERT(offsetX) % (INT_CONVERT(unitX)));
-
-  offsetY = (INT_CONVERT(offsetY) % INT_CONVERT(unitY) == 0)
-                ? 0
-                : unitY - (INT_CONVERT(offsetY) % (INT_CONVERT(unitY)));
+  if(IsPrecEqual(offsetY, PREC_MAX)) { 
+    for(auto& curRow : __ckt.defRowStor) {
+      offsetY = (offsetY > curRow.y()) ? curRow.y() : offsetY;
+    }
+    offsetY = (INT_CONVERT(offsetY) % INT_CONVERT(unitY) == 0)
+      ? 0
+      : unitY - (INT_CONVERT(offsetY) % (INT_CONVERT(unitY)));
+  }
 
   cout << "INFO:  OFFSET COORDINATE: ( " << offsetX << ", " << offsetY << " )"
        << endl
