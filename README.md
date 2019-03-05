@@ -51,23 +51,14 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
  
 ### How To Execute
     // download lefdef benchmarks
-    $ cd ~/RePlAce/bench/lefdef
+    $ cd ~/RePlAce/bench/ispd18
     $ ./download_ispd18.sh
-    
-    // download bookshelf benchmarks
-    $ cd ~/RePlAce/bench/bookshelf
-    $ ./download_dac2012.sh
     
     // Generate a result from ISPD18 - ispd18.test1.input
     // Check doc/ScriptUsage.md in detail
     $ cd ~/RePlAce/src
     $ ./execute_lefdef.py 0 
     
-    // Generate a result from DAC2012 - superblue19
-    // Check doc/ScriptUsage.md in detail
-    $ cd ~/RePlAce/src
-    $ ./execute_bookshelf.py superblue19
-
 
 ### Verified/supported Technologies
 * TSMC 65
