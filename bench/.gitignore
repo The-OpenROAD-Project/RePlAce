@@ -1,9 +1,9 @@
-lefdef/ispd18_*/*.lef
-lefdef/ispd18_*/*.def
-lefdef/ispd18_*/*.v
-lefdef/ispd18_*/*.guide
-lefdef/*.tar.bz2
-lefdef/tar
+ispd18/ispd18_*/*.lef
+ispd18/ispd18_*/*.def
+ispd18/ispd18_*/*.v
+ispd18/ispd18_*/*.guide
+ispd18/*.tar.bz2
+ispd18/tar
 bookshelf/**/*.aux
 bookshelf/**/*.scl
 bookshelf/**/*.nodes

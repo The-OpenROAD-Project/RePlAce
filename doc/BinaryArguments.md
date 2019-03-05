@@ -22,13 +22,6 @@ __Timing-Driven__ mode must have same arguments as non-timing mode, but the __di
 * __-capPerMicron__ : Capacitance per Micron. Unit: Farad. (Used for Internal RC Extraction)
 * __-resPerMicron__ : Resisance per Micron. Unit: Ohm. (Used for Internal RC Extraction)
 
-
-## Bookshelf (Academic Format)
-    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -aux <*.aux> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
-    
-* __-bmflag__ : Specify which Benchmark is used
-* __-aux__ : \*.aux Location
-
 ## Other Options
 ### Flow Control
 * __-timing__ : Enable Timing-Driven Placement Mode 
@@ -53,7 +46,7 @@ __Timing-Driven__ mode must have same arguments as non-timing mode, but the __di
 * __-plot__ : Plot Layout Every 10 Iterations (Cell, Bin, Arrow Plots)
 
 ### Router
-* __-R__ : Enable Routability flow (currently only supports DAC-2012 and ICCAD-2012 benchmark suites)
+* __-routability__ : Enable Routability flow 
 
 ### Other
 * __-unitY__ : Custom scaledown param for LEF/DEF/Verilog (especially for ASAP N7 library; Recommended: 864)

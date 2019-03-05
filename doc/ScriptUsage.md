@@ -1,8 +1,7 @@
 # RePlAce script Usage
-There are two python scripts to feed both of bookshelf and lef/def/verilog files.
+There is a python script to feed lef/def/verilog files.
 
 * [execute_lefdef.py](../src/execute_lefdef.py)
-* [execute_bookshelf.py](../src/execute_bookshelf.py)
 
 ## Configure options to execute scripts
 You can easily find this part inside of the python scripts.
@@ -22,36 +21,6 @@ You can easily find this part inside of the python scripts.
 * __useScreen__ : (__T__/__F__) Execute RePlAce in background mode using screen
 
 \* Note that __isNohup__ and __useScreen__ should not be __True__ at the same time.
-
-## Feed RePlAce with Bookshelf 
-    $ python execute_bookshelf.py [directory order | benchmark Name | all]
-
-For example, if you have bookshelf benchmarks as
-
-    bookshelf_bench/superblue10/superblue10.aux
-    bookshelf_bench/superblue10/superblue10.(nodes, nets, pl, shapes, ...)
-    bookshelf_bench/superblue14/superblue14.aux
-    bookshelf_bench/superblue14/superblue14.(nodes, nets, pl, shapes, ...)
-    bookshelf_bench/superblue19/superblue19.aux
-    bookshelf_bench/superblue19/superblue19.(nodes, nets, pl, shapes, ...)
-
-1. Directory order
-    
-        $ python execute_bookshelf.py 0
-    User can specify the sub-directory index (in alphabetical order)
-    (0 -> superblue10 // 1 -> superblue14 // 2 -> superblue19)
-
-2. Directory Name
-
-        $ python execute_bookshelf.py superblue19
-    User can also specify the exact name of a sub-folder name  
-    (superblue10 -> superblue10 // superblue14 -> superblue14 // superblue19 -> superblue19)
-
-3. All directory simultaneously (+ background)
-
-        $ python execute_bookshelf.py all
-    It'll execute all files in sequentially.  
-    If you set __useScreen__ = __True__ or __nohup__ = __True__, all benchmarks are executed simultaneously as background processes.
     
 ## Feed RePlAce with LEF/DEF/VERILOG
     $ python execute_lefdef.py [directory order | benchmark Name | all]
