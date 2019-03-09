@@ -1355,9 +1355,11 @@ inline void SetEscapedStr(std::string &inp) {
   }
 }
 
-inline char *GetEscapedStr(const char *name) {
+inline char *GetEscapedStr(const char *name, bool isEscape = true) {
   std::string tmp(name);
-  SetEscapedStr(tmp);
+  if( isEscape ) {
+    SetEscapedStr(tmp);
+  }
   return strdup(tmp.c_str());
 }
 

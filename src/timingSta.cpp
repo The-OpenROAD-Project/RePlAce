@@ -235,11 +235,20 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   // read_netlist
   NetworkReader* network = _sta->networkReader();
   bool readVerilog = false;
-  if(network) {
-    _sta->readNetlistBefore();
-    readVerilog = readVerilogFile(verilogName.c_str(), _sta->report(),
-                                  _sta->debug(), _sta->networkReader());
+  if(!network) {
+    cout << "ERROR: Internal OpenSTA has problem for generating networkReader" << endl;
+    exit(1);
   }
+
+
+  // Parsing the Verilog
+  _sta->readNetlistBefore();
+//  VerilogReader* verilogReader = new VerilogReader(_sta->report(), _sta->debug(), network);
+//  verilogReader->
+
+  readVerilog = readVerilogFile(verilogName.c_str(), _sta->report(),
+                                  _sta->debug(), _sta->networkReader());
+
 
   // link_design
   cout << "Now linking; " << topCellName << endl;
@@ -450,12 +459,23 @@ void Timing::FillSpefForSta() {
     }
   }
 
+  bool isEscape = true;
+  for(int i=0; i<_netCnt; i++) {
+    char* tmpStr = GetEscapedStr(netInstance[i].name, isEscape);
+    sta::Net* net = sta::spef_reader->findNet(tmpStr);
+    if( !net ) {
+      isEscape = false;
+      break;
+    }
+  }
+
   for(int i = 0; i < _netCnt; i++) {
     NET* curNet = &_nets[i];
     // char* netName = new char[strlen(curNet->name)+1];
     // strcpy(netName, curNet->name);
 
-    char* tmpStr = GetEscapedStr(curNet->name);
+    char* tmpStr = GetEscapedStr(curNet->name, isEscape);
+//    cout << "find: " << tmpStr << endl;
     sta::Net* net = sta::spef_reader->findNet(tmpStr);
     // cout << "SPEF: " << tmpStr << endl;
     free(tmpStr);
