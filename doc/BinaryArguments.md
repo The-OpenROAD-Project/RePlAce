@@ -16,11 +16,21 @@
 
 __Timing-Driven__ mode must have same arguments as non-timing mode, but the __differences__ are:
 * __-timing__ : Specify the Timing-Driven Placement Mode
-* __-verilog__ : \*.v Location (Required for OpenSTA)
+* __-verilog__ : \*.v Location (__Required__ for OpenSTA)
 * __-sdc__ : Specify the Synopsys Design Constraint (SDC) file. (Required for OpenSTA)
 * __-lib__ : \*.lib Location (Multiple lib files supported. Required for OpenSTA)
 * __-capPerMicron__ : Capacitance per Micron. Unit: Farad. (Used for Internal RC Extraction)
 * __-resPerMicron__ : Resisance per Micron. Unit: Ohm. (Used for Internal RC Extraction)
+
+## Legalization mode 
+    $ ./RePlAce -bmflag etc -onlyDP -onlyLG -lef tech.lef -lef macro.lef ...  -def <*.def> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation>
+
+Note that verilog is not supported in this mode.
+
+__Legalization-Only__ mode must have same arguments as original mode, but the __differences__ are:
+
+* __-onlyDP__ : Only Detailed Placement Mode
+* __-onlyLG__ : Call Detailed Placement in Legalization Mode
 
 ## Other Options
 ### Flow Control
