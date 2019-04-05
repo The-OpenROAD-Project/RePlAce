@@ -65,8 +65,8 @@ struct NODES {
 
 // for *.scl files
 struct ROW {
-  int site_wid;  // SiteWidth
-  int site_spa;  // SiteSpacing
+  prec site_wid;  // SiteWidth
+  prec site_spa;  // SiteSpacing
 
   string ori;
   //    string sym;
@@ -75,9 +75,9 @@ struct ROW {
   bool isR90Symmetry;
 
   int x_cnt;  // NumSites
-  POS pmin;
-  POS pmax;
-  POS size;
+  FPOS pmin;
+  FPOS pmax;
+  FPOS size;
 
   ROW()
       : site_wid(0),

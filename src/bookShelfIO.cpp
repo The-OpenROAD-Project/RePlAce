@@ -2944,7 +2944,20 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
   fflush( fp_route );
  
   Circuit::Circuit* _ckt = routeInst.GetCircuitInst();
-  fprintf( fp_route, "NumNiTerminals     : %d\n", _ckt->defPinStor.size() );
+  
+  int pinCnt = 0;
+  for(auto& curPin : _ckt->defPinStor) {
+    // skip for GROUND/POWER pins
+    if( curPin.hasUse() ) {
+      if( strcmp(curPin.use(), "GROUND") == 0 ||
+          strcmp(curPin.use(), "POWER") == 0 ) {
+        continue;
+      }
+    }
+    ++pinCnt;
+  }
+
+  fprintf( fp_route, "NumNiTerminals     : %d\n", pinCnt );
   
   for(auto& curPin : _ckt->defPinStor) {
     // skip for GROUND/POWER pins
@@ -3103,8 +3116,8 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
     if(isShapeDrawing) {
       fprintf(fp_nodes, "%*s %*d %*d %*s\n", 
           15, (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
-          14, (int)(curTerminal->size.x + 0.5),
-          14, (int)(curTerminal->size.y + 0.5), 
+          14, INT_CONVERT(curTerminal->size.x),
+          14, INT_CONVERT(curTerminal->size.y), 
           15, termString.c_str());
     }
     else {
@@ -3631,14 +3644,14 @@ void WriteScl(char *dir_tier, int curLayer) {
   // iterate based on the sorted order
   for(auto &curRow : tmpRowStor) {
     fprintf(fp_scl, "CoreRow Horizontal\n");
-    fprintf(fp_scl, "  Coordinate    :   %d\n", curRow.pmin.y);
-    fprintf(fp_scl, "  Height        :   %d\n", (int)(rowHeight + 0.5f));
-    fprintf(fp_scl, "  Sitewidth     :    %d\n", curRow.site_wid);
-    fprintf(fp_scl, "  Sitespacing   :    %d\n", curRow.site_spa);
+    fprintf(fp_scl, "  Coordinate    :   %d\n", INT_CONVERT(curRow.pmin.y));
+    fprintf(fp_scl, "  Height        :   %d\n", INT_CONVERT(rowHeight));
+    fprintf(fp_scl, "  Sitewidth     :    %d\n", INT_CONVERT( curRow.site_wid ));
+    fprintf(fp_scl, "  Sitespacing   :    %d\n", INT_CONVERT( curRow.site_spa ));
     fprintf(fp_scl, "  Siteorient    :    %s\n",
             (curRow.isYSymmetry) ? "Y" : "1");
     fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
-    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", curRow.pmin.x,
+    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", INT_CONVERT(curRow.pmin.x),
             curRow.x_cnt);
     fprintf(fp_scl, "End\n");
   }
@@ -3669,14 +3682,14 @@ void WriteSclWithDummy(char *dir_tier, int curLayer, DummyCellInfo &dummyInst) {
   // iterate based on the sorted order
   for(auto &curRow : *dummyInst.GetRowStor()) {
     fprintf(fp_scl, "CoreRow Horizontal\n");
-    fprintf(fp_scl, "  Coordinate    :   %d\n", curRow.pmin.y);
-    fprintf(fp_scl, "  Height        :   %d\n", (int)(rowHeight + 0.5f));
-    fprintf(fp_scl, "  Sitewidth     :    %d\n", curRow.site_wid);
-    fprintf(fp_scl, "  Sitespacing   :    %d\n", curRow.site_spa);
+    fprintf(fp_scl, "  Coordinate    :   %d\n", INT_CONVERT(curRow.pmin.y));
+    fprintf(fp_scl, "  Height        :   %d\n", INT_CONVERT(rowHeight));
+    fprintf(fp_scl, "  Sitewidth     :    %d\n", INT_CONVERT(curRow.site_wid));
+    fprintf(fp_scl, "  Sitespacing   :    %d\n", INT_CONVERT(curRow.site_spa));
     fprintf(fp_scl, "  Siteorient    :    %s\n",
             (curRow.isYSymmetry) ? "Y" : "1");
     fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
-    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", curRow.pmin.x,
+    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", INT_CONVERT(curRow.pmin.x),
             curRow.x_cnt);
     fprintf(fp_scl, "End\n");
   }
