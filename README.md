@@ -96,8 +96,5 @@ Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths 
 - Timing-Driven mode has been implemented by Mingyu Woo.
 
 ### Limitations
-* RePlAce scales down the design from LEF/DEF/Verilog inputs for internal numerical stability reason, and scales back up for outputs. The scaling parameters XXX/YYY must be integer and must result in integer units after scaling down. This limitation will be removed in a future release (-unitY solve this problem temporary).
-* RePlAce does not support verilog files with certain string delimiters (e.g. '/', '[', ']' with starting character backslash('\\')).
-* RePlAce does not support rouability-driven mode using the LEF/DEF/Verilog interface. This will be enabled in a future release.
 * Mixed-sized RePlAce with (LEF/DEF/Verilog) interface does not generate legalized placement.
 * RePlAce does not support rectilinear layout regions.
