@@ -66,7 +66,7 @@ class RouteInstance {
 
     // to generate *.route files for bookshelf
     // GCellSize in Bookshelf's scale, i.e., tileSize
-    int _tileSizeX, _tileSizeY;
+    float _tileSizeX, _tileSizeY;
     int _gridCountX, _gridCountY;
 
     int _gridInnerCountX, _gridInnerCountY;
@@ -116,8 +116,8 @@ class RouteInstance {
     vector<Layer>& GetLayerStor() {return _layerStor; };
     vector<int>& GetTrackCount() {return _trackCount; };
     int GetTrackCount(int layerIdx) { return _trackCount[layerIdx]; };
-    int GetTileSizeX() { return _tileSizeX; };
-    int GetTileSizeY() { return _tileSizeY; };
+    float GetTileSizeX() { return _tileSizeX; };
+    float GetTileSizeY() { return _tileSizeY; };
     int GetGridCountX() { return _gridCountX; };
     int GetGridCountY() { return _gridCountY; };
     float GetGridOriginX() {return _gridOriginX; };

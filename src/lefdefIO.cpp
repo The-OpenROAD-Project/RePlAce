@@ -196,6 +196,26 @@ void SetOffsetY(float _offsetY) {
   offsetY = _offsetY;
 }
 
+prec GetUnitX() { return unitX; }
+prec GetUnitY() { return unitY; }
+prec GetOffsetX() { return offsetX; }
+prec GetOffsetY() { return offsetY; }
+
+int GetScaleUpSize(prec input) {
+  return INT_CONVERT( input * GetUnitX() );
+}
+int GetScaleUpPoint(prec input) {
+  return INT_CONVERT( input * GetUnitX() - GetOffsetX() );
+}
+
+prec GetScaleDownSize(prec input) {
+  return input / GetUnitX();
+}
+prec GetScaleDownPoint( prec input) {
+  return (input + GetOffsetX()) / GetUnitX();
+}
+
+
 inline static bool IsPrecEqual(prec a, prec b) {
   return std::fabs(a - b) < std::numeric_limits< float >::epsilon();
 }
@@ -239,21 +259,8 @@ void SetParameter() {
   // required for net(DEF) -> module fast access
   moduleTermMap.set_empty_key(INIT_STR);
 
-  // unitX setting : CORE SITE's Width
-  if(IsPrecEqual(unitX, 0.0f)) {
-    for(auto& curSite : __ckt.lefSiteStor) {
-      if(!curSite.hasClass() || !curSite.hasSize()) {
-        continue;
-      }
-      if(strcmp(curSite.siteClass(), "CORE") == 0) {
-        unitX = l2d * curSite.sizeX();
-        break;
-      }
-    }
-  }
-
-  // unitY setting : RowHeight / 9 --> Converted Height: 9
-//  unitY = unitX;
+  // unitX, unitY setting : RowHeight / 9 --> Converted Height: 9
+  // RePlAce's Nesterov iteration parameter is optimized when cell height is around 9.
   auto sitePtr = __ckt.lefSiteMap.find(string(__ckt.defRowStor[0].macro()));
   unitY = l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / 9.0f;
   unitX = unitY;
@@ -285,7 +292,6 @@ void SetParameter() {
   cout << "INFO:  OFFSET COORDINATE: ( " << offsetX << ", " << offsetY << " )"
        << endl
        << endl;
-
 }
 
 void SetVerilogTopModule() {
@@ -505,7 +511,8 @@ bool AddShape(int defCompIdx, int lx, int ly) {
 
         // finally pushed into shapeStor
         shapeStor.push_back(SHAPE(
-            string("shape_") + to_string(shapeCnt), compName, shapeStor.size(),
+            string("shape_") + to_string(shapeCnt), compName, 
+            shapeStor.size(),
             (l2d * rect->xl + lx + offsetX) / unitX,  // lx
             (l2d * rect->yl + ly + offsetY) / unitY,  // ly
             l2d * (rect->xh - rect->xl) / unitX,      // xWidth
@@ -1935,10 +1942,10 @@ void ReadPlLefDef(const char* fileName) {
         continue;
 
       token = strtok(NULL, " \t\n");
-      curModule->pmin.x = atof(token);
+      curModule->pmin.x = GetScaleDownPoint( atof(token) );
 
       token = strtok(NULL, " \t\n");
-      curModule->pmin.y = atof(token);
+      curModule->pmin.y = GetScaleDownPoint( atof(token) );
 
       curModule->pmax.x = curModule->pmin.x + curModule->size.x;
       curModule->pmax.y = curModule->pmin.y + curModule->size.y;

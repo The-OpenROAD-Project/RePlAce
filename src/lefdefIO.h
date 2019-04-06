@@ -84,6 +84,7 @@
 #include <defrReader.hpp>
 #include <defiAlias.hpp>
 
+#include "global.h"
 #define INIT_STR "!@#!@#"
 
 using std::cout;
@@ -321,6 +322,17 @@ void SetUnitY(float _unitY);
 void SetOffsetX(float _offsetX);
 void SetOffsetY(float _offsetY);
 void SetUnitY(double _unitY);
+
+prec GetUnitX();
+prec GetUnitY();
+prec GetOffsetX();
+prec GetOffsetY();
+
+int GetScaleUpSize(float input);
+int GetScaleUpPoint(float input);
+
+prec GetScaleDownSize(float input);
+prec GetScaleDownPoint(float input);
 
 // return Component Index
 inline int GetDefComponentIdx(Circuit::Circuit& __ckt, string& compName) {

@@ -159,8 +159,8 @@ void RouteInstance::FillGCellXY() {
 //  _gCellSizeX = _ckt->lefSiteStor[0].sizeY();
 //  _gCellSizeY = _ckt->lefSiteStor[0].sizeY();
 
-  _tileSizeX = INT_CONVERT( _defDbu * _gCellSizeX / _unitX );
-  _tileSizeY = INT_CONVERT( _defDbu * _gCellSizeY / _unitY );
+  _tileSizeX =  _defDbu * _gCellSizeX / _unitX ;
+  _tileSizeY =  _defDbu * _gCellSizeY / _unitY ;
 
   cout << "INFO: TILE SIZE for GRouter in Micron: " << _gCellSizeX << " x " << _gCellSizeY << endl;
   cout << "INFO: SCALED TILE SIZE for GRouter: " << _tileSizeX
