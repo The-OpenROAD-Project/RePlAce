@@ -10,6 +10,7 @@
 * __-output__ : Specify the Location of Output Results
 * __-dpflag__ : Specify which Detailed Placer is Used
 * __-dploc__ : Specify the Location of Detailed Placer
+* __-fast__ : Fast and quick placement for IO-pin placement. Please do NOT use this command in general purposes (It'll not spread all cells enough)
 
 ## Timing-Driven mode for Lef/Def/Verilog (Commercial Format)
     $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> -verilog <*.v> -lib lib1.lib -lib lib2.lib ... -sdc <*.sdc> -timing -capPerMicron 0.23e-15 -resPerMicron 70.0 -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]

@@ -51,7 +51,7 @@ extern prec opt_phi_cof_local;
 extern prec gsum_pcnt;
 extern prec gsum_area;
 extern prec avg80p_cell_area;
-extern prec ref_dwl0;
+extern prec refDeltaWL;
 extern prec LOWER_PCOF, UPPER_PCOF;
 extern prec INIT_LAMBDA_COF_GP;
 extern prec MIN_PRE;

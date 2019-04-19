@@ -950,7 +950,6 @@ extern prec gsum_phi;
 extern prec gsum_ovfl;
 extern prec gsum_ovf_area;
 extern prec overflowMin;
-extern prec overflowMin_initial;
 extern prec mGP3D_opt_phi_cof;
 extern prec mGP2D_opt_phi_cof;
 extern prec cGP3D_opt_phi_cof;
@@ -1100,6 +1099,7 @@ extern string experimentCMD;
 extern vector< string > libStor;
 extern string verilogTopModule;
 extern int defMacroCnt;
+extern int numInitPlaceIter;
 
 extern string benchName;
 
@@ -1111,14 +1111,11 @@ extern string denCMD;
 extern string bxMaxCMD;
 extern string byMaxCMD;
 extern string bzMaxCMD;
-extern string overflowMinCMD;
-extern string pcofmaxCMD;
-extern string pcofminCMD;
 extern string racntiCMD;    // lutong
 extern string maxinflCMD;   // lutong
 extern string inflcoefCMD;  // lutong
 extern string filleriterCMD;
-extern string refdWLCMD;
+extern prec refDeltaWL;
 extern int conges_eval_methodCMD;  // grouter | prob
 
 extern bool isVerbose;

@@ -69,10 +69,6 @@ void initial_placement() {
 
   double time_s = 0;
 
-  int max_ip = (isRoutability) ? 1 : 30;
-  // debug : mgwoo
-  //    max_ip = 0;
-
   HPWL_count();
 
   if(isSkipIP) {
@@ -106,6 +102,10 @@ void initial_placement() {
       ycg_b(moduleCNT);
 
   for(int i = 0;; i++) {
+    if(i >= numInitPlaceIter) {
+      break;
+    }
+
     time_start(&time_s);
     CreateSparseMatrix(xcg_x, xcg_b, ycg_x, ycg_b, eMatX, eMatY);
 
@@ -138,10 +138,6 @@ void initial_placement() {
     fflush(stdout);
 
     if(fabs(x_err) < target_tol && fabs(y_err) < target_tol && i > 4) {
-      break;
-    }
-
-    if(i >= max_ip) {
       break;
     }
   }

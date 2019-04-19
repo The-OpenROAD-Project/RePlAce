@@ -253,8 +253,8 @@ void calcRef_dWL() {
   HPWLrange = trial_HPWLs[trial_HPWLs.size() - 1].first - trial_HPWLs[0].first;
   tGPiterCNT = trial_HPWLs.size();
 
-  ref_dwl0 = HPWLrange / (prec)tGPiterCNT / 2.0;
-  cout << "INFO:  Reference DELTA Wirelength = " << ref_dwl0 << endl;
+  refDeltaWL = HPWLrange / (prec)tGPiterCNT / 2.0;
+  cout << "INFO:  Reference DELTA Wirelength = " << refDeltaWL << endl;
 }
 
 void findMinHPWLduringTrial() {

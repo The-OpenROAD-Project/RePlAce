@@ -286,13 +286,6 @@ void myNesterov::InitializationCellStatus() {
 }
 
 void myNesterov::InitializationCoefficients() {
-  if(isRoutability)
-    INIT_LAMBDA_COF_GP = 0.001;
-  // if (isRoutability) INIT_LAMBDA_COF_GP = 0.1;
-  else {
-    //        INIT_LAMBDA_COF_GP = 0.0001;
-    INIT_LAMBDA_COF_GP = 0.00008;
-  }
 
   if(STAGE == mGP3D) {
     opt_phi_cof = sum_wgrad / sum_pgrad * INIT_LAMBDA_COF_GP;
@@ -367,9 +360,6 @@ void myNesterov::InitializationCoefficients() {
     wcof = get_wlen_cof(gsum_ovfl);
     wlen_cof = fp_mul(base_wcof, wcof);
     wlen_cof_inv = fp_inv(wlen_cof);
-    // IK
-    if(!isRoutability)
-      overflowMin = 0.07;
   }
 
   if(lambda2CMD == true) {
@@ -818,6 +808,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
         timingCheck[checkIter] = 1;
       }
     }
+
     // Termination Condition 1
     if(it->ovfl <= overflowMin && i > 50) {
       return i;
@@ -1385,9 +1376,9 @@ void myNesterov::UpdateNesterovIter(int iter, struct ITER *it,
     //    }
     //}
     // if (stnCMD == true) {
-    //  it->pcof = get_phi_cof1 ((it->tot_wwl-last_it->tot_wwl)/ref_dwl0);
+    //  it->pcof = get_phi_cof1 ((it->tot_wwl-last_it->tot_wwl)/ refDeltaWL );
     //} else {
-    it->pcof = get_phi_cof1((it->tot_hpwl - last_it->tot_hpwl) / ref_dwl0);
+    it->pcof = get_phi_cof1((it->tot_hpwl - last_it->tot_hpwl) / refDeltaWL );
     //}
     if(temp_iter == 1) {
       // opt_phi_cof /= 1.05;

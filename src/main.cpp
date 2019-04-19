@@ -230,7 +230,6 @@ prec gsum_phi;
 prec gsum_ovfl;
 prec gsum_ovf_area;
 prec overflowMin;
-prec overflowMin_initial;
 prec mGP3D_opt_phi_cof;
 prec mGP2D_opt_phi_cof;
 prec cGP3D_opt_phi_cof;
@@ -334,6 +333,8 @@ string experimentCMD;      // mgwoo
 vector< string > lefStor;  // mgwoo
 string verilogTopModule;
 int defMacroCnt;
+int numInitPlaceIter;
+prec refDeltaWL;
 
 int numThread;
 InputMode inputMode;
@@ -352,10 +353,6 @@ string BETAmGP_CMD;
 string BETAcGP_CMD;
 string dampParam_CMD;
 string aspectRatioCMD;
-string overflowMinCMD;
-string pcofmaxCMD;
-string pcofminCMD;
-string refdWLCMD;
 string stnweightCMD;    // lutong
 string hpitchCMD;       // lutong
 string vpitchCMD;       // lutong

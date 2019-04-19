@@ -55,18 +55,24 @@
 #include "lefdefIO.h"
 #include "routeOpt.h"
 
+
+static bool isFastMode = false;
+
 void initArgument(int argc, char *argv[]) {
   ///////////////////////////////////////////////////////
   //  Begin Arguments Analysis                         //
   bmFlagCMD = "NULL";       // string
   denCMD = "NULL";          // string
-  overflowMinCMD = "NULL";  // string
   bxMaxCMD = "32";          // string
   byMaxCMD = "32";          // string
   bzMaxCMD = "32";          // string
-  pcofmaxCMD = "1.05";      // string
-  pcofminCMD = "0.95";      // string
-  refdWLCMD = "346000";     // string
+
+  UPPER_PCOF = 1.05;
+  LOWER_PCOF = 0.95;
+  refDeltaWL = 346000;
+  INIT_LAMBDA_COF_GP = PREC_MIN;
+
+
   racntiCMD = "10";         // lutong
   maxinflCMD = "2.5";       // lutong
   inflcoefCMD = "2.33";     // lutong
@@ -138,6 +144,8 @@ void initArgument(int argc, char *argv[]) {
   onlyLG_CMD = (isRoutability) ? true : false;
 
 
+  overflowMin = PREC_MAX;
+
   // parse all argument here.
   if(argument(argc, argv) == false) {
     printUsage();
@@ -150,10 +158,24 @@ void initArgument(int argc, char *argv[]) {
 
   // density & overflowMin settings
   denCMD = (denCMD == "NULL") ? ((isRoutability) ? "0.9" : "1.0") : denCMD;
-  overflowMinCMD = (overflowMinCMD == "NULL")
-                       ? ((isRoutability) ? "0.17" : "0.1")
-                       : overflowMinCMD;
-  overflowMin = overflowMin_initial = atof(overflowMinCMD.c_str());
+
+  overflowMin = (overflowMin == PREC_MAX)? 
+                       ((isRoutability) ? 0.17 : 0.1)
+                       : overflowMin;
+  
+  INIT_LAMBDA_COF_GP = (INIT_LAMBDA_COF_GP == PREC_MIN)? 
+    ((isRoutability)? 0.001 : 0.00008) : INIT_LAMBDA_COF_GP ;
+
+  numInitPlaceIter = (isRoutability)? 1 : 30;
+
+  /// !!!
+  if( isFastMode ) {
+    UPPER_PCOF = 1.2;
+    overflowMin = 0.3;
+    refDeltaWL = 1000000;
+    numInitPlaceIter = 1;
+    INIT_LAMBDA_COF_GP = 1; 
+  } 
 
   DEN_ONLY_PRECON = false;
 
@@ -176,10 +198,6 @@ void initArgument(int argc, char *argv[]) {
   pincnt_coef = 1.66;
   gRoute_pitch_scal = 1.09;
 
-  overflowMin = overflowMin_initial = atof(overflowMinCMD.c_str());
-  LOWER_PCOF = atof(pcofminCMD.c_str());
-  UPPER_PCOF = atof(pcofmaxCMD.c_str());
-
   max_inflation_ratio = atof(maxinflCMD.c_str());    // lutong
   inflation_ratio_coef = atof(inflcoefCMD.c_str());  // lutong
   NUM_ITER_FILLER_PLACE = atoi(filleriterCMD.c_str());
@@ -188,7 +206,6 @@ void initArgument(int argc, char *argv[]) {
   globalRouterPosition = GetRealPath( globalRouterPosition );
   globalRouterSetPosition = GetRealPath( globalRouterSetPosition );
 
-  ref_dwl0 = atof(refdWLCMD.c_str());
   ExtraWSfor3D = 0;     //.12; //0.1;
   MaxExtraWSfor3D = 0;  //.20; //0.2;
   dim_bin.x = atoi(bxMaxCMD.c_str());
@@ -582,7 +599,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-overflow")) {
       i++;
       if(argv[i][0] != '-') {
-        overflowMinCMD = argv[i];
+        overflowMin = atof(argv[i]);
       }
       else {
         printf("\n**ERROR: Option %s requires overflow tolerance ",
@@ -594,7 +611,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-pcofmin")) {
       i++;
       if(argv[i][0] != '-') {
-        pcofminCMD = argv[i];
+        LOWER_PCOF = atof(argv[i]);
       }
       else {
         printf("\n**ERROR: Option %s requires pCof_Min ", argv[i - 1]);
@@ -605,13 +622,17 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-pcofmax")) {
       i++;
       if(argv[i][0] != '-') {
-        pcofmaxCMD = argv[i];
+        UPPER_PCOF = atof(argv[i]);
       }
       else {
         printf("\n**ERROR: Option %s requires pCof_Max", argv[i - 1]);
         printf("(FLT<1.1).\n");
         return false;
       }
+    }
+    else if(!strcmp(argv[i], "-fast")) {
+      isFastMode = true;
+      i++;
     }
     /*
     else if(!strcmp(argv[i], "-stnweight")) {
@@ -757,10 +778,10 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-stepScale")) {
       i++;
       if(argv[i][0] != '-') {
-        refdWLCMD = argv[i];
+        refDeltaWL = atof(argv[i]);
       }
       else {
-        printf("\n**ERROR: Option %s requires stepScale ", argv[i - 1]);
+        printf("\n**ERROR: Option %s requires refDeltaWL", argv[i - 1]);
         printf("ref is 346000 (INT).\n");
         return false;
       }
@@ -870,34 +891,6 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-fragmentedRow")) {
       isNtuDummyFill = true;
     }
-    /*
-    else if(!strcmp(argv[i], "-CE")) {
-        i++;
-        if(argv[i][0] != '-') {
-            if(!strcmp(argv[i], "router")) {
-                conges_eval_methodCMD = global_router_based;
-            }
-            else if(!strcmp(argv[i], "prob")) {
-                conges_eval_methodCMD = prob_ripple_based;
-            }
-            else {
-                printf(
-                    "\n**ERROR: Option %s should have either router or "
-                    "prob\n",
-                    argv[i - 1]);
-                return false;
-            }
-        }
-        else {
-            printf(
-                "\n**ERROR: Option %s requires your congestion est. "
-                "method ",
-                argv[i - 1]);
-            printf("router or prob.\n");
-            return false;
-        }
-    }
-    */
     else if(!strcmp(argv[i], "-bin")) {
       i++;
       if(argv[i][0] != '-') {
@@ -945,13 +938,6 @@ bool argument(int argc, char *argv[]) {
         return false;
       }
     }
-    /*
-    else if(!strcmp(argv[i], "-3d")) {
-        dimCMD = "3d";
-    }
-    else if(!strcmp(argv[i], "-2d")) {
-        dimCMD = "2d";
-    }*/
     else if(!strcmp(argv[i], "-plot")) {
       isPlot = true;
       plotCellCMD = true;
@@ -978,31 +964,16 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-routability")) {
       isRoutability = true;
     }
-    /*
-    else if(!strcmp(argv[i], "-stn")) {
-        stnCMD = true;
-    }*/
     else if(!strcmp(argv[i], "-DS")) {
       dynamicStepCMD = true;
       trialRunCMD = true;
     }
-    /*
-    else if(!strcmp(argv[i], "-thermal")) {
-        thermalAwarePlaceCMD = true;
-    }
-    else if(!strcmp(argv[i], "-TR")) {
-        trialRunCMD = true;
-    }*/
     else if(!strcmp(argv[i], "-timing")) {
       isTiming = true;
     }
     else if(!strcmp(argv[i], "-onlyGP")) {
       onlyGlobalPlaceCMD = true;
     }
-    /*
-    else if(!strcmp(argv[i], "-diffLambda")) {
-        lambda2CMD = true;
-    }*/
     else if(!strcmp(argv[i], "-auto_eval_RC")) {
       autoEvalRC_CMD = true;
     }
@@ -1171,27 +1142,3 @@ bool criticalArgumentError() {
   return false;
 }
 
-/*
- * replaced with one-line declariation - mgwoo
-void SetDefault_denCMD() {
-    if(denCMD == "NULL") {
-        if(isRoutability) {
-            denCMD = "0.9";
-        }
-        else {
-            denCMD = "1.0";
-        }
-    }
-}
-
-void SetDefault_overflowCMD() {
-    if(overflowMinCMD == "NULL") {
-        if(isRoutability) {
-            overflowMinCMD = "0.17";
-        }
-        else {
-            overflowMinCMD = "0.1";
-        }
-    }
-}
-*/
