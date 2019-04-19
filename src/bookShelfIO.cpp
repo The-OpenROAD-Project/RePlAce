@@ -1337,13 +1337,13 @@ int read_routes_3D(char *input) {
       }
       else if(strcmp(temp, "GridOrigin") == 0) {
         sscanf(line, "%*s : %lf %lf", &temp_gridLLx, &temp_gridLLy);
-        gridLLx = (prec)temp_gridLLx;
-        gridLLy = (prec)temp_gridLLy;
+        gridLLx = GetScaleDownPoint( temp_gridLLx );
+        gridLLy = GetScaleDownPoint( temp_gridLLy );
       }
       else if(strcmp(temp, "TileSize") == 0) {
         sscanf(line, "%*s : %lf %lf", &temp_tileWidth, &temp_tileHeight);
-        tileWidth = (prec)temp_tileWidth;
-        tileHeight = (prec)temp_tileHeight;
+        tileWidth = GetScaleDownSize( temp_tileWidth );
+        tileHeight = GetScaleDownSize( temp_tileHeight );
       }
       else if(strcmp(temp, "BlockagePorosity") == 0) {
         sscanf(line, "%*s : %lf", &temp_blockagePorosity);
@@ -2555,7 +2555,7 @@ void runtimeError(string error_text) {
   exit(1);
 }
 
-void read_routing_file(char *dir) {
+void read_routing_file(char *dir, string routeName ) {
   cout << "INFO:  READ BACK ROUTING FILE..." << endl;
   cout << "INFO:  netCNT: " << netCNT << endl;
   char route_file[BUFFERSIZE];
@@ -2571,8 +2571,8 @@ void read_routing_file(char *dir) {
   from.SetZero();
   to.SetZero();
 
-  sprintf(route_file, "%s/%s.est", dir, gbch);
-  cout << "INFO:  ROUTING FILE LOCATION: " << route_file << endl;
+  strcpy(route_file, routeName.c_str());
+  cout << "INFO:  ROUTING FILE LOCATION: " << route_file<< endl;
   FILE *fp = fopen(route_file, "r");
 
   if((fp = fopen(route_file, "r")) == NULL) {
@@ -2605,11 +2605,11 @@ void read_routing_file(char *dir) {
                &toY, &toL);
         if(fromL != toL)
           continue;
-        from.x = fromX;
-        from.y = fromY;
+        from.x = GetScaleDownPoint(fromX);
+        from.y = GetScaleDownPoint(fromY);
         from.z = fromL;
-        to.x = toX;
-        to.y = toY;
+        to.x = GetScaleDownPoint(toX);
+        to.y = GetScaleDownPoint(toY);
         to.z = toL;
         layer = fromL;
         curNet= &netInstance[netIdx];
@@ -4011,6 +4011,28 @@ void BookshelfNameMap::InitWithDummyCell( DummyCellInfo& dummyInst ) {
   }
 }
 
+const char* BookshelfNameMap::GetOrigModuleName( const char* name ) {
+  auto mtPtr = bsToModuleMap.find(string(name)); 
+  if( mtPtr != bsToModuleMap.end()) {
+    return mtPtr->second.c_str();
+  }
+  else {
+    cout << "WARNING:  " << __FUNCTION__ << " Cannot find " << name << " in bookshelf name map!" << endl;
+    return "";
+  }
+}
+
+const char* BookshelfNameMap::GetOrigTerminalName( const char* name ) {
+  auto mtPtr = bsToTerminalMap.find(string(name)); 
+  if( mtPtr != bsToTerminalMap.end()) {
+    return mtPtr->second.c_str();
+  }
+  else {
+    cout << "ERROR:  " << __FUNCTION__ << " Cannot find " << name << " in bookshelf name map!" << endl;
+    exit(1);
+  }
+}
+
 const char* BookshelfNameMap::GetBsModuleName( const char* name ) {
   auto mtPtr = moduleToBsMap.find(string(name)); 
   if( mtPtr != moduleToBsMap.end()) {
@@ -4050,6 +4072,7 @@ const char* BookshelfNameMap::GetBsNetName( const char* name ){
 // See also ReadPlLefDef(const char* fileName) in lefdefIO.cpp
 //
 void ReadPlBookshelf(const char *fileName) {
+  cout << "READ BACK FROM " << fileName << endl;
   FPOS pof;
   FILE *fp = fopen(fileName, "r");
   if(!fp) {
@@ -4115,11 +4138,7 @@ void ReadPlBookshelf(const char *fileName) {
   fclose(fp);
 }
 
-void output_tier_pl_global_router(char *dir, int z, int lab, bool isNameConvert) {
-  char fn_pl[BUF_SZ];
-  // char            dir_router[BUF_SZ];
-  // char            cmd[BUF_SZ];
-
+void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConvert) {
   FILE *fp_pl = NULL;
 
   struct TIER *tier = &tier_st[z];
@@ -4128,18 +4147,9 @@ void output_tier_pl_global_router(char *dir, int z, int lab, bool isNameConvert)
   struct TERM *curTerminal = NULL;
   struct PIN *pin = NULL;
 
-  // sprintf (dir_router, "%s/router/tier%d/inflarion_iter%d", dir_bnd, z,
-  // infl_iter);
+  cout << "INFO:  pl file writing: " << plName << endl; 
 
-  // sprintf (cmd, "mkdir -p %s", dir_router);
-  // system (cmd);
-
-  cout << "INFO:  "
-       << "Temp. Working Dir= " << endl
-       << "       " << dir << endl;
-  sprintf(fn_pl, "%s/%s.pl", dir, gbch);
-
-  fp_pl = fopen(fn_pl, "w");
+  fp_pl = fopen(plName.c_str(), "w");
 
   fputs("UCLA pl 1.0\n", fp_pl);
   fputs("# Created\t:\tJan  6 2005\n", fp_pl);
@@ -4151,19 +4161,25 @@ void output_tier_pl_global_router(char *dir, int z, int lab, bool isNameConvert)
 
   for(int i = 0; i < tier->modu_cnt; i++) {
     modu = tier->modu_st[i];
-    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, modu->pmin.x,
-            modu->pmin.y);
+    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
+        (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+        GetScaleUpPointFloat( modu->pmin.x ), 
+        GetScaleUpPointFloat( modu->pmin.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
     curTerminal = &terminalInstance[i];
     if(!curTerminal->isTerminalNI) {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
+          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+              GetScaleUpPoint(curTerminal->pmin.x), 
+              GetScaleUpPoint(curTerminal->pmin.y));
     }
     else {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED_NI\n", (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED_NI\n", 
+          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+              GetScaleUpPoint(curTerminal->pmin.x), 
+              GetScaleUpPoint(curTerminal->pmin.y));
     }
   }
   
@@ -4171,28 +4187,14 @@ void output_tier_pl_global_router(char *dir, int z, int lab, bool isNameConvert)
   for(auto &curTerm : *dummyTermStor) {
     fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
         (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.name) : curTerm.name,
-            prec2int(curTerm.pmin.x), prec2int(curTerm.pmin.y));
+            GetScaleUpPoint(curTerm.pmin.x), GetScaleUpPoint(curTerm.pmin.y));
   }
 
-  if(lab) {  // MMS-3D place
-    for(int i = 0; i < tier->mac_cnt; i++) {
-      mac = tier->mac_st[i];
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", mac->name, mac->pmin_lg.x,
-              mac->pmin_lg.y);
-    }
-  }
-
-  for(int i = 0; i < pinCNT; i++) {
-    pin = &pinInstance[i];
-    if(!pin->term && pin->tier != z)
-      fprintf(fp_pl, "fakePin%d\t%.6lf\t%.6lf\t: N /FIXED\n", pin->gid,
-              pin->fp.x, pin->fp.y);
-  }
   fclose(fp_pl);
   cout << "INFO:  Temp. placement solution for Global Router has been "
           "written at "
        << endl
-       << "       " << fn_pl << endl
+       << "       " << plName << endl
        << endl;
 }
 

@@ -58,8 +58,6 @@
 #include "macro.h"
 #include "opt.h"
 
-void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl);
-void CallNtuPlacer4h(char *tier_dir, char *tier_aux, char *tier_pl);
 
 void CallDetailPlace() {
   for(int i = 0; i < numLayer; i++) {
@@ -167,7 +165,7 @@ void call_FastDP_tier(char *tier_dir, char *tier_aux, char *tier_pl) {
   system(cmd);
 }
 
-void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
+void CallNtuPlacer3(const char *tier_dir, const char *tier_aux, const char *tier_pl) {
   char cmd[BUF_SZ] = {
       0,
   };
@@ -235,7 +233,7 @@ void CallNtuPlacer3(char *tier_dir, char *tier_aux, char *tier_pl) {
   */
 }
 
-void CallNtuPlacer4h(char *tier_dir, char *tier_aux, char *tier_pl) {
+void CallNtuPlacer4h(const char *tier_dir, const char *tier_aux, const char *tier_pl) {
   char cmd[BUF_SZ] = {
       0,
   };
@@ -244,9 +242,8 @@ void CallNtuPlacer4h(char *tier_dir, char *tier_aux, char *tier_pl) {
   cout << cmd << endl;
   system(cmd);
 
-  //    if(INPUT_FLG == ISPD || INPUT_FLG == MMS || INPUT_FLG == ETC) {
   sprintf(cmd,
-          "cd %s && ./ntuplace4h -aux %s -loadpl %s -noglobal \n",
+          "cd %s && ./ntuplace4h -aux %s -loadpl %s -noglobal -nodetail \n",
           tier_dir, tier_aux, tier_pl);
 
   // call
@@ -306,142 +303,3 @@ void CallNtuPlacer4h(char *tier_dir, char *tier_aux, char *tier_pl) {
   */
 }
 
-/*
- * unused code
-
-void call_DP(void) {
-#ifdef NO_WLEN
-    return;
-#endif
-
-#ifdef NO_DEN
-    return;
-#endif
-
-    switch(dpMode) {
-        case FastPlace:
-            call_FastDP();
-            break;
-        case NTUplace3:
-            call_NTUpl3();
-            break;
-    }
-}
-void call_FastDP(void) {
-    char cmd[BUF_SZ];
-
-    switch(INPUT_FLG) {
-        case IBM:
-            sprintf(cmd, "%s -legalize -noFlipping %s %s %s %s\n",
-dpLocation.c_str(),
-                    gbch_dir, gbch_aux, dir_bnd, gGP_pl_file);
-            break;
-        case ISPD05:
-            sprintf(cmd, "%s -legalize -noFlipping %s %s %s %s\n",
-dpLocation.c_str(),
-                    gbch_dir, gbch_aux, dir_bnd, gGP_pl_file);
-            break;
-        case ISPD06:
-            sprintf(cmd,
-                    "%s -legalize -noFlipping -target_density %.2lf -window "
-                    "10 %s %s %s %s\n",
-                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux,
-dir_bnd,
-                    gGP_pl_file);
-            break;
-        case ISPD06m:
-            sprintf(cmd,
-                    "%s -legalize -noFlipping -target_density %.2lf -window "
-                    "10 %s %s %s %s\n",
-                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux,
-dir_bnd,
-                    gGP_pl_file);
-            break;
-        case MMS:
-            sprintf(cmd,
-                    "%s -legalize -noFlipping -target_density %.2lf -window "
-                    "10 %s %s %s %s\n",
-                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux,
-dir_bnd,
-                    gGP_pl_file);
-
-            break;
-        case SB:
-            sprintf(cmd,
-                    "%s -legalize -noFlipping -target_density %.2lf -window "
-                    "10 %s %s %s %s\n",
-                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux,
-dir_bnd,
-                    gGP_pl_file);
-
-            break;
-        case ETC:
-            sprintf(cmd,
-                    "%s -legalize -noFlipping -target_density %.2lf -window "
-                    "10 %s %s %s %s\n",
-                    dpLocation.c_str(), target_cell_den, gbch_dir, gbch_aux,
-dir_bnd,
-                    gGP_pl_file);
-
-            break;
-    }
-
-    system(cmd);
-}
-
-void call_NTUpl3(void) {
-    char cmd[BUF_SZ];
-
-    switch(INPUT_FLG) {
-        case IBM:
-            sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
-                    dpLocation.c_str(), gbch_dir, gbch_aux,
-                    // target_cell_den ,
-                    dir_bnd, gGP_pl_file);
-            break;
-        case ISPD05:
-            sprintf(cmd, "%s -aux %s/%s -loadpl %s/%s -noglobal \n",
-                    dpLocation.c_str(), gbch_dir, gbch_aux,
-                    // target_cell_den ,
-                    dir_bnd, gGP_pl_file);
-            break;
-        case ISPD06:
-            sprintf(cmd,
-                    "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    dpLocation.c_str(), gbch_dir, gbch_aux, target_cell_den,
-dir_bnd,
-                    gGP_pl_file);
-            break;
-        case ISPD06m:
-            sprintf(cmd,
-                    "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    dpLocation.c_str(), gbch_dir, gbch_aux, target_cell_den,
-dir_bnd,
-                    gGP_pl_file);
-            break;
-        case MMS:
-            sprintf(cmd,
-                    "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    dpLocation.c_str(), gbch_dir, gbch_aux, target_cell_den,
-dir_bnd,
-                    gGP_pl_file);
-            break;
-        case SB:
-            sprintf(cmd,
-                    "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    detailPlacerLocationCMD.c_str(), gbch_dir, gbch_aux,
-target_cell_den, dir_bnd,
-                    gGP_pl_file);
-            break;
-        case ETC:
-            sprintf(cmd,
-                    "%s -aux %s/%s -util %.2lf -loadpl %s/%s -noglobal \n",
-                    detailPlacerLocationCMD.c_str(), gbch_dir, gbch_aux,
-target_cell_den, dir_bnd,
-                    gGP_pl_file);
-            break;
-    }
-
-    system(cmd);
-}
-*/

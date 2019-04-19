@@ -96,10 +96,6 @@ struct ITER {
 void routability();
 void routability_init();
 void FLUTE_init();  // lutong
-void get_intermediate_pl_sol(char *dir, int tier);
-void evaluate_RC_by_official_script(char *dir);
-void est_congest_global_router(char *dir);
-void run_global_router(char *dir);
 void clean_routing_tracks_in_net();
 void restore_cells_info();
 void bloating();

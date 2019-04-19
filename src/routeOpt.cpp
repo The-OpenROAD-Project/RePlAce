@@ -148,7 +148,8 @@ void RouteInstance::FillLayerStor() {
 
 void RouteInstance::FillGCellXY() {
   if( _layerStor.size() < 2) {
-    cout << "ERROR: The # LAYERs must be at least 2, current Size: " << _layerStor.size() << endl;
+    cout << "ERROR: The # LAYERs must be at least 2, current Size: " 
+      << _layerStor.size() << endl;
     exit(0);
   }
   // metal2's height and width
@@ -306,30 +307,25 @@ void RouteInstance::FillForReducedTrackStor() {
 //  }
 }
 
-void est_congest_global_router(char *dir) {
-  run_global_router(dir);
-  read_routing_file(dir);
+void est_congest_global_router(char *dir, string plName) {
+  run_global_router(dir, plName);
+  
+  string routeName = string(dir) + "/" + string(gbch) + ".est";
+  read_routing_file(dir, routeName);
 }
 
-void get_intermediate_pl_sol(char *dir, int tier) {
-  char cmd[BUFFERSIZE];
-
-  sprintf(cmd, "mkdir -p %s", dir);
-  system(cmd);
-
-  output_tier_pl_global_router(dir, tier, 0, true);
+void get_intermediate_pl_sol(char *dir, string plName) {
+  output_tier_pl_global_router(plName.c_str(), 0, 0, true);
   LinkConvertedBookshelf(dir);
-//  link_original_SB_files_to_Dir(dir);
-//  preprocess_SB_inputs(dir);
 }
 
-void run_global_router(char *dir) {
+void run_global_router(char *dir, string plName) {
   char cmd[BUFFERSIZE];
 
-  sprintf(cmd, "%s ICCAD %s/%s.aux %s/%s.pl %s %s/%s.est",
+  sprintf(cmd, "%s ICCAD %s/%s.aux %s %s %s/%s.est",
           globalRouterPosition.c_str(), 
-          dir, gbch, dir, 
-          gbch, 
+          dir, gbch, 
+          plName.c_str(),  
           globalRouterSetPosition.c_str(), 
           dir, gbch); // est
   cout << cmd << endl;
@@ -375,7 +371,7 @@ void evaluate_RC_by_official_script(char *dir) {
   system(cmd);
   
 //  sprintf(cmd, "cd %s && perl iccad2012_evaluate_solution.pl -p %s.aux %s.pl %s.est",
-  sprintf(cmd, "cd %s && perl iccad2012_evaluate_solution.pl %s.aux %s.pl %s.est",
+  sprintf(cmd, "cd %s && perl iccad2012_evaluate_solution.pl %s.aux %s.lg.pl %s.est",
           fullDir, gbch, gbch, gbch);
   cout << cmd << endl;
   system(cmd);
@@ -513,7 +509,9 @@ void congEstimation(struct FPOS *st) {
         clearTwoPinNets();
         calcCong_print();
 
-    } else*/ if(conges_eval_methodCMD == global_router_based) {
+    } else*/ 
+
+  if(conges_eval_methodCMD == global_router_based) {
     cout << "INFO:  Your congestion est. method is based on global router "
             "(NCTUgr)."
          << endl;
@@ -524,8 +522,28 @@ void congEstimation(struct FPOS *st) {
       if(stat(dir, &infl) < 0)
         break;
     }
-    get_intermediate_pl_sol(dir, 0);
-    est_congest_global_router(dir);
+
+
+    // directory create
+    string command = "mkdir -p " + string(dir);
+    system(command.c_str());
+   
+    string plName = string(dir) + "/" + string(gbch) + ".pl";
+    get_intermediate_pl_sol(dir, plName);
+
+    plName = string(gbch) + ".pl";
+    string auxName = string(gbch) + ".aux";
+    CallNtuPlacer4h(dir, auxName.c_str(), plName.c_str());
+    
+    string resultPlName = string(dir) + "/" + string(gbch) + ".lg.pl";
+    ReadPl(resultPlName.c_str(), true);
+
+    string defOut = string(dir) + "/" + string(gbch) + ".def";
+    WriteDef( defOut.c_str() );
+    
+    // for NCTUgr
+    est_congest_global_router(dir, resultPlName);
+    
     // delete_input_files_in (dir);
     calcCong(st, global_router_based);
     CalcPinDensity(st);

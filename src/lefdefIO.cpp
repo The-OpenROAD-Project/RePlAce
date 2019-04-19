@@ -208,6 +208,10 @@ int GetScaleUpPoint(prec input) {
   return INT_CONVERT( input * GetUnitX() - GetOffsetX() );
 }
 
+float GetScaleUpPointFloat(float input) {
+  return input * GetUnitX() - GetOffsetX();
+}
+
 prec GetScaleDownSize(prec input) {
   return input / GetUnitX();
 }
@@ -1885,10 +1889,10 @@ j );
 // ReadPlLefDef -- moduleTermMap -- lefdefIO.cpp
 // ReadBookshelf -- nodesMap -- bookshelfIO.cpp
 //
-void ReadPl(const char* fileName) {
+void ReadPl(const char* fileName, bool isNameConvert) {
   if(auxCMD == "" && lefStor.size() != 0 && defCMD != "") {
     // it references moduleTermMap
-    ReadPlLefDef(fileName);
+    ReadPlLefDef(fileName, isNameConvert);
   }
   else if(auxCMD != "" && lefStor.size() == 0 && defCMD == "") {
     // it references nodesMap
@@ -1902,7 +1906,8 @@ void ReadPl(const char* fileName) {
 //
 // See also ReadPlBookshelf(const char* fileName) in bookShelfIO.cpp
 //
-void ReadPlLefDef(const char* fileName) {
+void ReadPlLefDef(const char* fileName, bool isNameConvert) {
+  cout << "READ BACK FROM " << fileName << endl;
   FILE* fp = fopen(fileName, "r");
   if(!fp) {
     runtimeError(fileName + string(" is not Exist!"));
@@ -1921,12 +1926,17 @@ void ReadPlLefDef(const char* fileName) {
     if(name[0] == 'f' && name[1] == 'a' && name[2] == 'k' && name[3] == 'e')
       continue;
 
-    // if(!getCellIndex ( name , & moduleID , & isTerminal,
-    // &isTerminalNI))
-    // continue;
-
     bool isModule = false;
-    auto mtPtr = moduleTermMap.find(string(name));
+    string mName = (isNameConvert)? 
+      ((name[0] == 'o')? _bsMap.GetOrigModuleName( name ) : 
+       _bsMap.GetOrigTerminalName( name )) 
+      : name;
+    
+    if( mName == "" ) {
+      continue;
+    }
+
+    auto mtPtr = moduleTermMap.find(mName);
     if(mtPtr == moduleTermMap.end()) {
       continue;
     }
@@ -1946,6 +1956,7 @@ void ReadPlLefDef(const char* fileName) {
 
       token = strtok(NULL, " \t\n");
       curModule->pmin.y = GetScaleDownPoint( atof(token) );
+//      cout << "down: " << curModule->pmin.x << " " << curModule->pmin.y << endl;
 
       curModule->pmax.x = curModule->pmin.x + curModule->size.x;
       curModule->pmax.y = curModule->pmin.y + curModule->size.y;

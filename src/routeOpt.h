@@ -140,6 +140,11 @@ class RouteInstance {
 
 }; 
 
+void get_intermediate_pl_sol(char *dir, int tier);
+void evaluate_RC_by_official_script(char *dir);
+void est_congest_global_router(char *dir);
+void run_global_router(char *dir, string plName);
+
 void congEstimation(struct FPOS *st);
 extern RouteInstance routeInst;
 

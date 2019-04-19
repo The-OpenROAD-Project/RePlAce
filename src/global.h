@@ -1285,7 +1285,10 @@ inline prec getStepSizefromEPs(prec hpwl, prec hpwlEP, prec hpwlSTD,
 // writing Bookshelf function
 void WriteBookshelf();
 void WriteBookshelfForGR();
+
 void CallDetailPlace();
+void CallNtuPlacer3(const char *tier_dir, const char *tier_aux, const char *tier_pl);
+void CallNtuPlacer4h(const char *tier_dir, const char *tier_aux, const char *tier_pl);
 
 // useful function
 

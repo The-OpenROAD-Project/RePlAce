@@ -304,8 +304,8 @@ void ParseLefDef();
 // required for timing
 void SetVerilogTopModule();
 
-void ReadPl(const char* fileName);
-void ReadPlLefDef(const char* fileName);
+void ReadPl(const char* fileName, bool isNameConvert = false);
+void ReadPlLefDef(const char* fileName, bool isNameConvert = false);
 
 void WriteDef(const char* defOutput);
 
@@ -330,6 +330,7 @@ prec GetOffsetY();
 
 int GetScaleUpSize(float input);
 int GetScaleUpPoint(float input);
+float GetScaleUpPointFloat( float input);
 
 prec GetScaleDownSize(float input);
 prec GetScaleDownPoint(float input);
