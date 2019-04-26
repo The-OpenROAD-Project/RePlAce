@@ -170,8 +170,12 @@ void myNesterov::nesterov_opt() {
 
 void myNesterov::InitializationCommonVar() {
   for(int i = 0; i < 200; i++) {
-    timingCheck[i] = 0;
+    timingCheck[i] = 1;
   }
+  timingCheck[80] = timingCheck[79] = timingCheck[78] = 0;
+  timingCheck[50] = timingCheck[49] = timingCheck[48] = 0;
+  timingCheck[30] = timingCheck[29] = timingCheck[28] = 0;
+  timingCheck[16] = timingCheck[15] = timingCheck[14] = 0;
 
   N = gcell_cnt;
   N_org = moduleCNT;
@@ -782,7 +786,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
 
     if(isTiming) {
       int checkIter = INT_CONVERT(it->ovfl * 100);
-      if(checkIter % 2 == 0 && timingCheck[checkIter] == 0) {
+      if(timingCheck[checkIter] == 0) {
         // do something
 
         auto start = std::chrono::steady_clock::now();
@@ -804,8 +808,10 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
                 finish - start)
                 .count();
         cout << "ExecuteStaLater: " << elapsed_seconds << endl;
-
-        timingCheck[checkIter] = 1;
+        
+        for(int j=checkIter-2; j<=checkIter+2; j++) {
+          timingCheck[j] = 1;
+        }
       }
     }
 
