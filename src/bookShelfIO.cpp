@@ -2790,7 +2790,8 @@ void WriteShapes(char *dir_tier, bool isShapeDrawing, bool isNameConvert) {
 
   for(auto &curShapeNode : shapeMap) {
     fprintf(fp_shapes, "%s  :  %ld\n", 
-        _bsMap.GetBsTerminalName( curShapeNode.first.c_str() ), 
+        (isNameConvert)? 
+        _bsMap.GetBsTerminalName( curShapeNode.first.c_str() ) : curShapeNode.first.c_str(), 
             curShapeNode.second.size());
     for(auto &curIdx : curShapeNode.second) {
       fprintf(fp_shapes, "\t%s\t%d\t%d\t%d\t%d\n",
@@ -3465,8 +3466,8 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
     MODULE *modu = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
         (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
-        modu->pmin.x * GetUnitX() - GetOffsetX(), 
-        modu->pmin.y * GetUnitY() - GetOffsetY());
+        GetScaleUpPointFloat( modu->pmin.x ), 
+        GetScaleUpPointFloat( modu->pmin.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
@@ -3530,8 +3531,8 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
     MODULE *modu = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
         (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
-        GetScaleUpPoint(modu->pmin.x), 
-        GetScaleUpPoint(modu->pmin.y));
+        GetScaleUpPointFloat( modu->pmin.x ), 
+        GetScaleUpPointFloat( modu->pmin.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
