@@ -176,7 +176,7 @@ struct PinInfo {
     netIdx = numeric_limits< int >::max();
   }
 
-  inline string GetPinName(void* ptr, vector< vector< string > >& pNameStor) {
+  inline string GetPinName(void* ptr, vector< vector< string > >& pNameStor, bool isEscape = true) {
     if(isSteiner()) {
       cout << "ERROR: GetPinName must be executed only when NOT Steiner Point"
            << endl;
@@ -185,7 +185,9 @@ struct PinInfo {
 
     if(isModule()) {
       string moduleName(((MODULE*)ptr)[GetIdx()].name);
-      SetEscapedStr(moduleName);
+      if( isEscape ) {
+        SetEscapedStr(moduleName);
+      }
       return moduleName + ":" + pNameStor[GetIdx()][pNum];
     }
     else if(isTerminal()) {
@@ -202,14 +204,16 @@ struct PinInfo {
       }
       else {
         string termName(((TERM*)ptr)[GetIdx()].name);
-        SetEscapedStr(termName);
+        if( isEscape ) {
+          SetEscapedStr(termName);
+        }
         return termName + ":" + pNameStor[GetIdx()][pNum];
       }
     }
   }
 
   // only for steiner point
-  inline string GetStnPinName() {
+  inline string GetStnPinName( bool isEscape = true) {
     if(!isSteiner()) {
       cout << "ERROR: GetStnPinName must be executed only when Steiner Point"
            << endl;
@@ -218,7 +222,9 @@ struct PinInfo {
     //            return "sp_" + to_string(pNum);
     //            cout << netIdx << endl;
     string netStr(netInstance[netIdx].name);
-    SetEscapedStr(netStr);
+    if( isEscape ) {
+      SetEscapedStr(netStr);
+    }
 
     return netStr + ":" + to_string(pNum);
   }
@@ -307,10 +313,10 @@ class Timing {
   void FillNetPin();
 
   // helper function for return the pinName
-  inline string GetPinName(PIN* curPin);
+  inline string GetPinName(PIN* curPin, bool isEscape = true);
 
   // helper function for return the pinName
-  inline string GetPinName(PinInfo& curPin);
+  inline string GetPinName(PinInfo& curPin, bool isEscape = true);
 
   void CleanSteiner();
 

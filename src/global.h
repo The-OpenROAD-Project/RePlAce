@@ -51,6 +51,7 @@
 #include <vector>
 #include <iomanip>
 #include <google/dense_hash_map>
+#include <google/dense_hash_set>
 #include <cfloat>
 #include <cstring>
 
@@ -150,6 +151,7 @@ using std::to_string;
 using std::numeric_limits;
 using std::make_pair;
 using google::dense_hash_map;
+using google::dense_hash_set;
 
 struct POS;
 

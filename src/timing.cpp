@@ -8,7 +8,7 @@ using std::stringstream;
 using std::string;
 TIMING_NAMESPACE_OPEN
 
-inline string Timing::GetPinName(PIN* curPin) {
+inline string Timing::GetPinName(PIN* curPin, bool isEscape) {
   // itself is PINS in def.
   if(curPin->term && _terms[curPin->moduleID].isTerminalNI) {
     return string(_terms[curPin->moduleID].name);
@@ -18,7 +18,9 @@ inline string Timing::GetPinName(PIN* curPin) {
   string name = (curPin->term) ? string(_terms[curPin->moduleID].name)
                                : string(_modules[curPin->moduleID].name);
 
-  SetEscapedStr(name);
+  if( isEscape ) {
+    SetEscapedStr(name);
+  }
 
   // bookshelf cases, it must be empty
   if(_mPinName.size() == 0 && _tPinName.size() == 0) {
@@ -34,13 +36,13 @@ inline string Timing::GetPinName(PIN* curPin) {
   }
 }
 
-inline string Timing::GetPinName(PinInfo& curPin) {
+inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
   if(curPin.isSteiner()) {
     return curPin.GetStnPinName();
   }
 
-  return (curPin.isModule()) ? curPin.GetPinName((void*)_modules, _mPinName)
-                             : curPin.GetPinName((void*)_terms, _tPinName);
+  return (curPin.isModule()) ? curPin.GetPinName((void*)_modules, _mPinName, isEscape)
+                             : curPin.GetPinName((void*)_terms, _tPinName, isEscape);
 }
 
 // stn stands for steiner

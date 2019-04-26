@@ -1347,11 +1347,15 @@ void GenerateNetDefOnly(Circuit::Circuit& __ckt) {
     string netName = string(net.name());
     //        ReplaceStringInPlace(netName, "[", "\\[");
     //        ReplaceStringInPlace(netName, "]", "\\]");
+
+    // copy original name into netInstance
+    strcpy(curNet->name, netName.c_str());
+    
+    // But, netNameMap can have escaped strings
     ReplaceStringInPlace(netName, "\\[", "[");
     ReplaceStringInPlace(netName, "\\]", "]");
     ReplaceStringInPlace(netName, "\\/", "/");
 
-    strcpy(curNet->name, netName.c_str());
     //        cout << "copied net Name: " << curNet->name << endl;
     netNameMap[netName] = netIdx;
     curNet->idx = netIdx;
