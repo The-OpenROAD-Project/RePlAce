@@ -375,27 +375,23 @@ void filler_adj_cGP2D(void) {
 void cell_filler_init() {
   int i = 0;
   struct CELLx *filler = NULL;
-  /* struct MODULE*mdp=NULL; */
   prec k_f2c = 1.0;
-  prec f_area = 0;
-  struct FPOS f_size = zeroFPoint;
   struct CELLx *gcell_st_tmp = NULL;
-  prec a = 0;
   FILE *fp = NULL;
-  //    char filler_fn[BUF_SZ];
   struct FPOS org = zeroFPoint, end = zeroFPoint, len = zeroFPoint,
               rnd = zeroFPoint;
 
-  //    sprintf(filler_fn, "%s/%s_filler.txt", dir_bnd, gbch);
-  a = k_f2c * avg80p_cell_area;
-  f_area = a;
+  prec f_area = k_f2c * avg80p_cell_area;
 
+  struct FPOS f_size;
   f_size.x = avg80p_cell_dim.x < bin_stp.x ? avg80p_cell_dim.x : bin_stp.x;
   f_size.y = avg80p_cell_dim.y < bin_stp.y ? avg80p_cell_dim.y : bin_stp.y;
 
-  f_area = f_size.x * f_size.y;
+  f_size.Dump("f_size");
+  avg80p_cell_dim.Dump("avg80p");
+  bin_stp.Dump("bin_stp"); 
 
-  //    fp = fopen(filler_fn, "w");
+  f_area = f_size.x * f_size.y;
 
   total_move_available_area = total_WS_area * target_cell_den;
   total_filler_area = total_move_available_area - total_modu_area;
@@ -411,11 +407,13 @@ void cell_filler_init() {
   printf("INFO:  FillerCell's Area = %.6lf\n", filler_area);
 
   gfiller_cnt = (int)(total_filler_area / filler_area + 0.5);
-
-  //    fprintf(fp, "%d %.6lf\n", gfiller_cnt, filler_area);
+  cout << "gFillerCount: " << gfiller_cnt << endl;
+  cout << "filler_area: " << filler_area << endl;
+  cout << "total_filler_area: : " << total_filler_area << endl;
 
   printf("INFO:  FillerCell's X = %.6lf , FillerCell's Y = %.6lf\n",
            filler_size.x, filler_size.y);
+  fflush(stdout);
   gcell_cnt = moduleCNT + gfiller_cnt;
 
   // igkang:  replace realloc to mkl
@@ -474,8 +472,8 @@ void cell_init(void) {
   int min_idx = (int)(0.05 * (prec)moduleCNT);
   int max_idx = (int)(0.95 * (prec)moduleCNT);
   prec total_area = 0, avg_cell_area = 0;
-  prec avg_cell_x = 0, avg_cell_y = 0, avg_cell_z = 0;
-  prec total_x = 0, total_y = 0, total_z = 0;
+  prec avg_cell_x = 0, avg_cell_y = 0;
+  prec total_x = 0, total_y = 0;
   struct CELLx *cell = NULL;
   struct MODULE *mdp = NULL;
   struct FPOS pof;
@@ -484,7 +482,6 @@ void cell_init(void) {
   prec *cell_area_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
   prec *cell_x_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
   prec *cell_y_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
-  prec *cell_z_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
 
   for(i = 0; i < moduleCNT; i++) {
     mdp = &moduleInstance[i];
@@ -498,7 +495,6 @@ void cell_init(void) {
   qsort(cell_area_st, moduleCNT, sizeof(prec), area_sort);
   qsort(cell_x_st, moduleCNT, sizeof(prec), area_sort);
   qsort(cell_y_st, moduleCNT, sizeof(prec), area_sort);
-  qsort(cell_z_st, moduleCNT, sizeof(prec), area_sort);
   //    printf("qsort has after problem?\n");
   //    fflush(stdout);
 
@@ -506,18 +502,15 @@ void cell_init(void) {
     total_area += cell_area_st[i];
     total_x += cell_x_st[i];
     total_y += cell_y_st[i];
-    total_z += cell_z_st[i];
   }
 
   mkl_free(cell_area_st);
   mkl_free(cell_x_st);
   mkl_free(cell_y_st);
-  mkl_free(cell_z_st);
 
   avg_cell_area = total_area / ((prec)(max_idx - min_idx));
   avg_cell_x = total_x / ((prec)(max_idx - min_idx));
   avg_cell_y = total_y / ((prec)(max_idx - min_idx));
-  avg_cell_z = total_z / ((prec)(max_idx - min_idx));
 
   avg80p_cell_area = avg_cell_area;
   avg80p_cell_dim.x = avg_cell_x;
@@ -576,10 +569,6 @@ void cell_init(void) {
     }
 
     cell->netCNTinObject = cell->pinCNTinObject;
-    // cell->pin = (PIN**)realloc(cell->pin,sizeof(struct
-    // PIN*)*cell->pinCNTinObject);
-    // cell->pof = (FPOS*)realloc(cell->pof,sizeof(struct
-    // FPOS)*cell->pinCNTinObject);
     cell->pin_tmp = (struct PIN **)mkl_malloc(
         sizeof(struct PIN *) * cell->pinCNTinObject, 64);
     cell->pof_tmp = (struct FPOS *)mkl_malloc(
