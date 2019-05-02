@@ -384,12 +384,12 @@ void cell_filler_init() {
   prec f_area = k_f2c * avg80p_cell_area;
 
   struct FPOS f_size;
-  f_size.x = avg80p_cell_dim.x < bin_stp.x ? avg80p_cell_dim.x : bin_stp.x;
-  f_size.y = avg80p_cell_dim.y < bin_stp.y ? avg80p_cell_dim.y : bin_stp.y;
+  f_size.x = avg80p_cell_dim.x;
+  f_size.y = avg80p_cell_dim.y;
 
-  f_size.Dump("f_size");
-  avg80p_cell_dim.Dump("avg80p");
-  bin_stp.Dump("bin_stp"); 
+//  f_size.Dump("f_size");
+//  avg80p_cell_dim.Dump("avg80p");
+//  bin_stp.Dump("bin_stp"); 
 
   f_area = f_size.x * f_size.y;
 

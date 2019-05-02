@@ -164,8 +164,6 @@ void tier_delete_mGP2D(void) {
 void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
   int currTier = 0;
   int *z_st = (int *)mkl_malloc(sizeof(int) * numLayer, 64);
-  prec modu_area = 0;
-  struct MODULE *modu = NULL;
   struct MODULE **modu_st =
       (struct MODULE **)malloc(sizeof(struct MODULE *) * moduleCNT);
   struct T0 *t0_st = (struct T0 *)mkl_malloc(sizeof(struct T0) * numLayer, 64);
@@ -187,11 +185,11 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
     modu_st[i] = &moduleInstance[i];
   }
 
-  switch(LAYER_ASSIGN_3DIC) {
-    case MAX_PCNT_ORDER:
-      qsort(modu_st, moduleCNT, sizeof(struct MODULE *),
-            max_pinCNTinObject_cmp);
-      break;
+//  switch(LAYER_ASSIGN_3DIC) {
+//    case MAX_PCNT_ORDER:
+//      qsort(modu_st, moduleCNT, sizeof(struct MODULE *),
+//            max_pinCNTinObject_cmp);
+//      break;
 
 //    case MIN_TIER_ORDER:
 //      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), min_tier_cmp);
@@ -200,8 +198,9 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
 //    case MAX_AREA_DIS_DIV:
 //      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), max_area_dis_div_cmp);
 //      break;
-  }
+//  }
 
+  MODULE *modu = NULL;
   for(int i = 0; i < moduleCNT; i++) {
     if(mode == STDCELLonly) {
       if(modu_st[i]->flg == Macro)
@@ -213,33 +212,31 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
       modu = modu_st[i];
     }
 
-//    find_close_tier(modu->center.z, t0_st, z_st);
-
     for(int j = 0; j < numLayer; j++) {
       currTier = z_st[j];
       tier = &tier_st[currTier];
 
+      prec modu_area = 0;
       if(mode == MIXED) {
         if(modu->flg == Macro)
-          modu_area = modu->area * target_cell_den;
+          modu_area = modu->size.GetProduct()* target_cell_den;
         else
-          modu_area = modu->area;
+          modu_area = modu->size.GetProduct();
       }
       else if(mode == STDCELLonly) {
-        modu_area = modu->area;
+        modu_area = modu->size.GetProduct();
       }
+      cout << modu->name << endl;
+      modu->size.Dump("Module Size");
 
-      //            cout << "tier's modu_area: " << tier->modu_area << endl;
-      //            cout << "modu_area: " << modu_area << endl;
-      //            cout << "tier's ws_area: " << tier->ws_area << endl;
-      //            cout << "target_cell_den: " << target_cell_den << endl;
-      //            cout << dp_margin_per_tier << endl;
+      cout << "tier's modu_area: " << tier->modu_area << endl;
+      cout << "modu_area: " << modu_area << endl;
+      cout << "tier's ws_area: " << tier->ws_area << endl;
+      cout << "target_cell_den: " << target_cell_den << endl;
+      cout << "dp_margin_per_tier: " << dp_margin_per_tier << endl;
 
       if((tier->modu_area + modu_area) / tier->ws_area <=
          target_cell_den - dp_margin_per_tier) {
-//        modu->center.z = tier->center.z;
-//        modu->pmin.z = modu->center.z - modu->half_size.z;
-//        modu->pmax.z = modu->center.z + modu->half_size.z;
         modu->tier = currTier;
 
         tier->modu_st[tier->modu_cnt++] = modu;
@@ -248,19 +245,12 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
         for(int k = 0; k < modu->pinCNTinObject; k++) {
           pin = modu->pin[k];
           pin->tier = currTier;
-//          pin->fp.z = tier->center.z;
         }
-
         break;
       }
       else {
-        if(j == numLayer - 1) {
-          printf("ERROR: no more tier to assign!\n");
-          exit(1);
-        }
-        else {
-          continue;
-        }
+        cout << "ERROR: Exceed the placement Area!" << endl;
+        exit(1);
       }
     }
   }
@@ -280,7 +270,7 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
       tier->modu_st = (MODULE **)realloc(
           tier->modu_st, sizeof(struct MODULE *) * (tier->modu_cnt));
     }
-    //        tier->modu_den = tier->modu_area / tier->ws_area;
+    // tier->modu_den = tier->modu_area / tier->ws_area;
     prec moduleDensity = tier->modu_area / tier->ws_area;
 
     printf("INFO:  Tier %d, Density is %.6lf\n", i, moduleDensity);
