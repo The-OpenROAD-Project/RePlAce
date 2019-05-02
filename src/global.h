@@ -158,141 +158,122 @@ struct POS;
 struct FPOS {
   prec x;
   prec y;
-  prec z;
+//  prec z;
 
   FPOS() {
     SetZero();
   };
 
-  FPOS(prec _x, prec _y) : x(_x), y(_y), z(0){};
-  FPOS(prec _x, prec _y, prec _z) : x(_x), y(_y), z(_z){};
+  FPOS(prec _x, prec _y) : x(_x), y(_y){};
 
   inline void Set(prec a) {
-    x = y = z = a;
+    x = y = a;
   }
   inline void Set(FPOS a) {
     x = a.x;
     y = a.y;
-    z = a.z;
   }
   inline void Set(prec _x, prec _y, prec _z) {
     x = _x;
     y = _y;
-    z = _z;
   }
 
   inline void Set(POS a);
 
   inline void SetZero() {
-    x = y = z = 0.0f;
+    x = y = 0.0f;
   }
   inline void Add(FPOS a) {
     x += a.x;
     y += a.y;
-    z += a.z;
   }
   inline void SetAdd(FPOS a, FPOS b) {
     x = a.x + b.x;
     y = a.y + b.y;
-    z = a.z + b.z;
   }
   inline void Min(FPOS a) {
     x = min(x, a.x);
     y = min(y, a.y);
-    z = min(z, a.z);
   }
   inline void SetMin(FPOS a, FPOS b) {
     x = min(a.x, b.x);
     y = min(a.y, b.y);
-    z = min(a.z, b.z);
   }
   inline void Max(FPOS a) {
     x = max(x, a.x);
     y = max(y, a.y);
-    z = max(z, a.z);
   }
   inline void SetMax(FPOS a, FPOS b) {
     x = max(a.x, b.x);
     y = max(a.y, b.y);
-    z = max(a.z, b.z);
   }
 
   inline prec GetProduct() {
-    return x * y * z;
+    return x * y;
   }
   inline void Dump() {
-    cout << "(" << x << " " << y << " " << z << ")" << endl;
+    cout << "(" << x << " " << y << ")" << endl;
   }
   inline void Dump(string a) {
-    cout << a << ": (" << x << " " << y << " " << z << ")" << endl;
+    cout << a << ": (" << x << " " << y << ")" << endl;
   }
 };
 
 struct POS {
   int x;
   int y;
-  int z;
 
   POS() {
     SetZero();
   };
 
-  POS(int _x, int _y) : x(_x), y(_y), z(0){};
-  POS(int _x, int _y, int _z) : x(_x), y(_y), z(_z){};
+  POS(int _x, int _y) : x(_x), y(_y){};
 
   inline void Set(int a) {
-    x = y = z = a;
+    x = y = a;
   }
   inline void Set(POS a) {
     x = a.x;
     y = a.y;
-    z = a.z;
   }
 
-  inline void Set(int _x, int _y, int _z) {
+  inline void Set(int _x, int _y){
     x = _x;
     y = _y;
-    z = _z;
   }
 
   inline void Set(FPOS fp);
 
   inline void SetZero() {
-    x = y = z = 0.0f;
+    x = y = 0.0f;
   }
   inline void Add(POS a) {
     x += a.x;
     y += a.y;
-    z += a.z;
   }
 
   inline void SetAdd(POS a, POS b) {
     x = a.x + b.x;
     y = a.y + b.y;
-    z = a.z + b.z;
   }
   inline void Min(POS a) {
     x = min(x, a.x);
     y = min(y, a.y);
-    z = min(z, a.z);
   }
   inline void SetMin(POS a, POS b) {
     x = min(a.x, b.x);
     y = min(a.y, b.y);
-    z = min(a.z, b.z);
   }
   inline void Max(POS a) {
     x = max(x, a.x);
     y = max(y, a.y);
-    z = max(z, a.z);
   }
   inline void SetMax(POS a, POS b) {
     x = max(a.x, b.x);
     y = max(a.y, b.y);
-    z = max(a.z, b.z);
   }
   inline int GetProduct() {
-    return x * y * z;
+    return x * y ;
   }
   inline void SetXProjection(int a, int b) {
     x = (x < a) ? a : (x > b) ? b : x;
@@ -300,36 +281,30 @@ struct POS {
   inline void SetYProjection(int a, int b) {
     y = (y < a) ? a : (y > b) ? b : y;
   }
-  inline void SetZProjection(int a, int b) {
-    z = (z < a) ? a : (z > b) ? b : z;
-  }
   inline void SetProjection(POS a, POS b) {
     SetXProjection(a.x, b.x);
     SetYProjection(a.y, b.y);
-    SetZProjection(a.z, b.z);
   }
   inline void SetXYProjection(POS a, POS b) {
     SetXProjection(a.x, b.x);
     SetYProjection(a.y, b.y);
   }
   inline void Dump() {
-    cout << "(" << x << " " << y << " " << z << ")" << endl;
+    cout << "(" << x << " " << y << ")" << endl;
   }
   inline void Dump(string a) {
-    cout << a << ": (" << x << " " << y << " " << z << ")" << endl;
+    cout << a << ": (" << x << " " << y << ")" << endl;
   }
 };
 
 inline void FPOS::Set(POS p) {
   x = p.x;
   y = p.y;
-  z = p.z;
 }
 
 inline void POS::Set(FPOS fp) {
   x = (int)(fp.x + 0.5f);
   y = (int)(fp.y + 0.5f);
-  z = (int)(fp.z + 0.5f);
 }
 
 struct RECT {
@@ -1223,8 +1198,6 @@ inline FPOS fp_add(struct FPOS a, struct FPOS b) {
   struct FPOS c = zeroFPoint;
   c.x = a.x + b.x;
   c.y = a.y + b.y;
-  if(flg_3dic)
-    c.z = a.z + b.z;
   return c;
 }
 FPOS fp_add_abs(struct FPOS a, struct FPOS b);
@@ -1232,8 +1205,6 @@ inline FPOS fp_scal(prec s, struct FPOS a) {
   struct FPOS c = a;
   c.x *= s;
   c.y *= s;
-  if(flg_3dic)
-    c.z *= s;
   return c;
 }
 FPOS fp_subt(struct FPOS a, struct FPOS b);

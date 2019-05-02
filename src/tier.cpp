@@ -193,13 +193,13 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
             max_pinCNTinObject_cmp);
       break;
 
-    case MIN_TIER_ORDER:
-      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), min_tier_cmp);
-      break;
+//    case MIN_TIER_ORDER:
+//      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), min_tier_cmp);
+//      break;
 
-    case MAX_AREA_DIS_DIV:
-      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), max_area_dis_div_cmp);
-      break;
+//    case MAX_AREA_DIS_DIV:
+//      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), max_area_dis_div_cmp);
+//      break;
   }
 
   for(int i = 0; i < moduleCNT; i++) {
@@ -213,7 +213,7 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
       modu = modu_st[i];
     }
 
-    find_close_tier(modu->center.z, t0_st, z_st);
+//    find_close_tier(modu->center.z, t0_st, z_st);
 
     for(int j = 0; j < numLayer; j++) {
       currTier = z_st[j];
@@ -237,9 +237,9 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
 
       if((tier->modu_area + modu_area) / tier->ws_area <=
          target_cell_den - dp_margin_per_tier) {
-        modu->center.z = tier->center.z;
-        modu->pmin.z = modu->center.z - modu->half_size.z;
-        modu->pmax.z = modu->center.z + modu->half_size.z;
+//        modu->center.z = tier->center.z;
+//        modu->pmin.z = modu->center.z - modu->half_size.z;
+//        modu->pmax.z = modu->center.z + modu->half_size.z;
         modu->tier = currTier;
 
         tier->modu_st[tier->modu_cnt++] = modu;
@@ -248,7 +248,7 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
         for(int k = 0; k < modu->pinCNTinObject; k++) {
           pin = modu->pin[k];
           pin->tier = currTier;
-          pin->fp.z = tier->center.z;
+//          pin->fp.z = tier->center.z;
         }
 
         break;
@@ -296,13 +296,13 @@ void find_close_tier(prec z, struct T0 *st, int *z_st) {
   for(int i = 0; i < numLayer; i++) {
     tier_center_z = TIER_DEP * ((prec)i + 0.5);
     st[i].dis = fabs(tier_center_z - z);
-    st[i].z = i;
+//    st[i].z = i;
   }
 
   qsort(st, numLayer, sizeof(struct T0), prec_cmp);
 
   for(int i = 0; i < numLayer; i++) {
-    z_st[i] = st[i].z;
+//    z_st[i] = st[i].z;
   }
 
   return;

@@ -1289,7 +1289,7 @@ FPOS GetOffset(Circuit::Circuit& __ckt, string& instName, string& pinName,
 
   // calculate center offset
   return FPOS((l2d * (lx + ux) / 2 - centerX) / unitX,
-              (l2d * (ly + uy) / 2 - centerY) / unitY, 0);
+              (l2d * (ly + uy) / 2 - centerY) / unitY);
 }
 
 //////
@@ -1413,7 +1413,7 @@ void GenerateNetDefOnly(Circuit::Circuit& __ckt) {
         tPinName[termIdx].push_back(string(net.pin(i)));
 
         AddPinInfoForModuleAndTerminal(&curTerm->pin, &curTerm->pof,
-                                       curTerm->pinCNTinObject++, FPOS(0, 0, 0),
+                                       curTerm->pinCNTinObject++, FPOS(0, 0),
                                        termIdx, netIdx, i, pinIdx++, io, true);
       }
       // net.instance(i) must exist on moduleInst or termInst
@@ -1766,7 +1766,7 @@ void GenerateNetDefVerilog(Circuit::Circuit& __ckt) {
         tPinName[termIdx].push_back(pinName);
 
         AddPinInfoForModuleAndTerminal(&curTerm->pin, &curTerm->pof,
-                                       curTerm->pinCNTinObject++, FPOS(0, 0, 0),
+                                       curTerm->pinCNTinObject++, FPOS(0, 0),
                                        curTerm->idx, netIdx, connectIdx,
                                        pinIdx++, io, true);
       }

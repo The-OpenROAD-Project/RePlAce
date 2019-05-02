@@ -146,14 +146,6 @@ inline prec valid_coor2(prec da, prec half_size, int lab) {
     if(max_a > place.end.y)
       da -= max_a - place.end.y;
   }
-  // mgwoo
-  // accroding to Z
-  //    else if(lab == 2) {
-  //        if(min_a < place.org.z)
-  //            da += place.org.z - min_a;
-  //        if(max_a > place.end.z)
-  //            da -= max_a - place.end.z;
-  //    }
   return da;
 }
 
@@ -203,10 +195,7 @@ prec get_den2(prec area_num, prec area_denom);
 
 // return bin_mat's pointer
 inline BIN *get_bin_from_idx(POS p) {
-  int idx = 0;
-  (flg_3dic == 1) ? idx = p.x *max_bin.y *max_bin.z + p.y *max_bin.z + p.z
-                  : idx = p.x * max_bin.y + p.y;
-  return &bin_mat[idx];
+  return &bin_mat[ p.x * max_bin.y + p.y];
 };
 
 void add_net_to_bins(NET *ntp);

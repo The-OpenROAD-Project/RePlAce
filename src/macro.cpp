@@ -140,7 +140,7 @@ ITER mLG: %d\n\
     OVLP=%d\n\
     #ACC=%d\n\
     #REJ=%d\n",
-        iter + 1, total_hpwl.x + total_hpwl.y + total_hpwl.z, tot_mac_den,
+        iter + 1, total_hpwl.x + total_hpwl.y, tot_mac_den,
         tot_mac_ovlp, tot_accept_cnt, tot_reject_cnt);
 
     sa_param_init(iter);
@@ -160,7 +160,7 @@ ITER mLG: %d\n\
     OVLP=%d\n\
     #ACC=%d\n\
     #REJ=%d\n",
-      iter + 1, total_hpwl.x + total_hpwl.y + total_hpwl.z, tot_mac_den,
+      iter + 1, total_hpwl.x + total_hpwl.y, tot_mac_den,
       tot_mac_ovlp, tot_accept_cnt, tot_reject_cnt);
 
   if(plotMacroCMD) {
@@ -168,10 +168,8 @@ ITER mLG: %d\n\
       mac = macro_st[j];
       mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
       mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-      mac->pmin.z = mac->center.z - 0.5 * mac->size.z;
       mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
       mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-      mac->pmax.z = mac->center.z + 0.5 * mac->size.z;
     }
 //    cell_copy();
 //    plot("S3-LG3-macro", 9999, 1.0, 1);
@@ -190,9 +188,9 @@ void sa_mac_leg(int iter) {
   printf(
       "  -- %d, %.2e, %.2e, %.2e, %.2e, (%.8e, %.8e, %.8e), %.2e, "
       "\033[36m%d\033[0m, %d, %d \n",
-      0, sa_t, sa_r.x, sa_r.y, sa_r.z,
+      0, sa_t, sa_r.x, sa_r.y, 
       // tot_mac_hpwl ,
-      total_hpwl.x, total_hpwl.y, total_hpwl.z, tot_mac_den, tot_mac_ovlp,
+      total_hpwl.x, total_hpwl.y, tot_mac_den, tot_mac_ovlp,
       tot_accept_cnt, tot_reject_cnt);
 
   if(plotMacroCMD) {
@@ -200,10 +198,8 @@ void sa_mac_leg(int iter) {
       mac = macro_st[j];
       mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
       mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-      mac->pmin.z = mac->center.z - 0.5 * mac->size.z;
       mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
       mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-      mac->pmax.z = mac->center.z + 0.5 * mac->size.z;
     }
 
 //    cell_copy();
@@ -229,11 +225,10 @@ void sa_mac_leg(int iter) {
       //////////////////////////////////
 
       printf(
-          "  -- %d, %.2e, %.2e, %.2e, %.2e, (%.8e, %.8e, %.8e), %.2e, "
+          "  -- %d, %.2e, %.2e, %.2e, (%.8e, %.8e), %.2e, "
           "\033[36m%d\033[0m, %d, %d, %.2lf\n",
-          i / (sa_max_iter / sa_n_disp) + 1, sa_t, sa_r.x, sa_r.y, sa_r.z,
-          // tot_mac_hpwl ,
-          total_hpwl.x, total_hpwl.y, total_hpwl.z, tot_mac_den, tot_mac_ovlp,
+          i / (sa_max_iter / sa_n_disp) + 1, sa_t, sa_r.x, sa_r.y,
+          total_hpwl.x, total_hpwl.y, tot_mac_den, tot_mac_ovlp,
           cur_acc_cnt, cur_rej_cnt, t0);
       fflush(stdout);
 
@@ -244,10 +239,8 @@ void sa_mac_leg(int iter) {
           mac = macro_st[j];
           mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
           mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-          mac->pmin.z = mac->center.z - 0.5 * mac->size.z;
           mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
           mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-          mac->pmax.z = mac->center.z + 0.5 * mac->size.z;
         }
 
         cell_copy();
@@ -294,7 +287,6 @@ void sa_mac_leg_sub() {
     ///////////////////////
     total_hpwl.x += mac_hpwl.x - mac_hpwl_00.x;
     total_hpwl.y += mac_hpwl.y - mac_hpwl_00.y;
-    total_hpwl.z += mac_hpwl.z - mac_hpwl_00.z;
     ///////////////////////
 
     if(tot_mac_ovlp <= 0 && new_mac_ovlp <= 0 && org_mac_ovlp > 0) {
@@ -308,7 +300,6 @@ void sa_mac_leg_sub() {
     cur_rej_cnt++;
     mac_mov.x *= -1;
     mac_mov.y *= -1;
-    mac_mov.z *= -1;
     do_mac_mov(mac_idx, &mac_mov);
   }
 
@@ -322,19 +313,15 @@ void sa_mac_leg_sub() {
            ovlp2);
     for(i = 0; i < macro_cnt; i++) {
       mac = macro_st[i];
-      printf("%d. pminlg=(%d,%d,%d), pmaxlg=(%d,%d,%d), size=(%d,%d,%d)\n",
-             i + 1, mac->pmin_lg.x, mac->pmin_lg.y, mac->pmin_lg.z,
-             mac->pmax_lg.x, mac->pmax_lg.y, mac->pmax_lg.z,
-             prec2int(mac->size.x), prec2int(mac->size.y),
-             prec2int(mac->size.z));
+      printf("%d. pminlg=(%d,%d), pmaxlg=(%d,%d), size=(%d,%d)\n",
+             i + 1, mac->pmin_lg.x, mac->pmin_lg.y, 
+             mac->pmax_lg.x, mac->pmax_lg.y, 
+             prec2int(mac->size.x), prec2int(mac->size.y));
       if(mac->pmin_lg.x + prec2int(mac->size.x) != mac->pmax_lg.x) {
         printf("ERROR: x\n");
       }
       if(mac->pmin_lg.y + prec2int(mac->size.y) != mac->pmax_lg.y) {
         printf("ERROR: y\n");
-      }
-      if(mac->pmin_lg.z + prec2int(mac->size.z) != mac->pmax_lg.z) {
-        printf("ERROR: z\n");
       }
     }
     if(plotMacroCMD) {
@@ -342,10 +329,8 @@ void sa_mac_leg_sub() {
         mac = macro_st[i];
         mac->pmin.x = (prec)mac->pmin_lg.x;
         mac->pmin.y = (prec)mac->pmin_lg.y;
-        mac->pmin.z = (prec)mac->pmin_lg.z;
         mac->pmax.x = (prec)mac->pmax_lg.x;
         mac->pmax.y = (prec)mac->pmax_lg.y;
-        mac->pmax.z = (prec)mac->pmax_lg.z;
       }
 
       cell_copy();
@@ -387,7 +372,6 @@ void sa_init_top(void) {
 
       sum_mac_size.x += mac->size.x;
       sum_mac_size.y += mac->size.y;
-      sum_mac_size.z += mac->size.z;
     }
   }
 
@@ -414,10 +398,8 @@ void sa_init_top(void) {
       mac = macro_st[i];
       mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
       mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-      mac->pmin.z = mac->center.z - 0.5 * mac->size.z;
       mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
       mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-      mac->pmax.z = mac->center.z + 0.5 * mac->size.z;
     }
 
     cell_copy();
@@ -438,9 +420,9 @@ void sa_init_top(void) {
       get_mac_ovlp_3d_top();  // get_tot_mac_ovlp ();// get_mac_ovlp_top();
 
   printf(
-      "initial cost: HPWL = (%.2lf, %.2lf, %.2lf), den = %.2lf , ovlp = %d "
+      "initial cost: HPWL = (%.2lf, %.2lf), den = %.2lf , ovlp = %d "
       "\n",
-      total_hpwl.x, total_hpwl.y, total_hpwl.z, tot_mac_den, tot_mac_ovlp);
+      total_hpwl.x, total_hpwl.y, tot_mac_den, tot_mac_ovlp);
 
   if(tot_mac_ovlp <= 0)
     ovlp_free_flg = 1;
@@ -478,7 +460,7 @@ void sa_mac_leg_init_with_margin(void) {
             rowHeight +
         (int)(place.org.y + 0.5) /* ROW_Y0 */;
 
-    find_close_tier(center.z, t0_st, z_st);
+//    find_close_tier(center.z, t0_st, z_st);
 
     for(j = 0; j < numLayer; j++) {
       z = z_st[j];
@@ -491,7 +473,7 @@ void sa_mac_leg_init_with_margin(void) {
          !(tier->max_mac &&
            tier->max_mac->size.x + mac->size.x > tier->size.x &&
            tier->max_mac->size.y + mac->size.y > tier->size.y)) {
-        center_lg.z = tier->center.z;
+//        center_lg.z = tier->center.z;
 
         tier->temp_mac_area += mac->area;
 
@@ -524,19 +506,15 @@ void sa_mac_leg_init_with_margin(void) {
 
     mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
     mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-    mac->pmin.z = mac->center.z - 0.5 * mac->size.z;
 
     mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
     mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-    mac->pmax.z = mac->center.z + 0.5 * mac->size.z;
 
     mac->pmin_lg.x = (int)(mac->pmin.x + 0.5);
     mac->pmin_lg.y = (int)(mac->pmin.y + 0.5);
-    mac->pmin_lg.z = (int)(mac->pmin.z + 0.5);
 
     mac->pmax_lg.x = (int)(mac->pmax.x + 0.5);
     mac->pmax_lg.y = (int)(mac->pmax.y + 0.5);
-    mac->pmax_lg.z = (int)(mac->pmax.z + 0.5);
   }
 
   mkl_free(t0_st);
@@ -590,36 +568,24 @@ void sa_param_init(int iter) {
 
   sa_n.x = sa_n.y = sqrt((prec)macro_cnt / (prec)numLayer);
 
-  sa_n.z = (prec)macro_cnt * avg_mac_cnt_per_dim.z / mac_cnt_sum;
 
   sa_ncof.x = 0.05 * pow(1.5, (prec)iter);
   sa_ncof.y = 0.05 * pow(1.5, (prec)iter);
-  sa_ncof.z = 0.05 * pow(1.5, (prec)iter);
 
   max_sa_r.x = place.cnt.x / sa_n.x * sa_ncof.x;
   max_sa_r.y = place.cnt.y / sa_n.y * sa_ncof.y;
-  max_sa_r.z = place.cnt.z / sa_n.z * sa_ncof.z * MAX_SA_R_COF;
-
-  if(max_sa_r.z < MIN_SA_R_Z)
-    max_sa_r.z = MIN_SA_R_Z;
-  if(max_sa_r.z > MAX_SA_R_Z)
-    max_sa_r.z = MAX_SA_R_Z;
 
   min_sa_r.x = 1.0;
   min_sa_r.y = 1.0;  // rowHeight ;
-  min_sa_r.z = 1.0;  // TIER_DEP ;
 
   sa_r.x = max_sa_r.x;
   sa_r.y = max_sa_r.y;
-  sa_r.z = max_sa_r.z;
 
   sa_r_stp.x = (max_sa_r.x - min_sa_r.x) / (prec)sa_max_iter;
   sa_r_stp.y = (max_sa_r.y - min_sa_r.y) / (prec)sa_max_iter;
-  sa_r_stp.z = (max_sa_r.z - min_sa_r.z) / (prec)sa_max_iter;
 
   sa_u.x = 1;
   sa_u.y = 1;
-  sa_u.z = 1;
 }
 
 ////////////// OVERLAP COUNT //////////////
@@ -772,13 +738,10 @@ struct POS get_mac_mov(struct FPOS r, struct POS u) {
   struct POS mov = zeroPoint;
   rnd.x = rand();
   rnd.y = rand();
-  rnd.z = rand();
   drnd.x = (prec)rnd.x * inv_RAND_MAX - 0.5;
   drnd.y = (prec)rnd.y * inv_RAND_MAX - 0.5;
-  drnd.z = (prec)rnd.z * inv_RAND_MAX - 0.5;
   mov.x = prec2int(drnd.x * r.x) * u.x;
   mov.y = prec2int(drnd.y * r.y / rowHeight) * rowHeight * u.y;
-  mov.z = prec2int(drnd.y * r.z / TIER_DEP) * TIER_DEP * u.z;
   if(mov.x > 0)
     sa_x_gtz_cnt++;
   if(mov.x == 0)
@@ -791,17 +754,11 @@ struct POS get_mac_mov(struct FPOS r, struct POS u) {
     sa_y_eqz_cnt++;
   if(mov.y < 0)
     sa_y_ltz_cnt++;
-  if(mov.z > 0)
-    sa_z_gtz_cnt++;
-  if(mov.z == 0)
-    sa_z_eqz_cnt++;
-  if(mov.z < 0)
-    sa_z_ltz_cnt++;
   return mov;
 }
 
 void do_mac_mov(int idx, struct POS *mov) {
-  int i = 0, mx = mov->x, my = mov->y, mz = mov->z;
+  int i = 0, mx = mov->x, my = mov->y;
   struct PIN *pin = NULL;
   struct FPOS pof = zeroFPoint;
   struct MODULE *mac = macro_st[idx];
@@ -811,31 +768,25 @@ void do_mac_mov(int idx, struct POS *mov) {
 
   mac->center.x += (prec)mx;
   mac->center.y += (prec)my;
-  mac->center.z += (prec)mz;
 
   mac->center = valid_coor4(mac->center, mac->size);
 
   mov->x = mac->center.x - p0.x;
   mov->y = mac->center.y - p0.y;
-  mov->z = mac->center.z - p0.z;
 
   mac->pmin_lg.x = (int)(mac->center.x - 0.5 * mac->size.x + 0.5);
   mac->pmin_lg.y = (int)(mac->center.y - 0.5 * mac->size.y + 0.5);
-  mac->pmin_lg.z = (int)(mac->center.z - 0.5 * mac->size.z + 0.5);
 
   mac->pmax_lg.x = (int)(mac->center.x + 0.5 * mac->size.x + 0.5);
   mac->pmax_lg.y = (int)(mac->center.y + 0.5 * mac->size.y + 0.5);
-  mac->pmax_lg.z = (int)(mac->center.z + 0.5 * mac->size.z + 0.5);
 
   for(i = 0; i < cell->pinCNTinObject; i++) {
     pin = cell->pin[i];
     pof = cell->pof[i];
     pin->fp.x = mac->center.x + pof.x;
     pin->fp.y = mac->center.y + pof.y;
-    pin->fp.z = mac->center.z + pof.z;
   }
 
-  mac->tier = (int)((prec)(mac->pmin_lg.z) / TIER_DEP + 0.5);
 }
 
 int mov_accept(prec c0, prec c1) {
@@ -861,7 +812,6 @@ void sa_param_update_sub() {
   sa_t *= sa_t_cof;  // 0.999999 ;
   sa_r.x -= sa_r_stp.x;
   sa_r.y -= sa_r_stp.y;
-  sa_r.z -= sa_r_stp.z;
 }
 
 void sa_param_update() {
@@ -913,19 +863,14 @@ void sa_post(void) {
     mac = macro_st[i];
     mac->pmin.x = (prec)mac->pmin_lg.x;
     mac->pmin.y = (prec)mac->pmin_lg.y;
-    mac->pmin.z = (prec)mac->pmin_lg.z;
     mac->pmax.x = (prec)mac->pmax_lg.x;
     mac->pmax.y = (prec)mac->pmax_lg.y;
-    mac->pmax.z = (prec)mac->pmax_lg.z;
-
-    z = (int)((prec)mac->pmin_lg.z / TIER_DEP + 0.5);
 
     mac->tier = z;
 
     for(j = 0; j < mac->pinCNTinObject; j++) {
       pin = mac->pin[j];
       pin->tier = z;
-      pin->fp.z = mac->center.z;  // tier->center.z;
     }
   }
 

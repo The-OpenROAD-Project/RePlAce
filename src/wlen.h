@@ -105,14 +105,7 @@ inline void wlen_pre(int cell_idx, FPOS *wpre) {
       break;
 
     case PcntWpre:
-
-      if(flg_3dic) {
-        wpre->x = wpre->y = wpre->z = (prec)(cell->pinCNTinObject);
-      }
-      else {
-        wpre->x = wpre->y = (prec)(cell->pinCNTinObject);
-      }
-
+      wpre->x = wpre->y = (prec)(cell->pinCNTinObject);
       break;
   }
 
