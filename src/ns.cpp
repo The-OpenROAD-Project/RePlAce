@@ -1683,6 +1683,8 @@ void myNesterov::PrintNesterovOptStatus(int iter) {
 }
 
 void myNesterov::PlotNesterov(int iter) {
+
+  /*
   if(plotCellCMD) {
     cell_update(x_st, N);
     if(STAGE == mGP3D)
@@ -1714,4 +1716,5 @@ void myNesterov::PlotNesterov(int iter) {
     if(STAGE == cGP2D)
       plot_bin("S5-field-cGP2D-", iter, 1.0, 4);
   }
+  */
 }

@@ -89,22 +89,14 @@ static BIN **bin_mat_st;
 // STAGE : INIT_PLACEMENT -> Totally not-working
 POS get_bin_idx(int idx) {
   POS p;
-  if(numLayer > 1) {
-    p.x = idx / (max_bin.y * max_bin.z);
-    p.y = (idx % (max_bin.y * max_bin.z)) / max_bin.z;
-    p.z = idx % max_bin.z;
+  if(STAGE == mGP2D) {
+    p.x = idx / dim_bin_mGP2D.y;
+    p.y = idx % dim_bin_mGP2D.y;
   }
-  else {
-    if(STAGE == mGP2D) {
-      p.x = idx / dim_bin_mGP2D.y;
-      p.y = idx % dim_bin_mGP2D.y;
-    }
-    else if(STAGE == cGP2D) {
-      p.x = idx / dim_bin_cGP2D.y;
-      p.y = idx % dim_bin_cGP2D.y;
-    }
+  else if(STAGE == cGP2D) {
+    p.x = idx / dim_bin_cGP2D.y;
+    p.y = idx % dim_bin_cGP2D.y;
   }
-
   return p;
 }
 
@@ -135,27 +127,16 @@ void bin_init() {
   // update bin_step
   bin_stp.x = place.cnt.x / (prec)max_bin.x;
   bin_stp.y = place.cnt.y / (prec)max_bin.y;
-  bin_stp.z = place.cnt.z / (prec)max_bin.z;
 
   half_bin_stp.x = bin_stp.x * 0.5;
   half_bin_stp.y = bin_stp.y * 0.5;
-  half_bin_stp.z = bin_stp.z * 0.5;
 
   inv_bin_stp.x = 1.0 / (prec)bin_stp.x;
   inv_bin_stp.y = 1.0 / (prec)bin_stp.y;
-  inv_bin_stp.z = 1.0 / (prec)bin_stp.z;
 
-  if(flg_3dic) {
-    printf("INFO:  Boundary Bins Max_b_x=%d, Max_b_y=%d, Max_b_z=%d\n",
-           max_bin.x, max_bin.y, max_bin.z);
-    printf("INFO:  Bin Step X=%.4lf, Y=%.4lf, Z=%.4lf\n\n", bin_stp.x,
-           bin_stp.y, bin_stp.z);
-  }
-  else {
-    printf("INFO:  Boundary Bins Max_b_x=%d, Max_b_y=%d\n", max_bin.x,
-           max_bin.y);
-    printf("INFO:  Bin Step X=%.4lf, Y=%.4lf\n\n", bin_stp.x, bin_stp.y);
-  }
+  printf("INFO:  Boundary Bins Max_b_x=%d, Max_b_y=%d\n", max_bin.x,
+      max_bin.y);
+  printf("INFO:  Bin Step X=%.4lf, Y=%.4lf\n\n", bin_stp.x, bin_stp.y);
 
   bin_org = place.org;
 
@@ -250,7 +231,6 @@ void bin_init() {
   bin_st = (POS *)mkl_malloc(sizeof(POS) * tot_bin_cnt, 64);
   bin_share_x_st = (prec *)mkl_malloc(sizeof(prec) * max_bin.x, 64);
   bin_share_y_st = (prec *)mkl_malloc(sizeof(prec) * max_bin.y, 64);
-  bin_share_z_st = (prec *)mkl_malloc(sizeof(prec) * max_bin.z, 64);
   bin_share_st = (prec *)mkl_malloc(sizeof(prec) * tot_bin_cnt, 64);
 }
 
@@ -325,7 +305,6 @@ void bin_init_2D(int STAGE) {
     //}
     bin_stp_mGP2D.x = place.cnt.x / (prec)dim_bin_mGP2D.x;
     bin_stp_mGP2D.y = place.cnt.y / (prec)dim_bin_mGP2D.y;
-    bin_stp_mGP2D.z = TIER_DEP;
     printf("INFO:  dim_bin_mGP2D.(x,y) = (%d, %d)\n", dim_bin_mGP2D.x,
            dim_bin_mGP2D.y);
   }
@@ -340,7 +319,6 @@ void bin_init_2D(int STAGE) {
     //}
     bin_stp_cGP2D.x = place.cnt.x / (prec)dim_bin_cGP2D.x;
     bin_stp_cGP2D.y = place.cnt.y / (prec)dim_bin_cGP2D.y;
-    bin_stp_cGP2D.z = TIER_DEP;
 
     printf("INFO:  dim_bin_cGP2D.(x,y) = (%d, %d)\n", dim_bin_cGP2D.x,
            dim_bin_cGP2D.y);
@@ -361,22 +339,18 @@ void bin_init_2D(int STAGE) {
 
     tier->bin_stp.x = tier->size.x / tier->dim_bin.x;
     tier->bin_stp.y = tier->size.y / tier->dim_bin.y;
-    tier->bin_stp.z = TIER_DEP;
 
     tier->half_bin_stp.x = 0.5 * tier->bin_stp.x;
     tier->half_bin_stp.y = 0.5 * tier->bin_stp.y;
-    tier->half_bin_stp.z = 0.5 * tier->bin_stp.z;
 
     tier->inv_bin_stp.x = 1.0 / tier->bin_stp.x;
     tier->inv_bin_stp.y = 1.0 / tier->bin_stp.y;
-    tier->inv_bin_stp.z = 1.0 / tier->bin_stp.z;
 
     tier->bin_off.SetZero();
     tier->bin_org.x = tier->pmin.x - tier->bin_off.x;
     tier->bin_org.y = tier->pmin.y - tier->bin_off.y;
-    tier->bin_org.z = tier->pmin.z - tier->bin_off.z;
 
-    tier->bin_area = tier->bin_stp.x * tier->bin_stp.y * tier->bin_stp.z;
+    tier->bin_area = tier->bin_stp.x * tier->bin_stp.y;
 
     tier->inv_bin_area = 1.0 / tier->bin_area;
     tier->tot_bin_area = tier->bin_area * tier->tot_bin_cnt;
@@ -386,7 +360,7 @@ void bin_init_2D(int STAGE) {
 
     // for each allocated bin_mat_st..
     for(int i = 0; i < tier->tot_bin_cnt; i++) {
-      POS p(i / tier->dim_bin.y, i % tier->dim_bin.y, z);
+      POS p(i / tier->dim_bin.y, i % tier->dim_bin.y);
 
       BIN *bp = &tier->bin_mat[i];
 
@@ -397,11 +371,9 @@ void bin_init_2D(int STAGE) {
       bp->phi = 0;
       bp->pmin.x = tier->bin_org.x + (prec)p.x * tier->bin_stp.x;
       bp->pmin.y = tier->bin_org.y + (prec)p.y * tier->bin_stp.y;
-      bp->pmin.z = (prec)z * TIER_DEP;
 
       bp->pmax.x = bp->pmin.x + tier->bin_stp.x;
       bp->pmax.y = bp->pmin.y + tier->bin_stp.y;
-      bp->pmax.z = (prec)(z + 1) * TIER_DEP;
 
       //            p.Dump("p");
       //            bp->pmin.Dump("bp->pmin");
@@ -410,7 +382,6 @@ void bin_init_2D(int STAGE) {
 
       bp->center.x = bp->pmin.x + 0.5 * tier->bin_stp.x;
       bp->center.y = bp->pmin.y + 0.5 * tier->bin_stp.y;
-      bp->center.z = bp->pmin.z + 0.5 * tier->bin_stp.z;
 
       bp->p = p;
 
@@ -461,7 +432,7 @@ void bin_init_2D(int STAGE) {
       for(auto &curIdx : shapeMap[term->name]) {
         prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
              width = shapeStor[curIdx].width, height = shapeStor[curIdx].height;
-        FPOS tmpMin(llx, lly, 0), tmpMax(llx + width, lly + height, 1);
+        FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
 
         UpdateTerminalArea(tier, &tmpMin, &tmpMax);
       }
@@ -591,9 +562,6 @@ POS get_bin_pt_from_point(FPOS fp) {
   p.x = INT_DOWN((fp.x - bin_org.x) / bin_stp.x);
   p.y = INT_DOWN((fp.y - bin_org.y) / bin_stp.y);
 
-  if(flg_3dic)
-    p.z = INT_DOWN((fp.z - bin_org.z) / bin_stp.z);
-
   // projection
   legal_bin_idx(&p);
 
@@ -606,15 +574,10 @@ void legal_bin_idx(POS *p) {
     p->x = 0;
   if(p->y < 0)
     p->y = 0;
-  if(flg_3dic && p->z < 0)
-    p->z = 0;
-
   if(p->x >= max_bin.x)
     p->x = max_bin.x - 1;
   if(p->y >= max_bin.y)
     p->y = max_bin.y - 1;
-  if(flg_3dic && p->z >= max_bin.z)
-    p->z = max_bin.z - 1;
 }
 
 int point_in_range(prec a, prec min_a, prec max_a) {
@@ -625,8 +588,7 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
   int i = 0;
   prec xyz_dis = 0;
   prec min_dis = dp_wlen_weight.x * place.cnt.x +
-                 dp_wlen_weight.y * place.cnt.y +
-                 dp_wlen_weight.z * place.cnt.z;
+                 dp_wlen_weight.y * place.cnt.y;
   POS flg = zeroPoint, obj_flg = zeroPoint;
   FPOS new_center = center;
   FPOS dorg = zeroFPoint, dend = zeroFPoint;
@@ -636,26 +598,20 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
 
   half_size.x = obj_size.x * 0.5;
   half_size.y = obj_size.y * 0.5;
-  half_size.z = obj_size.z * 0.5;
 
   for(i = 0; i < place_st_cnt; i++) {
     place0 = &place_st[i];
 
     flg.x = point_in_range(center.x, place0->org.x, place0->end.x);
-
     flg.y = point_in_range(center.y, place0->org.y, place0->end.y);
-
-    flg.z = point_in_range(center.z, place0->org.z, place0->end.z);
 
     dorg.x = fabs(place0->org.x - center.x);
     dorg.y = fabs(place0->org.y - center.y);
-    dorg.z = fabs(place0->org.z - center.z);
 
     dend.x = fabs(place0->end.x - center.x);
     dend.y = fabs(place0->end.y - center.y);
-    dend.z = fabs(place0->end.z - center.z);
 
-    if(flg.x && flg.y && flg.z) {
+    if(flg.x && flg.y) {
       if(dorg.x < dend.x && dorg.x < half_size.x) {
         new_center.x += half_size.x - dorg.x;
       }
@@ -668,13 +624,6 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
       }
       else if(dorg.y > dend.y && dend.y < half_size.y) {
         new_center.y -= half_size.y - dend.y;
-      }
-
-      if(dorg.z < dend.z && dorg.z < half_size.z) {
-        new_center.z += half_size.z - dorg.z;
-      }
-      else if(dorg.z > dend.z && dend.z < half_size.z) {
-        new_center.z -= half_size.z - dend.z;
       }
 
       return new_center;
@@ -700,86 +649,7 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
         dis.y = 0;
       }
 
-      if(center.z < place0->org.z) {
-        dis.z = place0->org.z - center.z + half_size.z;
-      }
-      else {
-        dis.z = place0->end.z - (center.z + half_size.z);
-      }
-
-      xyz_dis = fabs(dis.x) + fabs(dis.y) + fabs(dis.z);
-
-      if(xyz_dis < min_dis) {
-        min_dis = xyz_dis;
-        obj_flg = flg;
-        obj_dis = dis;
-      }
-    }
-    else if(flg.x && flg.z) {
-      if(dorg.x < dend.x && dorg.x < half_size.x) {
-        dis.x = half_size.x - dorg.x;
-      }
-      else if(dorg.x > dend.x && dend.x < half_size.x) {
-        dis.x = dend.x - half_size.x;
-      }
-      else {
-        dis.x = 0;
-      }
-
-      if(dorg.z < dend.z && dorg.z < half_size.z) {
-        dis.z = half_size.z - dorg.z;
-      }
-      else if(dorg.z > dend.z && dend.z < half_size.z) {
-        dis.z = dend.z - half_size.z;
-      }
-      else {
-        dis.z = 0;
-      }
-
-      if(center.y < place0->org.y) {
-        dis.y = place0->org.y - center.y + half_size.y;
-      }
-      else {
-        dis.y = place0->end.y - (center.y + half_size.y);
-      }
-
-      xyz_dis = fabs(dis.x) + fabs(dis.y) + fabs(dis.z);
-
-      if(xyz_dis < min_dis) {
-        min_dis = xyz_dis;
-        obj_flg = flg;
-        obj_dis = dis;
-      }
-    }
-    else if(flg.y && flg.z) {
-      if(dorg.y < dend.y && dorg.y < half_size.y) {
-        dis.y = half_size.y - dorg.y;
-      }
-      else if(dorg.y > dend.y && dend.y < half_size.y) {
-        dis.y = dend.y - half_size.y;
-      }
-      else {
-        dis.y = 0;
-      }
-
-      if(dorg.z < dend.z && dorg.z < half_size.z) {
-        dis.z = half_size.z - dorg.z;
-      }
-      else if(dorg.z > dend.z && dend.z < half_size.z) {
-        dis.z = dend.z - half_size.z;
-      }
-      else {
-        dis.z = 0;
-      }
-
-      if(center.x < place0->org.x) {
-        dis.x = place0->org.x - center.x + half_size.x;
-      }
-      else {
-        dis.x = place0->end.x - (center.x + half_size.x);
-      }
-
-      xyz_dis = fabs(dis.x) + fabs(dis.y) + fabs(dis.z);
+      xyz_dis = fabs(dis.x) + fabs(dis.y);
 
       if(xyz_dis < min_dis) {
         min_dis = xyz_dis;
@@ -805,14 +675,59 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
         dis.y = place0->end.y - (center.y + half_size.y);
       }
 
-      if(center.z < place0->org.z) {
-        dis.z = place0->org.z - center.z + half_size.z;
+      xyz_dis = fabs(dis.x) + fabs(dis.y);
+
+      if(xyz_dis < min_dis) {
+        min_dis = xyz_dis;
+        obj_flg = flg;
+        obj_dis = dis;
+      }
+    }
+    else if(flg.y ) {
+      if(dorg.y < dend.y && dorg.y < half_size.y) {
+        dis.y = half_size.y - dorg.y;
+      }
+      else if(dorg.y > dend.y && dend.y < half_size.y) {
+        dis.y = dend.y - half_size.y;
       }
       else {
-        dis.z = place0->end.z - (center.z + half_size.z);
+        dis.y = 0;
       }
 
-      xyz_dis = fabs(dis.x) + fabs(dis.y) + fabs(dis.z);
+      if(center.x < place0->org.x) {
+        dis.x = place0->org.x - center.x + half_size.x;
+      }
+      else {
+        dis.x = place0->end.x - (center.x + half_size.x);
+      }
+
+      xyz_dis = fabs(dis.x) + fabs(dis.y);
+
+      if(xyz_dis < min_dis) {
+        min_dis = xyz_dis;
+        obj_flg = flg;
+        obj_dis = dis;
+      }
+    }
+    else if(flg.x) {
+      if(dorg.x < dend.x && dorg.x < half_size.x) {
+        dis.x = half_size.x - dorg.x;
+      }
+      else if(dorg.x > dend.x && dend.x < half_size.x) {
+        dis.x = dend.x - half_size.x;
+      }
+      else {
+        dis.x = 0;
+      }
+
+      if(center.y < place0->org.y) {
+        dis.y = place0->org.y - center.y + half_size.y;
+      }
+      else {
+        dis.y = place0->end.y - (center.y + half_size.y);
+      }
+
+      xyz_dis = fabs(dis.x) + fabs(dis.y);
 
       if(xyz_dis < min_dis) {
         min_dis = xyz_dis;
@@ -838,47 +753,7 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
         dis.x = place0->end.x - (center.x + half_size.x);
       }
 
-      if(center.z < place0->org.z) {
-        dis.z = place0->org.z - center.z + half_size.z;
-      }
-      else {
-        dis.z = place0->end.z - (center.z + half_size.z);
-      }
-
-      xyz_dis = fabs(dis.x) + fabs(dis.y) + fabs(dis.z);
-
-      if(xyz_dis < min_dis) {
-        min_dis = xyz_dis;
-        obj_flg = flg;
-        obj_dis = dis;
-      }
-    }
-    else if(flg.z) {
-      if(dorg.z < dend.z && dorg.z < half_size.z) {
-        dis.z = half_size.z - dorg.z;
-      }
-      else if(dorg.z > dend.z && dend.z < half_size.z) {
-        dis.z = dend.z - half_size.z;
-      }
-      else {
-        dis.z = 0;
-      }
-
-      if(center.x < place0->org.x) {
-        dis.x = place0->org.x - center.x + half_size.x;
-      }
-      else {
-        dis.x = place0->end.x - (center.x + half_size.x);
-      }
-
-      if(center.y < place0->org.y) {
-        dis.y = place0->org.y - center.y + half_size.y;
-      }
-      else {
-        dis.y = place0->end.y - (center.y + half_size.y);
-      }
-
-      xyz_dis = fabs(dis.x) + fabs(dis.y) + fabs(dis.z);
+      xyz_dis = fabs(dis.x) + fabs(dis.y);
 
       if(xyz_dis < min_dis) {
         min_dis = xyz_dis;
@@ -901,14 +776,7 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
         dis.y = place0->end.y - (center.y + half_size.y);
       }
 
-      if(center.z < place0->org.z) {
-        dis.z = place0->org.z - center.z + half_size.z;
-      }
-      else {
-        dis.z = place0->end.z - (center.z + half_size.z);
-      }
-
-      xyz_dis = fabs(dis.x) + fabs(dis.y) + fabs(dis.z);
+      xyz_dis = fabs(dis.x) + fabs(dis.y);
 
       if(xyz_dis < min_dis) {
         min_dis = xyz_dis;
@@ -920,20 +788,18 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
 
   new_center.x += obj_dis.x;
   new_center.y += obj_dis.y;
-  new_center.z += obj_dis.z;
 
   return new_center;
 }
 
 void bin_update(int N) {
-  if(STAGE == mGP3D || STAGE == cGP3D || STAGE == mLG3D)
-    return bin_update7(N);
-  else if(STAGE == cGP2D)
+  if(STAGE == cGP2D)
     return bin_update7_cGP2D();
   else if(STAGE == mGP2D)
     return bin_update7_mGP2D();
 }
 
+/*
 void bin_update7(int N) {
   BIN *bp = NULL;
 
@@ -963,7 +829,7 @@ void bin_update7(int N) {
       bp->den = area_num * inv_bin_area;
       bp->den2 = area_num2 * inv_bin_area;
 
-      copy_den_to_fft_3D(bp->den, bp->p);
+//      copy_den_to_fft_3D(bp->den, bp->p);
     }
   }
 
@@ -997,7 +863,7 @@ void bin_update7(int N) {
 
   // gsum_phi = gsum_cell_phi + gsum_term_phi + gsum_virt_phi;
   gsum_ovfl = ovf_area / total_modu_area;
-}
+}*/
 
 int compare(const void *p1, const void *p2) {
   return (*(prec *)p2 - *(prec *)p1);
@@ -1221,6 +1087,7 @@ int is_IO_block(TERM *term) {
     return 1;
 }
 
+/*
 prec get_bins_mac(FPOS center, MODULE *mac) {
   int x = 0, y = 0, z = 0, idx = 0;
   prec area_share = 0;
@@ -1233,19 +1100,15 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
 
   pmin.x = center.x - mac->half_size.x;
   pmin.y = center.y - mac->half_size.y;
-  pmin.z = center.z - mac->half_size.z;
 
   pmax.x = center.x + mac->half_size.x;
   pmax.y = center.y + mac->half_size.y;
-  pmax.z = center.z + mac->half_size.z;
 
   b0.x = INT_DOWN((pmin.x - bin_org.x) * inv_bin_stp.x);
   b0.y = INT_DOWN((pmin.y - bin_org.y) * inv_bin_stp.y);
-  b0.z = INT_DOWN((pmin.z - bin_org.z) * inv_bin_stp.z);
 
   b1.x = INT_UP((pmax.x - bin_org.x) * inv_bin_stp.x);
   b1.y = INT_UP((pmax.y - bin_org.y) * inv_bin_stp.y);
-  b1.z = INT_UP((pmax.z - bin_org.z) * inv_bin_stp.z);
 
   legal_bin_idx(&b0);
   legal_bin_idx(&b1);
@@ -1288,6 +1151,7 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
 
   return cost;
 }
+*/
 
 void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt) {
   prec *x_st = bin_share_x_st;
@@ -1308,19 +1172,15 @@ void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt) {
 
   pmin.x = center.x - cell->half_den_size.x;
   pmin.y = center.y - cell->half_den_size.y;
-  pmin.z = center.z - cell->half_den_size.z;
 
   pmax.x = center.x + cell->half_den_size.x;
   pmax.y = center.y + cell->half_den_size.y;
-  pmax.z = center.z + cell->half_den_size.z;
 
   b0.x = INT_DOWN((pmin.x - bin_org.x) * inv_bin_stp.x);
   b0.y = INT_DOWN((pmin.y - bin_org.y) * inv_bin_stp.y);
-  b0.z = INT_DOWN((pmin.z - bin_org.z) * inv_bin_stp.z);
 
   b1.x = INT_UP((pmax.x - bin_org.x) * inv_bin_stp.x);
   b1.y = INT_UP((pmax.y - bin_org.y) * inv_bin_stp.y);
-  b1.z = INT_UP((pmax.z - bin_org.z) * inv_bin_stp.z);
 
   legal_bin_idx(&b0);
   legal_bin_idx(&b1);
@@ -1353,45 +1213,23 @@ void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt) {
     y_st[y - b0.y] = share.y;
   }
 
-  if(flg_3dic) {
-    for(z = b0.z; z <= b1.z; z++) {
-      z0 = (prec)z * bin_stp.z + bin_org.z;
-
-      min_z = max(z0, pmin.z);
-
-      z1 = (prec)(z + 1) * bin_stp.z + bin_org.z;
-
-      max_z = min(z1, pmax.z);
-
-      share.z = max_z - min_z;
-
-      z_st[z - b0.z] = share.z;
-    }
-  }
-  else {
-    z_st[0] = 1.0;
-    b0.z = b1.z = 0;
-  }
+  z_st[0] = 1.0;
 
   for(x = b0.x; x <= b1.x; x++) {
     for(y = b0.y; y <= b1.y; y++) {
-      for(z = b0.z; z <= b1.z; z++) {
-        share.x = x_st[x - b0.x];
-        share.y = y_st[y - b0.y];
-        share.z = z_st[z - b0.z];
+      share.x = x_st[x - b0.x];
+      share.y = y_st[y - b0.y];
 
-        area_share = share.x * share.y * share.z * cell->den_scal;
+      area_share = share.x * share.y * cell->den_scal;
 
-        sum_area += area_share;
+      sum_area += area_share;
 
-        st[bin_cnt0].x = x;
-        st[bin_cnt0].y = y;
-        st[bin_cnt0].z = z;
+      st[bin_cnt0].x = x;
+      st[bin_cnt0].y = y;
 
-        share_st[bin_cnt0] = area_share;
+      share_st[bin_cnt0] = area_share;
 
-        bin_cnt0++;
-      }
+      bin_cnt0++;
     }
   }
 
@@ -1432,11 +1270,6 @@ bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
     p2->Set(-1);
     return false;
   }
-  else if(flg_3dic && (pmax1.z <= pmin2.z || pmin1.z >= pmax2.z)) {
-    p1->Set(-1);
-    p2->Set(-1);
-    return false;
-  }
   else {
     if((pmax1.x > pmin2.x || pmax1.x == pmin2.x) &&
        (pmax1.x < pmax2.x || pmax1.x == pmax2.x)) {
@@ -1487,33 +1320,6 @@ bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
     else {
       error(0, 0, "get_common_area: eff_x error");
     }
-
-    if(flg_3dic) {
-      if((pmax1.z > pmin2.z || pmax1.z == pmin2.z) &&
-         (pmax1.z < pmax2.z || pmax1.z == pmax2.z)) {
-        if(pmin1.z > pmin2.z || pmin1.z == pmin2.z) {
-          p1->z = pmin1.z;
-          p2->z = pmax1.z;
-        }
-        else {
-          p1->z = pmin2.z;
-          p2->z = pmax1.z;
-        }
-      }
-      else if(pmax1.z > pmax2.z || pmax1.z == pmax2.z) {
-        if(pmin1.z > pmin2.z || pmin1.z == pmin2.z) {
-          p1->z = pmin1.z;
-          p2->z = pmax2.z;
-        }
-        else {
-          p1->z = pmin2.z;
-          p2->z = pmax2.z;
-        }
-      }
-      else {
-        error(0, 0, "get_common_area: eff_x error");
-      }
-    }
   }
   return true;
 }
@@ -1525,8 +1331,6 @@ prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2) {
 
   if(pmax1.x <= pmin2.x || pmin1.x >= pmax2.x || pmax1.y <= pmin2.y ||
      pmin1.y >= pmax2.y)
-    return 0;
-  else if(flg_3dic && (pmin1.z >= pmax2.z || pmax1.z <= pmin2.z))
     return 0;
   else {
     if((pmax1.x > pmin2.x || pmax1.x == pmin2.x) &&
@@ -1565,27 +1369,8 @@ prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2) {
       g_rrr++;
     }
 
-    if(!flg_3dic)
+    if(!flg_3dic) {
       return eff_x * eff_y;
-    else {
-      if((pmax1.z > pmin2.z || pmax1.z == pmin2.z) &&
-         (pmax1.z < pmax2.z || pmax1.z == pmax2.z)) {
-        if(pmin1.z > pmin2.z || pmin1.z == pmin2.z)
-          eff_z = pmax1.z - pmin1.z;
-        else
-          eff_z = pmax1.z - pmin2.z;
-      }
-      else if(pmax1.z > pmax2.z || pmax1.z == pmax2.z) {
-        if(pmin1.z > pmin2.z || pmin1.z == pmin2.z)
-          eff_z = pmax2.z - pmin1.z;
-        else
-          eff_z = pmax2.z - pmin2.z;
-      }
-      else {
-        error(0, 0, "get_common_area: eff_x error");
-        g_rrr++;
-      }
-      return eff_x * eff_y * eff_z;
     }
   }
 }
@@ -1691,8 +1476,8 @@ prec get_all_macro_den(void) {
     center = mdp->center;
     mac = macro_st[mdp->mac_idx];
     half_size = mac->half_size;
-    den_cost += get_bins_mac(center, mac);
-    cout << get_bins_mac(center,mac) << endl;
+//    den_cost += get_bins_mac(center, mac);
+//    cout << get_bins_mac(center,mac) << endl;
   }
   return den_cost;
 }
@@ -1702,7 +1487,7 @@ prec get_mac_den(int idx) {
   FPOS center = mac->center;
   prec den_cost = 0;
 
-  den_cost = get_bins_mac(center, mac);
+//  den_cost = get_bins_mac(center, mac);
   return den_cost;
 }
 
@@ -1712,38 +1497,17 @@ int idx_in_bin_rect(POS *p, POS pmin, POS pmax) {
     return 1;
   }
   else {
-    if(flg_3dic) {
-      if(p->z < pmax.z) {
-        p->z++;
-        return 1;
-      }
-      else if(p->y < pmax.y) {
-        p->z = pmin.z;
-        p->y++;
-        return 1;
-      }
-      else if(p->x < pmax.x) {
-        p->z = pmin.z;
-        p->y = pmin.y;
-        p->x++;
-        return 1;
-      }
-      else
-        return 0;
+    if(p->y < pmax.y) {
+      p->y++;
+      return 1;
     }
-    else {
-      if(p->y < pmax.y) {
-        p->y++;
-        return 1;
-      }
-      else if(p->x < pmax.x) {
-        p->y = pmin.y;
-        p->x++;
-        return 1;
-      }
-      else
-        return 0;
+    else if(p->x < pmax.x) {
+      p->y = pmin.y;
+      p->x++;
+      return 1;
     }
+    else
+      return 0;
   }
 }
 
@@ -1808,7 +1572,7 @@ void den_comp_2d_mGP2D(CELLx *cell, TIER *tier) {
       }
 
       area_share =
-          (max_x - min_x) * (max_y - min_y) * cell->size.z * cell->den_scal;
+          (max_x - min_x) * (max_y - min_y) * cell->den_scal;
 
       if(cell->flg == FillerCell) {
         bpy->cell_area2 += area_share;
@@ -1885,85 +1649,6 @@ void den_comp_2d_cGP2D(CELLx *cell, TIER *tier) {
       }
       else {
         bpy->cell_area += area_share;
-      }
-    }
-  }
-
-  return;
-}
-
-void den_comp_3d(int cell_idx) {
-  int x = 0, y = 0, z = 0;
-  POS b0, b1;
-  CELLx *cell = &gcell_st[cell_idx];
-  prec area_share = 0;
-  int idx = 0;
-  prec min_x = 0, min_y = 0, min_z = 0;
-  prec max_x = 0, max_y = 0, max_z = 0;
-  BIN *bpx = NULL, *bpy = NULL, *bpz = NULL;
-
-  b0.x = INT_DOWN((cell->den_pmin.x - bin_org.x) * inv_bin_stp.x);
-  b0.y = INT_DOWN((cell->den_pmin.y - bin_org.y) * inv_bin_stp.y);
-  b0.z = INT_DOWN((cell->den_pmin.z - bin_org.z) * inv_bin_stp.z);
-
-  b1.x = INT_UP((cell->den_pmax.x - bin_org.x) * inv_bin_stp.x);
-  b1.y = INT_UP((cell->den_pmax.y - bin_org.y) * inv_bin_stp.y);
-  b1.z = INT_UP((cell->den_pmax.z - bin_org.z) * inv_bin_stp.z);
-
-  if(b0.x < 0)
-    b0.x = 0;
-  if(b0.y < 0)
-    b0.y = 0;
-  if(b0.z < 0)
-    b0.z = 0;
-
-  if(b0.x >= max_bin.x)
-    b0.x = max_bin.x - 1;
-  if(b0.y >= max_bin.y)
-    b0.y = max_bin.y - 1;
-  if(b0.z >= max_bin.z)
-    b0.z = max_bin.z - 1;
-
-  if(b1.x < 0)
-    b1.x = 0;
-  if(b1.y < 0)
-    b1.y = 0;
-  if(b1.z < 0)
-    b1.z = 0;
-
-  if(b1.x >= max_bin.x)
-    b1.x = max_bin.x - 1;
-  if(b1.y >= max_bin.y)
-    b1.y = max_bin.y - 1;
-  if(b1.z >= max_bin.z)
-    b1.z = max_bin.z - 1;
-
-  idx = b0.x * msh_yz + b0.y * msh.z + b0.z;
-
-  for(x = b0.x, bpx = &bin_mat[idx]; x <= b1.x; x++, bpx += msh_yz) {
-    max_x = min(bpx->pmax.x, cell->den_pmax.x);
-    min_x = max(bpx->pmin.x, cell->den_pmin.x);
-
-    for(y = b0.y, bpy = bpx; y <= b1.y; y++, bpy += msh.z) {
-      max_y = min(bpy->pmax.y, cell->den_pmax.y);
-      min_y = max(bpy->pmin.y, cell->den_pmin.y);
-
-      for(z = b0.z, bpz = bpy; z <= b1.z; z++, bpz++) {
-        max_z = min(bpz->pmax.z, cell->den_pmax.z);
-        min_z = max(bpz->pmin.z, cell->den_pmin.z);
-
-        area_share = (max_x - min_x) * (max_y - min_y) * (max_z - min_z) *
-                     cell->den_scal;
-
-        if(cell_idx < moduleCNT) {
-          if(cell->flg == Macro)
-            bpz->cell_area += area_share * global_macro_area_scale;
-          else
-            bpz->cell_area += area_share;
-        }
-        else {
-          bpz->cell_area2 += area_share;
-        }
       }
     }
   }

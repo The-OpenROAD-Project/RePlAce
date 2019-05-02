@@ -884,7 +884,7 @@ void expand_gp_from_one(void) {
 
   wcof_init(bin_stp);
   net_update_init();
-  fft_wxy_update_3d(bin_stp);
+//  fft_wxy_update_3d(bin_stp);
 }
 
 void shrink_gp_to_one(void) {
@@ -1093,7 +1093,7 @@ void shrink_gp_to_one(void) {
 
   net_update_init();
 
-  fft_wxy_update_3d(bin_stp);
+//  fft_wxy_update_3d(bin_stp);
 }
 
 void cg_input(struct FPOS *x_st, int N, int input) {

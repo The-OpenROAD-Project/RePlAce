@@ -121,7 +121,7 @@ extern struct POS dft_bin_3d;
 /// Electrostatic-Based Functions /////////////////////////////////////////
 void charge_fft_init(struct POS nbin, struct FPOS stp, int flg);
 void charge_fft_init_2d(struct POS nbin, struct FPOS stp);
-void charge_fft_init_3d(struct POS nbin, struct FPOS stp);
+//void charge_fft_init_3d(struct POS nbin, struct FPOS stp);
 
 void charge_fft_delete(int flg);
 void charge_fft_delete_2d(void);
@@ -192,6 +192,6 @@ void ddscct3d(int, int, int, int isgn, prec ***, prec *, int *, prec *);
 void ddcsct3d(int, int, int, int isgn, prec ***, prec *, int *, prec *);
 void ddccst3d(int, int, int, int isgn, prec ***, prec *, int *, prec *);
 
-void fft_wxy_update_3d(struct FPOS stp);
+//void fft_wxy_update_3d(struct FPOS stp);
 
 #endif

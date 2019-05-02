@@ -163,7 +163,7 @@ prec valid_coor3(prec da, prec sz, int lab);
 int is_IO_block(TERM *term);
 
 void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt);
-prec get_bins_mac(FPOS center, MODULE *mac);
+//prec get_bins_mac(FPOS center, MODULE *mac);
 void fft_test(void);
 
 #define DEN_SMOOTH_COF 5.0

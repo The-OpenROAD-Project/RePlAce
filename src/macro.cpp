@@ -163,17 +163,17 @@ ITER mLG: %d\n\
       iter + 1, total_hpwl.x + total_hpwl.y, tot_mac_den,
       tot_mac_ovlp, tot_accept_cnt, tot_reject_cnt);
 
-  if(plotMacroCMD) {
-    for(int j = 0; j < macro_cnt; j++) {
-      mac = macro_st[j];
-      mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
-      mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-      mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
-      mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-    }
+//  if(plotMacroCMD) {
+//    for(int j = 0; j < macro_cnt; j++) {
+//      mac = macro_st[j];
+//      mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
+//      mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
+//      mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
+//      mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
+//    }
 //    cell_copy();
 //    plot("S3-LG3-macro", 9999, 1.0, 1);
-  }
+//  }
   return ovlp_free_flg;
 }
 
@@ -193,18 +193,18 @@ void sa_mac_leg(int iter) {
       total_hpwl.x, total_hpwl.y, tot_mac_den, tot_mac_ovlp,
       tot_accept_cnt, tot_reject_cnt);
 
-  if(plotMacroCMD) {
-    for(j = 0; j < macro_cnt; j++) {
-      mac = macro_st[j];
-      mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
-      mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-      mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
-      mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-    }
+//  if(plotMacroCMD) {
+//    for(j = 0; j < macro_cnt; j++) {
+//      mac = macro_st[j];
+//      mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
+//      mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
+//      mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
+//      mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
+//    }
 
 //    cell_copy();
 //    plot("S3-LG2-macro", 0, 1.0, 1);
-  }
+//  }
   cur_acc_cnt = 0;
   cur_rej_cnt = 0;
 
@@ -234,22 +234,22 @@ void sa_mac_leg(int iter) {
 
       time_start(&t0);
 
-      if(plotMacroCMD) {
-        for(j = 0; j < macro_cnt; j++) {
-          mac = macro_st[j];
-          mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
-          mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-          mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
-          mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-        }
+//      if(plotMacroCMD) {
+//        for(j = 0; j < macro_cnt; j++) {
+//          mac = macro_st[j];
+//          mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
+//          mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
+//          mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
+//          mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
+//        }
 
-        cell_copy();
+//        cell_copy();
 
-        mac_ovlp_mark();
+//        mac_ovlp_mark();
 
-        plot("S3-LG2-macro",
-             iter * sa_n_disp + i / (sa_max_iter / sa_n_disp) + 1, 1.0, 1);
-      }
+//        plot("S3-LG2-macro",
+//             iter * sa_n_disp + i / (sa_max_iter / sa_n_disp) + 1, 1.0, 1);
+//      }
       cur_acc_cnt = 0;
       cur_rej_cnt = 0;
     }
@@ -393,19 +393,19 @@ void sa_init_top(void) {
 
   n = macro_cnt;
 
-  if(plotMacroCMD) {
-    for(i = 0; i < macro_cnt; i++) {
-      mac = macro_st[i];
-      mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
-      mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
-      mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
-      mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
-    }
+//  if(plotMacroCMD) {
+//    for(i = 0; i < macro_cnt; i++) {
+//      mac = macro_st[i];
+//      mac->pmin.x = mac->center.x - 0.5 * mac->size.x;
+//      mac->pmin.y = mac->center.y - 0.5 * mac->size.y;
+//      mac->pmax.x = mac->center.x + 0.5 * mac->size.x;
+//      mac->pmax.y = mac->center.y + 0.5 * mac->size.y;
+//    }
 
-    cell_copy();
+//    cell_copy();
 
-    plot("S3-LG1-macro-gp", 0, 1.0, 1);
-  }
+//    plot("S3-LG1-macro-gp", 0, 1.0, 1);
+//  }
 
   sa_mac_leg_init();
 

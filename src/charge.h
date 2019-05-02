@@ -65,8 +65,8 @@ inline void potn_pre(int cell_idx, struct FPOS *charge_dpre) {
       break;
   }
 }
-void potn_grad(int cell_idx, struct FPOS *grad);
-void potn_grad_local(int cell_idx, struct FPOS *grad, prec *cellLambda);
+//void potn_grad(int cell_idx, struct FPOS *grad);
+//void potn_grad_local(int cell_idx, struct FPOS *grad, prec *cellLambda);
 void potn_grad_2D(int cell_idx, struct FPOS *grad);
 void potn_grad_2D_local(int cell_idx, struct FPOS *grad, prec *cellLambda);
 

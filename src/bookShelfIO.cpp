@@ -1436,19 +1436,9 @@ int read_nodes_3D(char *input) {
     prec z = TIER_DEP;
 
 #if PREC_MODE == IS_FLOAT
-    if(flg_3dic_io) {
-      sscanf(line, "%s%f%f%f%s\n", nodeName, &x, &y, &z, node_type);
-    }
-    else {
-      sscanf(line, "%s%f%f%s\n", nodeName, &x, &y, node_type);
-    }
+    sscanf(line, "%s%f%f%s\n", nodeName, &x, &y, node_type);
 #elif PREC_MODE == IS_DOUBLE
-    if(flg_3dic_io) {
-      sscanf(line, "%s%lf%lf%lf%s\n", nodeName, &x, &y, &z, node_type);
-    }
-    else {
-      sscanf(line, "%s%lf%lf%s\n", nodeName, &x, &y, node_type);
-    }
+    sscanf(line, "%s%lf%lf%s\n", nodeName, &x, &y, node_type);
 #endif
 
     // cout << "current parsed: " << nodeName << ", " << x<< ", " <<
@@ -1773,7 +1763,6 @@ int read_nets_3D(char *input) {
 
 //
 // update terminalInst & moduleInst's Info
-/*
 int read_pl2(char *input) {
   FILE *fp = fopen(input, "r");
   char *token = NULL;
@@ -1818,29 +1807,12 @@ int read_pl2(char *input) {
       token = strtok(NULL, " \t\n");
       curModule->pmin.y = atof(token);
 
-      if(flg_3dic) {
-        if(flg_3dic_io) {
-          token = strtok(NULL, " \t\n");
-          curModule->pmin.z = atof(token);
-        }
-        else {
-          curModule->pmin.z = 0;
-        }
-      }
-
       curModule->center.x = curModule->pmin.x + curModule->half_size.x;
       curModule->center.y = curModule->pmin.y + curModule->half_size.y;
-
-      if(flg_3dic) {
-        curModule->center.z = curModule->pmin.z + curModule->half_size.z;
-      }
 
       curModule->pmax.x = curModule->pmin.x + curModule->size.x;
       curModule->pmax.y = curModule->pmin.y + curModule->size.y;
 
-      if(flg_3dic) {
-        curModule->pmax.z = curModule->pmin.z + curModule->size.z;
-      }
     }
     else {
       curTerminal = &terminalInstance[moduleID];
@@ -1850,16 +1822,6 @@ int read_pl2(char *input) {
 
       token = strtok(NULL, " \t\n");
       curTerminal->pmin.y = atof(token);
-
-      if(flg_3dic) {
-        if(flg_3dic_io) {
-          token = strtok(NULL, " \t\n");
-          curTerminal->pmin.z = atof(token);
-        }
-        else {
-          curTerminal->pmin.z = 0;
-        }
-      }
 
       curTerminal->center.x = curTerminal->pmin.x + 0.5 * curTerminal->size.x;
       curTerminal->center.y = curTerminal->pmin.y + 0.5 * curTerminal->size.y;
@@ -1884,7 +1846,6 @@ int read_pl2(char *input) {
   }
   return 1;
 }
-*/
 
 //
 // build the row_st(ROW)

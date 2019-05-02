@@ -761,18 +761,18 @@ void init() {
 
   switch(WLEN_MODEL) {
     case LSE:
-      wcof00.x = wcof00.y = wcof00.z = 0.1;
+      wcof00.x = wcof00.y = 0.1;
       break;
 
     case WA:
       if(INPUT_FLG == ISPD05 || INPUT_FLG == ISPD06 || INPUT_FLG == ISPD ||
          INPUT_FLG == MMS || INPUT_FLG == SB || INPUT_FLG == ETC) {
-        wcof00_dim1.x = wcof00_dim1.y = wcof00_dim1.z = 0.50;  // 500.0;
-        wcof00_org.x = wcof00_org.y = wcof00_org.z = 0.125;
+        wcof00_dim1.x = wcof00_dim1.y = 0.50;  // 500.0;
+        wcof00_org.x = wcof00_org.y = 0.125;
       }
       else if(INPUT_FLG == IBM) {
-        wcof00_dim1.x = wcof00_dim1.y = wcof00_dim1.z = 0.50;
-        wcof00_org.x = wcof00_org.y = wcof00_org.z = 0.50;
+        wcof00_dim1.x = wcof00_dim1.y = 0.50;
+        wcof00_org.x = wcof00_org.y = 0.50;
       }
       break;
   }
@@ -894,9 +894,8 @@ void initialPlacement_main() {
   initial_placement();
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
-  printf("   HPWL(IP): %.4f (%.4f, %.4f, %.4f)\n\n",
-         total_hpwl.x + total_hpwl.y + total_hpwl.z, total_hpwl.x, total_hpwl.y,
-         total_hpwl.z);
+  printf("   HPWL(IP): %.4f (%.4f, %.4f)\n\n",
+         total_hpwl.x + total_hpwl.y , total_hpwl.x, total_hpwl.y);
   place_backup = place;
   fflush(stdout);
 }
@@ -908,9 +907,8 @@ void tmGP3DglobalPlacement_main() {
   gp_opt();
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
-  printf("   HPWL(tGP3D): %.4f (%.4f, %.4f, %.4f)\n\n",
-         total_hpwl.x + total_hpwl.y + total_hpwl.z, total_hpwl.x, total_hpwl.y,
-         total_hpwl.z);
+  printf("   HPWL(tGP3D): %.4f (%.4f, %.4f)\n\n",
+         total_hpwl.x + total_hpwl.y, total_hpwl.x, total_hpwl.y);
   fflush(stdout);
 }
 
@@ -939,12 +937,11 @@ void mGP3DglobalPlacement_main() {
   isFirst_gp_opt = false;
   UpdateNetAndGetHpwl();
   if(dynamicStepCMD) {
-    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y + total_hpwl.z);
+    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y);
   }
   printf("RESULT:\n");
-  printf("   HPWL(mGP3D): %.4f (%.4f, %.4f, %.4f)\n\n",
-         total_hpwl.x + total_hpwl.y + total_hpwl.z, total_hpwl.x, total_hpwl.y,
-         total_hpwl.z);
+  printf("   HPWL(mGP3D): %.4f (%.4f, %.4f)\n\n",
+         total_hpwl.x + total_hpwl.y, total_hpwl.x, total_hpwl.y);
   fflush(stdout);
 }
 
@@ -961,7 +958,7 @@ void mGP2DglobalPlacement_main() {
   fflush(stdout);
   UpdateNetAndGetHpwl();
   if(dynamicStepCMD) {
-    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y + total_hpwl.z);
+    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y);
   }
   printf("RESULT:\n");
   printf("   HPWL(mGP2D): %.4f (%.4f, %.4f)\n\n", total_hpwl.x + total_hpwl.y,
@@ -977,9 +974,8 @@ void tcGP3DglobalPlacement_main() {
   gp_opt();
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
-  printf("   HPWL(tGP3D): %.4f (%.4f, %.4f, %.4f)\n\n",
-         total_hpwl.x + total_hpwl.y + total_hpwl.z, total_hpwl.x, total_hpwl.y,
-         total_hpwl.z);
+  printf("   HPWL(tGP3D): %.4f (%.4f, %.4f)\n\n",
+         total_hpwl.x + total_hpwl.y, total_hpwl.x, total_hpwl.y);
   fflush(stdout);
 }
 
@@ -992,12 +988,11 @@ void cGP3DglobalPlacement_main() {
   isFirst_gp_opt = false;
   UpdateNetAndGetHpwl();
   if(dynamicStepCMD) {
-    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y + total_hpwl.z);
+    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y);
   }
   printf("RESULT:\n");
-  printf("   HPWL(cGP3D): %.4f (%.4f, %.4f, %.4f)\n\n",
-         total_hpwl.x + total_hpwl.y + total_hpwl.z, total_hpwl.x, total_hpwl.y,
-         total_hpwl.z);
+  printf("   HPWL(cGP3D): %.4f (%.4f, %.4f)\n\n",
+         total_hpwl.x + total_hpwl.y, total_hpwl.x, total_hpwl.y);
   fflush(stdout);
 }
 
@@ -1039,7 +1034,7 @@ void macroLegalization_main() {
   sa_macro_lg();
   UpdateNetAndGetHpwl();
   if(dynamicStepCMD) {
-    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y + total_hpwl.z);
+    reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y);
   }
   printf("RESULT:\n");
   printf("   HPWL(mLG): %.4f (%.4f, %.4f)\n\n", total_hpwl.x + total_hpwl.y,

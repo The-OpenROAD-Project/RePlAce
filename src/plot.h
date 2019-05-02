@@ -47,25 +47,6 @@
 #include "bin.h"
 
 void mkdirPlot();
-void plotFinalLayout();
-
-struct PLOT_MATRIX {
-  prec val;
-  int color;
-};
-
-void plot(string fn, int idx, prec scale, int lab);
-void xfig_gp(prec x_stp, prec y_stp, char *file, int lab);
-void xfig_gp_3d(prec x_stp, prec y_stp, char *file, int lab);
-
-void plot_bin(string fn, int idx, prec scale, int lab);
-void xfig_cGP2D(prec x_stp, prec y_stp, char *file, int lab);
-void xfig_cGP2D_3d(prec x_stp, prec y_stp, char *file, int lab);
-
-void get_bin_color(struct BIN *bp, int *color, int *power);
-void get_bin_power(struct BIN *bp, int *color, int *power, int lab);
-void get_bin_power2(struct BIN *bp, int *color, int *power, int lab);
-void get_bin_power3(struct BIN *bp, int *color, int *power, int lab);
 
 string intoFourDigit(int idx);
 void idx2str4digits(int idx, char *str);

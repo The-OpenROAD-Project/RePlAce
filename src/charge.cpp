@@ -152,6 +152,7 @@ void get_term_potn(prec *phi) {
 //	}
 //}
 
+/*
 void potn_grad(int cell_idx, struct FPOS *pgrad) {
   int x = 0, y = 0, z = 0;
   int idx = 0;
@@ -227,7 +228,9 @@ void potn_grad(int cell_idx, struct FPOS *pgrad) {
     }
   }
 }
+*/
 
+/*
 // To calculate A_ij q_i \frac{\partial phi_j}{\partial cell_idx}
 void potn_grad_local(int cell_idx, struct FPOS *grad, prec *cellLambda) {
   int x = 0, y = 0, z = 0;
@@ -276,39 +279,29 @@ void potn_grad_local(int cell_idx, struct FPOS *grad, prec *cellLambda) {
   // b1:  BoundingBox UR, indicating bin index
   b0.x = INT_CONVERT((cell->den_pmin.x - bin_org.x) * inv_bin_stp.x);
   b0.y = INT_CONVERT((cell->den_pmin.y - bin_org.y) * inv_bin_stp.y);
-  b0.z = INT_CONVERT((cell->den_pmin.z - bin_org.z) * inv_bin_stp.z);
 
   b1.x = INT_CONVERT((cell->den_pmax.x - bin_org.x) * inv_bin_stp.x);
   b1.y = INT_CONVERT((cell->den_pmax.y - bin_org.y) * inv_bin_stp.y);
-  b1.z = INT_CONVERT((cell->den_pmax.z - bin_org.z) * inv_bin_stp.z);
 
   if(b0.x < 0)
     b0.x = 0;
   if(b0.y < 0)
     b0.y = 0;
-  if(b0.z < 0)
-    b0.z = 0;
 
   if(b0.x >= max_bin.x)
     b0.x = max_bin.x - 1;
   if(b0.y >= max_bin.y)
     b0.y = max_bin.y - 1;
-  if(b0.z >= max_bin.z)
-    b0.z = max_bin.z - 1;
 
   if(b1.x < 0)
     b1.x = 0;
   if(b1.y < 0)
     b1.y = 0;
-  if(b1.z < 0)
-    b1.z = 0;
 
   if(b1.x >= max_bin.x)
     b1.x = max_bin.x - 1;
   if(b1.y >= max_bin.y)
     b1.y = max_bin.y - 1;
-  if(b1.z >= max_bin.z)
-    b1.z = max_bin.z - 1;
 
   idx = b0.x * msh_yz + b0.y * msh.z + b0.z;
 
@@ -393,6 +386,7 @@ void potn_grad_local(int cell_idx, struct FPOS *grad, prec *cellLambda) {
     }
   }
 }
+*/
 
 void potn_grad_2D(int cell_idx, struct FPOS *grad) {
   //    cout << "executed?" << endl;
