@@ -207,7 +207,7 @@ int read_scl(char *input);
 
 // void post_read_2d(void);
 void post_read_3d(void);
-void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt);
+void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt);
 
 void extract_dir(char *f, char *d);
 void extract_sfx(char *f, char *s);
@@ -223,8 +223,7 @@ void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
                                     int curPinIdx, int curPinDirection,
                                     int isTerminal);
 
-void get_mms_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt);
-void get_ibm_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt);
+void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt);
 
 void write_new_bench(void);
 void write_3d_bench(void);  // useless

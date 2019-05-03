@@ -172,7 +172,7 @@ void ParseBookShelf() {
           post_read_2d();
       }
   */
-  POS tier_min, tier_max;
+  FPOS tier_min, tier_max;
   int tier_row_cnt = 0;
 
   get_mms_3d_dim(&tier_min, &tier_max, &tier_row_cnt);
@@ -180,7 +180,7 @@ void ParseBookShelf() {
   post_read_3d();
 }
 
-void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
+void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
   TERM *curTerminal = NULL;
   TIER *tier = NULL;
   MODULE *curModule = NULL;
@@ -325,11 +325,11 @@ void transform_3d(POS *tier_min, POS *tier_max, int tier_row_cnt) {
   for(int i = 0; i < numLayer; i++) {
     tier = &tier_st[i];
 
-    tier->pmin.x = (prec)tier_min->x;
-    tier->pmin.y = (prec)tier_min->y;
+    tier->pmin.x = tier_min->x;
+    tier->pmin.y = tier_min->y;
 
-    tier->pmax.x = (prec)tier_max->x;
-    tier->pmax.y = (prec)tier_max->y;
+    tier->pmax.x = tier_max->x;
+    tier->pmax.y = tier_max->y;
 
     tier->size.x = tier->pmax.x - tier->pmin.x;
     tier->size.y = tier->pmax.y - tier->pmin.y;
@@ -4171,7 +4171,7 @@ void get_3d_dimension(struct POS *tier_min, struct POS *tier_max,
 //
 // update tier_min, tier_max, and tier_row_cnt
 //
-void get_mms_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt) {
+void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt) {
   int xlen = 0;
   int ylen = 0;
 
@@ -4309,82 +4309,6 @@ void get_mms_3d_dim(POS *tier_min, POS *tier_max, int *tier_row_cnt) {
     printf("shrunk_(xlen, ylen) = (%d, %d)\n", shrunk_len_int.x,
            shrunk_len_int.y);
   }
-}
-
-void get_ibm_3d_dim(struct POS *tier_min, struct POS *tier_max,
-                    int *tier_row_cnt) {
-  if(INPUT_FLG != IBM) {
-    printf("Error function call of get_3d_dim, benchmark suite not IBM.\n");
-    exit(1);
-  }
-
-  tier_min->x = grow_pmin.x;
-  tier_min->y = grow_pmin.y;
-
-  // directly use 3D-IC core region from NTUplace3
-
-  if(!strcmp(gbch, "ibm01")) {
-    tier_max->x = 2337;
-    tier_max->y = 2304;
-    *tier_row_cnt = 36;
-  }
-  else if(!strcmp(gbch, "ibm03")) {
-    tier_max->x = 2859;
-    tier_max->y = 2816;
-    *tier_row_cnt = 44;
-  }
-  else if(!strcmp(gbch, "ibm04")) {
-    tier_max->x = 3330;
-    tier_max->y = 3328;
-    *tier_row_cnt = 52;
-  }
-  else if(!strcmp(gbch, "ibm06")) {
-    tier_max->x = 3266;
-    tier_max->y = 3264;
-    *tier_row_cnt = 51;
-  }
-  else if(!strcmp(gbch, "ibm07")) {
-    tier_max->x = 4231;
-    tier_max->y = 4224;
-    *tier_row_cnt = 66;
-  }
-  else if(!strcmp(gbch, "ibm08")) {
-    tier_max->x = 4414;
-    tier_max->y = 4352;
-    *tier_row_cnt = 68;
-  }
-  else if(!strcmp(gbch, "ibm09")) {
-    tier_max->x = 4484;
-    tier_max->y = 4480;
-    *tier_row_cnt = 70;
-  }
-  else if(!strcmp(gbch, "ibm13")) {
-    tier_max->x = 5442;
-    tier_max->y = 5440;
-    *tier_row_cnt = 85;
-  }
-  else if(!strcmp(gbch, "ibm15")) {
-    tier_max->x = 7602;
-    tier_max->y = 7552;
-    *tier_row_cnt = 118;
-  }
-  else if(!strcmp(gbch, "ibm18")) {
-    tier_max->x = 9490;
-    tier_max->y = 9472;
-    *tier_row_cnt = 148;
-  }
-  else {
-    printf("Error: %s not found in IBM 3D-IC benchmarks.\n", gbch);
-    exit(1);
-  }
-
-  tier_max->x += tier_min->x;
-  tier_max->y += tier_min->y;
-
-  shrunk_ratio.x = (tier_max->x - tier_min->x) / (grow_pmax.x - grow_pmin.x);
-  // shrunk_ratio.y = (tier_max->y - tier_min->y) / (grow_pmax.y -
-  // grow_pmin.y);
-  shrunk_ratio.y = (prec)(*tier_row_cnt) / (prec)row_cnt;
 }
 
 void output_gp_net_hpwl(char *fn) {

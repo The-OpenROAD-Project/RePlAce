@@ -400,16 +400,6 @@ void potn_grad_2D(int cell_idx, struct FPOS *grad) {
   CELLx *cell = &gcell_st[cell_idx];
   TIER *tier = &tier_st[cell->tier];
  
-  cout << cell_idx << " " << cell->tier << endl;
-//  if( cell->tier != 0 ) {
-//    cout << cell->tier << endl;
-//    exit(1);
-//  }
-
-//  cell->den_pmin.Dump("cell->den_pmin");
-//  tier->bin_org.Dump("tier->bin_org");
-//  tier->inv_bin_stp.Dump("tier->inv_bin_stp");
-
   b0.x =
       INT_CONVERT((cell->den_pmin.x - tier->bin_org.x) * tier->inv_bin_stp.x);
   b0.y =
@@ -419,9 +409,6 @@ void potn_grad_2D(int cell_idx, struct FPOS *grad) {
   b1.y =
       INT_CONVERT((cell->den_pmax.y - tier->bin_org.y) * tier->inv_bin_stp.y);
 
-
-  //    cout << "Cell->Tier: " << cell->tier << endl;
-  //    tier->dim_bin.Dump("tier->dim_bin");
 
   if(b0.x < 0)
     b0.x = 0;
