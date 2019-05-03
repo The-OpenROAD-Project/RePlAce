@@ -53,7 +53,7 @@ float GetMaxResistor(sta::Sta* sta, Pin* pin) {
 
   const MinMax* cnst_min_max = MinMaxAll::max()->asMinMax();
   ParasiticAnalysisPt* ap =
-      sta->corners()->defaultCorner()->findParasiticAnalysisPt(cnst_min_max);
+      sta->corners()->findCorner(0)->findParasiticAnalysisPt(cnst_min_max);
 
   Parasitics* parasitics = sta->parasitics();
 
@@ -307,7 +307,11 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   // WNS / TNS report
   const MinMax* cnst_min_max;
   cnst_min_max = MinMax::max();
-  Slack wns = _sta->worstSlack(cnst_min_max);
+
+  Slack wns; 
+  Vertex *worstVertex;
+  _sta->worstSlack(cnst_min_max, wns, worstVertex);
+
   Slack tns = _sta->totalNegativeSlack(cnst_min_max);
   cout << "WNS = " << wns << " seconds" << endl;
   cout << "TNS = " << tns << " seconds" << endl;
@@ -367,7 +371,9 @@ void Timing::ExecuteStaLater() {
   // WNS / TNS report
   const MinMax* cnst_min_max;
   cnst_min_max = MinMax::max();
-  Slack wns = _sta->worstSlack(cnst_min_max);
+  Slack wns; 
+  Vertex *worstVertex;
+  _sta->worstSlack(cnst_min_max, wns, worstVertex);
   Slack tns = _sta->totalNegativeSlack(cnst_min_max);
   cout << "timing summary" << endl;
   cout << "WNS = " << wns << " seconds" << endl;
@@ -381,7 +387,7 @@ char* GetNewStr(const char* inp) {
 }
 
 void Timing::FillSpefForSta() {
-  Corner* corner = _sta->corners()->defaultCorner();
+  const Corner* corner = _sta->corners()->findCorner(0);
   const MinMax* cnst_min_max;
   ParasiticAnalysisPt* ap;
 
@@ -396,8 +402,8 @@ void Timing::FillSpefForSta() {
       _sta->sdc()->operatingConditions(cnst_min_max);
 
   SpefReader* reader = new SpefReader(
-      "", NULL, 0, _sta->currentInstance(), ap, false, false, 0.0,
-      reduce_parasitics_to_pi_elmore, false, op_cond, corner, cnst_min_max,
+      "", NULL, _sta->currentInstance(), ap, false, false, false, 0.0,
+      ReduceParasiticsTo::pi_elmore, false, op_cond, corner, cnst_min_max,
       true, _sta->report(), _sta->network(), _sta->parasitics());
   sta::spef_reader = reader;
 
@@ -550,7 +556,7 @@ void Timing::FillSpefForSta() {
   }
 
   UpdateSpefClockNetVerilog();
-  parasiticsChangedAfter(_sta);
+//  parasiticsChangedAfter(_sta);
 }
 void Timing::GenerateClockSta() {
   // sdc -> clock definition (unit=second)
@@ -579,10 +585,11 @@ void Timing::UpdateTimingSta() {
 
 void Timing::UpdateNetWeightSta() {
   // report_checks -path_delay min_max
-  Corner* corner = _sta->corners()->defaultCorner();
+  Corner* corner = _sta->corners()->findCorner(0);
 
   PathEndSeq* ends =
       _sta->findPathEnds(NULL, NULL, NULL,          // from, thru, to
+                        false,                      // unconstrained
                          corner, MinMaxAll::max(),  // corner, delay_min_max
                          INT_MAX, 1, false,  // max_paths, nworst, unique_pins
                          -INF, INF,          // slack_min, slack_max
@@ -722,8 +729,12 @@ void Timing::UpdateNetWeightSta() {
         }
 
         // cout << "high Resistor: " << highRes << endl;
+        Slack wns; 
+        Vertex *worstVertex;
+        _sta->worstSlack(cnst_min_max, wns, worstVertex);
+
         float criticality =
-            max(0.0f, end->slack(_sta) / _sta->worstSlack(cnst_min_max));
+            max(0.0f, end->slack(_sta) / wns);
         int netDegree = max(2, netInstance[nnPtr->second].pinCNTinObject);
         float netWeight = highRes * (1 + criticality) / (netDegree - 1);
         netInstance[nnPtr->second].timingWeight = netWeight;
@@ -767,18 +778,18 @@ static std::string ExecuteCommand(const char* cmd) {
 
 TIMING_NAMESPACE_CLOSE
 
-void parasiticsChangedAfter(sta::Sta* sta_) {
-  CornerIterator corner_iter(sta_);
-  while(corner_iter.hasNext()) {
-    Corner* corner = corner_iter.next();
-    MinMaxIterator mm_iter;
-    while(mm_iter.hasNext()) {
-      MinMax* min_max = mm_iter.next();
-      ParasiticAnalysisPt* ap = corner->findParasiticAnalysisPt(min_max);
-      DcalcAnalysisPt* dcalc_ap = corner->findDcalcAnalysisPt(min_max);
-      dcalc_ap->setParasiticAnalysisPt(ap);
-    }
-  }
-  sta_->graphDelayCalc()->delaysInvalid();
-  sta_->search()->arrivalsInvalid();
-}
+//void parasiticsChangedAfter(sta::Sta* sta_) {
+//  CornerIterator corner_iter(sta_);
+//  while(corner_iter.hasNext()) {
+//    Corner* corner = corner_iter.next();
+//    MinMaxIterator mm_iter;
+//    while(mm_iter.hasNext()) {
+//      MinMax* min_max = mm_iter.next();
+//      ParasiticAnalysisPt* ap = corner->findParasiticAnalysisPt(min_max);
+//      DcalcAnalysisPt* dcalc_ap = corner->findDcalcAnalysisPt(min_max);
+//      dcalc_ap->setParasiticAnalysisPt(ap);
+//    }
+//  }
+//  sta_->graphDelayCalc()->delaysInvalid();
+//  sta_->search()->arrivalsInvalid();
+//}

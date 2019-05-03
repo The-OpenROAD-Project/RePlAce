@@ -49,16 +49,7 @@ MKLLIB 			= ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
 					${IPPROOT}/lib/intel64/libippcore.a \
 				   	${IPPROOT}/lib/intel64/libippvm.a
 
-OPENSTALIB 		= $(OPENSTAROOT)/lib/libliberty.a \
-					$(OPENSTAROOT)/lib/libutil.a \
-					$(OPENSTAROOT)/lib/libsearch.a \
-					$(OPENSTAROOT)/lib/libdcalc.a \
-					$(OPENSTAROOT)/lib/libgraph.a \
-					$(OPENSTAROOT)/lib/libnetwork.a \
-					$(OPENSTAROOT)/lib/libparasitics.a \
-					$(OPENSTAROOT)/lib/libsdc.a \
-					$(OPENSTAROOT)/lib/libsdf.a \
-					$(OPENSTAROOT)/lib/libverilog.a
+OPENSTALIB 		= $(OPENSTAROOT)/lib/libOpenSTA.a 
 
 ifndef	MKLROOT
     MKLROOT		=	/opt/intel/mkl
@@ -86,9 +77,7 @@ OPENSTASRCROOT 	= ../module/OpenSTA/
 	@echo "  Building... $@"
 	$(CPPC) $(CPPFLAG) $(INCLUDE) -c -o $@ $< 
 
-RePlAce	: $(OBJFILES) $(OPENSTASRCROOT)/app/StaApp_wrap.o \
-	$(OPENSTASRCROOT)/app/StaMain.o \
-	$(OPENSTASRCROOT)/app/TclInitVar.o
+RePlAce	: $(OBJFILES) 
 	@echo " "
 	@echo "  Linking..."
 	@echo "    Intel Math Kernel Library (MKL 11.3.3) and"

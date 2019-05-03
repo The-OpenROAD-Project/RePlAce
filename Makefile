@@ -20,10 +20,9 @@ hash:
 
 sta: 
 	cd $(OPENSTADIR) && mkdir -p install-sp && \
-		libtoolize && ./bootstrap && \
-		./configure --prefix=$(CURDIR)/$(OPENSTADIR)/install-sp && \
-		$(MAKE) && \
-		$(MAKE)	install;
+    cmake -DCMAKE_INSTALL_PREFIX=$(CURDIR)/$(OPENSTADIR)/install-sp . && \
+    $(MAKE) && \
+    $(MAKE) install;
 
 install:
 	@cp src/RePlAce $(INSTDIR)

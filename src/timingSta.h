@@ -8,7 +8,6 @@
 #include "Sta.hh"
 #include "Sdc.hh"
 #include "StaMain.hh"
-#include "Machine.hh"
 #include "Stats.hh"
 #include "Report.hh"
 #include "StringUtil.hh"
@@ -67,13 +66,14 @@
 #include "Corner.hh"
 #include "ReportPath.hh"
 #include "VisitPathGroupVertices.hh"
+#include "WorstSlack.hh"
+#include "ParasiticsClass.hh"
 
 #ifdef YY_INPUT
 #undef YY_INPUT
 #endif
 
 #include "parasitics/SpefReaderPvt.hh"
-#include "config.h"
 using namespace sta;
 
 // to import Swig
