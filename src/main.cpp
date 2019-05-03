@@ -1056,18 +1056,16 @@ void WriteBookshelfForGR() {
   sprintf( cmd, "mkdir -p %s", targetDir);
   system(cmd);
 
-  for(int i = 0; i < numLayer; i++) {
     // call Write Bookshelf function by its tier
     WriteBookshelfWithTier(
         targetDir, 
         // tier number
-        i, 
+        0, 
         // writing modes
         (placementMacroCNT == 0) ? STDCELLonly : MIXED,
         // *.shape support
 //        (detailPlacer == NTUplace3 || shapeMap.size() == 0) ? false : true);
         true, true, true);
-  }
   printf("PROC:  END WRITE BOOKSHELF\n\n");
   fflush(stdout);
 }

@@ -350,6 +350,9 @@ void bin_init_2D(int STAGE) {
     tier->bin_org.x = tier->pmin.x - tier->bin_off.x;
     tier->bin_org.y = tier->pmin.y - tier->bin_off.y;
 
+    tier->pmin.Dump("tier->pmin");
+  
+
     tier->bin_area = tier->bin_stp.x * tier->bin_stp.y;
 
     tier->inv_bin_area = 1.0 / tier->bin_area;
@@ -1369,9 +1372,7 @@ prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2) {
       g_rrr++;
     }
 
-    if(!flg_3dic) {
-      return eff_x * eff_y;
-    }
+    return eff_x * eff_y;
   }
 }
 
