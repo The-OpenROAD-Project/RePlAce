@@ -364,7 +364,7 @@ void ParseLefDef() {
   cout << "INFO:  SUCCESSFULLY LEF/DEF PARSED" << endl;
 
   // do weird things..
-  POS tier_min, tier_max;
+  FPOS tier_min, tier_max;
   int tier_row_cnt = 0;
 
   get_mms_3d_dim(&tier_min, &tier_max, &tier_row_cnt);
