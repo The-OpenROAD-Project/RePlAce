@@ -97,10 +97,7 @@ struct POS dft_bin_2d;
 struct POS dft_bin_3d;
 
 void charge_fft_init(struct POS nbin, struct FPOS stp, int flg) {
-  if(flg)
-    charge_fft_init_3d(nbin, stp);
-  else
-    charge_fft_init_2d(nbin, stp);
+  charge_fft_init_2d(nbin, stp);
 }
 
 void charge_fft_init_2d(struct POS nbin, struct FPOS stp) {
@@ -153,6 +150,7 @@ void charge_fft_init_2d(struct POS nbin, struct FPOS stp) {
   }
 }
 
+/*
 void charge_fft_init_3d(struct POS nbin, struct FPOS stp) {
   int x = 0;
   int y = 0;
@@ -215,12 +213,9 @@ void charge_fft_init_3d(struct POS nbin, struct FPOS stp) {
     wz2_3d_st[z] = wz_3d_st[z] * wz_3d_st[z];
   }
 }
-
+*/
 void charge_fft_call(int flg) {
-  if(flg)
-    return charge_fft_call_3d();
-  else
-    return charge_fft_call_2d();
+  charge_fft_call_2d();
 }
 
 void charge_fft_call_2d(void) {
@@ -298,11 +293,11 @@ void charge_fft_call_2d(void) {
   ddcst2d(n1, n2, 1, ey_2d_st2, NULL, charge_ip_2d, w_2d);
 }
 
+/*
 void charge_fft_call_3d(void) {
   int x = 0, y = 0, z = 0;
   int n1 = dft_bin_3d.x;
   int n2 = dft_bin_3d.y;
-  int n3 = dft_bin_3d.z;
   prec a_den = 0, a_phi = 0, denom = 0;
   prec a_ex = 0, a_ey = 0, a_ez = 0;
   prec wx = 0, wx2 = 0;
@@ -377,6 +372,7 @@ void charge_fft_call_3d(void) {
   ddccst3d(n3, n1, n2, 1, ey_3d_st3, NULL, charge_ip_3d, w_3d);
   ddscct3d(n3, n1, n2, 1, ez_3d_st3, NULL, charge_ip_3d, w_3d);
 }
+*/
 
 // void thermal_fft_call_3d (void) {
 //    int             x=0, y=0, z=0;
@@ -732,10 +728,7 @@ void charge_fft_call_3d(void) {
 //}
 
 void charge_fft_delete(int flg) {
-  if(flg)
-    return charge_fft_delete_3d();
-  else
-    return charge_fft_delete_2d();
+   charge_fft_delete_2d();
 }
 
 // void thermal_fft_delete (int flg) {
@@ -743,6 +736,7 @@ void charge_fft_delete(int flg) {
 //    else        return thermal_fft_delete_2d ();
 //}
 
+/*
 void charge_fft_delete_3d(void) {
   for(int i = 0; i < dft_bin_3d.x; i++) {
     for(int j = 0; j < dft_bin_3d.y; j++) {
@@ -772,6 +766,7 @@ void charge_fft_delete_3d(void) {
   free(wy2_3d_st);
   free(wz2_3d_st);
 }
+*/
 
 // void thermal_fft_delete_3d (void) {
 //    for (int i=0; i<dft_bin_3d.x; i++) {
@@ -841,21 +836,21 @@ void charge_fft_delete_2d(void) {
 //    free (thermal_wy2_2d_st);
 //}
 
-void fft_wxy_update_3d(struct FPOS stp) {
-  int x = 0, y = 0, z = 0;
-  for(x = 0; x < dft_bin_3d.x; x++) {
-    wx_3d_st[x] = PI * (prec)x / ((prec)dft_bin_3d.x * stp.x);
-    wx2_3d_st[x] = wx_3d_st[x] * wx_3d_st[x];
-  }
-  for(y = 0; y < dft_bin_3d.y; y++) {
-    wy_3d_st[y] = PI * (prec)y / ((prec)dft_bin_3d.y * stp.y);
-    wy2_3d_st[y] = wy_3d_st[y] * wy_3d_st[y];
-  }
-  for(z = 0; z < dft_bin_3d.z; z++) {
-    wz_3d_st[z] = PI * (prec)z / ((prec)dft_bin_3d.z * stp.z);
-    wz2_3d_st[z] = wz_3d_st[z] * wz_3d_st[z];
-  }
-}
+//void fft_wxy_update_3d(struct FPOS stp) {
+//  int x = 0, y = 0, z = 0;
+//  for(x = 0; x < dft_bin_3d.x; x++) {
+//    wx_3d_st[x] = PI * (prec)x / ((prec)dft_bin_3d.x * stp.x);
+//    wx2_3d_st[x] = wx_3d_st[x] * wx_3d_st[x];
+//  }
+//  for(y = 0; y < dft_bin_3d.y; y++) {
+//    wy_3d_st[y] = PI * (prec)y / ((prec)dft_bin_3d.y * stp.y);
+//    wy2_3d_st[y] = wy_3d_st[y] * wy_3d_st[y];
+//  }
+//  for(z = 0; z < dft_bin_3d.z; z++) {
+//    wz_3d_st[z] = PI * (prec)z / ((prec)dft_bin_3d.z * stp.z);
+//    wz2_3d_st[z] = wz_3d_st[z] * wz_3d_st[z];
+//  }
+//}
 
 // void thermal_fft_call (int flg) {
 //    if (flg)    return thermal_fft_call_3d ();

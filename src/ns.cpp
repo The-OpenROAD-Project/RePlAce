@@ -182,6 +182,7 @@ void myNesterov::InitializationCommonVar() {
   start_idx = 0;
   end_idx = N;
 
+
   if(dynamicStepCMD)
     max_iter = 6000;
   else
@@ -235,25 +236,25 @@ void myNesterov::InitializationCommonVar() {
   y0_pdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
   y0_pdstl = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
 
-  memset(x_st, 0.0f, sizeof(prec) * N * 3);
-  memset(y_st, 0.0f, sizeof(prec) * N * 3);
-  memset(y_dst, 0.0f, sizeof(prec) * N * 3);
-  memset(y_wdst, 0.0f, sizeof(prec) * N * 3);
-  memset(y_pdst, 0.0f, sizeof(prec) * N * 3);
-  memset(y_pdstl, 0.0f, sizeof(prec) * N * 3);
+  memset(x_st, 0.0f, sizeof(prec) * N * 2);
+  memset(y_st, 0.0f, sizeof(prec) * N * 2);
+  memset(y_dst, 0.0f, sizeof(prec) * N * 2);
+  memset(y_wdst, 0.0f, sizeof(prec) * N * 2);
+  memset(y_pdst, 0.0f, sizeof(prec) * N * 2);
+  memset(y_pdstl, 0.0f, sizeof(prec) * N * 2);
 
-  memset(z_st, 0.0f, sizeof(prec) * N * 3);
-  memset(z_dst, 0.0f, sizeof(prec) * N * 3);
-  memset(z_wdst, 0.0f, sizeof(prec) * N * 3);
-  memset(z_pdst, 0.0f, sizeof(prec) * N * 3);
-  memset(z_pdstl, 0.0f, sizeof(prec) * N * 3);
+  memset(z_st, 0.0f, sizeof(prec) * N * 2);
+  memset(z_dst, 0.0f, sizeof(prec) * N * 2);
+  memset(z_wdst, 0.0f, sizeof(prec) * N * 2);
+  memset(z_pdst, 0.0f, sizeof(prec) * N * 2);
+  memset(z_pdstl, 0.0f, sizeof(prec) * N * 2);
 
-  memset(x0_st, 0.0f, sizeof(prec) * N * 3);
-  memset(y0_st, 0.0f, sizeof(prec) * N * 3);
-  memset(y0_dst, 0.0f, sizeof(prec) * N * 3);
-  memset(y0_wdst, 0.0f, sizeof(prec) * N * 3);
-  memset(y0_pdst, 0.0f, sizeof(prec) * N * 3);
-  memset(y0_pdstl, 0.0f, sizeof(prec) * N * 3);
+  memset(x0_st, 0.0f, sizeof(prec) * N * 2);
+  memset(y0_st, 0.0f, sizeof(prec) * N * 2);
+  memset(y0_dst, 0.0f, sizeof(prec) * N * 2);
+  memset(y0_wdst, 0.0f, sizeof(prec) * N * 2);
+  memset(y0_pdst, 0.0f, sizeof(prec) * N * 2);
+  memset(y0_pdstl, 0.0f, sizeof(prec) * N * 2);
 
   cellLambdaArr = (prec *)mkl_malloc(sizeof(prec) * N, 64);
   pcofArr = (prec *)mkl_malloc(sizeof(prec) * 100, 64);
@@ -1683,6 +1684,8 @@ void myNesterov::PrintNesterovOptStatus(int iter) {
 }
 
 void myNesterov::PlotNesterov(int iter) {
+
+  /*
   if(plotCellCMD) {
     cell_update(x_st, N);
     if(STAGE == mGP3D)
@@ -1714,4 +1717,5 @@ void myNesterov::PlotNesterov(int iter) {
     if(STAGE == cGP2D)
       plot_bin("S5-field-cGP2D-", iter, 1.0, 4);
   }
+  */
 }

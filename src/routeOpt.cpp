@@ -1781,7 +1781,7 @@ void cell_calc_new_area_per_Cell(struct CELLx *cell, struct TILE *bp) {
     cell_size.y = cell->size.y;
   }
 
-  cell->inflatedNewArea = cell_size.x * cell_size.y * cell->size.z;
+  cell->inflatedNewArea = cell_size.x * cell_size.y;
   cell->inflatedNewAreaDelta = cell->inflatedNewArea - cell->area;
 }
 
@@ -1860,9 +1860,9 @@ void cell_inflation_per_Cell(struct CELLx *cell, struct TILE *bp) {
     cell->pmax.y = cell->center.y + cell->half_size.y;
   }
 
-  cell->inflatedNewArea = cell->size.x * cell->size.y * cell->size.z;
+  cell->inflatedNewArea = cell->size.x * cell->size.y;
   cell->inflatedNewAreaDelta = cell->inflatedNewArea - cell->area;
-  cell->area = cell->size.x * cell->size.y * cell->size.z;
+  cell->area = cell->size.x * cell->size.y;
 }
 
 void cell_den_scal_update_forNewGrad_inNSopt(struct CELLx *cell) {
@@ -1908,16 +1908,7 @@ void cell_den_scal_update_forNewGrad_inNSopt(struct CELLx *cell) {
     }
   }
 
-  if(cell->size.z < tier->bin_stp.z) {
-    scal.z = cell->size.z / tier->bin_stp.z;
-    cell->half_den_size.z = tier->half_bin_stp.z;
-  }
-  else {
-    scal.z = 1.0;
-    cell->half_den_size.z = cell->half_size.z;
-  }
-
-  cell->den_scal = scal.x * scal.y * scal.z;
+  cell->den_scal = scal.x * scal.y;
 
   cell->den_pmin.x = cell->center.x - cell->half_den_size.x;
   cell->den_pmin.y = cell->center.y - cell->half_den_size.y;
@@ -2276,7 +2267,7 @@ void shrink_filler_cells(prec area_to_shrink) {
     cell->pmax.y = cell->center.y + cell->half_size.y;
 
     temp_area_orig += cell->area;
-    cell->area = cell->size.x * cell->size.y * cell->size.z;
+    cell->area = cell->size.x * cell->size.y;
     temp_area_new += cell->area;
 
     cell_den_scal_update_forNewGrad_inNSopt(cell);

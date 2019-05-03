@@ -98,16 +98,14 @@ FPOS get_wlen_cof3(prec ovf) {
   if(ovf > 1.0) {
     cof.x = 1.0 / 10.0;
     cof.y = 1.0 / 10.0;
-    cof.z = 1.0 / 10.0;
   }
   else if(ovf < 0.1) {
     cof.x = 1.0 / 0.01;
     cof.y = 1.0 / 0.01;
-    cof.z = 1.0 / 0.01;
   }
   else {
     tmp = 1.0 / pow(10.0, (ovf - 0.1) * 10.0 / 3.0 - 2.0);
-    cof.x = cof.y = cof.z = tmp;
+    cof.x = cof.y =  tmp;
   }
   return cof;
 }
@@ -116,11 +114,11 @@ FPOS get_wlen_cof1(prec ovf) {
   FPOS cof;
 
   if(ovf > 1.0)
-    cof.x = cof.y = cof.z = 1.0 / 10.0;
+    cof.x = cof.y = 1.0 / 10.0;
   else if(ovf < 0.1)
-    cof.x = cof.y = cof.z = 1.0 / 0.01;
+    cof.x = cof.y = 1.0 / 0.01;
   else
-    cof.x = cof.y = cof.z = 1.0 / pow(10.0, (ovf - 0.1) * 10.0 / 3.0 - 2.0);
+    cof.x = cof.y = 1.0 / pow(10.0, (ovf - 0.1) * 10.0 / 3.0 - 2.0);
 
   return cof;
 }
@@ -131,16 +129,14 @@ FPOS get_wlen_cof2(prec ovf) {
   if(ovf > 1.0) {
     cof.x = 0.1;
     cof.y = 0.1;
-    cof.z = 0.1;
   }
   else if(ovf < 0.1) {
     cof.x = 10.0;
     cof.y = 10.0;
-    cof.z = 10.0;
   }
   else {
     tmp = 1.0 / pow(10.0, (ovf - 0.1) * 20 / 9.0 - 1.0);
-    cof.x = cof.y = cof.z = tmp;
+    cof.x = cof.y = tmp;
   }
   return cof;
 }
@@ -161,45 +157,29 @@ void wlen_init(void) {
     gp_wlen_weight.x = 1.0;
     gp_wlen_weight.y = place_backup.cnt.y / place_backup.cnt.x;
     // gp_wlen_weight.y = place.cnt.y / place.cnt.x;
-    if(flg_3dic)
-      gp_wlen_weight.z = TSV_WEIGHT;
-    else
-      gp_wlen_weight.z = 0.0;
   }
   else {
     gp_wlen_weight.x = gp_wlen_weight.y = 1.0;
-    if(flg_3dic)
-      gp_wlen_weight.z = TSV_WEIGHT;
-    else
-      gp_wlen_weight.z = 0.0;
   }
 
   dp_wlen_weight.x = 1.0;
   dp_wlen_weight.y = 1.0;
-  if(GP_DIM_ONE)
-    dp_wlen_weight.z = TSV_WEIGHT * place_backup.cnt.x / place_backup.cnt.z;
-  else
-    dp_wlen_weight.z = TSV_WEIGHT;
 }
 
 void wlen_init_mGP2D(void) {
   gp_wlen_weight.x = 1.0;
   gp_wlen_weight.y = 1.0;
-  gp_wlen_weight.z = 0.0;
 
   dp_wlen_weight.x = 1.0;
   dp_wlen_weight.y = 1.0;
-  dp_wlen_weight.z = 0.0;
 }
 
 void wlen_init_cGP2D(void) {
   gp_wlen_weight.x = 1.0;
   gp_wlen_weight.y = 1.0;
-  gp_wlen_weight.z = 0.0;
 
   dp_wlen_weight.x = 1.0;
   dp_wlen_weight.y = 1.0;
-  dp_wlen_weight.z = 0.0;
 }
 
 void wcof_init(FPOS bstp) {
@@ -210,7 +190,6 @@ void wcof_init(FPOS bstp) {
 
   base_wcof.x = wcof00.x / (0.5 * (bstp.x + bstp.y));
   base_wcof.y = wcof00.y / (0.5 * (bstp.x + bstp.y));
-  base_wcof.z = wcof00.z / (0.5 * (bstp.x + bstp.y));
 
   wlen_cof = fp_scal(0.1, base_wcof);
   wlen_cof_inv = fp_inv(wlen_cof);
@@ -244,20 +223,14 @@ prec get_wlen_wa() {
 
     total_wlen.x += net_wlen.x;
     total_wlen.y += net_wlen.y;
-    // total_wlen.z += net_wlen.z;
   }
 
   if(GP_DIM_ONE) {
     total_wlen.x *= place_backup.cnt.x * GP_SCAL;
-    // * gp_wlen_weight.x +
     total_wlen.y *= place_backup.cnt.y * GP_SCAL;
-    // * gp_wlen_weight.y +
-    // total_wlen.z *= place_backup.cnt.z * GP_SCAL;
-    // * gp_wlen_weight.z +
   }
 
   tot_wlen = total_wlen.x + total_wlen.y;  // +
-  // total_wlen.z;
 
   return tot_wlen;
 }
@@ -276,7 +249,6 @@ prec get_wlen_lse(void) {
     net_wlen = get_net_wlen_lse(net);
     total_wlen.x += net_wlen.x;
     total_wlen.y += net_wlen.y;
-    total_wlen.z += net_wlen.z;
   }
 
   if(GP_DIM_ONE) {
@@ -284,18 +256,15 @@ prec get_wlen_lse(void) {
         wlen_cof_inv.x * place_backup.cnt.x * GP_SCAL;  // * gp_wlen_weight.x +
     total_wlen.y *=
         wlen_cof_inv.y * place_backup.cnt.y * GP_SCAL;  // * gp_wlen_weight.y +
-    total_wlen.z *=
-        wlen_cof_inv.z * place_backup.cnt.z * GP_SCAL;  // * gp_wlen_weight.z +
   }
 
-  tot_wlen = total_wlen.x + total_wlen.y + total_wlen.z;
+  tot_wlen = total_wlen.x + total_wlen.y;
 
   return tot_wlen;
 
   /* return  */
   /*   total_wlen.x * wlen_cof_inv.x * gp_wlen_weight.x + */
   /*   total_wlen.y * wlen_cof_inv.y * gp_wlen_weight.y +  */
-  /*   total_wlen.z * wlen_cof_inv.z * gp_wlen_weight.z; */
 }
 
 FPOS get_net_wlen_wa(NET *net) {
@@ -309,12 +278,7 @@ FPOS get_net_wlen_wa(NET *net) {
     return zeroFPoint;
 
   net_wlen.x = sum_num1.x / sum_denom1.x - sum_num2.x / sum_denom2.x;
-
   net_wlen.y = sum_num1.y / sum_denom1.y - sum_num2.y / sum_denom2.y;
-
-  // if (flg_3dic)
-  //    net_wlen.z = (sum_num1.z / sum_denom1.z -
-  //    sum_num2.z / sum_denom2.z);
 
   return net_wlen;
 }
@@ -330,16 +294,13 @@ FPOS get_net_wlen_lse(NET *net) {
 
     sum1.x += get_exp(wlen_cof.x * fp.x);
     sum1.y += get_exp(wlen_cof.y * fp.y);
-    sum1.z += get_exp(wlen_cof.z * fp.z);
 
     sum2.x += get_exp(-1.0 * wlen_cof.x * fp.x);
     sum2.y += get_exp(-1.0 * wlen_cof.y * fp.y);
-    sum2.z += get_exp(-1.0 * wlen_cof.z * fp.z);
   }
 
   wlen.x = log(sum1.x) + log(sum2.x);
   wlen.y = log(sum1.y) + log(sum2.y);
-  wlen.z = log(sum1.z) + log(sum2.z);
 
   return wlen;
 }
@@ -357,12 +318,10 @@ prec GetHpwl() {
 
     total_hpwl.x += curNet->max_x - curNet->min_x;
     total_hpwl.y += curNet->max_y - curNet->min_y;
-    // total_hpwl.z += curNet->max_z - curNet->min_z ;
 
     //// lutong
     // total_stnwl.x += curNet->stn_cof * (curNet->max_x - curNet->min_x) ;
     // total_stnwl.y += curNet->stn_cof * (curNet->max_y - curNet->min_y) ;
-    ////total_stnwl.z += curNet->stn_cof * (curNet->max_z - curNet->min_z) ;
 
     // if(GP_DIM_ONE)
     //  {
@@ -378,7 +337,6 @@ prec GetHpwl() {
   if(GP_DIM_ONE) {
     total_hpwl.x *= place_backup.cnt.x * GP_SCAL;
     total_hpwl.y *= place_backup.cnt.y * GP_SCAL;
-    // total_hpwl.z *= place_backup.cnt.z * GP_SCAL;
   }
 
   return total_hpwl.x + total_hpwl.y;
@@ -386,7 +344,6 @@ prec GetHpwl() {
   //    total_hpwl_xyz =
   //        total_hpwl.x +
   //        total_hpwl.y;
-  //        total_hpwl.z;
   //    return total_hpwl_xyz;
 }
 
@@ -402,11 +359,9 @@ prec UpdateNetAndGetHpwl() {
 
     curNet->min_x = curNet->terminalMin.x;
     curNet->min_y = curNet->terminalMin.y;
-    curNet->min_z = curNet->terminalMin.z;
 
     curNet->max_x = curNet->terminalMax.x;
     curNet->max_y = curNet->terminalMax.y;
-    curNet->max_z = curNet->terminalMax.z;
 
     // update min_xyz, max_xyz in NET's info
     for(int j = 0; j < curNet->pinCNTinObject; j++) {
@@ -425,16 +380,13 @@ prec UpdateNetAndGetHpwl() {
 
       //          fp.x = center.x + pof.x;
       //          fp.y = center.y + pof.y;
-      //          fp.z = center.z + pof.z;
       //          pin->fp = fp;
 
       curNet->min_x = min(curNet->min_x, pin->fp.x);
       curNet->min_y = min(curNet->min_y, pin->fp.y);
-      curNet->min_z = min(curNet->min_z, pin->fp.z);
 
       curNet->max_x = max(curNet->max_x, pin->fp.x);
       curNet->max_y = max(curNet->max_y, pin->fp.y);
-      curNet->max_z = max(curNet->max_z, pin->fp.z);
     }
 
     if(curNet->pinCNTinObject <= 1) {
@@ -444,10 +396,9 @@ prec UpdateNetAndGetHpwl() {
     // calculate HPWL
     total_hpwl.x += curNet->max_x - curNet->min_x;
     total_hpwl.y += curNet->max_y - curNet->min_y;
-    total_hpwl.z += curNet->max_z - curNet->min_z;
   }
 
-  return total_hpwl.x + total_hpwl.y + total_hpwl.z;
+  return total_hpwl.x + total_hpwl.y;
   //    total_hpwl_xyz = total_hpwl.x + total_hpwl.y + total_hpwl.z;
   //    return  total_hpwl_xyz;
 }
@@ -487,8 +438,6 @@ void wlen_grad(int cell_idx, FPOS *grad) {
 void wlen_grad2_wa(FPOS *grad) {
   grad->x = 1.0;
   grad->y = 1.0;
-  if(flg_3dic)
-    grad->z = 1.0;
   return;
 }
 
@@ -511,7 +460,6 @@ void wlen_grad2_lse(int cell_idx, FPOS *grad2) {
 
     grad2->x += net_grad2.x;
     grad2->y += net_grad2.y;
-    grad2->z += net_grad2.z;
   }
 }
 
@@ -534,7 +482,6 @@ void wlen_grad_lse(int cell_idx, FPOS *grad) {
 
     grad->x += net_grad.x;
     grad->y += net_grad.y;
-    grad->z += net_grad.z;
   }
 }
 
@@ -624,20 +571,6 @@ void get_net_wlen_grad2_lse(NET *net, PIN *pin, FPOS *grad2) {
 
   grad2->y = grad2_1.y + grad2_2.y;
 
-  if(flg_3dic) {
-    if(flg1.z) {
-      grad2_1.z =
-          (e1.z) * (sum_denom1.z - e1.z) / (sum_denom1.z * sum_denom1.z);
-    }
-
-    if(flg2.z) {
-      grad2_2.z =
-          (e2.z) * (sum_denom2.z - e2.z) / (sum_denom2.z * sum_denom2.z);
-    }
-
-    grad2->z = (grad2_1.z + grad2_2.z);
-  }
-
   return;
 }
 
@@ -667,18 +600,6 @@ void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad) {
   }
 
   grad->y = grad1.y - grad2.y;
-
-  if(flg_3dic) {
-    if(flg1.z) {
-      grad1.z = e1.z / sum_denom1.z;
-    }
-
-    if(flg2.z) {
-      grad2.z = e2.z / sum_denom2.z;
-    }
-
-    grad->z = (grad1.z - grad2.z);
-  }
 
   return;
 }
@@ -984,11 +905,9 @@ prec net_update_hpwl_mac(void) {
 
     net->min_x = net->terminalMin.x;
     net->min_y = net->terminalMin.y;
-    net->min_z = net->terminalMin.z;
 
     net->max_x = net->terminalMax.x;
     net->max_y = net->terminalMax.y;
-    net->max_z = net->terminalMax.z;
 
     for(j = 0; j < net->pinCNTinObject; j++) {
       pin = net->pin[j];
@@ -999,16 +918,13 @@ prec net_update_hpwl_mac(void) {
         pof = curModule->pof[pin->pinIDinModule];
         fp.x = p0.x + pof.x;
         fp.y = p0.y + pof.y;
-        fp.z = p0.z + pof.z;
         pin->fp = fp;
 
         net->min_x = min(net->min_x, fp.x);
         net->min_y = min(net->min_y, fp.y);
-        net->min_z = min(net->min_z, fp.z);
 
         net->max_x = max(net->max_x, fp.x);
         net->max_y = max(net->max_y, fp.y);
-        net->max_z = max(net->max_z, fp.z);
       }
     }
 
@@ -1017,14 +933,12 @@ prec net_update_hpwl_mac(void) {
 
     total_hpwl.x += (net->max_x - net->min_x);
     total_hpwl.y += (net->max_y - net->min_y);
-    total_hpwl.z += (net->max_z - net->min_z);
   }
 
   /* total_hpwl_xy = total_hpwl.x + total_hpwl.y; */
   //  total_hpwl_xyz = total_hpwl.x + total_hpwl.y + total_hpwl.z;
 
-  hpwl = total_hpwl.x * dp_wlen_weight.x + total_hpwl.y * dp_wlen_weight.y +
-         total_hpwl.z * dp_wlen_weight.z;
+  hpwl = total_hpwl.x * dp_wlen_weight.x + total_hpwl.y * dp_wlen_weight.y;
 
   return hpwl;
 }

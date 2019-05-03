@@ -121,37 +121,37 @@ extern struct POS dft_bin_3d;
 /// Electrostatic-Based Functions /////////////////////////////////////////
 void charge_fft_init(struct POS nbin, struct FPOS stp, int flg);
 void charge_fft_init_2d(struct POS nbin, struct FPOS stp);
-void charge_fft_init_3d(struct POS nbin, struct FPOS stp);
+//void charge_fft_init_3d(struct POS nbin, struct FPOS stp);
 
 void charge_fft_delete(int flg);
 void charge_fft_delete_2d(void);
-void charge_fft_delete_3d(void);
+//void charge_fft_delete_3d(void);
 
 void charge_fft_call(int flg);
 void charge_fft_call_2d(void);
-void charge_fft_call_3d(void);
+//void charge_fft_call_3d(void);
 
 inline void copy_e_from_fft_2D(struct FPOS *e, struct POS p) {
   e->x = ex_2d_st2[p.x][p.y];
   e->y = ey_2d_st2[p.x][p.y];
 }
-inline void copy_e_from_fft_3D(struct FPOS *e, struct POS p) {
-  e->x = ex_3d_st3[p.z][p.x][p.y];
-  e->y = ey_3d_st3[p.z][p.x][p.y];
-  e->z = ez_3d_st3[p.z][p.x][p.y];
-}
+//inline void copy_e_from_fft_3D(struct FPOS *e, struct POS p) {
+//  e->x = ex_3d_st3[p.z][p.x][p.y];
+//  e->y = ey_3d_st3[p.z][p.x][p.y];
+//  e->z = ez_3d_st3[p.z][p.x][p.y];
+//}
 inline void copy_phi_from_fft_2D(prec *phi, struct POS p) {
   *phi = phi_2d_st2[p.x][p.y];
 }
-inline void copy_phi_from_fft_3D(prec *phi, struct POS p) {
-  *phi = phi_3d_st3[p.z][p.x][p.y];
-}
+//inline void copy_phi_from_fft_3D(prec *phi, struct POS p) {
+//  *phi = phi_3d_st3[p.z][p.x][p.y];
+//}
 inline void copy_den_to_fft_2D(prec den, struct POS p) {
   den_2d_st2[p.x][p.y] = den;
 }
-inline void copy_den_to_fft_3D(prec den, struct POS p) {
-  den_3d_st3[p.z][p.x][p.y] = den;
-}
+//inline void copy_den_to_fft_3D(prec den, struct POS p) {
+//  den_3d_st3[p.z][p.x][p.y] = den;
+//}
 
 /// Thermal-Based Functions ///////////////////////////////////////////////
 // void thermal_fft_init    (struct POS nbin, struct FPOS stp, int flg);
@@ -192,6 +192,6 @@ void ddscct3d(int, int, int, int isgn, prec ***, prec *, int *, prec *);
 void ddcsct3d(int, int, int, int isgn, prec ***, prec *, int *, prec *);
 void ddccst3d(int, int, int, int isgn, prec ***, prec *, int *, prec *);
 
-void fft_wxy_update_3d(struct FPOS stp);
+//void fft_wxy_update_3d(struct FPOS stp);
 
 #endif

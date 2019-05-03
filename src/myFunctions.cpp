@@ -166,8 +166,6 @@ struct FPOS fp_mul(struct FPOS a, struct FPOS b) {
   struct FPOS c = zeroFPoint;
   c.x = a.x * b.x;
   c.y = a.y * b.y;
-  if(flg_3dic)
-    c.z = a.z * b.z;
   return c;
 }
 
@@ -184,8 +182,6 @@ struct FPOS fp_add_abs(struct FPOS a, struct FPOS b) {
   struct FPOS c = zeroFPoint;
   c.x = fabs(a.x) + fabs(b.x);
   c.y = fabs(a.y) + fabs(b.y);
-  if(flg_3dic)
-    c.z = fabs(a.z) + fabs(b.z);
   return c;
 }
 
@@ -201,8 +197,6 @@ struct FPOS fp_subt(struct FPOS a, struct FPOS b) {
   struct FPOS c = zeroFPoint;
   c.x = a.x - b.x;
   c.y = a.y - b.y;
-  if(flg_3dic)
-    c.z = a.z - b.z;
   return c;
 }
 
@@ -210,39 +204,29 @@ struct FPOS fp_subt_const(struct FPOS a, prec b) {
   struct FPOS c = zeroFPoint;
   c.x = a.x - b;
   c.y = a.y - b;
-  if(flg_3dic)
-    c.z = a.z - b;
   return c;
 }
 
 prec fp_sum(struct FPOS a) {
   prec sum = 0.0;
   sum = a.x + a.y;
-  if(flg_3dic)
-    sum += a.z;
   return sum;
 }
 
 prec fp_product(struct FPOS a) {
   prec prod = 0;
   prod = a.x * a.y;
-  if(flg_3dic)
-    prod *= a.z;
   return prod;
 }
 
 int p_product(struct POS a) {
   int product = a.x * a.y;
-  if(flg_3dic)
-    product *= a.z;
   return product;
 }
 
 int p_max(struct POS a) {
   int m = 0;
   m = max(a.x, a.y);
-  if(flg_3dic)
-    m = max(m, a.z);
   return m;
 }
 
@@ -250,8 +234,6 @@ struct FPOS fp_exp(struct FPOS a) {
   struct FPOS b = zeroFPoint;
   b.x = exp(a.x);
   b.y = exp(a.y);
-  if(flg_3dic)
-    b.z = exp(a.z);
   return b;
 }
 
@@ -259,8 +241,6 @@ struct FPOS fp_inv(struct FPOS a) {
   struct FPOS b = zeroFPoint;
   b.x = 1.0 / a.x;
   b.y = 1.0 / a.y;
-  if(flg_3dic)
-    b.z = 1.0 / a.z;
   return b;
 }
 
@@ -268,8 +248,6 @@ struct FPOS fp_rand(void) {
   struct FPOS r = zeroFPoint;
   r.x = rand();
   r.y = rand();
-  if(flg_3dic)
-    r.z = rand();
   return r;
 }
 
@@ -277,8 +255,6 @@ struct FPOS fp_min2(struct FPOS a, struct FPOS b) {
   struct FPOS c = zeroFPoint;
   c.x = min(a.x, b.x);
   c.y = min(a.y, b.y);
-  if(flg_3dic)
-    c.z = min(a.z, b.z);
   return c;
 }
 
@@ -286,8 +262,6 @@ struct FPOS fp_max2(struct FPOS a, struct FPOS b) {
   struct FPOS c = zeroFPoint;
   c.x = max(a.x, b.x);
   c.y = max(a.y, b.y);
-  if(flg_3dic)
-    c.z = max(a.z, b.z);
   return c;
 }
 
@@ -295,8 +269,6 @@ struct FPOS fp_div(struct FPOS a, struct FPOS b) {
   struct FPOS c = zeroFPoint;
   c.x = a.x / b.x;
   c.y = a.y / b.y;
-  if(flg_3dic)
-    c.z = a.z / b.z;
   return c;
 }
 
@@ -304,8 +276,6 @@ struct FPOS p2fp(struct POS a) {
   struct FPOS b = zeroFPoint;
   b.x = (prec)a.x;
   b.y = (prec)a.y;
-  if(flg_3dic)
-    b.z = (prec)a.z;
   return b;
 }
 
@@ -313,8 +283,6 @@ struct POS fp2p_floor(struct FPOS a) {
   struct POS b = zeroPoint;
   b.x = (int)(a.x);
   b.y = (int)(a.y);
-  if(flg_3dic)
-    b.z = (int)(a.z);
   return b;
 }
 
@@ -322,8 +290,6 @@ struct POS fp2p_ceil(struct FPOS a) {
   struct POS b = zeroPoint;
   b.x = (int)(a.x) + 1;
   b.y = (int)(a.y) + 1;
-  if(flg_3dic)
-    b.z = (int)(a.z) + 1;
   return b;
 }
 
@@ -349,6 +315,7 @@ int max_pinCNTinObject_cmp(const void *a, const void *b) {
   return (*aa)->pinCNTinObject < (*bb)->pinCNTinObject ? 1 : 0;
 }
 
+/*
 int min_tier_cmp(const void *a, const void *b) {
   struct MODULE **aa = (struct MODULE **)a;
   struct MODULE **bb = (struct MODULE **)b;
@@ -370,6 +337,7 @@ int max_area_dis_div_cmp(const void *a, const void *b) {
 
   return cost_a < cost_b ? 1 : 0;
 }
+*/
 
 bool TwoPinNets_comp(TwoPinNets x, TwoPinNets y) {
   return x.rect_dist < y.rect_dist;

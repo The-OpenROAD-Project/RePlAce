@@ -159,16 +159,12 @@ void build_data_struct(bool initCoordi) {
 
   for(int i = 0; i < terminalCNT; i++) {
     term = &terminalInstance[i];
-    term->center.z = tier_st[0].center.z;
 
     for(int j = 0; j < term->pinCNTinObject; j++) {
       pin = term->pin[j];
-      pin->tier = (int)(term->center.z / TIER_DEP + 0.5);
-      pin->fp.z = term->center.z;
+      pin->tier = 0;
     }
 
-    term->pmin.z = term->center.z - 0.5 * term->size.z;
-    term->pmax.z = term->center.z + 0.5 * term->size.z;
   }
 
   for(int i = 0; i < moduleCNT; i++) {
@@ -176,16 +172,13 @@ void build_data_struct(bool initCoordi) {
 
     if(initCoordi) {
       mdp->center = place.center;
-      mdp->center.z = tier_st[0].center.z;
     }
 
     mdp->pmin.x = mdp->center.x - 0.5 * mdp->size.x;
     mdp->pmin.y = mdp->center.y - 0.5 * mdp->size.y;
-    mdp->pmin.z = mdp->center.z - 0.5 * mdp->size.z;
 
     mdp->pmax.x = mdp->center.x + 0.5 * mdp->size.x;
     mdp->pmax.y = mdp->center.y + 0.5 * mdp->size.y;
-    mdp->pmax.z = mdp->center.z + 0.5 * mdp->size.z;
 
     for(int j = 0; j < mdp->pinCNTinObject; j++) {
       pof = mdp->pof[j];
@@ -193,7 +186,6 @@ void build_data_struct(bool initCoordi) {
 
       pin->fp.x = mdp->center.x + pof.x;
       pin->fp.y = mdp->center.y + pof.y;
-      pin->fp.z = mdp->center.z + pof.z;
 
       pin->X_MIN = 0;
       pin->X_MAX = 0;
@@ -204,34 +196,26 @@ void build_data_struct(bool initCoordi) {
 
   term_pmin.x = PREC_MAX;
   term_pmin.x = PREC_MAX;
-  term_pmin.z = PREC_MAX;
   term_pmax.x = 0;
   term_pmax.y = 0;
-  term_pmax.z = 0;
 
   for(int i = 0; i < terminalCNT; i++) {
     term = &terminalInstance[i];
 
     term->pmin.x = term->center.x - 0.5 * term->size.x;
     term->pmin.y = term->center.y - 0.5 * term->size.y;
-    term->pmin.z = term->center.z - 0.5 * term->size.z;
 
     term->pmax.x = term->center.x + 0.5 * term->size.x;
     term->pmax.y = term->center.y + 0.5 * term->size.y;
-    term->pmax.z = term->center.z + 0.5 * term->size.z;
 
     if(term_pmin.x > term->pmin.x)
       term_pmin.x = term->pmin.x;
     if(term_pmin.y > term->pmin.y)
       term_pmin.y = term->pmin.y;
-    if(term_pmin.z > term->pmin.z)
-      term_pmin.z = term->pmin.z;
     if(term_pmax.x < term->pmax.x)
       term_pmax.x = term->pmax.x;
     if(term_pmax.y < term->pmax.y)
       term_pmax.y = term->pmax.y;
-    if(term_pmax.z < term->pmax.z)
-      term_pmax.z = term->pmax.z;
 
     for(int j = 0; j < term->pinCNTinObject; j++) {
       pof = term->pof[j];
@@ -239,7 +223,6 @@ void build_data_struct(bool initCoordi) {
 
       pin->fp.x = term->center.x + pof.x;
       pin->fp.y = term->center.y + pof.y;
-      pin->fp.z = term->center.z + pof.z;
 
       pin->X_MIN = 0;
       pin->X_MAX = 0;
@@ -383,7 +366,6 @@ void update_pin_by_module(void) {
 
       pin->fp.x = mdp->center.x + pof.x;
       pin->fp.y = mdp->center.y + pof.y;
-      pin->fp.z = mdp->center.z + pof.z;
 
       pin->X_MIN = 0;
       pin->X_MAX = 0;

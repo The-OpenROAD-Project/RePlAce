@@ -50,10 +50,6 @@ extern prec inv_bin_area;
 extern prec global_macro_area_scale;
 
 extern BIN *bin_mat;
-// extern prec *bin_share_x_st;
-// extern prec *bin_share_y_st;
-// extern prec *bin_share_z_st;
-// extern prec *bin_share_st;
 
 extern FPOS bin_org;
 extern FPOS bin_stp;
@@ -146,14 +142,6 @@ inline prec valid_coor2(prec da, prec half_size, int lab) {
     if(max_a > place.end.y)
       da -= max_a - place.end.y;
   }
-  // mgwoo
-  // accroding to Z
-  //    else if(lab == 2) {
-  //        if(min_a < place.org.z)
-  //            da += place.org.z - min_a;
-  //        if(max_a > place.end.z)
-  //            da -= max_a - place.end.z;
-  //    }
   return da;
 }
 
@@ -171,7 +159,7 @@ prec valid_coor3(prec da, prec sz, int lab);
 int is_IO_block(TERM *term);
 
 void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt);
-prec get_bins_mac(FPOS center, MODULE *mac);
+//prec get_bins_mac(FPOS center, MODULE *mac);
 void fft_test(void);
 
 #define DEN_SMOOTH_COF 5.0
@@ -203,10 +191,7 @@ prec get_den2(prec area_num, prec area_denom);
 
 // return bin_mat's pointer
 inline BIN *get_bin_from_idx(POS p) {
-  int idx = 0;
-  (flg_3dic == 1) ? idx = p.x *max_bin.y *max_bin.z + p.y *max_bin.z + p.z
-                  : idx = p.x * max_bin.y + p.y;
-  return &bin_mat[idx];
+  return &bin_mat[ p.x * max_bin.y + p.y];
 };
 
 void add_net_to_bins(NET *ntp);

@@ -210,7 +210,6 @@ void initArgument(int argc, char *argv[]) {
   MaxExtraWSfor3D = 0;  //.20; //0.2;
   dim_bin.x = atoi(bxMaxCMD.c_str());
   dim_bin.y = atoi(byMaxCMD.c_str());
-  dim_bin.z = atoi(bzMaxCMD.c_str());
 
   // detailPlacer settings
   detailPlacer = None;

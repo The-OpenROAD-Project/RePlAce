@@ -58,19 +58,21 @@
 #include "opt.h"
 
 void tier_init_2D(int STAGE) {
-  int i = 0, z = 0;
+  int i = 0;
   int min_idx = moduleCNT, max_idx = 0;
   struct TIER *tier = NULL;
   struct MODULE *modu = NULL;
   struct CELLx *cell = NULL;
-  struct CELLx *filler = NULL;
 
-  for(z = 0; z < numLayer; z++) {
+  for(int z = 0; z < numLayer; z++) {
     tier = &tier_st[z];
     tier->cell_st = (struct CELLx **)mkl_malloc(
         sizeof(struct CELLx *) * (tier->modu_cnt + gfiller_cnt), 64);
     tier->cell_cnt = 0;
   }
+
+  cout << "tier->modu_cnt:" << tier->modu_cnt << endl;
+  cout << "gfiller_cnt: " << gfiller_cnt << endl;
 
   for(i = 0; i < moduleCNT; i++) {
     modu = &moduleInstance[i];
@@ -78,15 +80,14 @@ void tier_init_2D(int STAGE) {
       if(modu->flg == Macro)
         continue;
     }
-    z = modu->tier;
     cell = &gcell_st[i];
-    tier = &tier_st[z];
-    cell->tier = z;
+    modu->tier = cell->tier = 0;
+    tier = &tier_st[0];
     tier->cell_st[tier->cell_cnt] = cell;
     tier->cell_cnt++;
   }
 
-  for(z = 0; z < numLayer; z++) {
+  for(int z = 0; z < numLayer; z++) {
     tier = &tier_st[z];
 
     tier->filler_area =
@@ -110,10 +111,14 @@ void tier_init_2D(int STAGE) {
     max_idx = min_idx + tier->filler_cnt > gcell_cnt
                   ? gcell_cnt
                   : min_idx + tier->filler_cnt;
+    cout << "min_idx: " << min_idx << endl;
+    cout << "max_idx: " << max_idx << endl;
+    cout << "gcell_cnt: " <<gcell_cnt << endl;
+    cout << "tier->filler_cnt: " <<tier->filler_cnt<< endl;
 
     for(i = min_idx; i < max_idx; i++) {
-      filler = &gcell_st[i];
-      filler->tier = z;
+      CELLx *filler = &gcell_st[i];
+      filler->tier = 0;
       tier->cell_st[tier->cell_cnt] = filler;
       tier->cell_cnt++;
     }
@@ -121,7 +126,7 @@ void tier_init_2D(int STAGE) {
     min_idx = max_idx;
   }
 
-  for(z = 0; z < numLayer; z++) {
+  for(int z = 0; z < numLayer; z++) {
     tier = &tier_st[z];
     if(tier->cell_cnt == 0)
       mkl_free(tier->cell_st);
@@ -162,47 +167,29 @@ void tier_delete_mGP2D(void) {
 }
 
 void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
-  int currTier = 0;
-  int *z_st = (int *)mkl_malloc(sizeof(int) * numLayer, 64);
-  prec modu_area = 0;
-  struct MODULE *modu = NULL;
   struct MODULE **modu_st =
       (struct MODULE **)malloc(sizeof(struct MODULE *) * moduleCNT);
   struct T0 *t0_st = (struct T0 *)mkl_malloc(sizeof(struct T0) * numLayer, 64);
   struct TIER *tier = NULL;
-  struct PIN *pin = NULL;
 
-  for(currTier = 0; currTier < numLayer; currTier++) {
-    tier = &tier_st[currTier];
-    tier->modu_cnt = 0;
-    if(moduleCNT > 0)
-      tier->modu_st =
-          (struct MODULE **)malloc(sizeof(struct MODULE *) * moduleCNT);
-    else
-      tier->modu_st = NULL;
-    tier->modu_area = 0;
-  }
+  int currTier = 0;
+  tier = &tier_st[currTier];
+  tier->modu_cnt = 0;
+  if(moduleCNT > 0)
+    tier->modu_st =
+      (struct MODULE **)malloc(sizeof(struct MODULE *) * moduleCNT);
+  else
+    tier->modu_st = NULL;
+  tier->modu_area = 0;
 
   for(int i = 0; i < moduleCNT; i++) {
     modu_st[i] = &moduleInstance[i];
   }
 
-  switch(LAYER_ASSIGN_3DIC) {
-    case MAX_PCNT_ORDER:
-      qsort(modu_st, moduleCNT, sizeof(struct MODULE *),
-            max_pinCNTinObject_cmp);
-      break;
-
-    case MIN_TIER_ORDER:
-      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), min_tier_cmp);
-      break;
-
-    case MAX_AREA_DIS_DIV:
-      qsort(modu_st, moduleCNT, sizeof(struct MODULE *), max_area_dis_div_cmp);
-      break;
-  }
-
+  MODULE *modu = NULL;
   for(int i = 0; i < moduleCNT; i++) {
+//    cout << i << endl;
+//    cout << moduleCNT << endl;
     if(mode == STDCELLonly) {
       if(modu_st[i]->flg == Macro)
         continue;
@@ -213,57 +200,45 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
       modu = modu_st[i];
     }
 
-    find_close_tier(modu->center.z, t0_st, z_st);
+    tier = &tier_st[currTier];
 
-    for(int j = 0; j < numLayer; j++) {
-      currTier = z_st[j];
-      tier = &tier_st[currTier];
+    prec modu_area = 0;
+    if(mode == MIXED) {
+      if(modu->flg == Macro)
+        modu_area = modu->size.GetProduct()* target_cell_den;
+      else
+        modu_area = modu->size.GetProduct();
+    }
+    else if(mode == STDCELLonly) {
+      modu_area = modu->size.GetProduct();
+    }
+//     cout << modu->name << endl;
+//     modu->size.Dump("Module Size");
 
-      if(mode == MIXED) {
-        if(modu->flg == Macro)
-          modu_area = modu->area * target_cell_den;
-        else
-          modu_area = modu->area;
-      }
-      else if(mode == STDCELLonly) {
-        modu_area = modu->area;
-      }
+//     cout << "tier's modu_area: " << tier->modu_area << endl;
+//     cout << "modu_area: " << modu_area << endl;
+//     cout << "tier's ws_area: " << tier->ws_area << endl;
+//     cout << "target_cell_den: " << target_cell_den << endl;
+//     cout << "dp_margin_per_tier: " << dp_margin_per_tier << endl;
 
-      //            cout << "tier's modu_area: " << tier->modu_area << endl;
-      //            cout << "modu_area: " << modu_area << endl;
-      //            cout << "tier's ws_area: " << tier->ws_area << endl;
-      //            cout << "target_cell_den: " << target_cell_den << endl;
-      //            cout << dp_margin_per_tier << endl;
+    if((tier->modu_area + modu_area) / tier->ws_area <=
+        target_cell_den - dp_margin_per_tier) {
+      modu->tier = currTier;
 
-      if((tier->modu_area + modu_area) / tier->ws_area <=
-         target_cell_den - dp_margin_per_tier) {
-        modu->center.z = tier->center.z;
-        modu->pmin.z = modu->center.z - modu->half_size.z;
-        modu->pmax.z = modu->center.z + modu->half_size.z;
-        modu->tier = currTier;
-
-        tier->modu_st[tier->modu_cnt++] = modu;
-        tier->modu_area += modu_area;
-
-        for(int k = 0; k < modu->pinCNTinObject; k++) {
-          pin = modu->pin[k];
-          pin->tier = currTier;
-          pin->fp.z = tier->center.z;
-        }
-
-        break;
-      }
-      else {
-        if(j == numLayer - 1) {
-          printf("ERROR: no more tier to assign!\n");
-          exit(1);
-        }
-        else {
-          continue;
-        }
+      tier->modu_st[tier->modu_cnt++] = modu;
+      tier->modu_area += modu_area;
+  
+      for(int k = 0; k < modu->pinCNTinObject; k++) {
+        PIN *pin = modu->pin[k];
+        pin->tier = currTier;
       }
     }
+    else {
+      cout << "ERROR: Exceed the placement Area!" << endl;
+      exit(1);
+    }
   }
+
 
   for(int i = 0; i < numLayer; i++) {
     tier = &tier_st[i];
@@ -280,14 +255,15 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
       tier->modu_st = (MODULE **)realloc(
           tier->modu_st, sizeof(struct MODULE *) * (tier->modu_cnt));
     }
-    //        tier->modu_den = tier->modu_area / tier->ws_area;
+    // tier->modu_den = tier->modu_area / tier->ws_area;
     prec moduleDensity = tier->modu_area / tier->ws_area;
 
     printf("INFO:  Tier %d, Density is %.6lf\n", i, moduleDensity);
   }
+//  cout << "Final module count: " << tier->modu_cnt << endl;
+//  exit(1);
   mkl_free(t0_st);
   free(modu_st);
-  mkl_free(z_st);
 }
 
 void find_close_tier(prec z, struct T0 *st, int *z_st) {
@@ -296,13 +272,13 @@ void find_close_tier(prec z, struct T0 *st, int *z_st) {
   for(int i = 0; i < numLayer; i++) {
     tier_center_z = TIER_DEP * ((prec)i + 0.5);
     st[i].dis = fabs(tier_center_z - z);
-    st[i].z = i;
+//    st[i].z = i;
   }
 
   qsort(st, numLayer, sizeof(struct T0), prec_cmp);
 
   for(int i = 0; i < numLayer; i++) {
-    z_st[i] = st[i].z;
+//    z_st[i] = st[i].z;
   }
 
   return;
@@ -329,7 +305,7 @@ void init_tier(void) {
 
     for(int j = 0; j < place_st_cnt; j++) {
       pl = &place_st[j];
-      pl_area = get_common_area(pl->org, pl->end, tier->pmin, tier->pmax);
+      pl_area = pGetCommonAreaXY(pl->org, pl->end, tier->pmin, tier->pmax);
       tier->pl_area += pl_area;
     }
     tier->virt_area = tier->area - tier->pl_area;
