@@ -440,13 +440,11 @@ void sa_mac_leg_init(void) {
 }
 
 void sa_mac_leg_init_with_margin(void) {
-  int i = 0, j = 0, z = 0;
+  int i = 0, j = 0;
   struct MODULE *mac = NULL;
   struct TIER *tier = NULL;
   struct FPOS pmin = zeroFPoint, center = zeroFPoint, center_lg = zeroFPoint;
   struct POS pmin_lg = zeroPoint;
-  int *z_st = (int *)mkl_malloc(sizeof(int) * numLayer, 64);
-  struct T0 *t0_st = (struct T0 *)mkl_malloc(sizeof(struct T0) * numLayer, 64);
 
   for(i = 0; i < macro_cnt; i++) {
     mac = macro_st[i];
@@ -460,12 +458,9 @@ void sa_mac_leg_init_with_margin(void) {
             rowHeight +
         (int)(place.org.y + 0.5) /* ROW_Y0 */;
 
-//    find_close_tier(center.z, t0_st, z_st);
 
     for(j = 0; j < numLayer; j++) {
-      z = z_st[j];
-
-      tier = &tier_st[z];
+      tier = &tier_st[0];
 
       if((tier->term_area + tier->virt_area + tier->temp_mac_area + mac->area) /
                  tier->area <=
@@ -482,7 +477,7 @@ void sa_mac_leg_init_with_margin(void) {
         else if(tier->max_mac->area < mac->area)
           tier->max_mac = mac;
 
-        mac->tier = z;
+        mac->tier = 0;
 
         break;
       }
@@ -517,8 +512,6 @@ void sa_mac_leg_init_with_margin(void) {
     mac->pmax_lg.y = (int)(mac->pmax.y + 0.5);
   }
 
-  mkl_free(t0_st);
-  mkl_free(z_st);
 }
 
 void sa_param_init_top(void) {

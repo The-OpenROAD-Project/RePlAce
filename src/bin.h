@@ -50,10 +50,6 @@ extern prec inv_bin_area;
 extern prec global_macro_area_scale;
 
 extern BIN *bin_mat;
-// extern prec *bin_share_x_st;
-// extern prec *bin_share_y_st;
-// extern prec *bin_share_z_st;
-// extern prec *bin_share_st;
 
 extern FPOS bin_org;
 extern FPOS bin_stp;

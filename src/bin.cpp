@@ -67,7 +67,6 @@ BIN *bin_mat;
 static POS *bin_st;
 static prec *bin_share_x_st;
 static prec *bin_share_y_st;
-static prec *bin_share_z_st;
 static prec *bin_share_st;
 
 FPOS bin_org;
@@ -114,7 +113,7 @@ POS get_bin_idx(int idx) {
 // bin_st,
 // bin_share_x_st,
 // bin_share_y_st,
-// bin_share_z_st,  bin_share_st
+// bin_share_st
 //
 // place_st
 
@@ -514,7 +513,6 @@ void bin_delete(void) {
   mkl_free(bin_st);
   mkl_free(bin_share_x_st);
   mkl_free(bin_share_y_st);
-  mkl_free(bin_share_z_st);
   mkl_free(bin_share_st);
 }
 
@@ -1159,7 +1157,6 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
 void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt) {
   prec *x_st = bin_share_x_st;
   prec *y_st = bin_share_y_st;
-  prec *z_st = bin_share_z_st;
   int x = 0, y = 0, z = 0;
   int bin_cnt0 = 0;
   prec sum_area = 0, diff_area = 0;
@@ -1216,7 +1213,6 @@ void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt) {
     y_st[y - b0.y] = share.y;
   }
 
-  z_st[0] = 1.0;
 
   for(x = b0.x; x <= b1.x; x++) {
     for(y = b0.y; y <= b1.y; y++) {
