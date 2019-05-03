@@ -146,7 +146,7 @@ void DrawTerminal(CImgObj &img, const unsigned char color[], float opacity) {
       continue;
     }
 
-    if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
+    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
       int x1 = pe.GetX(curTerminal->pmin);
       int x3 = pe.GetX(curTerminal->pmax);
       int y1 = pe.GetY(curTerminal->pmin);
@@ -156,7 +156,7 @@ void DrawTerminal(CImgObj &img, const unsigned char color[], float opacity) {
       //            black, NULL, 1, 30);
     }
     else {
-      for(auto &curIdx : shapeMap[curTerminal->name]) {
+      for(auto &curIdx : shapeMap[curTerminal->Name()]) {
         int x1 = pe.GetX(shapeStor[curIdx].llx);
         int y1 = pe.GetY(shapeStor[curIdx].lly);
 
@@ -173,7 +173,7 @@ void DrawGcell(CImgObj &img, const unsigned char fillerColor[],
                const unsigned char cellColor[],
                const unsigned char macroColor[], float opacity) {
   for(int i = 0; i < gcell_cnt; i++) {
-    CELLx *curGCell = &gcell_st[i];
+    CELL *curGCell = &gcell_st[i];
 
     curGCell->pmin.x = curGCell->center.x - 0.5 * curGCell->size.x;
     curGCell->pmax.x = curGCell->center.x + 0.5 * curGCell->size.x;

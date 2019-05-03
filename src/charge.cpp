@@ -86,7 +86,7 @@ void get_cell_potn1(struct FPOS *st, int N, prec *phi0) {
     struct FPOS half_size = zeroFPoint;
     struct POS p = zeroPoint;
     struct BIN *bp = NULL;
-    struct CELLx *cell = NULL;
+    struct CELL *cell = NULL;
 
     for(int i = 0; i < N; i++) {
         center = st[i];
@@ -140,7 +140,7 @@ void get_term_potn(prec *phi) {
 //#ifdef NO_DEN
 //    return;
 //#endif
-//    struct  CELLx   *cell = &gcell_st[cell_idx];
+//    struct  CELL   *cell = &gcell_st[cell_idx];
 //    switch (CHARGE_PRE) {
 //        case    NoneDpre:
 //            *charge_dpre = zeroFPoint;
@@ -168,7 +168,7 @@ void potn_grad(int cell_idx, struct FPOS *pgrad) {
   BIN *bpz = NULL;
   POS b0;
   POS b1;
-  CELLx *cell = &gcell_st[cell_idx];
+  CELL *cell = &gcell_st[cell_idx];
 
   *pgrad = zeroFPoint;
 
@@ -269,7 +269,7 @@ void potn_grad_local(int cell_idx, struct FPOS *grad, prec *cellLambda) {
   prec exp_term = 0;
   struct POS b0;
   struct POS b1;
-  struct CELLx *cell = &gcell_st[cell_idx];
+  struct CELL *cell = &gcell_st[cell_idx];
   struct BIN *bpx = NULL;
   struct BIN *bpy = NULL;
   struct BIN *bpz = NULL;
@@ -397,7 +397,7 @@ void potn_grad_2D(int cell_idx, struct FPOS *grad) {
 
   POS b0, b1;
 
-  CELLx *cell = &gcell_st[cell_idx];
+  CELL *cell = &gcell_st[cell_idx];
   TIER *tier = &tier_st[cell->tier];
  
   b0.x =
@@ -473,7 +473,7 @@ void potn_grad_2D_local(int cell_idx, struct FPOS *grad, prec *cellLambda) {
   struct BIN *bpy = NULL;
   struct POS b0 = zeroPoint;
   struct POS b1 = zeroPoint;
-  struct CELLx *cell = &gcell_st[cell_idx];
+  struct CELL *cell = &gcell_st[cell_idx];
   struct TIER *tier = &tier_st[cell->tier];
 
   *grad = zeroFPoint;

@@ -426,12 +426,12 @@ void bin_init_2D(int STAGE) {
     TIER *tier = &tier_st[0];
 
     // there is no shapes
-    if(shapeMap.find(term->name) == shapeMap.end()) {
+    if(shapeMap.find(term->Name()) == shapeMap.end()) {
       UpdateTerminalArea(tier, &(term->pmin), &(term->pmax));
     }
     // there are shapes
     else {
-      for(auto &curIdx : shapeMap[term->name]) {
+      for(auto &curIdx : shapeMap[term->Name()]) {
         prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
              width = shapeStor[curIdx].width, height = shapeStor[curIdx].height;
         FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
@@ -872,7 +872,7 @@ int compare(const void *p1, const void *p2) {
 
 void bin_update7_mGP2D() {
   BIN *bp = NULL;
-  CELLx *cell = NULL;
+  CELL *cell = NULL;
   TIER *tier = NULL;
   prec area_num = 0;
   prec area_num2 = 0;
@@ -1154,7 +1154,7 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
 }
 */
 
-void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt) {
+void get_bins(FPOS center, CELL *cell, POS *st, prec *share_st, int *bin_cnt) {
   prec *x_st = bin_share_x_st;
   prec *y_st = bin_share_y_st;
   int x = 0, y = 0, z = 0;
@@ -1407,7 +1407,7 @@ void bin_den_mac_update(void) {
 void bin_cell_area_update(void) {
   int i = 0, j = 0;
   prec area_share = 0;
-  CELLx *cell = NULL;
+  CELL *cell = NULL;
   FPOS center = zeroFPoint;
   FPOS half_size = zeroFPoint;
   POS p = zeroPoint;
@@ -1508,10 +1508,10 @@ int idx_in_bin_rect(POS *p, POS pmin, POS pmax) {
   }
 }
 
-void den_comp_2d_mGP2D(CELLx *cell, TIER *tier) {
+void den_comp_2d_mGP2D(CELL *cell, TIER *tier) {
   int x = 0, y = 0;
 
-  /*  CELLx*cell=&gcell_st[cell_idx]; */
+  /*  CELL*cell=&gcell_st[cell_idx]; */
   /*  FPOS pmin,pmax; */
   int idx = 0;
   prec area_share = 0;
@@ -1589,7 +1589,7 @@ void den_comp_2d_mGP2D(CELLx *cell, TIER *tier) {
 // tier->bin_mat->cell_area (Normal & Macro) and
 // tier->bin_mat->cell_area2(Filler Cell)
 //
-void den_comp_2d_cGP2D(CELLx *cell, TIER *tier) {
+void den_comp_2d_cGP2D(CELL *cell, TIER *tier) {
   POS b0, b1;
   b0.x = INT_DOWN((cell->den_pmin.x - tier->bin_org.x) * tier->inv_bin_stp.x);
   b0.y = INT_DOWN((cell->den_pmin.y - tier->bin_org.y) * tier->inv_bin_stp.y);

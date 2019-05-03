@@ -96,7 +96,7 @@ inline void wlen_pre(int cell_idx, FPOS *wpre) {
   return;
 #endif
 
-  CELLx *cell = &gcell_st[cell_idx];
+  CELL *cell = &gcell_st[cell_idx];
 
   switch(WLEN_PRE) {
     case NoneWpre:

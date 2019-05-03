@@ -11,12 +11,12 @@ TIMING_NAMESPACE_OPEN
 inline string Timing::GetPinName(PIN* curPin, bool isEscape) {
   // itself is PINS in def.
   if(curPin->term && _terms[curPin->moduleID].isTerminalNI) {
-    return string(_terms[curPin->moduleID].name);
+    return string(_terms[curPin->moduleID].Name());
   }
 
   // below is common
-  string name = (curPin->term) ? string(_terms[curPin->moduleID].name)
-                               : string(_modules[curPin->moduleID].name);
+  string name = (curPin->term) ? string(_terms[curPin->moduleID].Name())
+                               : string(_modules[curPin->moduleID].Name());
 
   if( isEscape ) {
     SetEscapedStr(name);
@@ -273,7 +273,7 @@ void Timing::WriteSpef(const string& spefLoc) {
     // 0. write net name and lumped sum of downstream cap
     //        cout << "*D_NET "<< curNet->name << " " << lumpedCapStor[i] /
     //        CAP_SCALE << endl;
-    feed << "*D_NET " << GetEscapedStr(curNet->name) << " "
+    feed << "*D_NET " << GetEscapedStr(curNet->Name()) << " "
          << lumpedCapStor[i] / CAP_SCALE << endl;
 
     // 1. write connections

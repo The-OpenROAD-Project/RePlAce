@@ -152,10 +152,8 @@ void build_data_struct(bool initCoordi) {
 
   prec min_x = 0;
   prec min_y = 0;
-  prec min_z = 0;
   prec max_x = 0;
   prec max_y = 0;
-  prec max_z = 0;
 
   for(int i = 0; i < terminalCNT; i++) {
     term = &terminalInstance[i];
@@ -236,17 +234,13 @@ void build_data_struct(bool initCoordi) {
 
     min_x = PREC_MAX;
     min_y = PREC_MAX;
-    min_z = PREC_MAX;
     max_x = PREC_MIN;
     max_y = PREC_MIN;
-    max_z = PREC_MIN;
 
     PIN *pin_xmin = NULL;
     PIN *pin_ymin = NULL;
-    PIN *pin_zmin = NULL;
     PIN *pin_xmax = NULL;
     PIN *pin_ymax = NULL;
-    PIN *pin_zmax = NULL;
 
     for(int j = 0; j < curNet->pinCNTinObject; j++) {
       pin = curNet->pin[j];
@@ -312,11 +306,9 @@ void build_data_struct(bool initCoordi) {
 
     curNet->min_x = min_x;
     curNet->min_y = min_y;
-    curNet->min_z = min_z;
 
     curNet->max_x = max_x;
     curNet->max_y = max_y;
-    curNet->max_z = max_z;
   }
 }
 
@@ -379,11 +371,11 @@ void update_net_by_pin() {
   for(int i = 0; i < netCNT; i++) {
     NET *curNet = &netInstance[i];
 
-    PIN *pin_xmin = NULL, *pin_ymin = NULL, *pin_zmin = NULL;
-    PIN *pin_xmax = NULL, *pin_ymax = NULL, *pin_zmax = NULL;
+    PIN *pin_xmin = NULL, *pin_ymin = NULL;
+    PIN *pin_xmax = NULL, *pin_ymax = NULL;
 
-    prec min_x = PREC_MAX, min_y = PREC_MAX, min_z = PREC_MAX;
-    prec max_x = PREC_MIN, max_y = PREC_MIN, max_z = PREC_MIN;
+    prec min_x = PREC_MAX, min_y = PREC_MAX;
+    prec max_x = PREC_MIN, max_y = PREC_MIN;
 
     for(int j = 0; j < curNet->pinCNTinObject; j++) {
       PIN *pin = curNet->pin[j];

@@ -62,12 +62,12 @@ void tier_init_2D(int STAGE) {
   int min_idx = moduleCNT, max_idx = 0;
   struct TIER *tier = NULL;
   struct MODULE *modu = NULL;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int z = 0; z < numLayer; z++) {
     tier = &tier_st[z];
-    tier->cell_st = (struct CELLx **)mkl_malloc(
-        sizeof(struct CELLx *) * (tier->modu_cnt + gfiller_cnt), 64);
+    tier->cell_st = (struct CELL **)mkl_malloc(
+        sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt), 64);
     tier->cell_cnt = 0;
   }
 
@@ -117,7 +117,7 @@ void tier_init_2D(int STAGE) {
     cout << "tier->filler_cnt: " <<tier->filler_cnt<< endl;
 
     for(i = min_idx; i < max_idx; i++) {
-      CELLx *filler = &gcell_st[i];
+      CELL *filler = &gcell_st[i];
       filler->tier = 0;
       tier->cell_st[tier->cell_cnt] = filler;
       tier->cell_cnt++;
@@ -132,18 +132,18 @@ void tier_init_2D(int STAGE) {
       mkl_free(tier->cell_st);
     else {
       // igkang:  replace realloc to mkl
-      tier->cell_st_tmp = (CELLx **)mkl_malloc(
-          sizeof(struct CELLx *) * (tier->modu_cnt + gfiller_cnt), 64);
+      tier->cell_st_tmp = (CELL **)mkl_malloc(
+          sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt), 64);
       memcpy(tier->cell_st_tmp, tier->cell_st,
-             sizeof(struct CELLx *) * (tier->modu_cnt + gfiller_cnt));
+             sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt));
       mkl_free(tier->cell_st);
       tier->cell_st =
-          (CELLx **)mkl_malloc(sizeof(struct CELLx *) * tier->cell_cnt, 64);
+          (CELL **)mkl_malloc(sizeof(struct CELL *) * tier->cell_cnt, 64);
       memcpy(tier->cell_st, tier->cell_st_tmp,
-             sizeof(struct CELLx *) * tier->cell_cnt);
+             sizeof(struct CELL *) * tier->cell_cnt);
       mkl_free(tier->cell_st_tmp);
-      // tier->cell_st = (CELLx**)realloc(tier->cell_st, sizeof(struct
-      // CELLx*)*tier->cell_cnt);
+      // tier->cell_st = (CELL**)realloc(tier->cell_st, sizeof(struct
+      // CELL*)*tier->cell_cnt);
     }
   }
 }
@@ -166,10 +166,10 @@ void tier_delete_mGP2D(void) {
   }
 }
 
-void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
+// 1: MIXED  0: CellOnly
+void tier_assign(int mode) {  
   struct MODULE **modu_st =
       (struct MODULE **)malloc(sizeof(struct MODULE *) * moduleCNT);
-  struct T0 *t0_st = (struct T0 *)mkl_malloc(sizeof(struct T0) * numLayer, 64);
   struct TIER *tier = NULL;
 
   int currTier = 0;
@@ -188,8 +188,6 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
 
   MODULE *modu = NULL;
   for(int i = 0; i < moduleCNT; i++) {
-//    cout << i << endl;
-//    cout << moduleCNT << endl;
     if(mode == STDCELLonly) {
       if(modu_st[i]->flg == Macro)
         continue;
@@ -262,27 +260,26 @@ void tier_assign(int mode) {  // 1: MIXED  0: CellOnly
   }
 //  cout << "Final module count: " << tier->modu_cnt << endl;
 //  exit(1);
-  mkl_free(t0_st);
   free(modu_st);
 }
 
-void find_close_tier(prec z, struct T0 *st, int *z_st) {
-  prec tier_center_z = 0;
+//void find_close_tier(prec z, struct T0 *st, int *z_st) {
+//  prec tier_center_z = 0;
 
-  for(int i = 0; i < numLayer; i++) {
-    tier_center_z = TIER_DEP * ((prec)i + 0.5);
-    st[i].dis = fabs(tier_center_z - z);
+//  for(int i = 0; i < numLayer; i++) {
+//    tier_center_z = TIER_DEP * ((prec)i + 0.5);
+//    st[i].dis = fabs(tier_center_z - z);
 //    st[i].z = i;
-  }
+//  }
 
-  qsort(st, numLayer, sizeof(struct T0), prec_cmp);
+//  qsort(st, numLayer, sizeof(struct T0), prec_cmp);
 
-  for(int i = 0; i < numLayer; i++) {
+//  for(int i = 0; i < numLayer; i++) {
 //    z_st[i] = st[i].z;
-  }
+//  }
 
-  return;
-}
+//  return;
+//}
 
 void init_tier(void) {
   prec pl_area = 0;

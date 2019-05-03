@@ -78,13 +78,6 @@ prec get_abs(prec a) {
   return a < 0.0 ? -1.0 * a : a;
 }
 
-int prec2int(prec a) {
-  int af = floor(a);
-  int ac = ceil(a);
-
-  return a - (prec)af < (prec)ac - a ? af : ac;
-}
-
 unsigned prec2unsigned(prec a) {
   int af = floor(a);
   int ac = ceil(a);
@@ -293,51 +286,12 @@ struct POS fp2p_ceil(struct FPOS a) {
   return b;
 }
 
-// int dge (prec a, prec b) {
-//    return  (a>b || a==b) ? 1 : 0;
-//}
-
-// int dle (prec a, prec b) {
-//    return  (a<b || a==b) ? 1 : 0;
-//}
-
-int prec_cmp(const void *a, const void *b) {
-  struct T0 *aa = (struct T0 *)a;
-  struct T0 *bb = (struct T0 *)b;
-
-  return aa->dis > bb->dis ? 1 : 0;
-}
-
 int max_pinCNTinObject_cmp(const void *a, const void *b) {
   struct MODULE **aa = (struct MODULE **)a;
   struct MODULE **bb = (struct MODULE **)b;
 
   return (*aa)->pinCNTinObject < (*bb)->pinCNTinObject ? 1 : 0;
 }
-
-/*
-int min_tier_cmp(const void *a, const void *b) {
-  struct MODULE **aa = (struct MODULE **)a;
-  struct MODULE **bb = (struct MODULE **)b;
-
-  return (*aa)->center.z > (*bb)->center.z ? 1 : 0;
-}
-
-int max_area_dis_div_cmp(const void *a, const void *b) {
-  struct MODULE **aa = (struct MODULE **)a;
-  struct MODULE **bb = (struct MODULE **)b;
-
-  prec dis_a = fabs((*aa)->center.z - (prec)((int)((*aa)->center.z + 0.5)));
-
-  prec cost_a = (*aa)->area / dis_a;
-
-  prec dis_b = fabs((*bb)->center.z - (prec)((int)((*bb)->center.z + 0.5)));
-
-  prec cost_b = (*bb)->area / dis_b;
-
-  return cost_a < cost_b ? 1 : 0;
-}
-*/
 
 bool TwoPinNets_comp(TwoPinNets x, TwoPinNets y) {
   return x.rect_dist < y.rect_dist;

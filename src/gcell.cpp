@@ -74,7 +74,7 @@ void get_blockage() {
 
   std::unordered_map< string, int > term2idx;
   for(int i = 0; i < terminalCNT; ++i) {
-    term2idx[terminalInstance[i].name] = i;
+    term2idx[terminalInstance[i].Name()] = i;
   }
 
   // cout <<"getting blockage..." <<endl;
@@ -438,7 +438,7 @@ void tile_init_cGP2D() {
 
   std::unordered_map< string, int > tempMap;
   for(int i = 0; i < terminalCNT; ++i) {
-    string terminalName = terminalInstance[i].name;
+    string terminalName = terminalInstance[i].Name();
     tempMap[terminalName] = i;
   }
   for(auto it = routeBlockageNodes.begin(); it != routeBlockageNodes.end();

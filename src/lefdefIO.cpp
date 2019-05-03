@@ -378,9 +378,9 @@ void WriteDef(const char* defOutput) {
   // moduleInstnace -> defComponentStor
   for(int i = 0; i < moduleCNT; i++) {
     curModule = &moduleInstance[i];
-    auto cmpPtr = __ckt.defComponentMap.find(string(curModule->name));
+    auto cmpPtr = __ckt.defComponentMap.find(string(curModule->Name()));
     if(cmpPtr == __ckt.defComponentMap.end()) {
-      cout << "** ERROR:  Module Instance ( " << curModule->name
+      cout << "** ERROR:  Module Instance ( " << curModule->Name()
            << " ) does not exist in COMPONENT statement (defComponentMap) "
            << endl;
       exit(1);
@@ -683,7 +683,8 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     string moduleName = curComp->id();
 
     // set Name
-    strcpy(curModule->name, moduleName.c_str());
+//    strcpy(curModule->name, moduleName.c_str());
+    moduleNameStor.push_back( moduleName );
 
     // set Index
     curModule->idx = moduleCNT;
@@ -794,7 +795,8 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     string termName = curComp->id();
 
     // set Name
-    strcpy(curTerm->name, termName.c_str());
+//    strcpy(curTerm->name, termName.c_str());
+    terminalNameStor.push_back(termName); 
 
     // set tier
     moduleTermMap[termName] = make_pair(false, terminalCNT);
@@ -808,7 +810,9 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     curTerm = &terminalInstance[terminalCNT];
     new(curTerm) TERM();
 
-    strcpy(curTerm->name, curPin.pinName());
+//    strcpy(curTerm->name, curPin.pinName());
+    terminalNameStor.push_back(curPin.pinName());
+
     curTerm->idx = terminalCNT;
     curTerm->IO = (strcmp(curPin.direction(), "INPUT") == 0) ? 0 : 1;
     curTerm->pmin.Set((curPin.placementX() + offsetX) / unitX,
@@ -819,7 +823,7 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     curTerm->pmax.Set(curTerm->pmin);
     curTerm->center.Set(curTerm->pmin);
 
-    moduleTermMap[string(curTerm->name)] = make_pair(false, terminalCNT);
+    moduleTermMap[string(curTerm->Name())] = make_pair(false, terminalCNT);
 
     //        curTerm->Dump();
     terminalCNT++;
@@ -831,7 +835,8 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     curTerm = &terminalInstance[terminalCNT];
     new(curTerm) TERM();
 
-    strcpy(curTerm->name, blockName.c_str());
+//    strcpy(curTerm->name, blockName.c_str());
+    terminalNameStor.push_back(blockName);
 
     curTerm->idx = terminalCNT;
     curTerm->IO = 2;
@@ -1349,7 +1354,8 @@ void GenerateNetDefOnly(Circuit::Circuit& __ckt) {
     //        ReplaceStringInPlace(netName, "]", "\\]");
 
     // copy original name into netInstance
-    strcpy(curNet->name, netName.c_str());
+//    strcpy(curNet->name, netName.c_str());
+    netNameStor.push_back( netName );
     
     // But, netNameMap can have escaped strings
     ReplaceStringInPlace(netName, "\\[", "[");
@@ -1723,8 +1729,9 @@ void GenerateNetDefVerilog(Circuit::Circuit& __ckt) {
     curNet->pinCNTinObject = net.second.size();
     curNet->pin = (PIN**)mkl_malloc(sizeof(PIN*) * net.second.size(), 64);
     // net name initialize
-    strcpy(curNet->name, net.first.c_str());
-    // all names are saved in here.
+//    strcpy(curNet->name, net.first.c_str());
+    netNameStor.push_back( net.first.c_str() );
+    // all names are saved in here.;
     for(auto& connection : net.second) {
       int connectIdx = &connection - &net.second[0];
       /////////////// Net Info Mapping part

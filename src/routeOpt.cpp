@@ -707,7 +707,7 @@ void buildRMSTPerNet_genRMST(struct NET *net) {
 }
 
 void buildRMSTPerNet_printRMST(struct FPOS *st, struct NET *net) {
-  cout << "net_name: " << net->name << endl;
+  cout << "net_name: " << net->Name() << endl;
   for(unsigned i = 0; i < net->two_pin_nets.size(); ++i) {
     if(net->two_pin_nets[i].selected == true) {
       cout << "Y: ";
@@ -722,22 +722,22 @@ void buildRMSTPerNet_printRMST(struct FPOS *st, struct NET *net) {
     if(net->two_pin_nets[i].start_modu % 2 == 0) {
       struct MODULE *tempInst1 = &moduleInstance[start_modu];
       center1 = st[start_modu];
-      cout << tempInst1->name << " (" << center1.x << ", " << center1.y << ") ";
+      cout << tempInst1->Name() << " (" << center1.x << ", " << center1.y << ") ";
     }
     else {
       struct TERM *tempInst1 = &terminalInstance[start_modu];
       center1 = net->pin[net->two_pin_nets[i].i]->fp;
-      cout << tempInst1->name << " (" << center1.x << ", " << center1.y << ") ";
+      cout << tempInst1->Name() << " (" << center1.x << ", " << center1.y << ") ";
     }
     if(net->two_pin_nets[i].end_modu % 2 == 0) {
       struct MODULE *tempInst2 = &moduleInstance[end_modu];
       center2 = st[end_modu];
-      cout << tempInst2->name << " (" << center2.x << ", " << center2.y << ") ";
+      cout << tempInst2->Name() << " (" << center2.x << ", " << center2.y << ") ";
     }
     else {
       struct TERM *tempInst2 = &terminalInstance[end_modu];
       center2 = net->pin[net->two_pin_nets[i].j]->fp;
-      cout << tempInst2->name << " (" << center2.x << ", " << center2.y << ") ";
+      cout << tempInst2->Name() << " (" << center2.x << ", " << center2.y << ") ";
     }
     cout << fabs(center1.x - center2.x) + fabs(center1.y - center2.y) << " "
          << net->two_pin_nets[i].rect_dist << endl;
@@ -1332,7 +1332,7 @@ void calcCong(struct FPOS *st, int est_method) {
 }
 
 void CalcPinDensity(struct FPOS *st) {
-  // struct  CELLx     *cell = NULL;
+  // struct  CELL     *cell = NULL;
 
   // for (int i=0; i<gcell_cnt; i++) {
   //  cell = &gcell_st[i];
@@ -1442,7 +1442,7 @@ void MergeBlkg2Route() {
   }
 }
 
-void CalcPinDensityPerCell(struct CELLx *cell) {
+void CalcPinDensityPerCell(struct CELL *cell) {
   struct TILE *bp = NULL;
   struct POS b0 = zeroPoint;
   struct TIER *tier = &tier_st[0];
@@ -1485,7 +1485,7 @@ void restore_org_MODULE_info() {
   ;
 }
 
-void backup_org_CELLx_info(struct CELLx *cell) {
+void backup_org_CELL_info(struct CELL *cell) {
   cell->area_org_befo_bloating = cell->area;
   cell->den_scal_org_befo_bloating = cell->den_scal;
   cell->size_org_befo_bloating = cell->size;
@@ -1493,11 +1493,11 @@ void backup_org_CELLx_info(struct CELLx *cell) {
   cell->half_den_size_org_befo_bloating = cell->half_den_size;
 }
 
-void prepare_bloat_CELLx_info() {
+void prepare_bloat_CELL_info() {
   ;
 }
 
-void restore_org_CELLx_info(struct CELLx *cell) {
+void restore_org_CELL_info(struct CELL *cell) {
   struct TIER *tier = &tier_st[0];
 
   cell->area = cell->area_org_befo_bloating;
@@ -1757,7 +1757,7 @@ void printInflationRatio() {
   }
 }
 
-void cell_calc_new_area_per_Cell(struct CELLx *cell, struct TILE *bp) {
+void cell_calc_new_area_per_Cell(struct CELL *cell, struct TILE *bp) {
   struct FPOS cell_size = zeroFPoint;
 
   // if (bp->h_inflation_ratio > 1.0 && is_inflation_h == true) {
@@ -1785,7 +1785,7 @@ void cell_calc_new_area_per_Cell(struct CELLx *cell, struct TILE *bp) {
   cell->inflatedNewAreaDelta = cell->inflatedNewArea - cell->area;
 }
 
-void cell_inflation_per_Cell(struct CELLx *cell, struct TILE *bp) {
+void cell_inflation_per_Cell(struct CELL *cell, struct TILE *bp) {
   struct TIER *tier = &tier_st[0];
 
   // if (bp->h_inflation_ratio > 0.90 && is_inflation_h == true) {
@@ -1865,7 +1865,7 @@ void cell_inflation_per_Cell(struct CELLx *cell, struct TILE *bp) {
   cell->area = cell->size.x * cell->size.y;
 }
 
-void cell_den_scal_update_forNewGrad_inNSopt(struct CELLx *cell) {
+void cell_den_scal_update_forNewGrad_inNSopt(struct CELL *cell) {
   struct FPOS scal = zeroFPoint;
   struct TIER *tier = &tier_st[0];
 
@@ -1921,7 +1921,7 @@ void bloat_prep() {
   struct TILE *bp = NULL;
   struct POS b0 = zeroPoint;
   struct TIER *tier = &tier_st[0];
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = 0; i < tier->tot_tile_cnt; i++) {
     bp = &tier->tile_mat[i];
@@ -2007,7 +2007,7 @@ void bloating() {
   struct TILE *bp = NULL;
   struct POS b0 = zeroPoint;
   struct TIER *tier = &tier_st[0];
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];
@@ -2218,7 +2218,7 @@ void calc_Total_inflate_ratio() {
 }
 
 void calc_Total_inflated_cell_area() {
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   prec temp_area = 0;
 
   total_inflatedNewAreaDelta = 0;
@@ -2235,7 +2235,7 @@ void calc_Total_inflated_cell_area() {
 }
 
 void shrink_filler_cells(prec area_to_shrink) {
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   prec total_filler_inflation_ratio =
       (curr_filler_area - area_to_shrink) / curr_filler_area;
 

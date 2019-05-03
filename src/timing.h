@@ -184,7 +184,7 @@ struct PinInfo {
     }
 
     if(isModule()) {
-      string moduleName(((MODULE*)ptr)[GetIdx()].name);
+      string moduleName(((MODULE*)ptr)[GetIdx()].Name());
       if( isEscape ) {
         SetEscapedStr(moduleName);
       }
@@ -203,7 +203,7 @@ struct PinInfo {
         return pNameStor[GetIdx()][pNum];
       }
       else {
-        string termName(((TERM*)ptr)[GetIdx()].name);
+        string termName(((TERM*)ptr)[GetIdx()].Name());
         if( isEscape ) {
           SetEscapedStr(termName);
         }
@@ -221,7 +221,7 @@ struct PinInfo {
     }
     //            return "sp_" + to_string(pNum);
     //            cout << netIdx << endl;
-    string netStr(netInstance[netIdx].name);
+    string netStr(netInstance[netIdx].Name());
     if( isEscape ) {
       SetEscapedStr(netStr);
     }

@@ -158,7 +158,7 @@ prec valid_coor3(prec da, prec sz, int lab);
 
 int is_IO_block(TERM *term);
 
-void get_bins(FPOS center, CELLx *cell, POS *st, prec *share_st, int *bin_cnt);
+void get_bins(FPOS center, CELL *cell, POS *st, prec *share_st, int *bin_cnt);
 //prec get_bins_mac(FPOS center, MODULE *mac);
 void fft_test(void);
 
@@ -217,8 +217,8 @@ enum { NoneTemppre, AreaTemppre, DenTemppre };
 #define TEMP_PRE /* NoneTemppre */ AreaTemppre /* DenTemppre */
 
 void den_comp(int cell_idx);
-inline void den_comp_2d_mGP2D(CELLx *cell, TIER *tier);
-inline void den_comp_2d_cGP2D(CELLx *cell, TIER *tier);
+inline void den_comp_2d_mGP2D(CELL *cell, TIER *tier);
+inline void den_comp_2d_cGP2D(CELL *cell, TIER *tier);
 void den_comp_3d(int cell_idx);
 
 // void    bin_zum_z ();

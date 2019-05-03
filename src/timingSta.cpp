@@ -13,12 +13,12 @@ TIMING_NAMESPACE_OPEN
 inline string Timing::GetPinName(PIN* curPin, bool isEscape) {
   // itself is PINS in def.
   if(curPin->term && _terms[curPin->moduleID].isTerminalNI) {
-    return string(_terms[curPin->moduleID].name);
+    return string(_terms[curPin->moduleID].Name());
   }
 
   // below is common
-  string name = (curPin->term) ? string(_terms[curPin->moduleID].name)
-                               : string(_modules[curPin->moduleID].name);
+  string name = (curPin->term) ? string(_terms[curPin->moduleID].Name())
+                               : string(_modules[curPin->moduleID].Name());
 
   if( isEscape ) {
     SetEscapedStr(name);
@@ -309,8 +309,6 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   cnst_min_max = MinMax::max();
   Slack wns = _sta->worstSlack(cnst_min_max);
   Slack tns = _sta->totalNegativeSlack(cnst_min_max);
-  cout << std::defaultfloat;
-  cout.precision();
   cout << "WNS = " << wns << " seconds" << endl;
   cout << "TNS = " << tns << " seconds" << endl;
 
@@ -465,7 +463,7 @@ void Timing::FillSpefForSta() {
   int stringCase = INT_MAX;
   bool isEscape = true;
   for(int i=0; i<_netCnt; i++) {
-    char* tmpStr = GetEscapedStr(netInstance[i].name, isEscape);
+    char* tmpStr = GetEscapedStr(netInstance[i].Name(), isEscape);
     sta::Net* net = sta::spef_reader->findNet(tmpStr);
     if( !net ) {
       isEscape = false;
@@ -479,7 +477,7 @@ void Timing::FillSpefForSta() {
     // char* netName = new char[strlen(curNet->name)+1];
     // strcpy(netName, curNet->name);
 
-    char* tmpStr = GetEscapedStr(curNet->name, isEscape);
+    char* tmpStr = GetEscapedStr(curNet->Name(), isEscape);
 //    cout << "find: " << tmpStr << endl;
     sta::Net* net = sta::spef_reader->findNet(tmpStr);
     if( !net ) {

@@ -1060,7 +1060,7 @@ void getCostFuncGradient2_DEN_ONLY_PRECON(struct FPOS *dst, struct FPOS *wdst,
   struct FPOS wpre;
   struct FPOS charge_dpre;
   struct FPOS pre;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = 0; i < N; i++) {
     cell = &gcell_st[i];
@@ -1140,7 +1140,7 @@ void getCostFuncGradient2_filler(struct FPOS *dst, struct FPOS *wdst,
   struct FPOS pgradl;
   struct FPOS charge_dpre;
   struct FPOS pre;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = start_idx; i < end_idx; i++) {
     cell = &gcell_st[i];
@@ -1213,7 +1213,7 @@ void getCostFuncGradient2_filler_DEN_ONLY_PRECON(
   struct FPOS pgradl;
   struct FPOS charge_dpre;
   struct FPOS pre;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = start_idx; i < end_idx; i++) {
     cell = &gcell_st[i];
@@ -1497,7 +1497,7 @@ void myNesterov::InitializationCostFunctionGradient(prec *sum_wgrad0,
   struct FPOS wgrad;
   struct FPOS pgrad;
   struct FPOS pgradl;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = 0; i < N; i++) {
     cell = &gcell_st[i];
@@ -1595,7 +1595,7 @@ void myNesterov::ShiftPL_SA_sub(struct FPOS *y_st, int N) {
   struct FPOS drnd;
   struct FPOS v;
   struct FPOS d;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   struct FPOS half_densize;
   struct FPOS center;
 

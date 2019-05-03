@@ -166,7 +166,7 @@ void post_opt(void) {
 //
 void cell_update(FPOS *st, int n) {
   for(int i = 0; i < n; i++) {
-    CELLx *cell = &gcell_st[i];
+    CELL *cell = &gcell_st[i];
     cell->center = st[i];
 
     FPOS tmp_scal = fp_scal(0.5, cell->size);
@@ -176,7 +176,7 @@ void cell_update(FPOS *st, int n) {
 }
 
 // void cell_update (struct FPOS *st, int n) {
-//    struct  CELLx   *cell = NULL;
+//    struct  CELL   *cell = NULL;
 //    for (int i=0; i<n; i++) {
 //        cell = &gcell_st[i];
 //        cell->center = st[i];
@@ -213,7 +213,7 @@ void whitespace_init(void) {
     }
 
     // if there is no shapes..
-    if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
+    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
       for(int j = 0; j < place_st_cnt; j++) {
         PLACE *pl = &place_st[j];
 
@@ -238,7 +238,7 @@ void whitespace_init(void) {
     }
     // there are shapes
     else {
-      for(auto &curIdx : shapeMap[curTerminal->name]) {
+      for(auto &curIdx : shapeMap[curTerminal->Name()]) {
         for(int j = 0; j < place_st_cnt; j++) {
           PLACE *pl = &place_st[j];
 
@@ -299,7 +299,7 @@ void rand_filler_adj(int idx) {
   int i = 0;
   struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
   struct FPOS rnd = zeroFPoint;
-  struct CELLx *filler = NULL;
+  struct CELL *filler = NULL;
 
   for(i = idx; i < gcell_cnt; i++) {
     filler = &gcell_st[i];
@@ -320,7 +320,7 @@ void filler_adj_mGP2D(void) {
   int z = 0, i = 0;
   struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
   struct FPOS rnd = zeroFPoint;
-  struct CELLx *filler = NULL;
+  struct CELL *filler = NULL;
   struct TIER *tier = NULL;
 
   for(z = 0; z < numLayer; z++) {
@@ -347,7 +347,7 @@ void filler_adj_cGP2D(void) {
   int z = 0, i = 0;
   struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
   struct FPOS rnd = zeroFPoint;
-  struct CELLx *filler = NULL;
+  struct CELL *filler = NULL;
   struct TIER *tier = NULL;
 
   for(z = 0; z < numLayer; z++) {
@@ -374,9 +374,9 @@ void filler_adj_cGP2D(void) {
 
 void cell_filler_init() {
   int i = 0;
-  struct CELLx *filler = NULL;
+  struct CELL *filler = NULL;
   prec k_f2c = 1.0;
-  struct CELLx *gcell_st_tmp = NULL;
+  struct CELL *gcell_st_tmp = NULL;
   FILE *fp = NULL;
   struct FPOS org = zeroFPoint, end = zeroFPoint, len = zeroFPoint,
               rnd = zeroFPoint;
@@ -418,12 +418,12 @@ void cell_filler_init() {
 
   // igkang:  replace realloc to mkl
   gcell_st_tmp =
-      (struct CELLx *)mkl_malloc(sizeof(struct CELLx) * gcell_cnt, 64);
-  memcpy(gcell_st_tmp, gcell_st, moduleCNT * (sizeof(struct CELLx)));
+      (struct CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+  memcpy(gcell_st_tmp, gcell_st, moduleCNT * (sizeof(struct CELL)));
   mkl_free(gcell_st);
 
-  gcell_st = (CELLx *)mkl_malloc(sizeof(struct CELLx) * gcell_cnt, 64);
-  memcpy(gcell_st, gcell_st_tmp, gcell_cnt * (sizeof(struct CELLx)));
+  gcell_st = (CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+  memcpy(gcell_st, gcell_st_tmp, gcell_cnt * (sizeof(struct CELL)));
   mkl_free(gcell_st_tmp);
 
   printf("INFO:  #CELL = %d =  %d (#MODULE) + %d (#FILLER)\n", gcell_cnt,
@@ -434,7 +434,9 @@ void cell_filler_init() {
     filler->flg = FillerCell;
     filler->idx = i - moduleCNT;
 
-    sprintf(filler->name, "f%d", filler->idx);
+//    sprintf(filler->Name, "f%d", filler->idx);
+    cellNameStor.push_back( "f" + to_string(filler->idx) );
+
     filler->size = filler_size;
     filler->half_size.x = 0.5 * filler->size.x;
     filler->half_size.y = 0.5 * filler->size.y;
@@ -474,7 +476,7 @@ void cell_init(void) {
   prec total_area = 0, avg_cell_area = 0;
   prec avg_cell_x = 0, avg_cell_y = 0;
   prec total_x = 0, total_y = 0;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   struct MODULE *mdp = NULL;
   struct FPOS pof;
   struct PIN *pin = NULL;
@@ -519,7 +521,7 @@ void cell_init(void) {
   printf("INFO:  Average 80pct Cell Area = %.4lf\n", avg80p_cell_area);
 
   gcell_cnt = moduleCNT;
-  gcell_st = (struct CELLx *)mkl_malloc(sizeof(struct CELLx) * gcell_cnt, 64);
+  gcell_st = (struct CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
 
   // pin2 copy loop 
   for(i = 0; i < netCNT; i++) {
@@ -538,7 +540,8 @@ void cell_init(void) {
     cell = &gcell_st[i];
     cell->flg = mdp->flg;
     cell->idx = i;
-    strcpy(cell->name, mdp->name);
+//    strcpy(cell->Name, mdp->name);
+    cellNameStor.push_back( mdp->Name() );
     cell->size = mdp->size;
     cell->half_size = mdp->half_size;
     cell->area = mdp->area;
@@ -597,7 +600,7 @@ void cell_init(void) {
 }
 
 void cell_delete(void) {
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];
@@ -632,7 +635,7 @@ void input_sol(struct FPOS *st, int N, char *fn) {
 
 void modu_copy(void) {
   int i = 0;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   struct MODULE *mdp = NULL;
 
   for(i = 0; i < moduleCNT; i++) {
@@ -652,7 +655,7 @@ void modu_copy(void) {
 }
 
 void cell_copy(void) {
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   struct MODULE *module = NULL;
 
   for(int i = 0; i < moduleCNT; i++) {
@@ -719,7 +722,7 @@ void expand_gp_from_one(void) {
   int i = 0, j = 0;
   BIN *bp = NULL;
   MODULE *modu = NULL;
-  CELLx *cell = NULL;
+  CELL *cell = NULL;
   TERM *term = NULL;
   PLACE *pl = NULL, *pl_backup = NULL;
   FPOS dim_scal = zeroFPoint;
@@ -880,7 +883,7 @@ void shrink_gp_to_one(void) {
   int i = 0, j = 0;
   struct BIN *bp = NULL;
   struct MODULE *modu = NULL;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   struct TERM *term = NULL;
   struct PLACE *pl = NULL;
 
@@ -1294,31 +1297,31 @@ void routability() {
 }
 
 void routability_init() {
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   // LW mod 11/17/16
   // inflation_area_over_whitespace = 0.10;
   inflation_area_over_whitespace = 1.0 / inflation_max_cnt;
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];
-    backup_org_CELLx_info(cell);
+    backup_org_CELL_info(cell);
   }
   isRoutabilityInit = true;
 }
 
 void restore_cells_info() {
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];
-    restore_org_CELLx_info(cell);
+    restore_org_CELL_info(cell);
   }
 }
 
 void cell_macro_copy(void) {
   int i = 0;
   struct MODULE *mdp = NULL;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
 
   for(i = 0; i < moduleCNT; i++) {
     mdp = &moduleInstance[i];
@@ -1339,7 +1342,7 @@ void cell_macro_copy(void) {
 
 void cell_init_2D(void) {
   int z = 0, i = 0;
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   struct TIER *tier = NULL;
   struct FPOS scal;
 
@@ -1412,7 +1415,7 @@ void cell_init_2D(void) {
 }
 
 void update_cell_den() {
-  struct CELLx *cell = NULL;
+  struct CELL *cell = NULL;
   struct FPOS scal = zeroFPoint;
 
   for(int i = 0; i < gcell_cnt; i++) {

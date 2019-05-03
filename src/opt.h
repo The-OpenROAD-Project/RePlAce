@@ -101,7 +101,7 @@ void restore_cells_info();
 void bloating();
 void bloat_prep();
 void adjust_inflation();
-void cell_calc_new_area_per_Cell(struct CELLx *cell, struct TILE *bp);
+void cell_calc_new_area_per_Cell(struct CELL *cell, struct TILE *bp);
 void shrink_filler_cells(prec);
 void calc_Total_inflate_ratio();
 void calc_Total_inflated_cell_area();
@@ -122,14 +122,14 @@ void calcCong(struct FPOS *st, int est_method);
 void CalcPinDensity(struct FPOS *st);
 void MergePinDen2Route();
 void MergeBlkg2Route();
-void CalcPinDensityPerCell(struct CELLx *cell);
+void CalcPinDensityPerCell(struct CELL *cell);
 void calcInflationRatio_foreachTile();
 void gen_sort_InflationList();
 bool inflationList_comp(std::pair< int, prec > a, std::pair< int, prec > b);
 void dynamicInflationAdjustment();
 void printInflationRatio();
-void cell_inflation_per_Cell(struct CELLx *cell, struct TILE *bp);
-void cell_den_scal_update_forNewGrad_inNSopt(struct CELLx *cell);
+void cell_inflation_per_Cell(struct CELL *cell, struct TILE *bp);
+void cell_den_scal_update_forNewGrad_inNSopt(struct CELL *cell);
 void print_inflation_list();
 
 // PIN
@@ -140,10 +140,10 @@ void restore_org_PIN_info();
 void backup_org_MODULE_info(struct MODULE *module);
 void prepare_bloat_MODULE_info();
 void restore_org_MODULE_info();
-// CELLx
-void backup_org_CELLx_info(struct CELLx *cell);
-void prepare_bloat_CELLx_info();
-void restore_org_CELLx_info(struct CELLx *cell);
+// CELL
+void backup_org_CELL_info(struct CELL *cell);
+void prepare_bloat_CELL_info();
+void restore_org_CELL_info(struct CELL *cell);
 // TERM
 void backup_org_TERM_info(struct TERM *term);
 void prepare_bloat_TERM_info();

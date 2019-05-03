@@ -81,21 +81,12 @@ void CallDetailPlace() {
     sprintf(tier_aux, "%s.aux", gbch);
     sprintf(tier_pl, "%s.pl", gbch);
 
-    //        if(dpMode == NTUplace4h && !strcmp(bmFlagCMD.c_str(), "sb")) {
-    //            link_original_SB_files_to_Dir(tier_dir);
-    //        }
-
     TIER *tier = &tier_st[i];
     if(tier->modu_cnt <= 0) {
       continue;
     }
 
     switch(detailPlacer) {
-      case FastPlace:
-        call_FastDP_tier(tier_dir, tier_aux, tier_pl);
-        sprintf(tier_dp, "%s/%s_FP_dp.pl", tier_dir, gbch);
-        break;
-
       case NTUplace3:  // Default of ePlace except SB benchmarks.
         CallNtuPlacer3(tier_dir, tier_aux, tier_pl);
         if(onlyLG_CMD) {
@@ -138,30 +129,6 @@ void postprocess_SB_inputs(char *tier_dir) {
   char cmd[BUF_SZ];
 
   sprintf(cmd, "%s/convert2.tcl %s %s", currentDir, tier_dir, gbch);
-  system(cmd);
-}
-
-void call_FastDP_tier(char *tier_dir, char *tier_aux, char *tier_pl) {
-  char cmd[BUF_SZ];
-
-#ifdef NO_DP_3DIC
-
-  sprintf(cmd,
-          "%s -legalize -noFlipping -noDp -target_density %.2lf -window 10 "
-          "%s %s %s %s\n",
-          detailPlacerLocationCMD.c_str(), target_cell_den, tier_dir, tier_aux,
-          tier_dir, tier_pl);
-
-#else
-
-  sprintf(cmd,
-          "%s -legalize -noFlipping -target_density %.2lf -window 10 %s %s "
-          "%s %s\n",
-          detailPlacerLocationCMD.c_str(), target_cell_den, tier_dir, tier_aux,
-          tier_dir, tier_pl);
-
-#endif
-
   system(cmd);
 }
 

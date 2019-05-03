@@ -233,8 +233,8 @@ void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
                   curTerminalA->pmax, curTerminalB->pmin,
                   curTerminalB->pmax );
            if(commonArea > 0) {
-               cout << "Warning!! " << curTerminalA->name << " , " <<
-                        curTerminalB->name << " : " << commonArea << endl;
+               cout << "Warning!! " << curTerminalA->Name() << " , " <<
+                        curTerminalB->Name() << " : " << commonArea << endl;
            }
        }
    }
@@ -258,7 +258,7 @@ void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
       curModule->flg = Macro;
     }
     else if(curModule->size.y - rowHeight < -Epsilon) {
-      printf("Cell %s   %d height ERROR: %f\n", curModule->name, i,
+      printf("Cell %s   %d height ERROR: %f\n", curModule->Name(), i,
              curModule->size.y);
     }
     else {
@@ -354,8 +354,8 @@ void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
 //        }
 
       // if there is no shape's information
-      if( shapeMap.find( curTerminal->name ) == shapeMap.end() ) {
-          cout << "not found: " << curTerminal->name << " " << place_st_cnt <<
+      if( shapeMap.find( curTerminal->Name() ) == shapeMap.end() ) {
+          cout << "not found: " << curTerminal->Name() << " " << place_st_cnt <<
 endl;
           // tier->term_area += get_common_area(curTerminal->pmin,
           // curTerminal->pmax, tier->pmin, tier->pmax);
@@ -367,8 +367,8 @@ endl;
       }
       // if there exist shape's information
       else {
-          for(auto& curIdx : shapeMap[curTerminal->name]) {
-              cout << "name: " << curTerminal->name << endl;
+          for(auto& curIdx : shapeMap[curTerminal->Name()]) {
+              cout << "name: " << curTerminal->Name() << endl;
               prec llx = shapeStor[curIdx].llx,
                    lly = shapeStor[curIdx].lly,
                    width = shapeStor[curIdx].width,
@@ -1009,7 +1009,7 @@ TERM)*terminalCNT,64);
             token = strtok(buf, " \t\n");
         } while (!token || token[0]=='#' || !strcmp(token, "UCLA"));
 
-        strcpy (curModule->name, token);
+        strcpy (curModule->Name(), token);
         idx = atoi(token+1);
 
         if (idx > modu_map_cnt-1) {
@@ -1056,7 +1056,7 @@ TERM)*terminalCNT,64);
         while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
 
 
-        strcpy(curTerminal->name,token);
+        strcpy(curTerminal->Name(),token);
 
         idx = atoi(token+1);
 
@@ -1477,7 +1477,8 @@ int read_nodes_3D(char *input) {
     if(!isTerminal && !isTerminalNI) {
       curModule = &moduleInstance[idx];
       curModule->idx = idx;
-      strcpy(curModule->name, nodeName);
+//      strcpy(curModule->Name(), nodeName);
+      moduleNameStor.push_back(nodeName);
 
       // width info
       // update size, half_size
@@ -1543,7 +1544,8 @@ int read_nodes_3D(char *input) {
     else {
       curTerminal = &terminalInstance[idx];
       curTerminal->idx = idx;
-      strcpy(curTerminal->name, nodeName);
+//      strcpy(curTerminal->Name(), nodeName);
+      terminalNameStor.push_back( nodeName );
 
       curTerminal->size.x = x;
       curTerminal->size.y = y;
@@ -1607,9 +1609,9 @@ int read_nodes_3D(char *input) {
   printf("INFO:               MinY=%.2lf, MaxY=%.2lf\n", minCell.y, maxCell.y);
   printf("INFO:               AvgX=%.2lf, AvgY=%.2lf\n", avgCellSize.x,
          avgCellSize.y);
-  printf("INFO:      Smallest Instance  %10s  Size %.2f\n", minSizeCell->name,
+  printf("INFO:      Smallest Instance  %10s  Size %.2f\n", minSizeCell->Name(),
          minSize);
-  printf("INFO:      Largest  Instance  %10s  Size %.2f\n", maxSizeCell->name,
+  printf("INFO:      Largest  Instance  %10s  Size %.2f\n", maxSizeCell->Name(),
          maxSize);
 
   printf("INFO:  TERMINALS INCLUDING PAD and FIXED MACRO\n");
@@ -1675,10 +1677,11 @@ int read_nets_3D(char *input) {
 
     token = strtok(NULL, " \t\n");
 
-    if(token)
-      strcpy(curNet->name, token);
+    if(token) {
+      netNameStor.push_back(token); 
+    }
     // lutong 05132016
-    // if (strcmp(curNet->name, "CLK") && (strcmp(curNet->name, "GND"))){
+    // if (strcmp(curNet->Name(), "CLK") && (strcmp(curNet->Name(), "GND"))){
 
     curNet->pin = (struct PIN **)mkl_malloc(
         sizeof(struct PIN *) * curNet->pinCNTinObject, 64);
@@ -1987,11 +1990,11 @@ void output_mGP2D_pl(char *output) {
   for(int i = 0; i < moduleCNT; i++) {
     curModule = &moduleInstance[i];
     if(flg_3dic) {
-      fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->name,
+      fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
               curModule->pmin.x, curModule->pmin.y, 0);
     }
     else {
-      fprintf(fp, "%s\t%.6lf\t%.6lf\t: N\n", curModule->name, curModule->pmin.x,
+      fprintf(fp, "%s\t%.6lf\t%.6lf\t: N\n", curModule->Name(), curModule->pmin.x,
               curModule->pmin.y);
     }
   }
@@ -1999,13 +2002,13 @@ void output_mGP2D_pl(char *output) {
   for(int i = 0; i < terminalCNT; i++) {
     if(flg_3dic) {
       curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y), 0);
+      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
+              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y), 0);
     }
     else {
       curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->Name(),
+              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
     }
   }
   fclose(fp);
@@ -2031,21 +2034,21 @@ void output_cGP2D_pl(char *output) {
 
     if(flg_3dic) {
       if(curModule->flg == StdCell) {
-        fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->name,
+        fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
                 curModule->pmin.x, curModule->pmin.y, 0);
       }
       else {
-        fprintf(fp, "%s\t%d\t%d\t%d\t: N /FIXED\n", curModule->name,
+        fprintf(fp, "%s\t%d\t%d\t%d\t: N /FIXED\n", curModule->Name(),
                 curModule->pmin_lg.x, curModule->pmin_lg.y, 0);
       }
     }
     else {
       if(curModule->flg == StdCell) {
-        fprintf(fp, "%s\t%.6lf\t%.6lf\t: N\n", curModule->name,
+        fprintf(fp, "%s\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
                 curModule->pmin.x, curModule->pmin.y);
       }
       else {
-        fprintf(fp, "%s\t%d\t%d\t: N /FIXED\n", curModule->name,
+        fprintf(fp, "%s\t%d\t%d\t: N /FIXED\n", curModule->Name(),
                 curModule->pmin_lg.x, curModule->pmin_lg.y);
       }
     }
@@ -2054,13 +2057,13 @@ void output_cGP2D_pl(char *output) {
   for(i = 0; i < terminalCNT; i++) {
     if(flg_3dic) {
       curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y), 0);
+      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
+              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y), 0);
     }
     else {
       curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->Name(),
+              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
     }
   }
 
@@ -2083,39 +2086,39 @@ void output_pl(char *output) {
   if(flg_3dic) {
     for(int i = 0; i < moduleCNT; i++) {
       curModule = &moduleInstance[i];
-      fprintf(fp, "%s %.6lf\t%.6lf\t%.6lf\t: N\n", curModule->name,
+      fprintf(fp, "%s %.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
               curModule->pmin.x, curModule->pmin.y, 0);
     }
     for(int i = 0; i < terminalCNT; i++) {
       curTerminal = &terminalInstance[i];
       // if (!curTerminal->isTerminalNI) {
-      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y),
+      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
+              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y),
               0);
       //} else {
       // fprintf (fp, "%s %d\t%d\t%d\t: N /FIXED_NI\n",
-      // curTerminal->name,
-      // prec2int (curTerminal->pmin.x),
-      // prec2int (curTerminal->pmin.y),
+      // curTerminal->Name(),
+      // INT_CONVERT (curTerminal->pmin.x),
+      // INT_CONVERT (curTerminal->pmin.y),
       //}
     }
   }
   else {
     for(int i = 0; i < moduleCNT; i++) {
       curModule = &moduleInstance[i];
-      fprintf(fp, "%s %.6lf\t%.6lf\t: N\n", curModule->name, curModule->pmin.x,
+      fprintf(fp, "%s %.6lf\t%.6lf\t: N\n", curModule->Name(), curModule->pmin.x,
               curModule->pmin.y);
     }
     for(int i = 0; i < terminalCNT; i++) {
       curTerminal = &terminalInstance[i];
       // if (!curTerminal->isTerminalNI) {
-      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->name,
-              prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->Name(),
+              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
       //} else {
       // fprintf (fp, "%s %d\t%d\t: N /FIXED_NI\n",
-      // curTerminal->name,
-      // prec2int (curTerminal->pmin.x),
-      // prec2int (curTerminal->pmin.y));
+      // curTerminal->Name(),
+      // INT_CONVERT (curTerminal->pmin.x),
+      // INT_CONVERT (curTerminal->pmin.y));
       //}
     }
   }
@@ -2252,7 +2255,7 @@ void write_new_bench(void) {
   for(i = 0; i < netCNT; i++) {
     net = &netInstance[i];
 
-    fprintf(fp_nets, "NetDegree : %d   %s\n", net->pinCNTinObject2, net->name);
+    fprintf(fp_nets, "NetDegree : %d   %s\n", net->pinCNTinObject2, net->Name());
     for(j = 0; j < net->pinCNTinObject2; j++) {
       pin = net->pin[j];
 
@@ -2271,7 +2274,7 @@ void write_new_bench(void) {
 
         pinIDinModule = pin->pinIDinModule;
 
-        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curModule->name, io,
+        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curModule->Name(), io,
                 curModule->pof[pinIDinModule].x,
                 curModule->pof[pinIDinModule].y);
       }
@@ -2279,7 +2282,7 @@ void write_new_bench(void) {
         moduleID = pin->moduleID;
         curTerminal = &terminalInstance[moduleID];
 
-        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->name, io,
+        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->Name(), io,
                 curTerminal->pof[pinIDinModule].x,
                 curTerminal->pof[pinIDinModule].y);
       }
@@ -2306,20 +2309,20 @@ void write_new_bench(void) {
     curModule = &moduleInstance[i];
 
     if(curModule->flg == StdCell) {
-      fprintf(fp_nodes, "\t%s\t%d\t%d\n", curModule->name,
-              prec2int(curModule->size.x), prec2int(curModule->size.y));
+      fprintf(fp_nodes, "\t%s\t%d\t%d\n", curModule->Name(),
+              INT_CONVERT(curModule->size.x), INT_CONVERT(curModule->size.y));
     }
     else {
-      fprintf(fp_nodes, "\t%s\t%d\t%d\tterminal\n", curModule->name,
-              prec2int(curModule->size.x), prec2int(curModule->size.y));
+      fprintf(fp_nodes, "\t%s\t%d\t%d\tterminal\n", curModule->Name(),
+              INT_CONVERT(curModule->size.x), INT_CONVERT(curModule->size.y));
     }
   }
 
   for(i = 0; i < terminalCNT; i++) {
     curTerminal = &terminalInstance[i];
 
-    fprintf(fp_nodes, "\t%s\t%d\t%d\tterminal\n", curTerminal->name,
-            prec2int(curTerminal->size.x), prec2int(curTerminal->size.y));
+    fprintf(fp_nodes, "\t%s\t%d\t%d\tterminal\n", curTerminal->Name(),
+            INT_CONVERT(curTerminal->size.x), INT_CONVERT(curTerminal->size.y));
   }
 
   fclose(fp_nodes);
@@ -2339,11 +2342,11 @@ void write_new_bench(void) {
     curModule = &moduleInstance[i];
 
     if(curModule->flg == StdCell) {
-      fprintf(fp_pl, "%s\t%.6lf\t%.6lf\t: N\n", curModule->name,
+      fprintf(fp_pl, "%s\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
               curModule->pmin.x, curModule->pmin.y);
     }
     else {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curModule->name,
+      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curModule->Name(),
               curModule->pmin_lg.x, curModule->pmin_lg.y);
     }
   }
@@ -2351,8 +2354,8 @@ void write_new_bench(void) {
   for(i = 0; i < terminalCNT; i++) {
     curTerminal = &terminalInstance[i];
 
-    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curTerminal->name,
-            prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
+            INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
   }
 
   fclose(fp_pl);
@@ -2638,7 +2641,7 @@ void WriteShapes(char *dir_tier, bool isShapeDrawing, bool isNameConvert) {
             curShapeNode.second.size());
     for(auto &curIdx : curShapeNode.second) {
       fprintf(fp_shapes, "\t%s\t%d\t%d\t%d\t%d\n",
-              shapeStor[curIdx].name.c_str(), 
+              shapeStor[curIdx].name, 
               GetScaleUpPoint( shapeStor[curIdx].llx ),
               GetScaleUpPoint( shapeStor[curIdx].lly ), 
               GetScaleUpSize( shapeStor[curIdx].width ),
@@ -2853,7 +2856,7 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
       continue;
     }
 
-    string termNameStr = curTerminal->name; 
+    string termNameStr = curTerminal->Name(); 
     vector<int>* layerIdx = NULL;
 
     bool isBlockage = false;
@@ -2884,7 +2887,7 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
 
 
     fprintf( fp_route, " %s ", 
-        (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name ) : curTerminal->name );
+        (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name() );
     fprintf( fp_route, " %d ", layerIdx->size());
     for(int i=0; i<layerIdx->size()-1; i++) {
       fprintf( fp_route, "%d ", layerIdx->at(i)+1);
@@ -2948,7 +2951,7 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
     fprintf(fp_nodes, "%*s %*d %*d\n", 15, 
-        (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+        (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
         14, GetScaleUpSize ( modu->size.x ),
         14, GetScaleUpSize ( modu->size.y ));
   }
@@ -2962,14 +2965,14 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
 
     if(isShapeDrawing) {
       fprintf(fp_nodes, "%*s %*d %*d %*s\n", 
-          15, (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+          15, (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
           14, GetScaleUpSize (curTerminal->size.x ),
           14, GetScaleUpSize (curTerminal->size.y ), 
           15, termString.c_str());
     }
     else {
       // considering shapeMaps - mgwoo
-      auto shapeMapIter = shapeMap.find(curTerminal->name);
+      auto shapeMapIter = shapeMap.find(curTerminal->Name());
       if(shapeMapIter == shapeMap.end()) {
         int sizeX =
             (curTerminal->isTerminalNI) ? 0 : GetScaleUpSize (curTerminal->size.x );
@@ -2977,12 +2980,12 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
             (curTerminal->isTerminalNI) ? 0 : GetScaleUpSize (curTerminal->size.y );
 
         fprintf(fp_nodes, "%*s %*d %*d %*s\n", 
-            15, (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, 
+            15, (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(), 
             14, sizeX, 14, sizeY,
             15, termString.c_str());
       }
       else {
-        for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+        for(auto &curShapeIdx : shapeMap[curTerminal->Name()]) {
           int sizeX = (curTerminal->isTerminalNI)
                           ? 0
                           : GetScaleUpSize( shapeStor[curShapeIdx].width );
@@ -2991,8 +2994,8 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
                           : GetScaleUpSize( shapeStor[curShapeIdx].height );
 
           fprintf(fp_nodes, "%*s %*d %*d %*s\n",
-              15, string(string((isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) + string("/") +
-                         string(shapeStor[curShapeIdx].name))
+              15, string(string((isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name() ) 
+                  : curTerminal->Name() + string("/") + string(shapeStor[curShapeIdx].name)))
                       .c_str(),
               14, sizeX, 
               14, sizeY, 
@@ -3048,7 +3051,7 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
 
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
-    fprintf(fp_nodes, "%s %d %d\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+    fprintf(fp_nodes, "%s %d %d\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
         GetScaleUpSize(modu->size.x), 
         GetScaleUpSize(modu->size.y)); 
   }
@@ -3062,26 +3065,26 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
 
     if(isShapeDrawing) {
       fprintf(fp_nodes, "%s %d %d %s\n",
-              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : 
-              curTerminal->name,
+              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : 
+              curTerminal->Name(),
               GetScaleUpSize(curTerminal->size.x),
               GetScaleUpSize(curTerminal->size.y), termString.c_str());
     }
     else {
       // considering shapeMaps - mgwoo
-      auto shapeMapIter = shapeMap.find(curTerminal->name);
+      auto shapeMapIter = shapeMap.find(curTerminal->Name());
       if(shapeMapIter == shapeMap.end()) {
         int sizeX =
             (curTerminal->isTerminalNI) ? 0 : GetScaleUpSize (curTerminal->size.x);
         int sizeY =
             (curTerminal->isTerminalNI) ? 0 : GetScaleUpSize (curTerminal->size.y);
         fprintf(fp_nodes, "%s %d %d %s\n", 
-            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name(),
             sizeX, sizeY,
                 termString.c_str());
       }
       else {
-        for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+        for(auto &curShapeIdx : shapeMap[curTerminal->Name()]) {
           int sizeX = (curTerminal->isTerminalNI)
                           ? 0
                           : GetScaleUpSize(shapeStor[curShapeIdx].width);
@@ -3091,7 +3094,7 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
 
           fprintf(fp_nodes, "%s %d %d %s\n",
                   string(string((isNameConvert)? 
-                        _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) 
+                        _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name()) 
                       + string("/") +
                          string(shapeStor[curShapeIdx].name))
                       .c_str(),
@@ -3107,7 +3110,7 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
   for(auto &curTerm : *termStor) {
     string termString = "terminal";
     fprintf(fp_nodes, "%s %d %d %s\n",  
-            (isNameConvert)? _bsMap.GetBsTerminalName( curTerm.name) : curTerm.name,
+            (isNameConvert)? _bsMap.GetBsTerminalName( curTerm.Name() ) : curTerm.Name(),
             GetScaleUpSize(curTerm.size.x),
             GetScaleUpSize(curTerm.size.y),
             termString.c_str());
@@ -3184,7 +3187,7 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
 
     fprintf(fp_nets, "NetDegree  :  %d    %s\n", 
          net->pinCNTinObject_tier,
-        (isNameConvert)?  _bsMap.GetBsNetName( net->name ) : net->name);
+        (isNameConvert)?  _bsMap.GetBsNetName( net->Name() ) : net->Name());
  
     vector<BsNetInfo> bsNetInfoStor;
 
@@ -3211,27 +3214,27 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
           bsNetInfoStor.push_back(
             BsNetInfo( 
               (isNameConvert)? 
-              _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, io,
+              _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(), io,
               curTerminal->pof[pinIDinModule].x * GetUnitX(),
               curTerminal->pof[pinIDinModule].y * GetUnitY() )
             );
         }
         else {
-          if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
+          if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
             bsNetInfoStor.push_back(
               BsNetInfo( 
                 (isNameConvert)? 
-                _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, io,
+                _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(), io,
                 curTerminal->pof[pinIDinModule].x * GetUnitX(),
                 curTerminal->pof[pinIDinModule].y * GetUnitY())
               );
           }
           else {
             // convert into "o506100/Shape_0"
-            SHAPE *curShape = &shapeStor[shapeMap[curTerminal->name][0]];
+            SHAPE *curShape = &shapeStor[shapeMap[curTerminal->Name()][0]];
             string concatedName = 
               string((isNameConvert)? 
-                _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) 
+                _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name()) 
               + string("/") + string(curShape->name);
 
             prec shapeCenterX = curShape->llx * GetUnitX() - GetOffsetX() 
@@ -3260,7 +3263,7 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
           MODULE *modu = &moduleInstance[moduleID];
           bsNetInfoStor.push_back(
             BsNetInfo( 
-              (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, io,
+              (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), io,
               modu->pof[pinIDinModule].x * GetUnitX(),
               modu->pof[pinIDinModule].y * GetUnitY())
             );
@@ -3269,7 +3272,7 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
           TERM *curTerminal = &terminalInstance[moduleID];
           bsNetInfoStor.push_back(
             BsNetInfo( 
-              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name, io,
+              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(), io,
               curTerminal->pof[pinIDinModule].x * GetUnitX(),
               curTerminal->pof[pinIDinModule].y * GetUnitY() )
             );
@@ -3308,7 +3311,7 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
-        (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+        (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
         GetScaleUpPointFloat( modu->pmin.x ), 
         GetScaleUpPointFloat( modu->pmin.y ));
   }
@@ -3319,24 +3322,24 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
 
     if(isShapeDrawing) {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
-          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
               GetScaleUpPoint(curTerminal->pmin.x), 
               GetScaleUpPoint(curTerminal->pmin.y),
               fixedStr.c_str());
     }
     else {
-      if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
+      if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
         fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
-            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
                 GetScaleUpPoint(curTerminal->pmin.x), 
                 GetScaleUpPoint(curTerminal->pmin.y),
                 fixedStr.c_str());
       }
       else {
-        for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+        for(auto &curShapeIdx : shapeMap[curTerminal->Name()]) {
           fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n",
                   string(string((isNameConvert)? 
-                      _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) + string("/") +
+                      _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name()) + string("/") +
                          string(shapeStor[curShapeIdx].name))
                       .c_str(),
                   GetScaleUpPoint(shapeStor[curShapeIdx].llx),
@@ -3373,7 +3376,7 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
   for(int i = 0; i < tier->modu_cnt; i++) {
     MODULE *modu = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
-        (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+        (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
         GetScaleUpPointFloat( modu->pmin.x ), 
         GetScaleUpPointFloat( modu->pmin.y ));
   }
@@ -3384,24 +3387,24 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
 
     if(isShapeDrawing) {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
-          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
               GetScaleUpPoint (curTerminal->pmin.x), 
               GetScaleUpPoint (curTerminal->pmin.y),
               fixedStr.c_str());
     }
     else {
-      if(shapeMap.find(curTerminal->name) == shapeMap.end()) {
+      if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
         fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
-            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
                 GetScaleUpPoint(curTerminal->pmin.x), 
                 GetScaleUpPoint(curTerminal->pmin.y),
                 fixedStr.c_str());
       }
       else {
-        for(auto &curShapeIdx : shapeMap[curTerminal->name]) {
+        for(auto &curShapeIdx : shapeMap[curTerminal->Name()]) {
           fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n",
                   string(string((isNameConvert)? 
-                      _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name) 
+                      _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name()) 
                     + string("/") + string(shapeStor[curShapeIdx].name)).c_str(),
                   GetScaleUpPoint(shapeStor[curShapeIdx].llx),
                   GetScaleUpPoint(shapeStor[curShapeIdx].lly), fixedStr.c_str());
@@ -3413,7 +3416,7 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
   vector< TERM > *dummyTermStor = dummyInst.GetTerminalStor();
   for(auto &curTerm : *dummyTermStor) {
     fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
-        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.name) : curTerm.name,
+        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.Name()) : curTerm.Name(),
             GetScaleUpPoint(curTerm.pmin.x), 
             GetScaleUpPoint(curTerm.pmin.y));
   }
@@ -3683,7 +3686,9 @@ void DummyCellInfo::GenerateDummyCell() {
         int endX = i;
 
         TERM curTerm;
-        strcpy(curTerm.name,
+//        strcpy(curTerm.Name(),
+//               string("dummy_inst_" + to_string(terminalStor_.size())).c_str());
+        terminalNameStor.push_back( 
                string("dummy_inst_" + to_string(terminalStor_.size())).c_str());
         curTerm.pmin.Set((prec)(dieRect_.llx + siteSizeX_ * startX),
                          (prec)(dieRect_.lly + j * siteSizeY_), (prec)0.0);
@@ -3818,8 +3823,8 @@ void BookshelfNameMap::Init() {
   for(int i=0; i<moduleCNT; i++) {
     MODULE* curModule = &moduleInstance[i];
     string bsModuleName = "o" + to_string(bsModuleCnt++);
-    moduleToBsMap[ curModule->name ] = bsModuleName;
-    bsToModuleMap[ bsModuleName ] = curModule->name;
+    moduleToBsMap[ curModule->Name() ] = bsModuleName;
+    bsToModuleMap[ bsModuleName ] = curModule->Name();
   }
 
   bsTerminalCnt = 0;
@@ -3827,13 +3832,13 @@ void BookshelfNameMap::Init() {
     TERM* curTerminal = &terminalInstance[i];
     if( curTerminal->isTerminalNI == false ) {
       string bsTerminalName = "o" + to_string(bsModuleCnt++);
-      terminalToBsMap[ curTerminal ->name ] = bsTerminalName;
-      bsToTerminalMap[ bsTerminalName ] = curTerminal->name;
+      terminalToBsMap[ curTerminal ->Name() ] = bsTerminalName;
+      bsToTerminalMap[ bsTerminalName ] = curTerminal->Name();
     }
     else { 
       string bsTerminalName = "p" + to_string(bsTerminalCnt++);
-      terminalToBsMap[ curTerminal ->name ] = bsTerminalName;
-      bsToTerminalMap[ bsTerminalName ] = curTerminal->name;
+      terminalToBsMap[ curTerminal ->Name() ] = bsTerminalName;
+      bsToTerminalMap[ bsTerminalName ] = curTerminal->Name();
     }
   }
 
@@ -3841,8 +3846,8 @@ void BookshelfNameMap::Init() {
   for(int i=0; i<netCNT; i++) {
     NET* curNet = &netInstance[i]; 
     string bsNetName = "n" + to_string(bsNetCnt++);
-    netToBsMap[ curNet->name ] = bsNetName;
-    bsToNetMap[ bsNetName ] = curNet->name;
+    netToBsMap[ curNet->Name() ] = bsNetName;
+    bsToNetMap[ bsNetName ] = curNet->Name();
   }
 }
 void BookshelfNameMap::InitWithDummyCell( DummyCellInfo& dummyInst ) {
@@ -3850,8 +3855,8 @@ void BookshelfNameMap::InitWithDummyCell( DummyCellInfo& dummyInst ) {
   vector< TERM > *dummyTermStor = dummyInst.GetTerminalStor();
   for(auto& curTerm : *dummyTermStor ) {
     string bsTerminalName = "o" + to_string(bsModuleCnt++);
-    terminalToBsMap[ curTerm.name ] = bsTerminalName;
-    bsToTerminalMap[ bsTerminalName ] = curTerm.name;
+    terminalToBsMap[ curTerm.Name() ] = bsTerminalName;
+    bsToTerminalMap[ bsTerminalName ] = curTerm.Name();
   }
 }
 
@@ -4006,7 +4011,7 @@ void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConv
   for(int i = 0; i < tier->modu_cnt; i++) {
     modu = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
-        (isNameConvert)? _bsMap.GetBsModuleName( modu->name ) : modu->name, 
+        (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
         GetScaleUpPointFloat( modu->pmin.x ), 
         GetScaleUpPointFloat( modu->pmin.y ));
   }
@@ -4015,13 +4020,13 @@ void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConv
     curTerminal = &terminalInstance[i];
     if(!curTerminal->isTerminalNI) {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
-          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
               GetScaleUpPoint(curTerminal->pmin.x), 
               GetScaleUpPoint(curTerminal->pmin.y));
     }
     else {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED_NI\n", 
-          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->name) : curTerminal->name,
+          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
               GetScaleUpPoint(curTerminal->pmin.x), 
               GetScaleUpPoint(curTerminal->pmin.y));
     }
@@ -4030,7 +4035,7 @@ void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConv
   vector< TERM > *dummyTermStor = _dummyInst.GetTerminalStor();
   for(auto &curTerm : *dummyTermStor) {
     fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
-        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.name) : curTerm.name,
+        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.Name()) : curTerm.Name(),
             GetScaleUpPoint(curTerm.pmin.x), GetScaleUpPoint(curTerm.pmin.y));
   }
 
@@ -4327,7 +4332,7 @@ void output_gp_net_hpwl(char *fn) {
       net_hpwl.y *= place_backup.cnt.y * GP_SCAL;
     }
 
-    fprintf(fp, "%s %.6lf %.6lf\n", net->name, net_hpwl.x, net_hpwl.y);
+    fprintf(fp, "%s %.6lf %.6lf\n", net->Name(), net_hpwl.x, net_hpwl.y);
   }
 }
 
@@ -4344,7 +4349,7 @@ void output_net_hpwl(char *fn) {
         net_hpwl.y = net->max_y - net->min_y;
         net_hpwl.z = net->max_z - net->min_z;
 
-        fprintf(fp, "%s %.6lf %.6lf %.6lf\n", net->name, net_hpwl.x, net_hpwl.y,
+        fprintf(fp, "%s %.6lf %.6lf %.6lf\n", net->Name(), net_hpwl.x, net_hpwl.y,
                 net_hpwl.z);
     }
 }
@@ -4369,21 +4374,21 @@ void output_final_pl(char *output) {
 
     if(flg_3dic) {
       if(curModule->flg == StdCell) {
-        fprintf(fp, "%s\t%d\t%d\t%d\t: N\n", curModule->name,
+        fprintf(fp, "%s\t%d\t%d\t%d\t: N\n", curModule->Name(),
                 (int)(curModule->pmin.x + 0.5), (int)(curModule->pmin.y + 0.5), 0);
       }
       else {
-        fprintf(fp, "%s\t%d\t%d\t%d\t: N\n", curModule->name,
+        fprintf(fp, "%s\t%d\t%d\t%d\t: N\n", curModule->Name(),
                 curModule->pmin_lg.x, curModule->pmin_lg.y, 0);
       }
     }
     else {
       if(curModule->flg == StdCell) {
-        fprintf(fp, "%s\t%d\t%d\t: N\n", curModule->name,
+        fprintf(fp, "%s\t%d\t%d\t: N\n", curModule->Name(),
                 (int)(curModule->pmin.x + 0.5), (int)(curModule->pmin.y + 0.5));
       }
       else {
-        fprintf(fp, "%s\t%d\t%d\t: N\n", curModule->name, curModule->pmin_lg.x,
+        fprintf(fp, "%s\t%d\t%d\t: N\n", curModule->Name(), curModule->pmin_lg.x,
                 curModule->pmin_lg.y);
       }
     }
@@ -4393,23 +4398,23 @@ void output_final_pl(char *output) {
     if(flg_3dic) {
       curTerminal = &terminalInstance[i];
       if(!curTerminal->isTerminalNI) {
-        fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->name,
-                prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y), 0);
+        fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
+                INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y), 0);
       }
       else {
-        fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED_NI\n", curTerminal->name,
-                prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y), 0);
+        fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED_NI\n", curTerminal->Name(),
+                INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y), 0);
       }
     }
     else {
       curTerminal = &terminalInstance[i];
       if(!curTerminal->isTerminalNI) {
-        fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->name,
-                prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+        fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->Name(),
+                INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
       }
       else {
-        fprintf(fp, "%s %d\t%d\t: N /FIXED_NI\n", curTerminal->name,
-                prec2int(curTerminal->pmin.x), prec2int(curTerminal->pmin.y));
+        fprintf(fp, "%s %d\t%d\t: N /FIXED_NI\n", curTerminal->Name(),
+                INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
       }
     }
   }

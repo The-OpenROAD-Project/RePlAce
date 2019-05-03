@@ -99,6 +99,11 @@ vector< vector< string > > mPinName;
 // for termInst's pinName
 vector< vector< string > > tPinName;
 
+vector<string> moduleNameStor;
+vector<string> terminalNameStor;
+vector<string> netNameStor;
+vector<string> cellNameStor;
+
 TERM *terminalInstance;
 NET *netInstance;
 dense_hash_map< string, int > netNameMap;
@@ -290,7 +295,7 @@ string sourceCodeDir;
 // RECT cur_rect;
 
 // opt.cpp -> main.cpp
-CELLx *gcell_st;
+CELL *gcell_st;
 ROW *row_st;
 
 PLACE *place_st;

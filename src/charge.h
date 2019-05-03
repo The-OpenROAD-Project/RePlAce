@@ -55,7 +55,7 @@ inline void potn_pre(int cell_idx, struct FPOS *charge_dpre) {
 #ifdef NO_DEN
   return;
 #endif
-  struct CELLx *cell = &gcell_st[cell_idx];
+  struct CELL *cell = &gcell_st[cell_idx];
   switch(CHARGE_PRE) {
     case NoneDpre:
       *charge_dpre = zeroFPoint;

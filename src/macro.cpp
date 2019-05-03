@@ -316,11 +316,11 @@ void sa_mac_leg_sub() {
       printf("%d. pminlg=(%d,%d), pmaxlg=(%d,%d), size=(%d,%d)\n",
              i + 1, mac->pmin_lg.x, mac->pmin_lg.y, 
              mac->pmax_lg.x, mac->pmax_lg.y, 
-             prec2int(mac->size.x), prec2int(mac->size.y));
-      if(mac->pmin_lg.x + prec2int(mac->size.x) != mac->pmax_lg.x) {
+             INT_CONVERT(mac->size.x), INT_CONVERT(mac->size.y));
+      if(mac->pmin_lg.x + INT_CONVERT(mac->size.x) != mac->pmax_lg.x) {
         printf("ERROR: x\n");
       }
-      if(mac->pmin_lg.y + prec2int(mac->size.y) != mac->pmax_lg.y) {
+      if(mac->pmin_lg.y + INT_CONVERT(mac->size.y) != mac->pmax_lg.y) {
         printf("ERROR: y\n");
       }
     }
@@ -361,11 +361,11 @@ void sa_init_top(void) {
     mdp = &moduleInstance[i];
 
     if(mdp->flg == StdCell) {
-      tot_std_area += prec2int(mdp->area);
+      tot_std_area += INT_CONVERT(mdp->area);
       continue;
     }
     else {
-      tot_mac_area += prec2int(mdp->area);
+      tot_mac_area += INT_CONVERT(mdp->area);
       mac = macro_st[macro_cnt] = mdp;
       mac->mac_idx = macro_cnt;
       macro_cnt++;
@@ -483,7 +483,7 @@ void sa_mac_leg_init_with_margin(void) {
       }
       else {
         if(j == numLayer - 1) {
-          printf("ERROR: no more tier to assign macro %s!\n", mac->name);
+          printf("ERROR: no more tier to assign macro %s!\n", mac->Name());
           g_rrr++;
           exit(1);
         }
@@ -733,8 +733,8 @@ struct POS get_mac_mov(struct FPOS r, struct POS u) {
   rnd.y = rand();
   drnd.x = (prec)rnd.x * inv_RAND_MAX - 0.5;
   drnd.y = (prec)rnd.y * inv_RAND_MAX - 0.5;
-  mov.x = prec2int(drnd.x * r.x) * u.x;
-  mov.y = prec2int(drnd.y * r.y / rowHeight) * rowHeight * u.y;
+  mov.x = INT_CONVERT(drnd.x * r.x) * u.x;
+  mov.y = INT_CONVERT(drnd.y * r.y / rowHeight) * rowHeight * u.y;
   if(mov.x > 0)
     sa_x_gtz_cnt++;
   if(mov.x == 0)
@@ -756,7 +756,7 @@ void do_mac_mov(int idx, struct POS *mov) {
   struct FPOS pof = zeroFPoint;
   struct MODULE *mac = macro_st[idx];
   int moduleID = mac->idx;
-  struct CELLx *cell = &gcell_st[moduleID];
+  struct CELL *cell = &gcell_st[moduleID];
   struct FPOS p0 = mac->center;
 
   mac->center.x += (prec)mx;

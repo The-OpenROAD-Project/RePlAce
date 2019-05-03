@@ -443,7 +443,7 @@ void wlen_grad2_wa(FPOS *grad) {
 
 void wlen_grad2_lse(int cell_idx, FPOS *grad2) {
   FPOS net_grad2;
-  CELLx *cell = &gcell_st[cell_idx];
+  CELL *cell = &gcell_st[cell_idx];
   NET *net = NULL;
   PIN *pin = NULL;
 
@@ -465,7 +465,7 @@ void wlen_grad2_lse(int cell_idx, FPOS *grad2) {
 
 void wlen_grad_lse(int cell_idx, FPOS *grad) {
   FPOS net_grad = zeroFPoint;
-  CELLx *cell = &gcell_st[cell_idx];
+  CELL *cell = &gcell_st[cell_idx];
   NET *net = NULL;
   PIN *pin = NULL;
 
@@ -507,7 +507,7 @@ void wlen_grad_debug ( FPOS grad)
 */
 
 void wlen_grad_wa(int cell_idx, FPOS *grad) {
-  CELLx *cell = &gcell_st[cell_idx];
+  CELL *cell = &gcell_st[cell_idx];
   PIN *pin = NULL;
   NET *net = NULL;
   FPOS net_grad = zeroFPoint;
@@ -718,7 +718,7 @@ void net_update(FPOS *st) {
 
 void net_update_lse(FPOS *st) {
   int i = 0, j = 0;
-  CELLx *cell = NULL;
+  CELL *cell = NULL;
   NET *net = NULL;
   PIN *pin = NULL;
   MODULE *curModule = NULL;
@@ -1104,7 +1104,7 @@ prec get_mac_hpwl(int idx) {
   NET *net = NULL;
   int i = 0, j = 0;
   int moduleID = mac->idx;
-  CELLx *cell = &gcell_st[moduleID];
+  CELL *cell = &gcell_st[moduleID];
   FPOS fp = zeroFPoint;
 
   mac_hpwl = zeroFPoint;
@@ -1238,17 +1238,17 @@ int HPWL_count() {
     ty_HPWL += (curNet->max_y - curNet->min_y);
 
     if(curNet->max_x - curNet->min_x < 0) {
-      cout << "NEGATIVE HPWL ERROR! " << curNet->name << " " << curNet->max_x
+      cout << "NEGATIVE HPWL ERROR! " << curNet->Name() << " " << curNet->max_x
            << " " << curNet->min_x << endl;
     }
     if(curNet->max_y - curNet->min_y < 0) {
-      cout << "NEGATIVE HPWL ERROR! " << curNet->name << " " << curNet->max_y
+      cout << "NEGATIVE HPWL ERROR! " << curNet->Name() << " " << curNet->max_y
            << " " << curNet->min_y << endl;
     }
 
     if(tx_HPWL < 0 || ty_HPWL < 0) {
       printf("NEGATIVE HPWL ERROR! \n");
-      cout << curNet->name << tx_HPWL << " " << ty_HPWL << endl;
+      cout << curNet->Name() << tx_HPWL << " " << ty_HPWL << endl;
       exit(1);
     }
   }

@@ -303,9 +303,20 @@ inline void FPOS::Set(POS p) {
 }
 
 inline void POS::Set(FPOS fp) {
-  x = (int)(fp.x + 0.5f);
-  y = (int)(fp.y + 0.5f);
+  x = INT_CONVERT(fp.x);
+  y = INT_CONVERT(fp.y);
 }
+
+
+// for saving pinName
+// If it's lied in the PIN structure, it'll enlarge the runtime
+extern vector< vector< string > > mPinName;
+extern vector< vector< string > > tPinName;
+
+extern vector<string> moduleNameStor; 
+extern vector<string> terminalNameStor;
+extern vector<string> cellNameStor;
+extern vector<string> netNameStor;
 
 struct RECT {
   FPOS pmin;
@@ -349,10 +360,6 @@ struct PIN {
   }
 };
 
-// for saving pinName
-// If it's lied in the PIN structure, it'll enlarge the runtime
-extern vector< vector< string > > mPinName;
-extern vector< vector< string > > tPinName;
 
 // *.nodes -> not isTerminal
 // Module Instance
@@ -365,7 +372,6 @@ struct MODULE {
   FPOS *pof;
   PIN **pin;
   prec area;
-  char name[255];
   int idx;
   int netCNTinObject;
   int pinCNTinObject;
@@ -376,11 +382,12 @@ struct MODULE {
   POS pmin_lg;
   POS pmax_lg;
 
+  const char* Name() { return moduleNameStor[idx].c_str(); }
+
   MODULE()
       : pof(0),
         pin(0),
         area(0.0f),
-        name(""),
         idx(0),
         netCNTinObject(0),
         pinCNTinObject(0),
@@ -397,7 +404,6 @@ struct MODULE {
     pmax_lg.SetZero();
   }
   void Dump(string a) {
-    cout << idx << ", name: " << name << endl;
     cout << "tier: " << tier << endl;
     cout << "mac_idx: " << mac_idx << endl;
     cout << "ovlp_flg: " << ovlp_flg << endl;
@@ -415,6 +421,8 @@ struct MODULE {
   }
 };
 
+
+
 // *.nodes -> isTerminal // isTerminalNI
 // Terminal Instance
 struct TERM {
@@ -427,21 +435,19 @@ struct TERM {
   FPOS center;
   FPOS *pof;
   PIN **pin;
-  char name[255];
   int idx;
   int netCNTinObject;
   int pinCNTinObject;
   int IO;  // I -> 0; O -> 1
            //    int tier;
   bool isTerminalNI;
-
   prec PL_area;
+  const char* Name() { return terminalNameStor[idx].c_str(); }
 
   TERM()
       : area(0.0f),
         pof(0),
         pin(0),
-        name(""),
         idx(0),
         netCNTinObject(0),
         pinCNTinObject(0),
@@ -455,7 +461,7 @@ struct TERM {
   }
 
   void Dump() {
-    printf("terminal[%d]: name: %s \n", idx, name);
+//    printf("terminal[%d]: name: %s \n", idx, name);
     fflush(stdout);
     cout << "isTerminalNI: " << (isTerminalNI ? "YES" : "NO") << endl;
     cout << "IO: " << ((IO == 0) ? "Input" : "Output") << endl;
@@ -472,7 +478,7 @@ struct TERM {
   }
 };
 
-struct CELLx {
+struct CELL {
   FPOS pmin;
   FPOS pmax;
   FPOS den_pmin;
@@ -488,7 +494,6 @@ struct CELLx {
   prec den_scal;
   FPOS half_size;
   FPOS half_den_size;
-  char name[255];
   int idx;
   int pinCNTinObject;
   int netCNTinObject;
@@ -502,9 +507,8 @@ struct CELLx {
   FPOS half_den_size_org_befo_bloating;
   FPOS *pof_tmp;
   PIN **pin_tmp;
+  const char* Name() { return cellNameStor[idx].c_str(); }
 };
-
-typedef struct CELLx CELL;
 
 class SHAPE {
  public:
@@ -586,8 +590,8 @@ class TwoPinNets {
 
 bool TwoPinNets_comp(TwoPinNets x, TwoPinNets y);
 
-int UFFind(struct NET *net, int moduleID);
-void UFUnion(struct NET *net, int idx, int idy);
+int UFFind(class NET *net, int moduleID);
+void UFUnion(class NET *net, int idx, int idy);
 
 class ROUTRACK {
  public:
@@ -612,17 +616,14 @@ class ROUTRACK {
 
 class NET {
   public:
-  char name[255];
   std::map< int, UFPin > mUFPin;
   vector< TwoPinNets > two_pin_nets;
   vector< ROUTRACK > routing_tracks;
 
   prec min_x;
   prec min_y;
-  prec min_z;
   prec max_x;
   prec max_y;
-  prec max_z;
   FPOS sum_num1;
   FPOS sum_num2;
   FPOS sum_denom1;
@@ -634,7 +635,6 @@ class NET {
 
   prec hpwl_x;
   prec hpwl_y;
-  prec hpwl_z;
   prec hpwl;
   int outPinIdx;  // determine outpin's index
   int pinCNTinObject;
@@ -646,9 +646,11 @@ class NET {
   prec stn_cof;       // lutong
   prec wl_rsmt;       // lutong
 
-  NET() : name(""), min_x(PREC_MAX), min_y(PREC_MAX), 
-  min_z(PREC_MAX), max_x(PREC_MIN), max_y(PREC_MIN), max_z(PREC_MIN),
-  pin(0), pin2(0), hpwl_x(PREC_MIN), hpwl_y(PREC_MIN), hpwl_z(PREC_MIN), 
+  const char* Name() { return netNameStor[idx].c_str(); }
+
+  NET() : min_x(PREC_MAX), min_y(PREC_MAX), 
+  max_x(PREC_MIN), max_y(PREC_MIN),
+  pin(0), pin2(0), hpwl_x(PREC_MIN), hpwl_y(PREC_MIN),  
   outPinIdx(INT_MAX), pinCNTinObject(INT_MAX), pinCNTinObject2(INT_MAX),
   pinCNTinObject_tier(INT_MAX), idx(INT_MAX), mod_idx(INT_MAX), 
   timingWeight(0.0f), 
@@ -661,11 +663,6 @@ class NET {
     terminalMin.SetZero();
     terminalMax.SetZero();
   };
-};
-
-struct T0 {
-  int z;
-  prec dis;
 };
 
 // for *.scl files
@@ -702,7 +699,7 @@ struct TIER {
   struct MODULE **modu_st;
   struct TERM **term_st;
   struct MODULE **mac_st;
-  struct CELLx **cell_st;
+  struct CELL **cell_st;
   struct FPOS bin_stp;
   prec area;
   prec modu_area;
@@ -727,7 +724,7 @@ struct TIER {
   struct FPOS bin_off;
   struct FPOS half_bin_stp;
   struct MODULE *max_mac;
-  struct CELLx **cell_st_tmp;
+  struct CELL **cell_st_tmp;
 
   // routability
   struct FPOS tile_stp;
@@ -1017,7 +1014,7 @@ extern prec blockagePorosity;
 extern RECT cur_rect;
 extern PIN *pinInstance;
 extern MODULE *moduleInstance;
-extern CELLx *gcell_st;
+extern CELL *gcell_st;
 extern TERM *terminalInstance;
 
 extern NET *netInstance;
@@ -1161,7 +1158,6 @@ bool criticalArgumentError(void);
 string getexepath();
 int pos_eqv(struct POS p1, struct POS p2);
 int prec_eqv(prec x, prec y);
-int prec2int(prec a);
 unsigned prec2unsigned(prec a);
 int find_non_zero(prec *a, int cnt);
 int prec_le(prec x, prec y);
@@ -1186,11 +1182,6 @@ inline int dle(prec a, prec b) {
 void OR_opt(void);
 void rdft2dsort(int, int, int, prec **);
 
-// void call_DP(void);
-// void call_FastDP(void);
-// void call_NTUpl3(void);
-// void call_NTUpl4h(void);
-// void call_DP_StdCell_NTUpl4h(void);
 void read_macro(char *fn);
 
 FPOS fp_mul(struct FPOS a, struct FPOS b);
@@ -1228,15 +1219,10 @@ FPOS fp_inv(struct FPOS a);
 void tier_assign(int);
 void tier_assign_with_macro(void);
 void tier_assign_without_macro(void);
-void find_close_tier(prec z, struct T0 *t0_st, int *z_st);
 int prec_cmp(const void *a, const void *b);
 int max_pinCNTinObject_cmp(const void *a, const void *b);
 int min_tier_cmp(const void *a, const void *b);
 int max_area_dis_div_cmp(const void *a, const void *b);
-
-void call_FastDP_tier(char *tier_dir, char *tier_aux, char *tier_pl);
-// void call_NTUpl3_tier(char *tier_dir, char *tier_aux, char *tier_pl);
-// void call_NTUpl4h_tier(char *tier_dir, char *tier_aux, char *tier_pl);
 
 void preprocess_SB_inputs(char *tier_dir);
 void postprocess_SB_inputs(char *tier_dir);
@@ -1260,7 +1246,8 @@ void CallDetailPlace();
 void CallNtuPlacer3(const char *tier_dir, const char *tier_aux, const char *tier_pl);
 void CallNtuPlacer4h(const char *tier_dir, const char *tier_aux, const char *tier_pl);
 
-// useful function
+// Inline function definition
+
 
 // return Common Area
 // between Rectangle A and Rectangle B.
