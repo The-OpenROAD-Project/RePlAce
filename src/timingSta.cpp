@@ -559,7 +559,8 @@ void Timing::FillSpefForSta() {
   }
 
   UpdateSpefClockNetVerilog();
-//  parasiticsChangedAfter(_sta);
+  _sta->graphDelayCalc()->delaysInvalid();
+  _sta->search()->arrivalsInvalid(); 
 }
 void Timing::GenerateClockSta() {
   // sdc -> clock definition (unit=second)
@@ -780,19 +781,3 @@ static std::string ExecuteCommand(const char* cmd) {
 }
 
 TIMING_NAMESPACE_CLOSE
-
-//void parasiticsChangedAfter(sta::Sta* sta_) {
-//  CornerIterator corner_iter(sta_);
-//  while(corner_iter.hasNext()) {
-//    Corner* corner = corner_iter.next();
-//    MinMaxIterator mm_iter;
-//    while(mm_iter.hasNext()) {
-//      MinMax* min_max = mm_iter.next();
-//      ParasiticAnalysisPt* ap = corner->findParasiticAnalysisPt(min_max);
-//      DcalcAnalysisPt* dcalc_ap = corner->findDcalcAnalysisPt(min_max);
-//      dcalc_ap->setParasiticAnalysisPt(ap);
-//    }
-//  }
-//  sta_->graphDelayCalc()->delaysInvalid();
-//  sta_->search()->arrivalsInvalid();
-//}

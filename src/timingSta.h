@@ -86,8 +86,4 @@ namespace sta {
 extern const char *tcl_inits[];
 }
 
-// void evalTclInitForLibrary(Tcl_Interp *interp,
-//        const char *inits[]);
-void parasiticsChangedAfter(sta::Sta *sta);
-
 #endif
