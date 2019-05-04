@@ -196,6 +196,9 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   //    Tcl_FindExecutable(argv[0]);
   _interp = Tcl_CreateInterp();
 
+  // Initialize the TCL interpreter
+  Tcl_Init(_interp);
+
   // define swig commands
   Sta_Init(_interp);
 
