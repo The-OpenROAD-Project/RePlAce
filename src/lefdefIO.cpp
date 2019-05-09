@@ -874,7 +874,7 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
 /////////////////////////////////////////////
 //  DieRect Instances
 //
-DieRect GetDieFromProperty() {
+DieRect GetDieFromProperty( bool isScaleDown ) {
   // Set DieArea from PROPERTYDEFINITIONS
   string llxStr = "FE_CORE_BOX_LL_X", urxStr = "FE_CORE_BOX_UR_X";
   string llyStr = "FE_CORE_BOX_LL_Y", uryStr = "FE_CORE_BOX_UR_Y";
@@ -886,29 +886,29 @@ DieRect GetDieFromProperty() {
     }
 
     if(string(prop.propName()) == llxStr) {
-      retRect.llx = INT_CONVERT(prop.number() * l2d / unitX);
+      retRect.llx = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitX) : INT_CONVERT(prop.number()*l2d);
     }
     else if(string(prop.propName()) == llyStr) {
-      retRect.lly = INT_CONVERT(prop.number() * l2d / unitY);
+      retRect.lly = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitY) : INT_CONVERT(prop.number()*l2d);
     }
     else if(string(prop.propName()) == urxStr) {
-      retRect.urx = INT_CONVERT(prop.number() * l2d / unitX);
+      retRect.urx = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitX) : INT_CONVERT(prop.number()*l2d);
     }
     else if(string(prop.propName()) == uryStr) {
-      retRect.ury = INT_CONVERT(prop.number() * l2d / unitY);
+      retRect.ury = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitY) : INT_CONVERT(prop.number()*l2d);
     }
   }
   return retRect;
 }
 
-DieRect GetDieFromDieArea() {
+DieRect GetDieFromDieArea( bool isScaleDown ) {
   DieRect retRect;
   defiPoints points = __ckt.defDieArea.getPoint();
   if(points.numPoints >= 2) {
-    retRect.llx = points.x[0] / unitX;
-    retRect.lly = points.y[0] / unitY;
-    retRect.urx = points.x[1] / unitX;
-    retRect.ury = points.y[1] / unitY;
+    retRect.llx = (isScaleDown)? points.x[0] / unitX : points.x[0];
+    retRect.lly = (isScaleDown)? points.y[0] / unitY : points.y[0];
+    retRect.urx = (isScaleDown)? points.x[1] / unitX : points.x[1];
+    retRect.ury = (isScaleDown)? points.y[1] / unitY : points.y[1];
   }
   for(int i = 0; i < points.numPoints; i++) {
     cout << points.x[i] << " " << points.y[i] << endl;

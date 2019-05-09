@@ -295,8 +295,8 @@ struct DieRect {
   }
 };
 
-DieRect GetDieFromProperty();
-DieRect GetDieFromDieArea();
+DieRect GetDieFromProperty(bool isScaleDown = true);
+DieRect GetDieFromDieArea(bool isScaleDown = true);
 
 void ParseInput();
 void ParseLefDef();

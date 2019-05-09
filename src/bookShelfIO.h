@@ -122,7 +122,7 @@ class DummyCellInfo {
   prec l2d_, unitX_, unitY_;
 
   // cellSize
-  int siteSizeX_, siteSizeY_;
+  float siteSizeX_, siteSizeY_;
 
   // rowsize
   int rowSizeX_, rowSizeY_;
@@ -154,7 +154,7 @@ class DummyCellInfo {
 
   void SetCircuitInst();
   void SetScaleDownParam();
-  void SetSiteSize(int siteSizeX, int siteSizeY);
+  void SetSiteSize(float siteSizeX, float siteSizeY);
   void SetArraySize(int numX, int numY);
 
   int GetCoordiX(prec x);

@@ -3552,20 +3552,24 @@ void DummyCellInfo::SetEnvironment() {
     exit(1);
   }
 
-  int siteSizeX =
-      INT_CONVERT(l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeX() / unitX_);
-  int siteSizeY =
-      INT_CONVERT(l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeY() / unitY_);
+  float siteSizeX =
+       l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeX() / unitX_;
+  float siteSizeY =
+       l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeY() / unitY_;
 
   SetSiteSize(siteSizeX, siteSizeY);
+  cout << "siteSize: " << siteSizeX << " " << siteSizeY << endl;
 
-  int rowCntX = (dieRect_.urx - dieRect_.llx) / siteSizeX;
-  int rowCntY = (dieRect_.ury - dieRect_.lly) / siteSizeY;
+  int rowCntX = INT_CONVERT( (dieRect_.urx - dieRect_.llx) / siteSizeX );
+  int rowCntY = INT_CONVERT( (dieRect_.ury - dieRect_.lly) / siteSizeY );
+  cout << "rowCnt: " << rowCntX << " " << rowCntY << endl;
 
   SetArraySize(rowCntX, rowCntY);
+  cout << "arraySize: " << rowCntX << " " << rowCntY << endl;
 
   rowSizeX_ = numX_ * siteSizeX_;
   rowSizeY_ = siteSizeY_;
+  cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
   InitArray();
   InitRow();
 }
@@ -3589,7 +3593,7 @@ void DummyCellInfo::InitArray() {
   }
 }
 
-void DummyCellInfo::SetSiteSize(int siteSizeX, int siteSizeY) {
+void DummyCellInfo::SetSiteSize(float siteSizeX, float siteSizeY) {
   siteSizeX_ = siteSizeX;
   siteSizeY_ = siteSizeY;
 }
@@ -3616,7 +3620,7 @@ void DummyCellInfo::InitRow() {
 
     curRow.x_cnt = numX_;
     curRow.site_wid = curRow.site_spa = siteSizeX_;
-    //    curRow.Dump(to_string(i));
+//    curRow.Dump("inserted-Row " + to_string(i));
     rowStor_.push_back(curRow);
   }
 }
@@ -3637,15 +3641,15 @@ void DummyCellInfo::FillRowInst(ROW *curRow) {
 //  curRow->pmin.Dump("curRowPmin");
 //  curRow->pmax.Dump("curRowPmax");
 
-//  cout << GetCoordiX(curRow->pmin.x) << " " << GetCoordiX(curRow->pmax.x)
+//  cout << "lx: " << GetCoordiX(curRow->pmin.x) << " ux:" << GetCoordiX(curRow->pmax.x)
 //       << endl;
-//  cout << GetCoordiY(curRow->pmin.y) << " " << GetCoordiY(curRow->pmax.y)
+//  cout << "ly: " << GetCoordiY(curRow->pmin.y) << " uy:" << GetCoordiY(curRow->pmax.y)
 //       << endl;
 
   for(int i = GetCoordiX(curRow->pmin.x); i < GetCoordiX(curRow->pmax.x); i++) {
     for(int j = GetCoordiY(curRow->pmin.y); j < GetCoordiY(curRow->pmax.y);
         j++) {
-      //      cout << "[Row] i: " << i << ", j: " << j << endl;
+//      cout << "[Row] i: " << i << ", j: " << j << endl;
       arr_[j * numX_ + i] = CellInfo::Row;
     }
   }
@@ -3653,11 +3657,17 @@ void DummyCellInfo::FillRowInst(ROW *curRow) {
 void DummyCellInfo::FillFixedCell(TERM *curTerm) {
 //  curTerm->pmin.Dump("curTermPmin");
 //  curTerm->pmax.Dump("curTermPmax");
+  
+//  cout << "lx: " << GetCoordiX(curTerm->pmin.x) << " ux:" << GetCoordiX(curTerm->pmax.x)
+//       << endl;
+//  cout << "ly: " << GetCoordiY(curTerm->pmin.y) << " uy:" << GetCoordiY(curTerm->pmax.y)
+//       << endl;
+
   for(int i = GetCoordiX(curTerm->pmin.x); i < GetCoordiX(curTerm->pmax.x);
       i++) {
     for(int j = GetCoordiY(curTerm->pmin.y); j < GetCoordiY(curTerm->pmax.y);
         j++) {
-      //      cout << "[Fixed] i: " << i << ", j: " << j << endl;
+//      cout << "[Fixed] i: " << i << ", j: " << j << endl;
       arr_[j * numX_ + i] = CellInfo::Cell;
     }
   }
