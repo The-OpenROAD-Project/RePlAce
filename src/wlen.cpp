@@ -38,7 +38,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <error.h>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>

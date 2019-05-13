@@ -45,11 +45,6 @@
 #include <ctime>
 #include <climits>
 #include <cfloat>
-#include <sys/time.h>
-#include <error.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <iomanip>
 
 #include "global.h"

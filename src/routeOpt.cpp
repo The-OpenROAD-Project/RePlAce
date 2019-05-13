@@ -45,7 +45,6 @@
 #include <ctime>
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <error.h>
 #include <fstream>
 
 #include "global.h"

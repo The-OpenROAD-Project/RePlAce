@@ -43,11 +43,6 @@
 #include <cstring>
 #include <cmath>
 #include <ctime>
-#include <sys/time.h>
-#include <error.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <vector>
 
 #include "mkl.h"

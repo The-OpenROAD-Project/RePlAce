@@ -38,7 +38,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <error.h>
 #include <climits>
 #include <cmath>
 #include <cstdio>
@@ -352,7 +351,6 @@ void update_pin_by_module(void) {
       pin = mdp->pin[j];
 
       if(pin->moduleID != i || pin->pinIDinModule != j || pin->term == 1) {
-        error(0, 0, "update_pin_by_module: \n");
         exit(1);
       }
 

@@ -38,7 +38,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <error.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -1292,7 +1291,7 @@ bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
       }
     }
     else {
-      error(0, 0, "get_common_area: eff_x error");
+//      error(0, 0, "get_common_area: eff_x error");
     }
 
     if((pmax1.y > pmin2.y || pmax1.y == pmin2.y) &&
@@ -1317,7 +1316,7 @@ bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
       }
     }
     else {
-      error(0, 0, "get_common_area: eff_x error");
+//      error(0, 0, "get_common_area: eff_x error");
     }
   }
   return true;
@@ -1346,7 +1345,7 @@ prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2) {
         eff_x = pmax2.x - pmin2.x;
     }
     else {
-      error(0, 0, "get_common_area: eff_x error");
+//      error(0, 0, "get_common_area: eff_x error");
       g_rrr++;
     }
 
@@ -1364,7 +1363,7 @@ prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2) {
         eff_y = pmax2.y - pmin2.y;
     }
     else {
-      error(0, 0, "get_common_area: eff_x error");
+//      error(0, 0, "get_common_area: eff_x error");
       g_rrr++;
     }
 

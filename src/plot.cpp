@@ -51,8 +51,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-//#include <tgmath.h>
-#include <error.h>
 #include <cmath>
 
 using namespace cimg_library;

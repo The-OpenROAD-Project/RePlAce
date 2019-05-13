@@ -38,8 +38,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <error.h>
-#include <sys/time.h>
 #include <algorithm>
 #include <cfloat>
 #include <climits>

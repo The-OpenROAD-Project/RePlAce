@@ -45,7 +45,6 @@
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
-#include <error.h>
 
 #include "global.h"
 #include "bin.h"
