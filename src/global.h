@@ -929,8 +929,6 @@ extern prec mGP2D_opt_phi_cof;
 extern prec cGP3D_opt_phi_cof;
 extern prec cGP2D_opt_phi_cof;
 extern prec inv_RAND_MAX;
-extern prec theta;
-extern prec dp_margin_per_tier;
 extern prec stn_weight;  // lutong
 extern prec opt_w_cof;   // lutong
 

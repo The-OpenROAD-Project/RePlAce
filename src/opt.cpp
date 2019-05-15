@@ -84,8 +84,6 @@ void setup_before_opt(void) {
   total_modu_area = total_std_area + total_macro_area * target_cell_den;
   inv_total_modu_area = 1.00 / total_modu_area;
 
-  dp_margin_per_tier = 0.0f;
-
   cell_init();
   cell_filler_init();  // So that we can get total_filler_area.
   calc_average_module_width();
@@ -1343,11 +1341,6 @@ void cell_init_2D(void) {
   struct TIER *tier = NULL;
   struct FPOS scal;
 
-  // if ((INPUT_FLG == MMS && (target_cell_den == 1.00f ||
-  //                          target_cell_den == 0.80f ||
-  //                          target_cell_den == 1.00 ||
-  //                          target_cell_den == 0.80)) ||
-  //    (isRoutability == true && tier_st[0].modu_den < 0.32)) {
   if((INPUT_FLG == MMS &&
       (target_cell_den == 1.00f || target_cell_den == 0.80f ||
        target_cell_den == 1.00 || target_cell_den == 0.80))) {

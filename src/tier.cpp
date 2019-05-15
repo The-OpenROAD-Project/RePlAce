@@ -195,15 +195,15 @@ void tier_assign(int mode) {
 
     tier = &tier_st[currTier];
 
-    prec modu_area = 0;
+    prec moduleArea = 0;
     if(mode == MIXED) {
       if(modu->flg == Macro)
-        modu_area = modu->size.GetProduct()* target_cell_den;
+        moduleArea = modu->size.GetProduct()* target_cell_den;
       else
-        modu_area = modu->size.GetProduct();
+        moduleArea = modu->size.GetProduct();
     }
     else if(mode == STDCELLonly) {
-      modu_area = modu->size.GetProduct();
+      moduleArea = modu->size.GetProduct();
     }
 //     cout << modu->name << endl;
 //     modu->size.Dump("Module Size");
@@ -212,23 +212,22 @@ void tier_assign(int mode) {
 //     cout << "modu_area: " << modu_area << endl;
 //     cout << "tier's ws_area: " << tier->ws_area << endl;
 //     cout << "target_cell_den: " << target_cell_den << endl;
-//     cout << "dp_margin_per_tier: " << dp_margin_per_tier << endl;
 
-    if((tier->modu_area + modu_area) / tier->ws_area <=
-        target_cell_den - dp_margin_per_tier) {
-      modu->tier = currTier;
-
-      tier->modu_st[tier->modu_cnt++] = modu;
-      tier->modu_area += modu_area;
-  
-      for(int k = 0; k < modu->pinCNTinObject; k++) {
-        PIN *pin = modu->pin[k];
-        pin->tier = currTier;
-      }
+    if((tier->modu_area + moduleArea) / tier->ws_area > target_cell_den) {
+      cout << "** Warning: Exceed the placement Area" << endl;
+      cout << "   ModuleArea     : " << tier->modu_area + moduleArea << endl; 
+      cout << "   WhiteSpaceArea : " << tier->ws_area << endl;
+      cout << "   TargetDensity  : " << target_cell_den << endl;
     }
-    else {
-      cout << "ERROR: Exceed the placement Area!" << endl;
-      exit(1);
+
+    modu->tier = currTier;
+
+    tier->modu_st[tier->modu_cnt++] = modu;
+    tier->modu_area += moduleArea;
+
+    for(int k = 0; k < modu->pinCNTinObject; k++) {
+      PIN *pin = modu->pin[k];
+      pin->tier = currTier;
     }
   }
 

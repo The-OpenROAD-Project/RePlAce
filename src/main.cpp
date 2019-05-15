@@ -239,8 +239,6 @@ prec mGP2D_opt_phi_cof;
 prec cGP3D_opt_phi_cof;
 prec cGP2D_opt_phi_cof;
 prec inv_RAND_MAX;
-prec theta;
-prec dp_margin_per_tier;
 
 unsigned extPt1_2ndOrder;
 unsigned extPt2_2ndOrder;
@@ -685,7 +683,6 @@ void init() {
 
   inv_RAND_MAX = (prec)1.0 / RAND_MAX;
 
-  theta = THETA_XY_3D_PLOT;
   target_cell_den = atof(denCMD.c_str());
   target_cell_den_orig = atof(denCMD.c_str());  // lutong
   // overflowMin     = overflowMin/atof(den);
