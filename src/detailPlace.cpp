@@ -132,7 +132,7 @@ void CallNtuPlacer3(const char *tier_dir, const char *tier_aux, const char *tier
       0,
   };
 
-  sprintf(cmd, "ln -s %s %s/", detailPlacerLocationCMD.c_str(), tier_dir);
+  sprintf(cmd, "ln -s %s %s/", detailPlacerLocation.c_str(), tier_dir);
   cout << cmd << endl;
   system(cmd);
 
@@ -200,7 +200,7 @@ void CallNtuPlacer4h(const char *tier_dir, const char *tier_aux, const char *tie
       0,
   };
 
-  sprintf(cmd, "ln -s %s %s/", detailPlacerLocationCMD.c_str(), tier_dir);
+  sprintf(cmd, "ln -s %s %s/", detailPlacerLocation.c_str(), tier_dir);
   cout << cmd << endl;
   system(cmd);
 

@@ -74,9 +74,9 @@ void initArgument(int argc, char *argv[]) {
   filleriterCMD = "0";
 
   auxCMD = "";
-  defCMD = "";
-  sdcCMD = "";
-  verilogCMD = "";
+  defName = "";
+  sdcName = "";
+  verilogName = "";
   outputCMD = "";
   experimentCMD = "";
   verilogTopModule = "";
@@ -110,8 +110,8 @@ void initArgument(int argc, char *argv[]) {
   trialRunCMD = false;           // bool
   autoEvalRC_CMD = false;        // bool
 
-  detailPlacerFlagCMD = "";  // mgwoo
-  detailPlacerLocationCMD = "";
+  detailPlacerFlag = "";  // mgwoo
+  detailPlacerLocation = "";
   isOnlyLGinDP = (isRoutability) ? true : false;
 
   numThread = 1;  // default
@@ -198,8 +198,22 @@ void initArgument(int argc, char *argv[]) {
   NUM_ITER_FILLER_PLACE = atoi(filleriterCMD.c_str());
   inflation_max_cnt = atof(racntiCMD.c_str());  // lutong
 
+  // newly set RealPath
   globalRouterPosition = GetRealPath( globalRouterPosition );
   globalRouterSetPosition = GetRealPath( globalRouterSetPosition );
+  detailPlacerLocation = GetRealPath( detailPlacerLocation );
+
+  // newline escape
+  ReplaceStringInPlace(verilogName, "\r", "");
+  ReplaceStringInPlace(verilogName, "\r", "");
+  ReplaceStringInPlace(sdcName, "\r", "");
+  ReplaceStringInPlace(sdcName, "\n", "");
+  
+  for(auto& libName: libStor) {
+    ReplaceStringInPlace(libName, "\r", "");
+    ReplaceStringInPlace(libName, "\n", "");
+  } 
+
 
   ExtraWSfor3D = 0;     //.12; //0.1;
   MaxExtraWSfor3D = 0;  //.20; //0.2;
@@ -208,13 +222,10 @@ void initArgument(int argc, char *argv[]) {
 
   // detailPlacer settings
   detailPlacer = None;
-  if(!strcmp(detailPlacerFlagCMD.c_str(), "FP")) {
-    detailPlacer = FastPlace;
-  }
-  else if(!strcmp(detailPlacerFlagCMD.c_str(), "NTU3")) {
+  if(!strcmp(detailPlacerFlag.c_str(), "NTU3")) {
     detailPlacer = NTUplace3;
   }
-  else if(!strcmp(detailPlacerFlagCMD.c_str(), "NTU4")) {
+  else if(!strcmp(detailPlacerFlag.c_str(), "NTU4")) {
     detailPlacer = NTUplace4h;
   }
   else {
@@ -269,7 +280,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-def")) {
       i++;
       if(argv[i][0] != '-') {
-        defCMD = argv[i];
+        defName = argv[i];
       }
       else {
         printf("\n**ERROR: Option %s requires *.def.\n", argv[i - 1]);
@@ -280,7 +291,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-sdc")) {
       i++;
       if(argv[i][0] != '-') {
-        sdcCMD = argv[i];
+        sdcName = argv[i];
       }
       else {
         printf("\n**ERROR: Option %s requires *.sdc.\n", argv[i - 1]);
@@ -290,7 +301,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-verilog")) {
       i++;
       if(argv[i][0] != '-') {
-        verilogCMD = argv[i];
+        verilogName = argv[i];
       }
       else {
         printf("\n**ERROR: Option %s requires *.v.\n", argv[i - 1]);
@@ -784,18 +795,18 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-dpflag")) {
       i++;
       if(argv[i][0] != '-') {
-        detailPlacerFlagCMD = argv[i];
+        detailPlacerFlag = argv[i];
       }
       else {
         printf(
             "\n**ERROR: Option %s requires which Detailed Placer you want to "
             "use",
             argv[i - 1]);
-        printf("currently support 3 detail placer : FP, NTU3, and NTU4.\n");
-        printf("You must specify Detail Placer between these three.\n");
+        printf("currently support 3 detail placer : NTU3, and NTU4.\n");
+        printf("You must specify Detail Placer between these two.\n");
         printf(
-            "example : ./RePlACE -input @@ -output @@ -dpflag NTU3 -dploc "
-            "./ntuplacer3\n");
+            "example : ./RePlACE -input @@ -output @@ -dpflag NTU4 -dploc "
+            "./ntuplacer4h\n");
         return false;
       }
     }
@@ -803,16 +814,16 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-dploc")) {
       i++;
       if(argv[i][0] != '-') {
-        detailPlacerLocationCMD = argv[i];
+        detailPlacerLocation = argv[i];
       }
       else {
         printf("\n**ERROR: Option %s requires your Detailed Placer's location ",
                argv[i - 1]);
-        printf("currently support 3 detail placer : FP, NTU3, and NTU4.\n");
-        printf("You must specify Detail Placer between these three.\n");
+        printf("currently support 2 detail placer : NTU3, and NTU4.\n");
+        printf("You must specify Detail Placer between these two.\n");
         printf(
-            "example : ./RePlACE -input @@ -output @@ -dpflag NTU3 -dploc "
-            "./ntuplacer3\n");
+            "example : ./RePlACE -input @@ -output @@ -dpflag NTU4 -dploc "
+            "./ntuplacer4h\n");
         return false;
       }
     }
@@ -1061,7 +1072,7 @@ bool criticalArgumentError() {
   }
 
   // mgwoo
-  if(auxCMD == "" && lefStor.size() == 0 && defCMD == "") {
+  if(auxCMD == "" && lefStor.size() == 0 && defName == "") {
     printf(
         "\n** ERROR: lef/def pair or aux files are needed, use (-lef/-def) or "
         "(-aux) options.\n");
@@ -1070,7 +1081,7 @@ bool criticalArgumentError() {
   }
 
   // mgwoo
-  if(auxCMD == "" && !(lefStor.size() != 0 && defCMD != "")) {
+  if(auxCMD == "" && !(lefStor.size() != 0 && defName != "")) {
     printf("\n** ERROR: Both of lef/def files are needed.\n");
     printUsage();
     return true;
@@ -1091,13 +1102,13 @@ bool criticalArgumentError() {
       printUsage();
       return true;
     }
-    if(verilogCMD == "") {
+    if(verilogName == "") {
       printf("\n** ERROR: Timing mode must contain verilog.\n");
       printUsage();
       return true;
     }
 
-    if(sdcCMD == "" && !isClockGiven) {
+    if(sdcName == "" && !isClockGiven) {
       printf("\n** ERROR: Timing mode must contain sdc file.\n");
       printUsage();
       return true;

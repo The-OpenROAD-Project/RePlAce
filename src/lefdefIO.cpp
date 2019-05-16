@@ -162,16 +162,16 @@ static vector< string > clockNetsVerilog;
 
 // from main.cpp
 void ParseInput() {
-  if(auxCMD == "" && lefStor.size() != 0 && defCMD != "") {
+  if(auxCMD == "" && lefStor.size() != 0 && defName != "") {
     inputMode = InputMode::lefdef;
     ParseLefDef();
   }
-  else if(auxCMD != "" && lefStor.size() == 0 && defCMD == "") {
+  else if(auxCMD != "" && lefStor.size() == 0 && defName == "") {
     inputMode = InputMode::bookshelf;
     ParseBookShelf();
   }
 
-  if(verilogCMD != "") {
+  if(verilogName != "") {
     SetVerilogTopModule();
   }
 }
@@ -302,16 +302,16 @@ void SetVerilogTopModule() {
   /*
     using namespace verilog;
 
-    FILE* verilogInput = fopen(verilogCMD.c_str(), "rb");
+    FILE* verilogInput = fopen(verilogName.c_str(), "rb");
     if( !verilogInput ) {
-        cout << "** ERROR:  Cannot open verilog file: " << verilogCMD << endl;
+        cout << "** ERROR:  Cannot open verilog file: " << verilogName << endl;
         exit(1);
     }
 
     verilog::verilog_parser_init();
     int result = verilog::verilog_parse_file( verilogInput );
     if( result != 0 ) {
-        cout << "** ERROR:  Verilog Parse Failed: " << verilogCMD << endl;
+        cout << "** ERROR:  Verilog Parse Failed: " << verilogName << endl;
         exit(1);
     }
 
@@ -333,9 +333,9 @@ void SetVerilogTopModule() {
 void ParseLefDef() {
   // for input parse only
   //
-  // Circuit::Circuit __ckt(lefStor, defCMD, "");
+  // Circuit::Circuit __ckt(lefStor, defName, "");
   //
-  __ckt.Init(lefStor, defCMD, isVerbose);
+  __ckt.Init(lefStor, defName, isVerbose);
 
   SetParameter();
 
@@ -351,7 +351,7 @@ void ParseLefDef() {
   }
   else {
     cout << "INFO:  EXTRACT NET INFO FROM DEF & VERILOG" << endl;
-    if(verilogCMD == "") {
+    if(verilogName == "") {
       cout << "** ERROR:  Cannot Find any Net information "
            << "(Check NETS statement in DEF) "
            << "or use -verilog command instead" << endl;
@@ -1495,17 +1495,16 @@ void GenerateNetDefOnly(Circuit::Circuit& __ckt) {
 void GenerateNetDefVerilog(Circuit::Circuit& __ckt) {
   using namespace verilog;
 
-  FILE* verilogInput = fopen(verilogCMD.c_str(), "rb");
+  FILE* verilogInput = fopen(verilogName.c_str(), "rb");
   if(!verilogInput) {
-    cout << "** ERROR:  Cannot open verilog file: " << verilogCMD << endl;
+    cout << "** ERROR:  Cannot open verilog file: " << verilogName << endl;
     exit(1);
   }
 
   verilog::verilog_parser_init();
   int result = verilog::verilog_parse_file(verilogInput);
   if(result != 0) {
-    cout << "** ERROR:  Verilog Parse Failed: " << verilogCMD << endl;
-    exit(1);
+    cout << "** ERROR:  Verilog Parse Failed: " << verilogName << endl; exit(1);
   }
 
   verilog::verilog_source_tree* tree = verilog::yy_verilog_source_tree;
@@ -1901,11 +1900,11 @@ j );
 // ReadBookshelf -- nodesMap -- bookshelfIO.cpp
 //
 void ReadPl(const char* fileName, bool isNameConvert) {
-  if(auxCMD == "" && lefStor.size() != 0 && defCMD != "") {
+  if(auxCMD == "" && lefStor.size() != 0 && defName != "") {
     // it references moduleTermMap
     ReadPlLefDef(fileName, isNameConvert);
   }
-  else if(auxCMD != "" && lefStor.size() == 0 && defCMD == "") {
+  else if(auxCMD != "" && lefStor.size() == 0 && defName == "") {
     // it references nodesMap
     ReadPlBookshelf(fileName);
   }

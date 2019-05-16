@@ -794,8 +794,8 @@ enum {
 // these variable is required to have detailPlacer settings
 extern int detailPlacer;
 enum { None, FastPlace, NTUplace3, NTUplace4h };
-extern string detailPlacerLocationCMD;
-extern string detailPlacerFlagCMD;
+extern string detailPlacerLocation;
+extern string detailPlacerFlag;
 
 extern bool isOnlyLGinDP;
 extern bool isSkipPlacement;
@@ -1062,9 +1062,9 @@ extern FPOS grow_pmax;
 ///////////////////////////////////////////////////////////////////////////
 extern string bmFlagCMD;
 extern string auxCMD;
-extern string defCMD;
-extern string verilogCMD;
-extern string sdcCMD;
+extern string defName;
+extern string verilogName;
+extern string sdcName;
 extern vector< string > lefStor;
 extern string outputCMD;
 extern string experimentCMD;

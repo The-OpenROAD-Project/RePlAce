@@ -326,9 +326,9 @@ int numLayer;
 prec aspectRatio;
 string bmFlagCMD;
 string auxCMD;             // mgwoo
-string defCMD;             // mgwoo
-string sdcCMD;             // mgwoo
-string verilogCMD;         // mgwoo
+string defName;             // mgwoo
+string sdcName;             // mgwoo
+string verilogName;         // mgwoo
 vector< string > libStor;  // mgwoo
 string outputCMD;          // mgwoo
 string experimentCMD;      // mgwoo
@@ -370,8 +370,8 @@ string filleriterCMD;
 
 // for detail Placer
 int detailPlacer;
-string detailPlacerLocationCMD;
-string detailPlacerFlagCMD;
+string detailPlacerLocation;
+string detailPlacerFlag;
 
 prec densityDP;
 prec routeMaxDensity; 
@@ -791,7 +791,7 @@ void init() {
   //
   //
 
-  string fileCMD = (auxCMD != "") ? auxCMD : defCMD;
+  string fileCMD = (auxCMD != "") ? auxCMD : defName;
 
   //
   // check '/' from back side

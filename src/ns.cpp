@@ -71,7 +71,7 @@ void myNesterov::nesterov_opt() {
 
   if(isTiming) {
     TimingInst.BuildSteiner(true);
-    TimingInst.ExecuteStaFirst(verilogTopModule, verilogCMD, libStor, sdcCMD);
+    TimingInst.ExecuteStaFirst(verilogTopModule, verilogName, libStor, sdcName );
   }
 
   InitializationCommonVar();
