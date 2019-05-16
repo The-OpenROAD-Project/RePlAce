@@ -93,9 +93,6 @@ RePlAce	: $(OBJFILES)
 	@echo " "
 	@echo "  Linking is completed !!"
 	@echo " "
-	@echo "  Tagging..."
-	ctags -R *
-	@echo " "
 	@echo "- Compiling RePlAce is done."
 	@echo " "
 	@echo "GNU GCC/G++ compiler has been used."
@@ -108,5 +105,3 @@ clean :
 	@echo "Delete: binary"
 	@rm -rvf $(CURDIR)/RePlAce
 
-tag :
-	ctags -R *
