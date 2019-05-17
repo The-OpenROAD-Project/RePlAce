@@ -265,7 +265,14 @@ void SetParameter() {
 
   // unitX, unitY setting : RowHeight / 9 --> Converted Height: 9
   // RePlAce's Nesterov iteration parameter is optimized when cell height is around 9.
+  cout << "INFO:  DEF SITE: " << __ckt.defRowStor[0].macro() << endl;
   auto sitePtr = __ckt.lefSiteMap.find(string(__ckt.defRowStor[0].macro()));
+  if( sitePtr == __ckt.lefSiteMap.end() ) {
+    cout << "ERROR:  CANNOT find SITE: " 
+      << __ckt.defRowStor[0].macro() << " IN DEF" << endl;
+    exit(1);
+  }
+
   unitY = l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / 9.0f;
   unitX = unitY;
 
