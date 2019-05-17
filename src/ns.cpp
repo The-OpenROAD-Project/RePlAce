@@ -758,7 +758,6 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
               bloatCNT++;
               inflation_cnt = 0;
             }
-            isBloatingBegin = true;
             if(inflation_cnt == 1) {
               before100iter_cof = pcofArr[(i + 2) % 100];
               // if (constraintDrivenCMD) {
@@ -777,8 +776,10 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
     // Update ALPHA and BETA for Local Density Function
     if(constraintDrivenCMD == true)
       UpdateAlpha(it);
+
     if(lambda2CMD == true)
       UpdateBeta(it);
+
     // Elimination Condition
     if(it->tot_hpwl > 2000000000)
       exit(0);
@@ -1433,11 +1434,6 @@ void myNesterov::UpdateNesterovIter(int iter, struct ITER *it,
                             string("/arrow/" + modeStr + "_arrow_") +
                             intoFourDigit(iter));
   }
-
-  // if ((approxiPlotCMD && (iter%10 == 0 || iter==1)) || (approxiPlotCMD &&
-  // isBloatingBegin && iter%5 == 0))
-  // if (!approxiPlotCMD && (plotCellCMD || plotDensityCMD || plotFieldCMD))
-  // PlotNesterov (iter);
 
   time_calc(last_it->cpu_curr, &it->cpu_curr, &it->cpu_cost);
   PrintNesterovOptStatus(iter);

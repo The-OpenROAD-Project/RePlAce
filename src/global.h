@@ -984,7 +984,6 @@ extern char currentDir[BUF_SZ];
 
 extern string sourceCodeDir;
 
-extern bool isBloatingBegin;
 extern bool isRoutabilityInit;
 extern bool isTrial;
 extern bool isFirst_gp_opt;

@@ -154,7 +154,6 @@ prec total_inflation_ratio;
 prec h_max_inflation_ratio;
 prec v_max_inflation_ratio;
 prec total_inflatedNewAreaDelta;
-bool isBloatingBegin = false;
 bool isRoutabilityInit = false;
 bool flg_noroute = false;
 int routepath_maxdist;
