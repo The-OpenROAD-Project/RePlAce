@@ -2641,7 +2641,7 @@ void WriteShapes(char *dir_tier, bool isShapeDrawing, bool isNameConvert) {
             curShapeNode.second.size());
     for(auto &curIdx : curShapeNode.second) {
       fprintf(fp_shapes, "\t%s\t%d\t%d\t%d\t%d\n",
-              shapeStor[curIdx].name, 
+              shapeStor[curIdx].name.c_str(), 
               GetScaleUpPoint( shapeStor[curIdx].llx ),
               GetScaleUpPoint( shapeStor[curIdx].lly ), 
               GetScaleUpSize( shapeStor[curIdx].width ),
