@@ -461,7 +461,7 @@ struct TERM {
   }
 
   void Dump() {
-//    printf("terminal[%d]: name: %s \n", idx, name);
+    printf("terminal[%d]: name: %s \n", idx, Name());
     fflush(stdout);
     cout << "isTerminalNI: " << (isTerminalNI ? "YES" : "NO") << endl;
     cout << "IO: " << ((IO == 0) ? "Input" : "Output") << endl;
