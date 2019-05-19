@@ -1109,6 +1109,4 @@ void free_trial_mallocs() {
   mkl_free(tier_st);
   free(place_st);
 
-  //    mkl_free(modu_map);
-  //    mkl_free(term_map);
 }

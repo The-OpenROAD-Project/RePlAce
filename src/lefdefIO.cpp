@@ -126,7 +126,8 @@ static dense_hash_map< string, pair< bool, int > > moduleTermMap;
 static string metal1Name;
 
 // helper function for LEF/DEF in siteorient
-static char* orientStr(int orient) {
+static char* 
+orientStr(int orient) {
   switch(orient) {
     case 0:
       return ((char*)"N");
@@ -146,6 +147,72 @@ static char* orientStr(int orient) {
       return ((char*)"FE");
   };
   return ((char*)"BOGUS");
+}
+
+// orient coordinate shift 
+inline static std::pair<float, float> 
+GetOrientPoint( float x, float y, float w, float h, int orient ) {
+  switch(orient) {
+    case 0: // North
+      return std::make_pair(x, y); 
+    case 1: // West
+      return std::make_pair(h-y, x);
+    case 2: // South
+      return std::make_pair(w-x, h-y); // x-flip, y-flip
+    case 3: // East
+      return std::make_pair(y, w-x);
+    case 4: // Flipped North
+      return std::make_pair(w-x, y); // x-flip
+    case 5: // Flipped West
+      return std::make_pair(y, x); // x-flip from West
+    case 6: // Flipped South
+      return std::make_pair(x, h-y); // y-flip
+    case 7: // Flipped East
+      return std::make_pair(h-y, w-x); // y-flip from West
+  }
+}
+
+// Get Lower-left coordinates from rectangle's definition
+inline static std::pair<float, float> 
+GetOrientLowerLeftPoint( float lx, float ly, float ux, float uy,
+   float w, float h, int orient ) {
+  switch(orient) {
+    case 0: // North
+      return std::make_pair(lx, ly); // verified
+    case 1: // West
+      return GetOrientPoint(lx, uy, w, h, orient);
+    case 2: // South
+      return GetOrientPoint(ux, uy, w, h, orient);
+    case 3: // East
+      return GetOrientPoint(ux, ly, w, h, orient);
+    case 4: // Flipped North
+      return GetOrientPoint(ux, ly, w, h, orient); // x-flip
+    case 5: // Flipped West
+      return GetOrientPoint(lx, ly, w, h, orient); // x-flip from west
+    case 6: // Flipped South
+      return GetOrientPoint(lx, uy, w, h, orient); // y-flip
+    case 7: // Flipped East
+      return GetOrientPoint(ux, uy, w, h, orient); // y-flip from west
+  }
+}
+
+// orient coordinate shift 
+inline static std::pair<float, float> 
+GetOrientSize( float w, float h, int orient ) {
+  switch(orient) {
+    // East, West, FlipEast, FlipWest
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+      return std::make_pair(h, w);
+    // otherwise 
+    case 0:
+    case 2:
+    case 4:
+    case 6:
+      return std::make_pair(w, h); 
+  }
 }
 
 // for Saving verilog information
@@ -443,7 +510,8 @@ void WriteDef(const char* defOutput) {
 // return type :
 // true -- the sub-rectangular has been found and added
 // false -- the sub-rectangular has not been found.
-bool AddShape(int defCompIdx, int lx, int ly) {
+bool AddShape(int defCompIdx, int lx, int ly,
+    float w, float h, int orient) {
   string compName = string(__ckt.defComponentStor[defCompIdx].id());
   string macroName = string(__ckt.defComponentStor[defCompIdx].name());
 
@@ -520,7 +588,15 @@ bool AddShape(int defCompIdx, int lx, int ly) {
         }
         totalShapeCount++;
 
+        std::pair<float, float> rectLxLy = 
+          GetOrientLowerLeftPoint( rect->xl, rect->yl, rect->xh, rect->yh, 
+                                    w, h, orient );
+
+        std::pair<float, float> rectSize = 
+          GetOrientSize( rect->xh - rect->xl, rect->yh - rect->yl, orient );
+
         // finally pushed into shapeStor
+        /*
         shapeStor.push_back(SHAPE(
             string("shape_") + to_string(shapeCnt), compName, 
             shapeStor.size(),
@@ -528,9 +604,17 @@ bool AddShape(int defCompIdx, int lx, int ly) {
             (l2d * rect->yl + ly + offsetY) / unitY,  // ly
             l2d * (rect->xh - rect->xl) / unitX,      // xWidth
             l2d * (rect->yh - rect->yl) / unitY));    // yWidth
+        */
 
-        //                cout << compName << ", " <<
-        //                string("shape_")+to_string(shapeCnt) << endl;
+        // finally pushed into shapeStor
+        shapeStor.push_back(SHAPE(
+            string("shape_") + to_string(shapeCnt), compName, 
+            shapeStor.size(),
+            (l2d * rectLxLy.first + lx + offsetX) / unitX,  // lx
+            (l2d * rectLxLy.second + ly + offsetY) / unitY,  // ly
+            l2d * rectSize.first / unitX,      // xWidth
+            l2d * rectSize.second / unitY));    // yWidth
+
         shapeCnt++;
       }
       // now, meets another Layer
@@ -737,9 +821,6 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
 
     curTerm->idx = terminalCNT;
 
-    // check whether this nodes contains sub-rectangular sets
-    bool shapeFound =
-        AddShape(curIdx, curComp->placementX(), curComp->placementY());
 
     // pmin info update
     curTerm->pmin.Set(((prec)curComp->placementX() + offsetX) / unitX,
@@ -761,6 +842,12 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
            << curComp->name() << endl;
       exit(1);
     }
+    
+    // check whether this nodes contains sub-rectangular sets
+    bool shapeFound =
+        AddShape(curIdx, curComp->placementX(), curComp->placementY(),
+                  curMacro->sizeX(), curMacro->sizeY(), // for orient 
+                  curComp->placementOrient());          // for orient 
 
     //
     // ** terminal/terminal_NI determination rule
@@ -776,8 +863,14 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     // size info update from LEF Macro
     //        if( shapeFound || __ckt.lefObsStor[macroIdx].size() == 0) {
     // terminal nodes (in bookshelf)
-    curTerm->size.Set(l2d * curMacro->sizeX() / unitX,
-                      l2d * curMacro->sizeY() / unitY, 1);
+   
+    // Orient consideration
+    std::pair<float, float> macroSize = 
+      GetOrientSize(curMacro->sizeX(), curMacro->sizeY(), curComp->placementOrient()); 
+
+    curTerm->size.Set(l2d * macroSize.first   / unitX,
+                      l2d * macroSize.second  / unitY, 1);
+
     curTerm->isTerminalNI = false;
     //        }
     //        else {
@@ -802,13 +895,11 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     string termName = curComp->id();
 
     // set Name
-//    strcpy(curTerm->name, termName.c_str());
     terminalNameStor.push_back(termName); 
 
     // set tier
     moduleTermMap[termName] = make_pair(false, terminalCNT);
 
-    //        curTerm->Dump();
     terminalCNT++;
   }
 
@@ -1215,10 +1306,11 @@ int GetIO(Circuit::Circuit& __ckt, string& instName, string& pinName,
 FPOS GetOffset(Circuit::Circuit& __ckt, string& instName, string& pinName,
                int macroIdx = INT_MAX) {
   //    int defCompIdx = INT_MAX;
-  if(macroIdx == INT_MAX) {
-    // First, it references COMPONENTS
-    int defCompIdx = GetDefComponentIdx(__ckt, instName);
+  
+  // First, it references COMPONENTS
+  int defCompIdx = GetDefComponentIdx(__ckt, instName);
 
+  if(macroIdx == INT_MAX) {
     // Second, it reference MACRO in lef
     string compName = string(__ckt.defComponentStor[defCompIdx].name());
     macroIdx = GetLefMacroIdx(__ckt, compName);
@@ -1226,10 +1318,21 @@ FPOS GetOffset(Circuit::Circuit& __ckt, string& instName, string& pinName,
 
   // Finally, it reference PIN from MACRO in lef
   int pinIdx = GetLefMacroPinIdx(__ckt, macroIdx, pinName);
+  
+  // extract orient information from def
+  int orient = __ckt.defComponentStor[defCompIdx].placementOrient();
 
-  // extract center Macro Cell Coordinate
-  prec centerX = l2d * __ckt.lefMacroStor[macroIdx].sizeX() / 2;
-  prec centerY = l2d * __ckt.lefMacroStor[macroIdx].sizeY() / 2;
+  // extract Macro's center points
+  // orient-awareness
+  float origMacroSizeX = __ckt.lefMacroStor[macroIdx].sizeX();
+  float origMacroSizeY = __ckt.lefMacroStor[macroIdx].sizeY();
+
+  std::pair<float, float> macroSize = 
+    GetOrientSize( origMacroSizeX, origMacroSizeY, orient );
+
+  // real center points with orient-aware
+  prec centerX = l2d * macroSize.first / 2;
+  prec centerY = l2d * macroSize.second / 2;
 
   bool isFirstMetal = false;
 
@@ -1298,10 +1401,16 @@ FPOS GetOffset(Circuit::Circuit& __ckt, string& instName, string& pinName,
          << " - " << pinName << endl;
     exit(1);
   }
+ 
+  // Get pinCenter points
+  // orient-awareness
+  std::pair<float, float> pinCenter =
+    GetOrientPoint( (lx + ux) / 2, (ly + uy) / 2, 
+                    origMacroSizeX, origMacroSizeY, orient  );
 
   // calculate center offset
-  return FPOS((l2d * (lx + ux) / 2 - centerX) / unitX,
-              (l2d * (ly + uy) / 2 - centerY) / unitY);
+  return FPOS((l2d * pinCenter.first - centerX) / unitX,
+              (l2d * pinCenter.second - centerY) / unitY);
 }
 
 //////
