@@ -2929,7 +2929,6 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
   fputs("\n", fp_nodes);
 
   TIER *tier = &tier_st[curLayer];
-  tier->row_term_cnt = 0;
 
   int term_cnt = (lab) ? tier->mac_cnt + terminalCNT + pin_term_cnt
                        : terminalCNT + pin_term_cnt;
@@ -3028,7 +3027,6 @@ void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
   fputs("\n", fp_nodes);
 
   TIER *tier = &tier_st[curLayer];
-  tier->row_term_cnt = 0;
 
   int term_cnt = (lab) ? tier->mac_cnt + terminalCNT + pin_term_cnt
                        : terminalCNT + pin_term_cnt;
@@ -3485,7 +3483,7 @@ void WriteSclWithDummy(char *dir_tier, int curLayer, DummyCellInfo &dummyInst) {
   TIER *tier = &tier_st[curLayer];
 
   fputs("\n", fp_scl);
-  fprintf(fp_scl, "NumRows :  \t%d\n", tier->row_cnt + tier->row_term_cnt);
+  fprintf(fp_scl, "NumRows :  \t%d\n", tier->row_cnt);
   fputs("\n", fp_scl);
 
   // sort the Y-Order due to limit of DP

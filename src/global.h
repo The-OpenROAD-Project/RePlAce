@@ -713,7 +713,6 @@ struct TIER {
   prec inv_bin_area;
   prec sum_ovf;
   int row_cnt;
-  int row_term_cnt;
   int modu_cnt;
   int filler_cnt;
   int cell_cnt;
