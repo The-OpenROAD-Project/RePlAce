@@ -134,7 +134,11 @@ int PlotEnv::GetY(prec coord) {
 
 typedef CImg< unsigned char > CImgObj;
 
-void DrawTerminal(CImgObj &img, const unsigned char color[], float opacity) {
+void DrawTerminal(CImgObj &img, 
+    const unsigned char termColor[],
+    const unsigned char pinColor[], float opacity) {
+  int pinWidth = 30;
+
   // FIXED CELL
   for(int i = 0; i < terminalCNT; i++) {
     TERM *curTerminal = &terminalInstance[i];
@@ -149,20 +153,28 @@ void DrawTerminal(CImgObj &img, const unsigned char color[], float opacity) {
       int x3 = pe.GetX(curTerminal->pmax);
       int y1 = pe.GetY(curTerminal->pmin);
       int y3 = pe.GetY(curTerminal->pmax);
-      img.draw_rectangle(x1, y1, x3, y3, color, opacity);
-      //            img.draw_text((x1+x3)/2, (y1+y3)/2, curTerminal->name,
-      //            black, NULL, 1, 30);
+      img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
     }
     else {
-      for(auto &curIdx : shapeMap[curTerminal->Name()]) {
+      for(auto &curIdx : shapeMap[curTerminal->Name()]  ) {
         int x1 = pe.GetX(shapeStor[curIdx].llx);
         int y1 = pe.GetY(shapeStor[curIdx].lly);
 
         int x3 = pe.GetX(shapeStor[curIdx].llx + shapeStor[curIdx].width);
         int y3 = pe.GetY(shapeStor[curIdx].lly + shapeStor[curIdx].height);
 
-        img.draw_rectangle(x1, y1, x3, y3, color, opacity);
+        img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
       }
+    }
+
+    for(int j=0; j<curTerminal->pinCNTinObject; j++) {
+      int x1 = pe.GetX((curTerminal->center.x + curTerminal->pof[j].x) - pinWidth / 2.0);
+      int y1 = pe.GetY((curTerminal->center.y + curTerminal->pof[j].y) - pinWidth / 2.0);
+
+      int x3 = pe.GetX((curTerminal->center.x + curTerminal->pof[j].x) + pinWidth / 2.0);
+      int y3 = pe.GetY((curTerminal->center.y + curTerminal->pof[j].y) + pinWidth / 2.0);
+
+      img.draw_rectangle( x1, y1, x3, y3, pinColor, opacity );
     }
   }
 }
@@ -373,7 +385,7 @@ void DrawArrowDensity(CImgObj &img, float opacity) {
 void SaveCellPlot(CImgObj &img, bool isGCell) {
   float opacity = 0.7;
   // FIXED CELL
-  DrawTerminal(img, blue, opacity);
+  DrawTerminal(img, blue, black, opacity);
 
   // STD CELL
   if(!isGCell) {
