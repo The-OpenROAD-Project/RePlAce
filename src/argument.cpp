@@ -103,7 +103,7 @@ void initArgument(int argc, char *argv[]) {
   onlyGlobalPlaceCMD = false;   // bool
   isSkipIP = false;             // bool
   isTiming = false;
-  isNtuDummyFill = false;
+  isNtuDummyFill =  true;
 
   isARbyUserCMD = false;         // bool
   thermalAwarePlaceCMD = false;  // bool
