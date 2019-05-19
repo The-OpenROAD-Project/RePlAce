@@ -3,11 +3,11 @@ CPPC	=   g++
 LD      =   ld
 # For Multi-thread
 # OPTFLAG = 	-g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 -fopenmp -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 
-OPTFLAG = -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
+OPTFLAG = -g -ggdb -m64 -O3 -fPIC -DNDEBUG -ffast-math -Dcimg_display=1 
 WFLAG 	= -W -Wall -Wextra -Wunreachable-code 
 WSTRICT =	-Werror -Wundef -Wpointer-arith 
 
-INCLUDE = -I$(CURDIR) -I$(MKLROOT)/include -I$(IPPROOT)/include \
+INCLUDE = -I$(CURDIR) -I$(MKLROOT)/include \
 			-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
 			-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/include \
 			-I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
@@ -43,20 +43,12 @@ VERILOGLIB 		= -L$(VERILOGROOT)/lib -lverilog_parser
 FLUTELIB 		= -L$(FLUTEROOT)/lib -lflute
 MKLLIB 			= ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
 					${MKLROOT}/lib/intel64/libmkl_gnu_thread.a \
-					${MKLROOT}/lib/intel64/libmkl_core.a \
-					${IPPROOT}/lib/intel64/libippi.a \
-				   	${IPPROOT}/lib/intel64/libipps.a \
-					${IPPROOT}/lib/intel64/libippcore.a \
-				   	${IPPROOT}/lib/intel64/libippvm.a
+					${MKLROOT}/lib/intel64/libmkl_core.a
 
 OPENSTALIB 		= $(OPENSTAROOT)/lib/libOpenSTA.a 
 
 ifndef	MKLROOT
     MKLROOT		=	/opt/intel/mkl
-endif
-
-ifndef	IPPROOT
-    IPPROOT		=	/opt/intel/ipp
 endif
 
 HASHROOT 		= ../module/sparsehash/install-sp/include

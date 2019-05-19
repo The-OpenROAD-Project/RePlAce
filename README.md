@@ -21,7 +21,7 @@
 ## Install on a bare-metal machine
 
 ### Pre-requisite
-* Intel MKL and IPP package [Link](https://software.intel.com/en-us/articles/free-ipsxe-tools-and-libraries) >= 2016.3.210
+* Intel MKL packages [Link](https://software.intel.com/en-us/articles/free-ipsxe-tools-and-libraries) >= 2016.3.210
 * GCC compiler and libstdc++ static library >= 5.4.0
 * boost library >= 1.41
 * bison (for verilog parser) >= 3.0.4
@@ -32,7 +32,7 @@
 ### Clone repo and submodules 
     $ git clone --recursive https://github.com/abk-openroad/RePlAce.git
     
-Then, modify the __MKLROOT__ and __IPPROOT__ to the corresponding install paths in [src/Makefile](src/Makefile)
+Then, modify the __MKLROOT__ to the corresponding install paths in [src/Makefile](src/Makefile)
 
     $ cd ~/RePlAce
     $ make clean
