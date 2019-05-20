@@ -240,29 +240,31 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
 
   // read_netlist
   NetworkReader* network = _sta->networkReader();
-  bool readVerilog = false;
   if(!network) {
     cout << "ERROR: Internal OpenSTA has problem for generating networkReader" << endl;
     exit(1);
   }
 
-
   // Parsing the Verilog
   _sta->readNetlistBefore();
-//  VerilogReader* verilogReader = new VerilogReader(_sta->report(), _sta->debug(), network);
-//  verilogReader->
 
-  readVerilog = readVerilogFile(verilogName.c_str(), _sta->report(),
+  bool readVerilog = readVerilogFile(verilogName.c_str(), _sta->report(),
                                   _sta->debug(), _sta->networkReader());
 
-
   // link_design
-  cout << "Now linking; " << topCellName << endl;
-  bool link = _sta->linkDesign(topCellName.c_str());
+  cout << "INFO:  Now linking: " << topCellName << endl;
+  Tcl_Eval(_interp, string("set link_make_black_boxes 0").c_str() ); 
+  Tcl_Eval(_interp, string("link_design " + topCellName ).c_str() );
 
   bool is_linked = network->isLinked();
   if(is_linked) {
-    cout << "linked: " << network->cellName(_sta->currentInstance()) << endl;
+    cout << "INFO:  Successfully linked: " 
+      << network->cellName(_sta->currentInstance()) << endl;
+  }
+  else {
+    cout << "ERROR:  Linking Fail. Please put liberty files ";
+    cout << "to instantiate OpenSTA correctly" << endl;
+    exit(1);
   }
 
   // network = _sta->networkReader();
