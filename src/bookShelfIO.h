@@ -120,6 +120,7 @@ class DummyCellInfo {
 
   // scale down param
   prec l2d_, unitX_, unitY_;
+  prec offsetX_, offsetY_;
 
   // cellSize
   float siteSizeX_, siteSizeY_;
@@ -154,6 +155,7 @@ class DummyCellInfo {
 
   void SetCircuitInst();
   void SetScaleDownParam();
+  void SetOffsetParam();
   void SetSiteSize(float siteSizeX, float siteSizeY);
   void SetArraySize(int numX, int numY);
 

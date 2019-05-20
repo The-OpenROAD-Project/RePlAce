@@ -271,12 +271,19 @@ prec GetOffsetY() { return offsetY; }
 int GetScaleUpSize(prec input) {
   return INT_CONVERT( input * GetUnitX() );
 }
-int GetScaleUpPoint(prec input) {
+
+int GetScaleUpPointX(prec input) {
   return INT_CONVERT( input * GetUnitX() - GetOffsetX() );
 }
+int GetScaleUpPointY(prec input) {
+  return INT_CONVERT( input * GetUnitY() - GetOffsetY() );
+}
 
-float GetScaleUpPointFloat(float input) {
+float GetScaleUpPointFloatX(float input) {
   return input * GetUnitX() - GetOffsetX();
+}
+float GetScaleUpPointFloatY(float input) {
+  return input * GetUnitY() - GetOffsetY();
 }
 
 prec GetScaleDownSize(prec input) {
@@ -340,7 +347,10 @@ void SetParameter() {
     exit(1);
   }
 
-  unitY = l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / 9.0f;
+  int siteSizeX = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() );
+  int siteSizeY = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() );
+
+  unitY = 1.0 * siteSizeY / 9.0f;
   unitX = unitY;
 
   cout << "INFO:  SCALE DOWN UNIT: ( " << unitX << ", " << unitY << " )"
@@ -348,24 +358,30 @@ void SetParameter() {
 
   // offsetX & offsetY : Minimum coordinate of ROW's x/y
   if(IsPrecEqual(offsetX, PREC_MAX)) {
+    int rowMin = INT_MAX;
     for(auto& curRow : __ckt.defRowStor) {
-      offsetX = (offsetX > curRow.x()) ? curRow.x() : offsetX;
+      rowMin = (rowMin > curRow.x()) ? curRow.x() : rowMin;
     }
-    offsetX = (INT_CONVERT(offsetX) % INT_CONVERT(unitX) == 0)
-      ? 0
-      : unitX - (INT_CONVERT(offsetX) % (INT_CONVERT(unitX)));
+//    offsetX = (INT_CONVERT(offsetX) % INT_CONVERT(unitX) == 0)
+//      ? 0
+//      : unitX - (INT_CONVERT(offsetX) % (INT_CONVERT(unitX)));
+
+    offsetX = (rowMin % siteSizeY == 0)? 
+              0 : siteSizeY - (rowMin % siteSizeY);
   }
 
   if(IsPrecEqual(offsetY, PREC_MAX)) { 
+    int rowMin = INT_MAX;
     for(auto& curRow : __ckt.defRowStor) {
-      offsetY = (offsetY > curRow.y()) ? curRow.y() : offsetY;
+      rowMin = (rowMin > curRow.y()) ? curRow.y() : rowMin;
     }
-    offsetY = (INT_CONVERT(offsetY) % INT_CONVERT(unitY) == 0)
-      ? 0
-      : unitY - (INT_CONVERT(offsetY) % (INT_CONVERT(unitY)));
+//    offsetY = (INT_CONVERT(offsetY) % INT_CONVERT(unitY) == 0)
+//      ? 0
+//      : unitY - (INT_CONVERT(offsetY) % (INT_CONVERT(unitY)));
+    
+    offsetY = (rowMin % siteSizeY == 0)? 
+              0 : siteSizeY - (rowMin % siteSizeY);
   }
-
-  offsetX = offsetY = 0;
 
   cout << "INFO:  OFFSET COORDINATE: ( " << offsetX << ", " << offsetY << " )"
        << endl
@@ -415,9 +431,7 @@ void ParseLefDef() {
 
   GenerateRow(__ckt);
   GenerateModuleTerminal(__ckt);
-  if(defMacroCnt > 0 || isNtuDummyFill ) {
-    GenerateFullRow(__ckt);
-  }
+  GenerateFullRow(__ckt);
 
   if(__ckt.defNetStor.size() > 0) {
     cout << "INFO:  EXTRACT NET INFO FROM DEF ONLY" << endl;
@@ -984,16 +998,24 @@ DieRect GetDieFromProperty( bool isScaleDown ) {
     }
 
     if(string(prop.propName()) == llxStr) {
-      retRect.llx = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitX) : INT_CONVERT(prop.number()*l2d);
+      retRect.llx = (isScaleDown)? 
+        (prop.number() * l2d / unitX) : 
+        (prop.number() * l2d);
     }
     else if(string(prop.propName()) == llyStr) {
-      retRect.lly = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitY) : INT_CONVERT(prop.number()*l2d);
+      retRect.lly = (isScaleDown)? 
+        (prop.number() * l2d / unitY) : 
+        (prop.number() * l2d);
     }
     else if(string(prop.propName()) == urxStr) {
-      retRect.urx = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitX) : INT_CONVERT(prop.number()*l2d);
+      retRect.urx = (isScaleDown)? 
+        (prop.number() * l2d / unitX) : 
+        (prop.number() * l2d);
     }
     else if(string(prop.propName()) == uryStr) {
-      retRect.ury = (isScaleDown)? INT_CONVERT(prop.number() * l2d / unitY) : INT_CONVERT(prop.number()*l2d);
+      retRect.ury = (isScaleDown)? 
+        (prop.number() * l2d / unitY) : 
+        (prop.number() * l2d);
     }
   }
   return retRect;
@@ -1014,6 +1036,38 @@ DieRect GetDieFromDieArea( bool isScaleDown ) {
 
   retRect.Dump();
   return retRect;
+}
+
+DieRect GetCoreFromRow() {
+  
+  float minX = FLT_MAX, minY = FLT_MAX;
+  float maxX = FLT_MIN, maxY = FLT_MIN;
+
+  for(auto& curRow : __ckt.defRowStor) {
+    auto sitePtr = __ckt.lefSiteMap.find(string(curRow.macro()));
+    if(sitePtr == __ckt.lefSiteMap.end()) {
+      cout << "\n** ERROR:  Cannot find SITE in lef files: " << curRow.macro()
+           << endl;
+      exit(1);
+    }
+    lefiSite* lefSite = &__ckt.lefSiteStor[sitePtr->second];
+
+    float curMinX = ( (curRow.x() + offsetX) / unitX );
+    float curMinY = ( (curRow.y() + offsetY) / unitY );
+
+    minX = (minX > curMinX) ? curMinX : minX;
+    minY = (minY > curMinY) ? curMinY : minY;
+
+    float curMaxX = ( (curRow.x() + offsetX +
+          curRow.xNum() * l2d * lefSite->sizeX()) / unitX );
+    float curMaxY = ( (curRow.y() + offsetY + 
+          curRow.yNum() * l2d * lefSite->sizeY()) / unitY );
+   
+    maxX = (maxX < curMaxX) ? curMaxX : maxX;
+    maxY = (maxY < curMaxY) ? curMaxY : maxY;
+  }
+
+  return DieRect(minX, minY, maxX, maxY); 
 }
 
 /////////////////////////////////////////////
@@ -1118,10 +1172,14 @@ void GenerateRow(Circuit::Circuit& __ckt) {
 // MS-Placement requires this!
 void GenerateFullRow(Circuit::Circuit& __ckt) {
   cout << "INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) " << endl;
-  mkl_free(row_st);
+  if( row_st ) {
+    mkl_free(row_st);
+  }
   // Newly create the all ROW area for floorplan.
   // In here, I've used DESIGN FE_CORE_BOX_LL_X statements in
   // PROPERTYDEFINITIONS
+  
+  /*
   DieRect dieArea = GetDieFromProperty();
   if(dieArea.isNotInitialize()) {
     dieArea = GetDieFromDieArea();
@@ -1129,10 +1187,12 @@ void GenerateFullRow(Circuit::Circuit& __ckt) {
   if(dieArea.isNotInitialize()) {
     cout << "ERROR: DIEAREA ERROR" << endl;
     exit(1);
-  }
+  }*/
 
-  cout << "INFO:  DIEAREA: (" << dieArea.llx << " " << dieArea.lly << ") - ("
-       << dieArea.urx << " " << dieArea.ury << ")" << endl;
+  DieRect coreArea = GetCoreFromRow();
+
+  cout << "INFO:  CORE AREA: (" << coreArea.llx << " " << coreArea.lly << ") - ("
+       << coreArea.urx << " " << coreArea.ury << ")" << endl;
 
   // this portion is somewhat HARD_CODING
   // it regards there only one SITE definition per each design!
@@ -1153,16 +1213,14 @@ void GenerateFullRow(Circuit::Circuit& __ckt) {
     exit(1);
   }
 
-  int siteX =
-      INT_CONVERT(l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX);
-  int siteY =
-      INT_CONVERT(l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY);
+  float siteX = l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX;
+  float siteY = l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY;
 
-  int rowCntX = (dieArea.urx - dieArea.llx) / siteX;
-  int rowCntY = (dieArea.ury - dieArea.lly) / siteY;
+  int rowCntX = INT_CONVERT( (coreArea.urx - coreArea.llx) / siteX );
+  int rowCntY = INT_CONVERT( (coreArea.ury - coreArea.lly) / siteY );
 
-  int rowSizeX = rowCntX * siteX;
-  int rowSizeY = rowHeight = siteY;
+  float rowSizeX = rowCntX * siteX;
+  float rowSizeY = rowHeight = siteY;
 
   row_cnt = rowCntY;
   row_st = (ROW*)mkl_malloc(sizeof(ROW) * row_cnt, 64);
@@ -1229,9 +1287,9 @@ void GenerateFullRow(Circuit::Circuit& __ckt) {
     ROW* curRow = &row_st[i];
     new(curRow) ROW();
 
-    curRow->pmin.Set(dieArea.llx, dieArea.lly + i * siteY, 0);
+    curRow->pmin.Set(coreArea.llx, coreArea.lly + i * siteY, 0);
     curRow->size.Set(rowSizeX, rowSizeY, 1);
-    curRow->pmax.Set(dieArea.llx + rowSizeX, dieArea.lly + i * siteY + rowSizeY,
+    curRow->pmax.Set(coreArea.llx + rowSizeX, coreArea.lly + i * siteY + rowSizeY,
                      1);
 
     if(i == 0) {
@@ -1243,7 +1301,7 @@ void GenerateFullRow(Circuit::Circuit& __ckt) {
 
     curRow->x_cnt = rowCntX;
     curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep() / unitX;
-    //        curRow->Dump(to_string(i));
+//    curRow->Dump(to_string(i));
   }
 
   cout << "INFO:  NEW ROW SIZE: ( " << SITE_SPA << ", " << rowHeight << " ) "
@@ -2286,6 +2344,11 @@ void DummyCellInfo::SetScaleDownParam() {
   unitX_ = unitX;
   unitY_ = unitY;
   l2d_ = l2d;
+}
+
+void DummyCellInfo::SetOffsetParam() {
+  offsetX_ = offsetX;
+  offsetY_ = offsetY;
 }
 
 void DummyCellInfo::SetCircuitInst() {

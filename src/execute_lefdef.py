@@ -17,7 +17,7 @@ import time
 bmflag = "etc"
 dpflag = "NTU4"
 dploc = "../ntuplace/ntuplace4h"
-dirpos = "../bench/lefdef"
+dirpos = "../bench/ispd18"
 binaryName = "./RePlAce"
 outpos = "../output"
 logpos = "../logdir"

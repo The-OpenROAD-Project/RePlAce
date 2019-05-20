@@ -283,20 +283,25 @@ extern Circuit __ckt;
 CIRCUIT_NAMESPACE_CLOSE
 
 struct DieRect {
-  int llx, lly, urx, ury;
-  DieRect() : llx(INT_MAX), lly(INT_MAX), urx(INT_MIN), ury(INT_MIN){};
+  float llx, lly, urx, ury;
+  DieRect() : 
+    llx(FLT_MAX), lly(FLT_MAX), urx(FLT_MIN), ury(FLT_MIN) {};
+  DieRect(float _llx, float _lly, float _urx, float _ury) :
+    llx(_llx), lly(_lly), urx(_urx), ury(_ury) {};
+
   bool isNotInitialize() {
-    return (llx == INT_MAX || lly == INT_MAX || urx == INT_MIN ||
-            ury == INT_MIN);
+    return (llx == FLT_MAX || lly == FLT_MAX || 
+            urx == FLT_MIN || ury == FLT_MIN);
   }
   void Dump() {
-    cout << "(" << llx << ", " << lly << ") - (" << urx << ", " << ury << ")"
-         << endl;
+    cout << "(" << llx << ", " << lly << ") - (" 
+      << urx << ", " << ury << ")" << endl;
   }
 };
 
 DieRect GetDieFromProperty(bool isScaleDown = true);
 DieRect GetDieFromDieArea(bool isScaleDown = true);
+DieRect GetCoreFromRow();
 
 void ParseInput();
 void ParseLefDef();
@@ -329,8 +334,10 @@ prec GetOffsetX();
 prec GetOffsetY();
 
 int GetScaleUpSize(float input);
-int GetScaleUpPoint(float input);
-float GetScaleUpPointFloat( float input);
+int GetScaleUpPointX(float input);
+int GetScaleUpPointY(float input);
+float GetScaleUpPointFloatX( float input);
+float GetScaleUpPointFloatY( float input);
 
 prec GetScaleDownSize(float input);
 prec GetScaleDownPoint(float input);

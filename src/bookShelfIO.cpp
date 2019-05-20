@@ -2642,8 +2642,8 @@ void WriteShapes(char *dir_tier, bool isShapeDrawing, bool isNameConvert) {
     for(auto &curIdx : curShapeNode.second) {
       fprintf(fp_shapes, "\t%s\t%d\t%d\t%d\t%d\n",
               shapeStor[curIdx].name.c_str(), 
-              GetScaleUpPoint( shapeStor[curIdx].llx ),
-              GetScaleUpPoint( shapeStor[curIdx].lly ), 
+              GetScaleUpPointX( shapeStor[curIdx].llx ),
+              GetScaleUpPointY( shapeStor[curIdx].lly ), 
               GetScaleUpSize( shapeStor[curIdx].width ),
               GetScaleUpSize( shapeStor[curIdx].height ));
     }
@@ -3310,8 +3310,8 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
     MODULE *modu = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
         (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
-        GetScaleUpPointFloat( modu->pmin.x ), 
-        GetScaleUpPointFloat( modu->pmin.y ));
+        GetScaleUpPointFloatX( modu->pmin.x ), 
+        GetScaleUpPointFloatY( modu->pmin.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
@@ -3321,16 +3321,16 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
     if(isShapeDrawing) {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
           (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-              GetScaleUpPoint(curTerminal->pmin.x), 
-              GetScaleUpPoint(curTerminal->pmin.y),
+              GetScaleUpPointX(curTerminal->pmin.x), 
+              GetScaleUpPointY(curTerminal->pmin.y),
               fixedStr.c_str());
     }
     else {
       if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
         fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
             (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-                GetScaleUpPoint(curTerminal->pmin.x), 
-                GetScaleUpPoint(curTerminal->pmin.y),
+                GetScaleUpPointX(curTerminal->pmin.x), 
+                GetScaleUpPointY(curTerminal->pmin.y),
                 fixedStr.c_str());
       }
       else {
@@ -3340,8 +3340,8 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
                       _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name()) + string("/") +
                          string(shapeStor[curShapeIdx].name))
                       .c_str(),
-                  GetScaleUpPoint(shapeStor[curShapeIdx].llx),
-                  GetScaleUpPoint(shapeStor[curShapeIdx].lly), fixedStr.c_str());
+                  GetScaleUpPointX(shapeStor[curShapeIdx].llx),
+                  GetScaleUpPointY(shapeStor[curShapeIdx].lly), fixedStr.c_str());
         }
       }
     }
@@ -3372,11 +3372,11 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
   TIER *tier = &tier_st[curLayer];
 
   for(int i = 0; i < tier->modu_cnt; i++) {
-    MODULE *modu = tier->modu_st[i];
+    MODULE *curModule = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
-        (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
-        GetScaleUpPointFloat( modu->pmin.x ), 
-        GetScaleUpPointFloat( modu->pmin.y ));
+        (isNameConvert)? _bsMap.GetBsModuleName( curModule->Name() ) : curModule->Name(), 
+        GetScaleUpPointFloatX( curModule->pmin.x ), 
+        GetScaleUpPointFloatY( curModule->pmin.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
@@ -3386,16 +3386,16 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
     if(isShapeDrawing) {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
           (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-              GetScaleUpPoint (curTerminal->pmin.x), 
-              GetScaleUpPoint (curTerminal->pmin.y),
+              GetScaleUpPointX (curTerminal->pmin.x), 
+              GetScaleUpPointY (curTerminal->pmin.y),
               fixedStr.c_str());
     }
     else {
       if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
         fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
             (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-                GetScaleUpPoint(curTerminal->pmin.x), 
-                GetScaleUpPoint(curTerminal->pmin.y),
+                GetScaleUpPointX(curTerminal->pmin.x), 
+                GetScaleUpPointY(curTerminal->pmin.y),
                 fixedStr.c_str());
       }
       else {
@@ -3404,8 +3404,8 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
                   string(string((isNameConvert)? 
                       _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name()) 
                     + string("/") + string(shapeStor[curShapeIdx].name)).c_str(),
-                  GetScaleUpPoint(shapeStor[curShapeIdx].llx),
-                  GetScaleUpPoint(shapeStor[curShapeIdx].lly), fixedStr.c_str());
+                  GetScaleUpPointX(shapeStor[curShapeIdx].llx),
+                  GetScaleUpPointY(shapeStor[curShapeIdx].lly), fixedStr.c_str());
         }
       }
     }
@@ -3415,8 +3415,8 @@ void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
   for(auto &curTerm : *dummyTermStor) {
     fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
         (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.Name()) : curTerm.Name(),
-            GetScaleUpPoint(curTerm.pmin.x), 
-            GetScaleUpPoint(curTerm.pmin.y));
+            GetScaleUpPointX(curTerm.pmin.x), 
+            GetScaleUpPointY(curTerm.pmin.y));
   }
 
   fclose(fp_pl);
@@ -3452,14 +3452,14 @@ void WriteScl(char *dir_tier, int curLayer) {
   // iterate based on the sorted order
   for(auto &curRow : tmpRowStor) {
     fprintf(fp_scl, "CoreRow Horizontal\n");
-    fprintf(fp_scl, "  Coordinate    :   %d\n", GetScaleUpPoint(curRow.pmin.y));
+    fprintf(fp_scl, "  Coordinate    :   %d\n", GetScaleUpPointY(curRow.pmin.y));
     fprintf(fp_scl, "  Height        :   %d\n", GetScaleUpSize(rowHeight));
     fprintf(fp_scl, "  Sitewidth     :    %d\n", GetScaleUpSize( curRow.site_wid ));
     fprintf(fp_scl, "  Sitespacing   :    %d\n", GetScaleUpSize( curRow.site_spa ));
     fprintf(fp_scl, "  Siteorient    :    %s\n",
             (curRow.isYSymmetry) ? "Y" : "1");
     fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
-    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", GetScaleUpPoint(curRow.pmin.x),
+    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", GetScaleUpPointX(curRow.pmin.x),
             curRow.x_cnt);
     fprintf(fp_scl, "End\n");
   }
@@ -3490,14 +3490,14 @@ void WriteSclWithDummy(char *dir_tier, int curLayer, DummyCellInfo &dummyInst) {
   // iterate based on the sorted order
   for(auto &curRow : *dummyInst.GetRowStor()) {
     fprintf(fp_scl, "CoreRow Horizontal\n");
-    fprintf(fp_scl, "  Coordinate    :   %d\n", GetScaleUpPoint(curRow.pmin.y));
+    fprintf(fp_scl, "  Coordinate    :   %d\n", GetScaleUpPointY(curRow.pmin.y));
     fprintf(fp_scl, "  Height        :   %d\n", GetScaleUpSize(rowHeight));
     fprintf(fp_scl, "  Sitewidth     :    %d\n", GetScaleUpSize(curRow.site_wid));
     fprintf(fp_scl, "  Sitespacing   :    %d\n", GetScaleUpSize(curRow.site_spa));
     fprintf(fp_scl, "  Siteorient    :    %s\n",
             (curRow.isYSymmetry) ? "Y" : "1");
     fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
-    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", GetScaleUpPoint(curRow.pmin.x),
+    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", GetScaleUpPointX(curRow.pmin.x),
             curRow.x_cnt);
     fprintf(fp_scl, "End\n");
   }
@@ -3513,6 +3513,8 @@ DummyCellInfo::DummyCellInfo()
     : l2d_(PREC_MAX),
       unitX_(PREC_MAX),
       unitY_(PREC_MAX),
+      offsetX_(PREC_MAX),
+      offsetY_(PREC_MAX),
       siteSizeX_(INT_MAX),
       siteSizeY_(INT_MAX),
       numX_(INT_MAX),
@@ -3524,6 +3526,7 @@ DummyCellInfo::DummyCellInfo()
 void DummyCellInfo::Init() {
   SetCircuitInst();
   SetScaleDownParam();
+  SetOffsetParam();
   SetLayoutArea();
   SetEnvironment();
   GenerateDummyCell();
@@ -3573,14 +3576,15 @@ void DummyCellInfo::SetEnvironment() {
 }
 
 void DummyCellInfo::SetLayoutArea() {
-  dieRect_ = GetDieFromProperty();
-  if(dieRect_.isNotInitialize()) {
-    dieRect_ = GetDieFromDieArea();
-  }
-  if(dieRect_.isNotInitialize()) {
-    cout << "ERROR: DIEAREA ERROR" << endl;
-    exit(1);
-  }
+//  dieRect_ = GetDieFromProperty();
+//  if(dieRect_.isNotInitialize()) {
+//    dieRect_ = GetDieFromDieArea();
+//  }
+//  if(dieRect_.isNotInitialize()) {
+//    cout << "ERROR: DIEAREA ERROR" << endl;
+//    exit(1);
+//  }
+  dieRect_ = GetCoreFromRow();
 }
 
 void DummyCellInfo::InitArray() {
@@ -3773,11 +3777,8 @@ void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing,
     for(int j = 0; j < net->pinCNTinObject2; j++) {
       pin = net->pin[j];
 
-      /* if(pin->tier <= z) */
-      /*   { */
       net->pinCNTinObject_tier++;
       pin_cnt++;
-      /* } */
     }
   }
 
@@ -4020,8 +4021,8 @@ void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConv
     modu = tier->modu_st[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
         (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
-        GetScaleUpPointFloat( modu->pmin.x ), 
-        GetScaleUpPointFloat( modu->pmin.y ));
+        GetScaleUpPointFloatX( modu->pmin.x ), 
+        GetScaleUpPointFloatY( modu->pmin.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
@@ -4029,14 +4030,14 @@ void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConv
     if(!curTerminal->isTerminalNI) {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
           (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-              GetScaleUpPoint(curTerminal->pmin.x), 
-              GetScaleUpPoint(curTerminal->pmin.y));
+              GetScaleUpPointX(curTerminal->pmin.x), 
+              GetScaleUpPointY(curTerminal->pmin.y));
     }
     else {
       fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED_NI\n", 
           (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-              GetScaleUpPoint(curTerminal->pmin.x), 
-              GetScaleUpPoint(curTerminal->pmin.y));
+              GetScaleUpPointX(curTerminal->pmin.x), 
+              GetScaleUpPointY(curTerminal->pmin.y));
     }
   }
   
@@ -4044,7 +4045,7 @@ void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConv
   for(auto &curTerm : *dummyTermStor) {
     fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
         (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.Name()) : curTerm.Name(),
-            GetScaleUpPoint(curTerm.pmin.x), GetScaleUpPoint(curTerm.pmin.y));
+            GetScaleUpPointX(curTerm.pmin.x), GetScaleUpPointY(curTerm.pmin.y));
   }
 
   fclose(fp_pl);
