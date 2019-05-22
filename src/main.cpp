@@ -380,7 +380,7 @@ bool isOnlyLGinDP;
 bool isPlot;
 bool isSkipIP;
 bool isBinSet;
-bool isNtuDummyFill;
+bool isDummyFill;
 
 int conges_eval_methodCMD;
 bool isVerbose;

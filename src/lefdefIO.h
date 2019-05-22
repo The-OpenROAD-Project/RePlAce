@@ -95,6 +95,7 @@ using std::pair;
 using google::dense_hash_map;
 
 CIRCUIT_NAMESPACE_OPEN
+
 class Circuit {
  public:
   Circuit() : lefManufacturingGrid(DBL_MIN) {
@@ -261,19 +262,11 @@ class Circuit {
 
 // Verilog net Info Storage
 struct NetInfo {
-  //    string macroName;
-  //    string compName;
-  //    string pinName;
 
   int macroIdx;
   int compIdx;
   int pinIdx;
 
-  //    NetInfo(char* _macroName, char* _compName, char* _pinName) {
-  //        macroName = string(_macroName);
-  //        compName = string(_compName);
-  //        pinName = string(_pinName);
-  //    }
   NetInfo(int _macroIdx, int _compIdx, int _pinIdx)
       : macroIdx(_macroIdx), compIdx(_compIdx), pinIdx(_pinIdx){};
 };
@@ -282,6 +275,8 @@ extern Circuit __ckt;
 
 CIRCUIT_NAMESPACE_CLOSE
 
+/////////////////////////////////////////////////////
+// DieRect struct  
 struct DieRect {
   float llx, lly, urx, ury;
   DieRect() : 
@@ -303,6 +298,28 @@ DieRect GetDieFromProperty(bool isScaleDown = true);
 DieRect GetDieFromDieArea(bool isScaleDown = true);
 DieRect GetCoreFromRow();
 
+/////////////////////////////////////////////////////
+// ArrayInfo class
+class ArrayInfo {
+private:
+  float lx_;
+  float ly_;
+  float siteSizeX_;
+  float siteSizeY_;
+public:
+  enum CellInfo {Empty, Row, Cell};
+  ArrayInfo(float lx, float ly, float siteSizeX, float siteSizeY) :
+    lx_(lx), ly_(ly), siteSizeX_(siteSizeX), siteSizeY_(siteSizeY) {};
+  int GetCoordiX( float x );
+  int GetCoordiY( float y );
+  
+  int GetLowerX( float x );
+  int GetLowerY( float y );
+  
+  int GetUpperX( float x );
+  int GetUpperY( float y );
+};
+
 void ParseInput();
 void ParseLefDef();
 
@@ -317,6 +334,7 @@ void WriteDef(const char* defOutput);
 void GenerateModuleTerminal(Circuit::Circuit& __ckt);
 void GenerateRow(Circuit::Circuit& __ckt);
 void GenerateFullRow(Circuit::Circuit& __ckt);
+void GenerateDummyCell(Circuit::Circuit& __ckt);
 
 void GenerateNetDefOnly(Circuit::Circuit& __ckt);
 void GenerateNetDefVerilog(Circuit::Circuit& __ckt);

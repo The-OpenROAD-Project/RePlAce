@@ -64,7 +64,6 @@ OPENSTASRCROOT 	= ../module/OpenSTA/
 	$(CPPC) $(CPPFLAG) $(IFLUTE) -c -o $@ $< 
 
 %.o:		%.cpp 	$(DEPENDS)
-	@touch main.cpp
 	@echo " "
 	@echo "  Building... $@"
 	$(CPPC) $(CPPFLAG) $(INCLUDE) -c -o $@ $< 

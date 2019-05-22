@@ -801,7 +801,7 @@ extern bool isSkipPlacement;
 extern bool hasDensityDP;
 extern bool isSkipIP;
 extern bool isBinSet;
-extern bool isNtuDummyFill;
+extern bool isDummyFill;
 extern prec densityDP;
 extern prec routeMaxDensity;
 

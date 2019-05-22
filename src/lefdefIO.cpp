@@ -362,10 +362,9 @@ void SetParameter() {
     for(auto& curRow : __ckt.defRowStor) {
       rowMin = (rowMin > curRow.x()) ? curRow.x() : rowMin;
     }
-//    offsetX = (INT_CONVERT(offsetX) % INT_CONVERT(unitX) == 0)
-//      ? 0
-//      : unitX - (INT_CONVERT(offsetX) % (INT_CONVERT(unitX)));
 
+    // Note that OffsetX should follow siteSizeY, because unitX = unitY
+    // and unitY comes from siteSizeY
     offsetX = (rowMin % siteSizeY == 0)? 
               0 : siteSizeY - (rowMin % siteSizeY);
   }
@@ -375,9 +374,6 @@ void SetParameter() {
     for(auto& curRow : __ckt.defRowStor) {
       rowMin = (rowMin > curRow.y()) ? curRow.y() : rowMin;
     }
-//    offsetY = (INT_CONVERT(offsetY) % INT_CONVERT(unitY) == 0)
-//      ? 0
-//      : unitY - (INT_CONVERT(offsetY) % (INT_CONVERT(unitY)));
     
     offsetY = (rowMin % siteSizeY == 0)? 
               0 : siteSizeY - (rowMin % siteSizeY);
@@ -389,34 +385,6 @@ void SetParameter() {
 }
 
 void SetVerilogTopModule() {
-  /*
-    using namespace verilog;
-
-    FILE* verilogInput = fopen(verilogName.c_str(), "rb");
-    if( !verilogInput ) {
-        cout << "** ERROR:  Cannot open verilog file: " << verilogName << endl;
-        exit(1);
-    }
-
-    verilog::verilog_parser_init();
-    int result = verilog::verilog_parse_file( verilogInput );
-    if( result != 0 ) {
-        cout << "** ERROR:  Verilog Parse Failed: " << verilogName << endl;
-        exit(1);
-    }
-
-    verilog::verilog_source_tree* tree = verilog::yy_verilog_source_tree;
-    verilog::verilog_resolve_modules(tree);
-
-    if( tree->modules->items > 2 ) {
-        cout << "WARNING:  # Modules in Verilog: " << tree->modules->items
-             << ", so only use the 'First' module" << endl;
-    }
-
-    // extract the '1st' module
-    ast_module_declaration* module =
-    (ast_module_declaration*)ast_list_get(tree->modules, 0);
-  */
   verilogTopModule = __ckt.defDesignName;
 }
 
@@ -431,6 +399,8 @@ void ParseLefDef() {
 
   GenerateRow(__ckt);
   GenerateModuleTerminal(__ckt);
+  
+  GenerateDummyCell(__ckt);
   GenerateFullRow(__ckt);
 
   if(__ckt.defNetStor.size() > 0) {
@@ -835,7 +805,6 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
 
     curTerm->idx = terminalCNT;
 
-
     // pmin info update
     curTerm->pmin.Set(((prec)curComp->placementX() + offsetX) / unitX,
                       ((prec)curComp->placementY() + offsetY) / unitY, (prec)0);
@@ -863,20 +832,6 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
                   curMacro->sizeX(), curMacro->sizeY(), // for orient 
                   curComp->placementOrient());          // for orient 
 
-    //
-    // ** terminal/terminal_NI determination rule
-    //
-    // if OBS exists,
-    //   1) if M1 exists -> (Then shapeFound has 'true') ->  terminal Cell
-    //   2) if M1 does not exists in OBS -> terminal_NI Cell
-    //
-    // if OBS not exists -> terminal Cell (All Metal layer cannot accross this
-    // region)
-    //
-    //
-    // size info update from LEF Macro
-    //        if( shapeFound || __ckt.lefObsStor[macroIdx].size() == 0) {
-    // terminal nodes (in bookshelf)
    
     // Orient consideration
     std::pair<float, float> macroSize = 
@@ -885,16 +840,8 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
     curTerm->size.Set(l2d * macroSize.first   / unitX,
                       l2d * macroSize.second  / unitY, 1);
 
+    // Always visible blockage: terminal
     curTerm->isTerminalNI = false;
-    //        }
-    //        else {
-    // terminal_NI nodes (in bookshelf)
-    //            curTerm->size.Set(0, 0, 1);
-    //            curTerm->isTerminalNI = true;
-    //        }
-
-    //        curTerm->isTerminalNI = (shapeFound ||
-    //        __ckt.lefObsStor[macroIdx].size() == 0)? false : true;
 
     // set center coordi
     curTerm->center.x = curTerm->pmin.x + curTerm->size.x / 2;
@@ -982,6 +929,200 @@ void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
   cout << "INFO:  #MODULE: " << moduleCNT << ", #TERMINAL: " << terminalCNT
        << endl;
 }
+
+/////////////////////////////////////////////////////
+// ArrayInfo class
+
+int ArrayInfo::GetCoordiX( float x ) {
+  return INT_CONVERT ( ((x) - lx_ ) / siteSizeX_ );
+}
+
+int ArrayInfo::GetCoordiY( float y ) {
+  return INT_CONVERT ( ((y) - ly_ ) / siteSizeY_ );
+}
+
+int ArrayInfo::GetLowerX( float x ) {
+  return int( ((x) - lx_ ) / siteSizeX_ );
+}
+
+int ArrayInfo::GetLowerY( float y ) {
+  return int( ((y) - ly_ ) / siteSizeY_ );
+}
+
+int ArrayInfo::GetUpperX (float x) {
+  float val = ( x - lx_ ) / siteSizeX_;
+  int intVal = int( val );
+  return (fabs(val-intVal) <= 0.0001)? intVal : intVal+1;
+}
+
+int ArrayInfo::GetUpperY (float y) {
+  float val = ( y - ly_ ) / siteSizeY_;
+  int intVal = int( val );
+  return (fabs(val-intVal) <= 0.0001)? intVal : intVal+1;
+}
+
+/////////////////////////////////////////////////////
+
+// Dummy Cell Generation procedure to be aware of fragmented-Row
+void GenerateDummyCell(Circuit::Circuit& __ckt) {
+  defiRow *minRow = &__ckt.defRowStor[0];
+  // get the lowest one
+  for(auto curRow : __ckt.defRowStor) {
+    if(minRow->y() < minRow->y()) {
+      minRow = &curRow;
+    }
+  }
+
+  auto sitePtr = __ckt.lefSiteMap.find(string(minRow->macro()));
+  if(sitePtr == __ckt.lefSiteMap.end()) {
+    cout << "\n** ERROR:  Cannot find SITE in lef files: " << minRow->macro()
+         << endl;
+    exit(1);
+  }
+  // Set Site Size
+  float siteSizeX_ =
+       l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX;
+  float siteSizeY_ =
+       l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY;
+
+  cout << "siteSize: " << siteSizeX_ << " " << siteSizeY_ << endl;
+
+  //Set LayoutArea
+  DieRect dieRect_ = GetCoreFromRow();
+
+  // Set Array Counts 
+  int numX_ = INT_CONVERT( (dieRect_.urx - dieRect_.llx) / siteSizeX_ );
+  int numY_ = INT_CONVERT( (dieRect_.ury - dieRect_.lly) / siteSizeY_ );
+  cout << "rowCnt: " << numX_ << " " << numY_ << endl;
+
+  float rowSizeX_ = numX_ * siteSizeX_;
+  float rowSizeY_ = siteSizeY_;
+  cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
+ 
+  // Empty Array Fill 
+  ArrayInfo::CellInfo* arr_ = new ArrayInfo::CellInfo[numX_ * numY_];
+  for(int i = 0; i < numX_ * numY_; i++) {
+    arr_[i] = ArrayInfo::CellInfo::Empty;
+  }
+
+  ArrayInfo ainfo(dieRect_.llx, dieRect_.lly, siteSizeX_, siteSizeY_); 
+
+  // ROW array fill
+  for(int i=0; i<row_cnt ; i++) {
+    ROW* curRow = &row_st[i];
+
+//    curRow->pmin.Dump("curRowPmin");
+//    curRow->pmax.Dump("curRowPmax");
+
+//    cout << "ROW lx: " << ainfo.GetCoordiX(curRow->pmin.x) << " ux: " << ainfo.GetUpperX(curRow->pmax.x);
+//    cout << " ly: " << ainfo.GetCoordiY(curRow->pmin.y) << " uy: " << ainfo.GetUpperY(curRow->pmax.y) << endl;
+
+    for(int i = ainfo.GetCoordiX(curRow->pmin.x); i < ainfo.GetCoordiX(curRow->pmax.x); i++) {
+      for(int j = ainfo.GetCoordiY(curRow->pmin.y); j < ainfo.GetCoordiY(curRow->pmax.y);
+          j++) {
+//        cout << "[Row] i: " << i << ", j: " << j << endl;
+        arr_[j * numX_ + i] = ArrayInfo::CellInfo::Row;
+      }
+    } 
+  }
+  
+  // TERM array fill
+  for(int i=0; i<terminalCNT; i++) {
+    TERM* curTerm = &terminalInstance[i];
+    if( curTerm -> isTerminalNI ) {
+      continue;
+    }
+
+    // TERM-nonShape array fill
+    if( shapeMap.find( curTerm->Name() ) == shapeMap.end()) {
+//      curTerm->pmin.Dump("curTermPmin");
+//      curTerm->pmax.Dump("curTermPmax");
+//      cout << "TERM lx: " << ainfo.GetLowerX(curTerm->pmin.x) << " ux:" << ainfo.GetUpperX(curTerm->pmax.x);
+//      cout << " ly: " << ainfo.GetLowerY(curTerm->pmin.y) << " uy:" << ainfo.GetUpperY(curTerm->pmax.y)
+//        << endl;
+      for(int i = ainfo.GetLowerX(curTerm->pmin.x); i < ainfo.GetUpperX(curTerm->pmax.x);
+          i++) {
+        for(int j = ainfo.GetLowerY(curTerm->pmin.y); j < ainfo.GetUpperY(curTerm->pmax.y);
+            j++) {
+//          cout << "[Fixed] i: " << i << ", j: " << j << endl;
+          arr_[j * numX_ + i] = ArrayInfo::CellInfo::Cell;
+        }
+      }
+    }
+    // TERM-Shape array fill
+    else {
+      for(auto& curIdx : shapeMap[curTerm->Name()]) {
+        float llx = shapeStor[curIdx].llx,
+              lly = shapeStor[curIdx].lly,
+              width = shapeStor[curIdx].width,
+              height = shapeStor[curIdx].height;
+//        cout << "SHAPE pmin: " << llx << " " << lly << endl;
+//        cout << "      pmax: " << llx + width  << " " << lly + height << endl;
+//        cout << "lx: " << ainfo.GetLowerX(llx) << " ux:" << ainfo.GetUpperX(llx + width )
+//          << " ly: " << ainfo.GetLowerY(lly) << " uy:" << ainfo.GetUpperY(lly + height)
+//          << endl;
+
+        for(int i = ainfo.GetLowerX(llx); i < ainfo.GetUpperX(llx + width);
+            i++) {
+          for(int j = ainfo.GetLowerY(lly); j < ainfo.GetUpperY(lly + height);
+              j++) {
+//            cout << "[Fixed] i: " << i << ", j: " << j << endl;
+            arr_[j * numX_ + i] = ArrayInfo::CellInfo::Cell;
+          }
+        }
+      }
+    }
+  }
+
+
+  int idxCnt = terminalCNT;
+  vector< TERM > dummyTermStor_;
+  for(int j = 0; j < numY_; j++) {
+    for(int i = 0; i < numX_; i++) {
+      if(arr_[j * numX_ + i] == ArrayInfo::CellInfo::Empty) {
+        int startX = i;
+        while(i < numX_ && arr_[j * numX_ + i] == ArrayInfo::CellInfo::Empty) {
+          i++;
+        }
+        int endX = i;
+
+        TERM curTerm;
+//        strcpy(curTerm.Name(),
+//               string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
+        terminalNameStor.push_back( 
+               string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
+        curTerm.pmin.Set((prec)(dieRect_.llx + siteSizeX_ * startX),
+                         (prec)(dieRect_.lly + j * siteSizeY_), (prec)0.0);
+        curTerm.pmax.Set((prec)(dieRect_.llx + siteSizeX_ * endX),
+                         (prec)(dieRect_.lly + j * siteSizeY_ + rowSizeY_),
+                         (prec)1.0);
+        curTerm.size.Set((prec)((endX - startX) * siteSizeX_),
+                         (prec)(rowSizeY_), (prec)1.0);
+        
+        curTerm.center.Set( curTerm.pmin.x + 0.5*curTerm.size.x,
+                            curTerm.pmin.y + 0.5*curTerm.size.y, 0 ); 
+
+        curTerm.isTerminalNI = false;
+        curTerm.area = curTerm.size.GetProduct();
+        curTerm.idx = idxCnt++;
+        dummyTermStor_.push_back(curTerm);
+      }
+    }
+  }
+
+  // termCnt Updates 
+  int prevCnt = terminalCNT;
+  terminalCNT += dummyTermStor_.size();
+  terminalInstance = 
+    (TERM*) mkl_realloc( terminalInstance, sizeof(TERM) * terminalCNT);
+ 
+  // copy into original instances 
+  for(int i=prevCnt; i<terminalCNT; i++) {
+    terminalInstance[i] = dummyTermStor_[i - prevCnt];
+  }
+}
+
+
 
 /////////////////////////////////////////////
 //  DieRect Instances
@@ -2334,26 +2475,6 @@ void Timing::UpdateSpefClockNetVerilog() {
 TIMING_NAMESPACE_CLOSE
 
 
-////////////////////////////////////////////////
-//
-// Dummy Cell Filler Part
-//
-////////////////////////////////////////////////
-
-void DummyCellInfo::SetScaleDownParam() {
-  unitX_ = unitX;
-  unitY_ = unitY;
-  l2d_ = l2d;
-}
-
-void DummyCellInfo::SetOffsetParam() {
-  offsetX_ = offsetX;
-  offsetY_ = offsetY;
-}
-
-void DummyCellInfo::SetCircuitInst() {
-  this->ckt_ = &__ckt;
-}
 
 ////////////////////////////////////////////////
 //

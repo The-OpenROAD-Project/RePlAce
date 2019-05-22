@@ -79,8 +79,6 @@ static POS max_mac_dim;
 
 static dense_hash_map< string, NODES > nodesMap;
 
-static bool isDummyCellInfoInit = false;
-static DummyCellInfo _dummyInst;
 
 void ParseBookShelf() {
   // extract directory
@@ -2850,6 +2848,8 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
   macroBlockageMap.set_empty_key(INT_MAX);
 
   string blockagePrefix = "replace_blockage_";
+  string dummyInstPrefix = "dummy_inst_";
+
   for(int i=0; i<terminalCNT; i++) {
     TERM* curTerminal = &terminalInstance[i];
     if( curTerminal -> isTerminalNI ) {
@@ -2870,6 +2870,11 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
         layerIdx->push_back(i);
       }
     }
+    // for Dummy Instances, just block Metal 1.
+    else if ( termNameStr.compare( 0, dummyInstPrefix.length(), dummyInstPrefix) == 0 ) {
+      layerIdx = new vector<int>;
+      layerIdx->push_back(0); 
+    }
     // else, then It should reference from MACRO in LEF files
     else {
       int compIdx = GetDefComponentIdx( *_ckt, termNameStr );
@@ -2884,7 +2889,6 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
       }
       layerIdx = &macroBlockageMap[ macroIdx ]; 
     }
-
 
     fprintf( fp_route, " %s ", 
         (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name() );
@@ -3002,116 +3006,6 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
         }
       }
     }
-  }
-
-  fclose(fp_nodes);
-}
-
-// *.nodes writing
-void WriteNodesWithDummy(char *dir_tier, int curLayer, int lab,
-                         int pin_term_cnt, bool isShapeDrawing,
-                         bool isNameConvert, 
-                         DummyCellInfo &dummyInst) {
-  char fn_nodes[BUF_SZ] = {
-      0,
-  };
-  sprintf(fn_nodes, "%s/%s.nodes", dir_tier, gbch);
-  FILE *fp_nodes = fopen(fn_nodes, "w");
-
-  fputs("UCLA nodes 1.0 \n", fp_nodes);
-  fputs("# Created	:	Jan  6 2005\n", fp_nodes);
-  fputs(
-      "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_nodes);
-  fputs("\n", fp_nodes);
-
-  TIER *tier = &tier_st[curLayer];
-
-  int term_cnt = (lab) ? tier->mac_cnt + terminalCNT + pin_term_cnt
-                       : terminalCNT + pin_term_cnt;
-
-  term_cnt = (!isShapeDrawing)
-                 ? term_cnt + totalShapeCount - numNonRectangularNodes
-                 : term_cnt;
-  // for Dummy Cell
-  term_cnt += dummyInst.GetTerminalStor()->size();
-
-  //    if(lab)
-  //        term_cnt = tier->mac_cnt + terminalCNT + pin_term_cnt;
-  //    else
-  //        term_cnt = terminalCNT + pin_term_cnt;
-
-  int node_cnt = tier->modu_cnt + term_cnt;
-
-  fprintf(fp_nodes, "NumNodes      :  \t%d\n", node_cnt);
-  fprintf(fp_nodes, "NumTerminals  :  \t%d\n\n", term_cnt);
-
-  for(int i = 0; i < tier->modu_cnt; i++) {
-    MODULE *modu = tier->modu_st[i];
-    fprintf(fp_nodes, "%s %d %d\n", (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
-        GetScaleUpSize(modu->size.x), 
-        GetScaleUpSize(modu->size.y)); 
-  }
-
-  for(int i = 0; i < terminalCNT; i++) {
-    TERM *curTerminal = &terminalInstance[i];
-    string termString =
-        isShapeDrawing
-            ? ((curTerminal->isTerminalNI) ? "terminal_NI" : "terminal")
-            : "terminal";
-
-    if(isShapeDrawing) {
-      fprintf(fp_nodes, "%s %d %d %s\n",
-              (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : 
-              curTerminal->Name(),
-              GetScaleUpSize(curTerminal->size.x),
-              GetScaleUpSize(curTerminal->size.y), termString.c_str());
-    }
-    else {
-      // considering shapeMaps - mgwoo
-      auto shapeMapIter = shapeMap.find(curTerminal->Name());
-      if(shapeMapIter == shapeMap.end()) {
-        int sizeX =
-            (curTerminal->isTerminalNI) ? 0 : GetScaleUpSize (curTerminal->size.x);
-        int sizeY =
-            (curTerminal->isTerminalNI) ? 0 : GetScaleUpSize (curTerminal->size.y);
-        fprintf(fp_nodes, "%s %d %d %s\n", 
-            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name(),
-            sizeX, sizeY,
-                termString.c_str());
-      }
-      else {
-        for(auto &curShapeIdx : shapeMap[curTerminal->Name()]) {
-          int sizeX = (curTerminal->isTerminalNI)
-                          ? 0
-                          : GetScaleUpSize(shapeStor[curShapeIdx].width);
-          int sizeY = (curTerminal->isTerminalNI)
-                          ? 0
-                          : GetScaleUpSize(shapeStor[curShapeIdx].height);
-
-          fprintf(fp_nodes, "%s %d %d %s\n",
-                  string(string((isNameConvert)? 
-                        _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name()) 
-                      + string("/") +
-                         string(shapeStor[curShapeIdx].name))
-                      .c_str(),
-                  sizeX, sizeY, termString.c_str());
-        }
-      }
-    }
-  }
-
-  vector< TERM > *termStor = dummyInst.GetTerminalStor();
-
-  // Dummy Cell Drawing
-  for(auto &curTerm : *termStor) {
-    string termString = "terminal";
-    fprintf(fp_nodes, "%s %d %d %s\n",  
-            (isNameConvert)? _bsMap.GetBsTerminalName( curTerm.Name() ) : curTerm.Name(),
-            GetScaleUpSize(curTerm.size.x),
-            GetScaleUpSize(curTerm.size.y),
-            termString.c_str());
   }
 
   fclose(fp_nodes);
@@ -3350,78 +3244,6 @@ void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
   fclose(fp_pl);
 }
 
-// *.pl writing
-void WritePlWithDummy(char *dir_tier, int curLayer, int lab,
-                      bool isShapeDrawing, bool isNameConvert, 
-                      DummyCellInfo &dummyInst) {
-  char fn_pl[BUF_SZ] = {
-      0,
-  };
-  sprintf(fn_pl, "%s/%s.pl", dir_tier, gbch);
-  FILE *fp_pl = fopen(fn_pl, "w");
-
-  fputs("UCLA pl 1.0\n", fp_pl);
-  fputs("# Created\t:\tJan  6 2005\n", fp_pl);
-  fputs(
-      "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_pl);
-
-  fputs("\n", fp_pl);
-
-  TIER *tier = &tier_st[curLayer];
-
-  for(int i = 0; i < tier->modu_cnt; i++) {
-    MODULE *curModule = tier->modu_st[i];
-    fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
-        (isNameConvert)? _bsMap.GetBsModuleName( curModule->Name() ) : curModule->Name(), 
-        GetScaleUpPointFloatX( curModule->pmin.x ), 
-        GetScaleUpPointFloatY( curModule->pmin.y ));
-  }
-
-  for(int i = 0; i < terminalCNT; i++) {
-    TERM *curTerminal = &terminalInstance[i];
-    string fixedStr = (curTerminal->isTerminalNI) ? "FIXED_NI" : "FIXED";
-
-    if(isShapeDrawing) {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
-          (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-              GetScaleUpPointX (curTerminal->pmin.x), 
-              GetScaleUpPointY (curTerminal->pmin.y),
-              fixedStr.c_str());
-    }
-    else {
-      if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
-        fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n", 
-            (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name(),
-                GetScaleUpPointX(curTerminal->pmin.x), 
-                GetScaleUpPointY(curTerminal->pmin.y),
-                fixedStr.c_str());
-      }
-      else {
-        for(auto &curShapeIdx : shapeMap[curTerminal->Name()]) {
-          fprintf(fp_pl, "%s\t%d\t%d\t: N /%s\n",
-                  string(string((isNameConvert)? 
-                      _bsMap.GetBsTerminalName( curTerminal->Name()) : curTerminal->Name()) 
-                    + string("/") + string(shapeStor[curShapeIdx].name)).c_str(),
-                  GetScaleUpPointX(shapeStor[curShapeIdx].llx),
-                  GetScaleUpPointY(shapeStor[curShapeIdx].lly), fixedStr.c_str());
-        }
-      }
-    }
-  }
-
-  vector< TERM > *dummyTermStor = dummyInst.GetTerminalStor();
-  for(auto &curTerm : *dummyTermStor) {
-    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
-        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.Name()) : curTerm.Name(),
-            GetScaleUpPointX(curTerm.pmin.x), 
-            GetScaleUpPointY(curTerm.pmin.y));
-  }
-
-  fclose(fp_pl);
-}
-
 // *.scl writing
 void WriteScl(char *dir_tier, int curLayer) {
   char fn_scl[BUF_SZ];
@@ -3465,257 +3287,6 @@ void WriteScl(char *dir_tier, int curLayer) {
   }
 
   fclose(fp_scl);
-}
-
-// *.scl writing
-void WriteSclWithDummy(char *dir_tier, int curLayer, DummyCellInfo &dummyInst) {
-  char fn_scl[BUF_SZ];
-  sprintf(fn_scl, "%s/%s.scl", dir_tier, gbch);
-  FILE *fp_scl = fopen(fn_scl, "w");
-
-  fputs("UCLA scl 1.0\n", fp_scl);
-  fputs("# Created\t:\tJan  6 2005\n", fp_scl);
-  fputs(
-      "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_scl);
-
-  TIER *tier = &tier_st[curLayer];
-
-  fputs("\n", fp_scl);
-  fprintf(fp_scl, "NumRows :  \t%d\n", tier->row_cnt);
-  fputs("\n", fp_scl);
-
-  // sort the Y-Order due to limit of DP
-  // iterate based on the sorted order
-  for(auto &curRow : *dummyInst.GetRowStor()) {
-    fprintf(fp_scl, "CoreRow Horizontal\n");
-    fprintf(fp_scl, "  Coordinate    :   %d\n", GetScaleUpPointY(curRow.pmin.y));
-    fprintf(fp_scl, "  Height        :   %d\n", GetScaleUpSize(rowHeight));
-    fprintf(fp_scl, "  Sitewidth     :    %d\n", GetScaleUpSize(curRow.site_wid));
-    fprintf(fp_scl, "  Sitespacing   :    %d\n", GetScaleUpSize(curRow.site_spa));
-    fprintf(fp_scl, "  Siteorient    :    %s\n",
-            (curRow.isYSymmetry) ? "Y" : "1");
-    fprintf(fp_scl, "  Sitesymmetry  :    %s\n", curRow.ori.c_str());
-    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", GetScaleUpPointX(curRow.pmin.x),
-            curRow.x_cnt);
-    fprintf(fp_scl, "End\n");
-  }
-
-  fclose(fp_scl);
-}
-
-///////////////////////////////////////////////////////////////////
-//  Handle Dummy Cell Cases
-///////////////////////////////////////////////////////////////////
-
-DummyCellInfo::DummyCellInfo()
-    : l2d_(PREC_MAX),
-      unitX_(PREC_MAX),
-      unitY_(PREC_MAX),
-      offsetX_(PREC_MAX),
-      offsetY_(PREC_MAX),
-      siteSizeX_(INT_MAX),
-      siteSizeY_(INT_MAX),
-      numX_(INT_MAX),
-      numY_(INT_MAX),
-      rowSizeX_(INT_MAX),
-      rowSizeY_(INT_MAX),
-      arr_(0) { }
-
-void DummyCellInfo::Init() {
-  SetCircuitInst();
-  SetScaleDownParam();
-  SetOffsetParam();
-  SetLayoutArea();
-  SetEnvironment();
-  GenerateDummyCell();
-}
-
-DummyCellInfo::~DummyCellInfo() {
-  delete[] arr_;
-}
-
-void DummyCellInfo::SetEnvironment() {
-  assert(ckt_->defRowStor->size() >= 1);
-  defiRow *minRow = &ckt_->defRowStor[0];
-  // get the lowest one
-  for(auto curRow : ckt_->defRowStor) {
-    if(minRow->y() < minRow->y()) {
-      minRow = &curRow;
-    }
-  }
-
-  auto sitePtr = ckt_->lefSiteMap.find(string(minRow->macro()));
-  if(sitePtr == ckt_->lefSiteMap.end()) {
-    cout << "\n** ERROR:  Cannot find SITE in lef files: " << minRow->macro()
-         << endl;
-    exit(1);
-  }
-
-  float siteSizeX =
-       l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeX() / unitX_;
-  float siteSizeY =
-       l2d_ * ckt_->lefSiteStor[sitePtr->second].sizeY() / unitY_;
-
-  SetSiteSize(siteSizeX, siteSizeY);
-  cout << "siteSize: " << siteSizeX << " " << siteSizeY << endl;
-
-  int rowCntX = INT_CONVERT( (dieRect_.urx - dieRect_.llx) / siteSizeX );
-  int rowCntY = INT_CONVERT( (dieRect_.ury - dieRect_.lly) / siteSizeY );
-  cout << "rowCnt: " << rowCntX << " " << rowCntY << endl;
-
-  SetArraySize(rowCntX, rowCntY);
-  cout << "arraySize: " << rowCntX << " " << rowCntY << endl;
-
-  rowSizeX_ = numX_ * siteSizeX_;
-  rowSizeY_ = siteSizeY_;
-  cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
-  InitArray();
-  InitRow();
-}
-
-void DummyCellInfo::SetLayoutArea() {
-//  dieRect_ = GetDieFromProperty();
-//  if(dieRect_.isNotInitialize()) {
-//    dieRect_ = GetDieFromDieArea();
-//  }
-//  if(dieRect_.isNotInitialize()) {
-//    cout << "ERROR: DIEAREA ERROR" << endl;
-//    exit(1);
-//  }
-  dieRect_ = GetCoreFromRow();
-}
-
-void DummyCellInfo::InitArray() {
-  assert(numX_ != INT_MAX && numY_ != INT_MAX);
-  arr_ = new CellInfo[numX_ * numY_];
-  for(int i = 0; i < numX_ * numY_; i++) {
-    arr_[i] = CellInfo::Empty;
-  }
-}
-
-void DummyCellInfo::SetSiteSize(float siteSizeX, float siteSizeY) {
-  siteSizeX_ = siteSizeX;
-  siteSizeY_ = siteSizeY;
-}
-
-void DummyCellInfo::SetArraySize(int numX, int numY) {
-  numX_ = numX;
-  numY_ = numY;
-}
-
-void DummyCellInfo::InitRow() {
-  for(int i = 0; i < numY_; i++) {
-    ROW curRow;
-
-    curRow.pmin.Set(dieRect_.llx, dieRect_.lly + i * siteSizeY_, 0);
-    curRow.size.Set(rowSizeX_, rowSizeY_, 1);
-    curRow.pmax.Set(dieRect_.llx + rowSizeX_,
-                    dieRect_.lly + i * siteSizeY_ + rowSizeY_, 1);
-    if(i == 0) {
-      globalRowMin_.Set(curRow.pmin);
-    }
-    else if(i == numY_ - 1) {
-      globalRowMax_.Set(curRow.pmax);
-    }
-
-    curRow.x_cnt = numX_;
-    curRow.site_wid = curRow.site_spa = siteSizeX_;
-//    curRow.Dump("inserted-Row " + to_string(i));
-    rowStor_.push_back(curRow);
-  }
-}
-
-int DummyCellInfo::GetCoordiX(prec x) {
-  //  cout << numX_ << " x: " << x << " " << INT_CONVERT( (x -
-  //  globalRowMin_.x)/siteSizeX_) << endl;
-  return INT_CONVERT((x - globalRowMin_.x) / siteSizeX_);
-}
-
-int DummyCellInfo::GetCoordiY(prec y) {
-  //  cout << numY_ << " y: " << y << " " << INT_CONVERT( (y -
-  //  globalRowMin_.y)/siteSizeY_) << endl;
-  return INT_CONVERT((y - globalRowMin_.y) / siteSizeY_);
-}
-
-void DummyCellInfo::FillRowInst(ROW *curRow) {
-//  curRow->pmin.Dump("curRowPmin");
-//  curRow->pmax.Dump("curRowPmax");
-
-//  cout << "lx: " << GetCoordiX(curRow->pmin.x) << " ux:" << GetCoordiX(curRow->pmax.x)
-//       << endl;
-//  cout << "ly: " << GetCoordiY(curRow->pmin.y) << " uy:" << GetCoordiY(curRow->pmax.y)
-//       << endl;
-
-  for(int i = GetCoordiX(curRow->pmin.x); i < GetCoordiX(curRow->pmax.x); i++) {
-    for(int j = GetCoordiY(curRow->pmin.y); j < GetCoordiY(curRow->pmax.y);
-        j++) {
-//      cout << "[Row] i: " << i << ", j: " << j << endl;
-      arr_[j * numX_ + i] = CellInfo::Row;
-    }
-  }
-}
-void DummyCellInfo::FillFixedCell(TERM *curTerm) {
-//  curTerm->pmin.Dump("curTermPmin");
-//  curTerm->pmax.Dump("curTermPmax");
-  
-//  cout << "lx: " << GetCoordiX(curTerm->pmin.x) << " ux:" << GetCoordiX(curTerm->pmax.x)
-//       << endl;
-//  cout << "ly: " << GetCoordiY(curTerm->pmin.y) << " uy:" << GetCoordiY(curTerm->pmax.y)
-//       << endl;
-
-  for(int i = GetCoordiX(curTerm->pmin.x); i < GetCoordiX(curTerm->pmax.x);
-      i++) {
-    for(int j = GetCoordiY(curTerm->pmin.y); j < GetCoordiY(curTerm->pmax.y);
-        j++) {
-//      cout << "[Fixed] i: " << i << ", j: " << j << endl;
-      arr_[j * numX_ + i] = CellInfo::Cell;
-    }
-  }
-}
-
-void DummyCellInfo::GenerateDummyCell() {
-  for(int i = 0; i < row_cnt; i++) {
-    ROW *curRow = &row_st[i];
-    FillRowInst(curRow);
-  }
-  for(int i = 0; i < terminalCNT; i++) {
-    TERM *curTerm = &terminalInstance[i];
-    if(curTerm->isTerminalNI) {
-      continue;
-    }
-    FillFixedCell(curTerm);
-  }
-
-  for(int j = 0; j < numY_; j++) {
-    for(int i = 0; i < numX_; i++) {
-      if(arr_[j * numX_ + i] == CellInfo::Empty) {
-        int startX = i;
-        while(i < numX_ && arr_[j * numX_ + i] == CellInfo::Empty) {
-          i++;
-        }
-        int endX = i;
-
-        TERM curTerm;
-//        strcpy(curTerm.Name(),
-//               string("dummy_inst_" + to_string(terminalStor_.size())).c_str());
-        terminalNameStor.push_back( 
-               string("dummy_inst_" + to_string(terminalStor_.size())).c_str());
-        curTerm.pmin.Set((prec)(dieRect_.llx + siteSizeX_ * startX),
-                         (prec)(dieRect_.lly + j * siteSizeY_), (prec)0.0);
-        curTerm.pmax.Set((prec)(dieRect_.llx + siteSizeX_ * endX),
-                         (prec)(dieRect_.lly + j * siteSizeY_ + rowSizeY_),
-                         (prec)1.0);
-        curTerm.size.Set((prec)((endX - startX) * siteSizeX_),
-                         (prec)(rowSizeY_), (prec)1.0);
-        curTerm.isTerminalNI = false;
-        curTerm.area = curTerm.size.GetProduct();
-        // curTerm.Dump();
-        terminalStor_.push_back(curTerm);
-      }
-    }
-  }
 }
 
 // write bookshelf's output
@@ -3786,35 +3357,15 @@ void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing,
   WriteAux(dir_tier, isShapeDrawing);
   WriteWts(dir_tier);
 
-  if(inputMode == InputMode::lefdef && isNtuDummyFill) {
-    if( !isDummyCellInfoInit ) {
-      _dummyInst.Init();
-      isDummyCellInfoInit = true;
-    }
-    _bsMap.InitWithDummyCell( _dummyInst );
-    
-    // _bsMap is used to below functions.
-    WriteShapes(dir_tier, isShapeDrawing, isNameConvert);  
-    WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing, isNameConvert);
+  _bsMap.Init(); 
+  WriteShapes(dir_tier, isShapeDrawing, isNameConvert);  
+  WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing, isNameConvert);
 
-    WriteSclWithDummy(dir_tier, z, _dummyInst);
-    WriteNodesWithDummy(dir_tier, z, lab, pin_term_cnt, isShapeDrawing,
-                        isNameConvert, _dummyInst);
-    WritePlWithDummy(dir_tier, z, lab, isShapeDrawing, isNameConvert, _dummyInst);
-  }
-  else {
-    _bsMap.Init(); 
-    WriteShapes(dir_tier, isShapeDrawing, isNameConvert);  
-    WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing, isNameConvert);
+  WriteScl(dir_tier, z);
+  WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing, isNameConvert);
+  WritePl(dir_tier, z, lab, isShapeDrawing, isNameConvert );
 
-    WriteScl(dir_tier, z);
-    WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing, isNameConvert);
-    WritePl(dir_tier, z, lab, isShapeDrawing, isNameConvert );
-  }
-
-//  if( isRoutability ) {
-    WriteRoute( dir_tier, isNameConvert, routeInst, isMetal1Removed);
-//  }
+  WriteRoute( dir_tier, isNameConvert, routeInst, isMetal1Removed);
 
 
   // shapeSupport doesn't affect to below function
@@ -3857,15 +3408,6 @@ void BookshelfNameMap::Init() {
     string bsNetName = "n" + to_string(bsNetCnt++);
     netToBsMap[ curNet->Name() ] = bsNetName;
     bsToNetMap[ bsNetName ] = curNet->Name();
-  }
-}
-void BookshelfNameMap::InitWithDummyCell( DummyCellInfo& dummyInst ) {
-  Init();
-  vector< TERM > *dummyTermStor = dummyInst.GetTerminalStor();
-  for(auto& curTerm : *dummyTermStor ) {
-    string bsTerminalName = "o" + to_string(bsModuleCnt++);
-    terminalToBsMap[ curTerm.Name() ] = bsTerminalName;
-    bsToTerminalMap[ bsTerminalName ] = curTerm.Name();
   }
 }
 
@@ -4039,13 +3581,6 @@ void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConv
               GetScaleUpPointX(curTerminal->pmin.x), 
               GetScaleUpPointY(curTerminal->pmin.y));
     }
-  }
-  
-  vector< TERM > *dummyTermStor = _dummyInst.GetTerminalStor();
-  for(auto &curTerm : *dummyTermStor) {
-    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", 
-        (isNameConvert)? _bsMap.GetBsTerminalName(curTerm.Name()) : curTerm.Name(),
-            GetScaleUpPointX(curTerm.pmin.x), GetScaleUpPointY(curTerm.pmin.y));
   }
 
   fclose(fp_pl);
