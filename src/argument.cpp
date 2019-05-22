@@ -103,7 +103,7 @@ void initArgument(int argc, char *argv[]) {
   onlyGlobalPlaceCMD = false;   // bool
   isSkipIP = false;             // bool
   isTiming = false;
-  isNtuDummyFill =  true;
+  isDummyFill =  true;
 
   isARbyUserCMD = false;         // bool
   thermalAwarePlaceCMD = false;  // bool
@@ -894,7 +894,7 @@ bool argument(int argc, char *argv[]) {
     }
     // Dummy Cell Create For NtuPlacer3
     else if(!strcmp(argv[i], "-fragmentedRow")) {
-      isNtuDummyFill = true;
+      isDummyFill = true;
     }
     else if(!strcmp(argv[i], "-bin")) {
       i++;
