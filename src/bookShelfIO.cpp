@@ -2668,7 +2668,7 @@ void WriteWts(char *dir_tier) {
   fclose(fp_wts);
 }
 
-vector<int> GetBlockageLayers(Circuit::Circuit* _ckt, 
+vector<int> GetBlockageLayers(Replace::Circuit* _ckt, 
     RouteInstance& routeInst, int macroIdx) {
   vector<int> retVec;
  
@@ -2790,7 +2790,7 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
   
   fflush( fp_route );
  
-  Circuit::Circuit* _ckt = routeInst.GetCircuitInst();
+  Replace::Circuit* _ckt = routeInst.GetCircuitInst();
   
   int pinCnt = 0;
   for(auto& curPin : _ckt->defPinStor) {

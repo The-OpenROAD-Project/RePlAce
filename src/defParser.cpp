@@ -79,7 +79,7 @@
 #include "lefdefIO.h"
 
 using namespace std;
-using Circuit::Circuit;
+using Replace::Circuit;
 
 // Global variables
 static FILE* fout;
@@ -3101,31 +3101,31 @@ static void printWarning(const char* str) {
 //
 ///////////////////////////////////////////////////////////////////////
 
-void Circuit::Circuit::DumpDefVersion() {
+void Replace::Circuit::DumpDefVersion() {
   CIRCUIT_FPRINTF(fout, "VERSION %s ;\n",
                   (isVersionVisit) ? defVersion.c_str() : "5.8");
 }
 
-void Circuit::Circuit::DumpDefDividerChar() {
+void Replace::Circuit::DumpDefDividerChar() {
   CIRCUIT_FPRINTF(fout, "DIVIDERCHAR \"%s\" ;\n",
                   (isDividerCharVisit) ? defDividerChar.c_str() : "/");
 }
 
-void Circuit::Circuit::DumpDefBusBitChar() {
+void Replace::Circuit::DumpDefBusBitChar() {
   CIRCUIT_FPRINTF(fout, "BUSBITCHARS \"%s\" ;\n",
                   (isBusBitCharVisit) ? defBusBitChar.c_str() : "[]");
 }
 
-void Circuit::Circuit::DumpDefDesignName() {
+void Replace::Circuit::DumpDefDesignName() {
   CIRCUIT_FPRINTF(fout, "DESIGN %s ;\n",
                   (isDesignNameVisit) ? defDesignName.c_str() : "noname");
 }
 
-void Circuit::Circuit::DumpDefUnit() {
+void Replace::Circuit::DumpDefUnit() {
   CIRCUIT_FPRINTF(fout, "UNITS DISTANCE MICRONS %g ;\n", defUnit);
 }
 
-void Circuit::Circuit::DumpDefProp() {
+void Replace::Circuit::DumpDefProp() {
   if(defPropStor.size() == 0) {
     return;
   }
@@ -3180,7 +3180,7 @@ void Circuit::Circuit::DumpDefProp() {
   CIRCUIT_FPRINTF(fout, "END PROPERTYDEFINITIONS\n\n");
 }
 
-void Circuit::Circuit::DumpDefDieArea() {
+void Replace::Circuit::DumpDefDieArea() {
   defiBox* box = &defDieArea;
   CIRCUIT_FPRINTF(fout, "DIEAREA ( %d %d ) ( %d %d ) ;\n\n", box->xl(),
                   box->yl(), box->xh(), box->yh());
@@ -3191,7 +3191,7 @@ void Circuit::Circuit::DumpDefDieArea() {
   //    CIRCUIT_FPRINTF(fout, ";\n");
 }
 
-void Circuit::Circuit::DumpDefRow() {
+void Replace::Circuit::DumpDefRow() {
   if(defRowStor.size() == 0) {
     return;
   }
@@ -3239,7 +3239,7 @@ void Circuit::Circuit::DumpDefRow() {
   CIRCUIT_FPRINTF(fout, "\n");
 }
 
-void Circuit::Circuit::DumpDefTrack() {
+void Replace::Circuit::DumpDefTrack() {
   if(defTrackStor.size() == 0) {
     return;
   }
@@ -3270,7 +3270,7 @@ void Circuit::Circuit::DumpDefTrack() {
   CIRCUIT_FPRINTF(fout, "\n");
 }
 
-void Circuit::Circuit::DumpDefGcellGrid() {
+void Replace::Circuit::DumpDefGcellGrid() {
   if(defGcellGridStor.size() == 0) {
     return;
   }
@@ -3283,7 +3283,7 @@ void Circuit::Circuit::DumpDefGcellGrid() {
   CIRCUIT_FPRINTF(fout, "\n");
 }
 
-void Circuit::Circuit::DumpDefVia() {
+void Replace::Circuit::DumpDefVia() {
   if(defViaStor.size() == 0) {
     return;
   }
@@ -3369,7 +3369,7 @@ void Circuit::Circuit::DumpDefVia() {
   CIRCUIT_FPRINTF(fout, "END VIAS\n\n");
 }
 
-void Circuit::Circuit::DumpDefComponentMaskShiftLayer() {
+void Replace::Circuit::DumpDefComponentMaskShiftLayer() {
   if(!defComponentMaskShiftLayer.numMaskShiftLayers()) {
     return;
   }
@@ -3382,7 +3382,7 @@ void Circuit::Circuit::DumpDefComponentMaskShiftLayer() {
   CIRCUIT_FPRINTF(fout, ";\n\n");
 }
 
-void Circuit::Circuit::DumpDefComponent() {
+void Replace::Circuit::DumpDefComponent() {
   if(defComponentStor.size() == 0) {
     return;
   }
@@ -3496,7 +3496,7 @@ void Circuit::Circuit::DumpDefComponent() {
   CIRCUIT_FPRINTF(fout, "END COMPONENTS\n\n");
 }
 
-void Circuit::Circuit::DumpDefBlockage() {
+void Replace::Circuit::DumpDefBlockage() {
   if(defBlockageStor.size() == 0) {
     return;
   }
@@ -3558,7 +3558,7 @@ void Circuit::Circuit::DumpDefBlockage() {
   CIRCUIT_FPRINTF(fout, "END BLOCKAGES\n\n");
 }
 
-void Circuit::Circuit::DumpDefPin() {
+void Replace::Circuit::DumpDefPin() {
   if(defPinStor.size() == 0) {
     return;
   }
@@ -3796,7 +3796,7 @@ void Circuit::Circuit::DumpDefPin() {
   CIRCUIT_FPRINTF(fout, "END PINS\n\n");
 }
 
-void Circuit::Circuit::DumpDefSpecialNet() {
+void Replace::Circuit::DumpDefSpecialNet() {
   if(defSpecialNetStor.size() == 0) {
     return;
   }
@@ -4502,7 +4502,7 @@ void Circuit::Circuit::DumpDefSpecialNet() {
   CIRCUIT_FPRINTF(fout, "END SPECIALNETS\n\n");
 }
 
-void Circuit::Circuit::DumpDefNet() {
+void Replace::Circuit::DumpDefNet() {
   if(defNetStor.size() == 0) {
     return;
   }
@@ -4776,12 +4776,12 @@ void Circuit::Circuit::DumpDefNet() {
   CIRCUIT_FPRINTF(fout, "END NETS\n\n");
 }
 
-void Circuit::Circuit::DumpDefDone() {
+void Replace::Circuit::DumpDefDone() {
   CIRCUIT_FPRINTF(fout, "END DESIGN\n");
 }
 
 // below is for additional Check
-void Circuit::Circuit::DumpDefComponentPinToNet() {
+void Replace::Circuit::DumpDefComponentPinToNet() {
   for(auto& curComponent : defComponentPinToNet) {
     int idx = &curComponent - &defComponentPinToNet[0];
     cout << "Comp: " << defComponentStor[idx].id() << endl;
@@ -4797,7 +4797,7 @@ void Circuit::Circuit::DumpDefComponentPinToNet() {
 //
 /////////////////////////////////////////////////////////////////////
 
-void Circuit::Circuit::ParseDef(string fileName, bool isVerbose = false) {
+void Replace::Circuit::ParseDef(string fileName, bool isVerbose = false) {
   //    int num = 99;
   char* inFile[6];
   FILE* f;
@@ -5161,7 +5161,7 @@ void Circuit::Circuit::ParseDef(string fileName, bool isVerbose = false) {
   free(inFile[0]);
 }
 
-void Circuit::Circuit::WriteDef(FILE* _fout) {
+void Replace::Circuit::WriteDef(FILE* _fout) {
   fout = _fout;
 
   //    fout = stdout;

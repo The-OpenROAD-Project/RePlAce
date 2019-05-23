@@ -9,7 +9,7 @@ WSTRICT =	-Werror -Wundef -Wpointer-arith
 
 INCLUDE = -I$(CURDIR) -I$(MKLROOT)/include \
 			-I$(HASHROOT) -I$(EIGENROOT) -I$(CIMGROOT) \
-			-I$(LEFROOT)/include -I$(DEFROOT)/include -I$(VERILOGROOT)/include \
+			-I$(LEFROOT)/include -I$(DEFROOT)/include \
 			-I$(FLUTEROOT)/include -I$(OPENSTAROOT)/include -I$(OPENSTASRCROOT)
 
 CPPFLAG =   -std=c++0x $(OPTFLAG)
@@ -34,12 +34,10 @@ DEPENDS			=   $(HFILES)
 
 LEFROOT 		= ../module/lef/5.8-p027
 DEFROOT 		= ../module/def/5.8-p027
-VERILOGROOT 	= ../module/verilog-parser
 FLUTEROOT 		= ../module/flute
 
 DEFLIB         	= -L$(DEFROOT)/lib -ldef -ldefzlib -lcdef -lcdefzlib
 LEFLIB         	= -L$(LEFROOT)/lib -llef -llefzlib -lclef -lclefzlib
-VERILOGLIB 		= -L$(VERILOGROOT)/lib -lverilog_parser
 FLUTELIB 		= -L$(FLUTEROOT)/lib -lflute
 MKLLIB 			= ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a \
 					${MKLROOT}/lib/intel64/libmkl_gnu_thread.a \
@@ -80,7 +78,7 @@ RePlAce	: $(OBJFILES)
 	$(CPPC) -o $@ $(CPPFLAG) $^ \
  	-Wl,--start-group ${MKLLIB} ${OPENSTALIB} -Wl,--end-group \
 	-lgomp -lpthread -lm -ldl -lX11 -ltcl8.5 -lz \
-	${LEFLIB} ${DEFLIB} ${VERILOGLIB} ${FLUTELIB} -static-libstdc++ 	
+	${LEFLIB} ${DEFLIB} ${FLUTELIB} -static-libstdc++ 	
 	@echo " "
 	@echo "  Linking is completed !!"
 	@echo " "

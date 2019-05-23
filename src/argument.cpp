@@ -1017,7 +1017,7 @@ void printUsage() {
   cout << "  -bmflag     : Specify which Benchmark is Used" << endl;
   cout << "  -lef        : *.lef Location" << endl;
   cout << "  -def        : *.def Location" << endl;
-  cout << "  -verilog    : *.v Location (Optional)" << endl << endl;
+  cout << "  -verilog    : *.v Location (Required for Timing-Driven)" << endl << endl;
   cout << "[Options]" << endl;
   cout << " Placement " << endl;
   cout << "  -onlyGP     : Only Global Placement mode" << endl;

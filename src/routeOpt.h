@@ -54,7 +54,7 @@ class RouteInstance {
     vector<int> _trackCount;
 
 
-    Circuit::Circuit* _ckt;
+    Replace::Circuit* _ckt;
 
     float _defDbu; 
 
@@ -122,7 +122,7 @@ class RouteInstance {
     int GetGridCountY() { return _gridCountY; };
     float GetGridOriginX() {return _gridOriginX; };
     float GetGridOriginY() {return _gridOriginY; };
-    Circuit::Circuit* GetCircuitInst() { return _ckt; };
+    Replace::Circuit* GetCircuitInst() { return _ckt; };
     dense_hash_map<string, int>& GetLayerMap() {return _layerMap; };
     
     int GetReducedTrackCount() { return _bsReducedTrackStor.size(); };

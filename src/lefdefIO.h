@@ -49,8 +49,8 @@
 #ifndef __circuit__
 #define __circuit__ 0
 
-#define CIRCUIT_NAMESPACE_OPEN namespace Circuit {
-#define CIRCUIT_NAMESPACE_CLOSE }
+#define REPLACE_NAMESPACE_OPEN namespace Replace {
+#define REPLACE_NAMESPACE_CLOSE }
 
 #ifndef CIRCUIT_FPRINTF
 #define CIRCUIT_FPRINTF(fmt, ...)  \
@@ -94,7 +94,7 @@ using std::vector;
 using std::pair;
 using google::dense_hash_map;
 
-CIRCUIT_NAMESPACE_OPEN
+REPLACE_NAMESPACE_OPEN
 
 class Circuit {
  public:
@@ -273,7 +273,7 @@ struct NetInfo {
 
 extern Circuit __ckt;
 
-CIRCUIT_NAMESPACE_CLOSE
+REPLACE_NAMESPACE_CLOSE
 
 /////////////////////////////////////////////////////
 // DieRect struct  
@@ -331,13 +331,12 @@ void ReadPlLefDef(const char* fileName, bool isNameConvert = false);
 
 void WriteDef(const char* defOutput);
 
-void GenerateModuleTerminal(Circuit::Circuit& __ckt);
-void GenerateRow(Circuit::Circuit& __ckt);
-void GenerateFullRow(Circuit::Circuit& __ckt);
-void GenerateDummyCell(Circuit::Circuit& __ckt);
+void GenerateModuleTerminal(Replace::Circuit& __ckt);
+void GenerateRow(Replace::Circuit& __ckt);
+void GenerateFullRow(Replace::Circuit& __ckt);
+void GenerateDummyCell(Replace::Circuit& __ckt);
 
-void GenerateNetDefOnly(Circuit::Circuit& __ckt);
-void GenerateNetDefVerilog(Circuit::Circuit& __ckt);
+void GenerateNetDefOnly(Replace::Circuit& __ckt);
 
 // custom scale down parameter setting during the stage
 void SetUnitX(float _unitX);
@@ -361,7 +360,7 @@ prec GetScaleDownSize(float input);
 prec GetScaleDownPoint(float input);
 
 // return Component Index
-inline int GetDefComponentIdx(Circuit::Circuit& __ckt, string& compName) {
+inline int GetDefComponentIdx(Replace::Circuit& __ckt, string& compName) {
   auto dcPtr = __ckt.defComponentMap.find(compName);
   if(dcPtr == __ckt.defComponentMap.end()) {
     cout << "** ERROR:  Component Instance ( " << compName
@@ -373,7 +372,7 @@ inline int GetDefComponentIdx(Circuit::Circuit& __ckt, string& compName) {
 }
 
 // return Macro Index
-inline int GetLefMacroIdx(Circuit::Circuit& __ckt, string& macroName) {
+inline int GetLefMacroIdx(Replace::Circuit& __ckt, string& macroName) {
   auto mcPtr = __ckt.lefMacroMap.find(macroName);
   if(mcPtr == __ckt.lefMacroMap.end()) {
     cout << "** ERROR:  Macro Instance ( " << macroName
@@ -384,7 +383,7 @@ inline int GetLefMacroIdx(Circuit::Circuit& __ckt, string& macroName) {
 }
 
 // return Pin Index
-inline int GetLefMacroPinIdx(Circuit::Circuit& __ckt, int macroIdx,
+inline int GetLefMacroPinIdx(Replace::Circuit& __ckt, int macroIdx,
                              string& pinName) {
   auto pinPtr = __ckt.lefPinMapStor[macroIdx].find(pinName);
   if(pinPtr == __ckt.lefPinMapStor[macroIdx].end()) {
@@ -395,7 +394,7 @@ inline int GetLefMacroPinIdx(Circuit::Circuit& __ckt, int macroIdx,
   return pinPtr->second;
 }
 
-inline int GetDefPinIdx(Circuit::Circuit& __ckt, string& pinName) {
+inline int GetDefPinIdx(Replace::Circuit& __ckt, string& pinName) {
   auto pinPtr = __ckt.defPinMap.find(pinName);
   if(pinPtr == __ckt.defPinMap.end()) {
     cout << "** ERROR:  Pin Instance ( " << pinName

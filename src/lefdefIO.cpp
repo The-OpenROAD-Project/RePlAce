@@ -50,10 +50,6 @@
 #include "lefdefIO.h"
 #include "bookShelfIO.h"
 
-#include "verilog_writer.h"
-#include "verilog_parser.h"
-#include "verilog_ast_util.h"
-
 #include "mkl.h"
 
 #include "timing.h"
@@ -62,8 +58,8 @@
 #include <boost/functional/hash.hpp>
 
 using namespace std;
-using Circuit::NetInfo;
-using Circuit::Circuit;
+using Replace::NetInfo;
+using Replace::Circuit;
 
 //
 // The below global variable is updated.
@@ -91,7 +87,7 @@ using Circuit::Circuit;
 //
 
 // global variable.. to write output as DEF
-Circuit::Circuit __ckt;
+Replace::Circuit __ckt;
 
 // lef 2 def unit convert
 static prec l2d = 0.0f;
@@ -391,7 +387,7 @@ void SetVerilogTopModule() {
 void ParseLefDef() {
   // for input parse only
   //
-  // Circuit::Circuit __ckt(lefStor, defName, "");
+  // Replace::Circuit __ckt(lefStor, defName, "");
   //
   __ckt.Init(lefStor, defName, isVerbose);
 
@@ -408,15 +404,9 @@ void ParseLefDef() {
     GenerateNetDefOnly(__ckt);
   }
   else {
-    cout << "INFO:  EXTRACT NET INFO FROM DEF & VERILOG" << endl;
-    if(verilogName == "") {
-      cout << "** ERROR:  Cannot Find any Net information "
-           << "(Check NETS statement in DEF) "
-           << "or use -verilog command instead" << endl;
+    cout << "** ERROR:  Cannot Find any Net information "
+      << "(Check NETS statement in DEF) " << endl;
       exit(1);
-    }
-
-    GenerateNetDefVerilog(__ckt);
   }
 
   cout << "INFO:  SUCCESSFULLY LEF/DEF PARSED" << endl;
@@ -671,7 +661,7 @@ void SetSizeForObsMacro(int macroIdx, MODULE* curModule) {
 // defComponentStor(FIXED cell), defPinStor -> terminalInstnace
 //
 // terminal_pmin & terminal_pmax must be updated...
-void GenerateModuleTerminal(Circuit::Circuit& __ckt) {
+void GenerateModuleTerminal(Replace::Circuit& __ckt) {
   moduleInstance =
       (MODULE*)mkl_malloc(sizeof(MODULE) * __ckt.defComponentStor.size(), 64);
 
@@ -964,7 +954,7 @@ int ArrayInfo::GetUpperY (float y) {
 /////////////////////////////////////////////////////
 
 // Dummy Cell Generation procedure to be aware of fragmented-Row
-void GenerateDummyCell(Circuit::Circuit& __ckt) {
+void GenerateDummyCell(Replace::Circuit& __ckt) {
   defiRow *minRow = &__ckt.defRowStor[0];
   // get the lowest one
   for(auto curRow : __ckt.defRowStor) {
@@ -1215,7 +1205,7 @@ DieRect GetCoreFromRow() {
 //  Generate RowInstance
 // defRowStor -> rowInstance
 // this must update grow_pmin / grow_pmax, rowHeight
-void GenerateRow(Circuit::Circuit& __ckt) {
+void GenerateRow(Replace::Circuit& __ckt) {
   // Get the sites from ROW statements
   // usual cases
   bool isFirst = true;
@@ -1311,7 +1301,7 @@ void GenerateRow(Circuit::Circuit& __ckt) {
 }
 
 // MS-Placement requires this!
-void GenerateFullRow(Circuit::Circuit& __ckt) {
+void GenerateFullRow(Replace::Circuit& __ckt) {
   cout << "INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) " << endl;
   if( row_st ) {
     mkl_free(row_st);
@@ -1463,7 +1453,7 @@ void GenerateFullRow(Circuit::Circuit& __ckt) {
 // If macroName is given (like verilog),
 // then skip for NETS->COMPONENTS->MACRO
 //
-int GetIO(Circuit::Circuit& __ckt, string& instName, string& pinName,
+int GetIO(Replace::Circuit& __ckt, string& instName, string& pinName,
           int macroIdx = INT_MAX) {
   if(macroIdx == INT_MAX) {
     // First, it references COMPONENTS
@@ -1502,7 +1492,7 @@ int GetIO(Circuit::Circuit& __ckt, string& instName, string& pinName,
 // If macroName is given (like verilog),
 // then skip for NETS->COMPONENTS->MACRO
 //
-FPOS GetOffset(Circuit::Circuit& __ckt, string& instName, string& pinName,
+FPOS GetOffset(Replace::Circuit& __ckt, string& instName, string& pinName,
                int macroIdx = INT_MAX) {
   //    int defCompIdx = INT_MAX;
   
@@ -1617,7 +1607,7 @@ FPOS GetOffset(Circuit::Circuit& __ckt, string& instName, string& pinName,
 // defNetStor -> netInstnace
 // defPinStor -> pinInstance
 //
-void GenerateNetDefOnly(Circuit::Circuit& __ckt) {
+void GenerateNetDefOnly(Replace::Circuit& __ckt) {
   pinCNT = 0;
   netCNT = __ckt.defNetStor.size();
   for(auto& curNet : __ckt.defNetStor) {
@@ -1800,411 +1790,6 @@ void GenerateNetDefOnly(Circuit::Circuit& __ckt) {
   pinInstance = (PIN*)mkl_realloc(pinInstance, sizeof(PIN) * pinCNT);
 
   cout << "INFO:  #NET: " << netCNT << ", #PIN: " << pinCNT << endl;
-}
-
-//////
-//
-// defPinStor -> pinInstnace -- (verilog cannot store pin's coordinate)!
-// verilog -> netInstnace
-//
-void GenerateNetDefVerilog(Circuit::Circuit& __ckt) {
-  using namespace verilog;
-
-  FILE* verilogInput = fopen(verilogName.c_str(), "rb");
-  if(!verilogInput) {
-    cout << "** ERROR:  Cannot open verilog file: " << verilogName << endl;
-    exit(1);
-  }
-
-  verilog::verilog_parser_init();
-  int result = verilog::verilog_parse_file(verilogInput);
-  if(result != 0) {
-    cout << "** ERROR:  Verilog Parse Failed: " << verilogName << endl; exit(1);
-  }
-
-  verilog::verilog_source_tree* tree = verilog::yy_verilog_source_tree;
-  verilog::verilog_resolve_modules(tree);
-
-  if(tree->modules->items > 2) {
-    cout << "WARNING:  # Modules in Verilog: " << tree->modules->items
-         << ", so only use the 'First' module" << endl;
-  }
-
-  // extract the '1st' module
-  ast_module_declaration* module =
-      (ast_module_declaration*)ast_list_get(tree->modules, 0);
-
-  /*
-  // IO map update
-  // (used in Net Instance Mapping)
-  dense_hash_map<string, int> ioMap;
-  ioMap.set_empty_key(INIT_STR);
-
-  int portCnt = module->module_ports->items;
-  for(int i=0; i< portCnt; i++) {
-      ast_port_declaration* port =
-  (ast_port_declaration*)ast_list_get(module->module_ports, i);
-
-      //
-      // input : 0
-      // output : 1
-      // inout : 2
-      //
-      int io = (port->direction == PORT_INPUT)? 0:
-               (port->direction == PORT_OUTPUT)? 1:2;
-
-      for(int j=0; j<port->port_names->items; j++) {
-          ast_identifier name = (ast_identifier) ast_list_get( port->port_names,
-  j);
-          char* tmp = ast_identifier_tostring(name);
-          ioMap[string(tmp)] = io;
-          free(tmp);
-      }
-  }
-  */
-
-  //
-  // first : netName
-  // second : NetInfo (macroName / compName / pinName)
-  netMap.set_empty_key(INIT_STR);
-
-  bool warnIccadClk = false;
-  bool warnLcb = false;
-  string lcbStr = "lcb_";
-
-  // pinCNT check && netMap build
-  pinCNT = 0;
-  for(int i = 0; i < module->module_instantiations->items; i++) {
-    ast_module_instantiation* inst = (ast_module_instantiation*)ast_list_get(
-        module->module_instantiations, i);
-
-    ast_module_instance* innerInst =
-        (ast_module_instance*)ast_list_get(inst->module_instances, 0);
-
-    /*
-     * memory leak?
-    char* macroNamePtr = ast_identifier_tostring( inst-> module_identifer );
-    char* compNamePtr = ast_identifier_tostring( innerInst->instance_identifier
-    );
-    string macroName = string(macroNamePtr);
-    string compName = string(compNamePtr);
-
-    int macroIdx = GetLefMacroIdx( __ckt, macroName );
-    int compIdx = GetDefComponentIdx( __ckt, compName );
-    free(macroNamePtr);
-    free(compNamePtr);
-    */
-
-    string macroName = string(ast_identifier_tostring(inst->module_identifer));
-    string compName =
-        string(ast_identifier_tostring(innerInst->instance_identifier));
-
-    int macroIdx = GetLefMacroIdx(__ckt, macroName);
-    int compIdx = GetDefComponentIdx(__ckt, compName);
-
-    if(!innerInst->port_connections) {
-      cout << "** WARNING:  " << compName << " has empty connection in verilog."
-           << endl;
-      continue;
-    }
-    pinCNT += innerInst->port_connections->items;
-    for(int j = 0; j < innerInst->port_connections->items; j++) {
-      ast_port_connection* port =
-          (ast_port_connection*)ast_list_get(innerInst->port_connections, j);
-
-      char tmpNetName[256] = {
-          0,
-      };
-      char* netNamePtr =
-          ast_identifier_tostring(port->expression->primary->value.identifier);
-      strcpy(tmpNetName, netNamePtr);
-      free(netNamePtr);
-
-      char rhs[256] = {
-          0,
-      };
-      if(port->expression->right) {
-        strcpy(rhs, "[");
-        char* cont = ast_expression_tostring(port->expression->right);
-        strcat(rhs, cont);
-        free(cont);
-      }
-
-      if(strlen(rhs) > 0) {
-        strcat(tmpNetName, rhs);
-      }
-      string netName(tmpNetName);
-
-      //            if( !warnIccadClk && netName == "iccad_clk" ) {
-      //                cout << "** WARNING:  iccad_clk is detected. It'll be
-      //                automatically excluded"
-      //                    << " (netMap)" << endl;
-      //                warnIccadClk = true;
-      //                continue;
-      //            }
-
-      //            if( !warnLcb && std::equal( lcbStr.begin(), lcbStr.end(),
-      //            netName.begin()) ) {
-      //                cout << "** WARNING:  lcb_ prefix is detected. It'll be
-      //                automatically excluded"
-      //                    << " (netMap)" << endl;
-      //                warnLcb = true;
-      //                continue;
-      //            }
-
-      //            if( netName == "iccad_clk" ||
-      //                    std::equal( lcbStr.begin(), lcbStr.end(),
-      //                    netName.begin() ) ) {
-      //                continue;
-      //            }
-      //            if( netName == "iccad_clk" ) {
-      //                continue;
-      //            }
-
-      char* pinNamePtr = ast_identifier_tostring(port->port_name);
-      string pinName = string(pinNamePtr);
-      int pinIdx = GetLefMacroPinIdx(__ckt, macroIdx, pinName);
-      free(pinNamePtr);
-
-      // netMap build
-      if(netMap.find(netName) == netMap.end()) {
-        vector< NetInfo > tmpStor;
-        tmpStor.push_back(NetInfo(macroIdx, compIdx, pinIdx));
-        netMap[netName] = tmpStor;
-      }
-      else {
-        netMap[netName].push_back(NetInfo(macroIdx, compIdx, pinIdx));
-      }
-    }
-  }
-
-  // insert PIN information into nets based on the DefPinStor
-  if(__ckt.defPinStor.size() > 0) {
-    for(auto& curPin : __ckt.defPinStor) {
-      auto nmPtr = netMap.find(string(curPin.netName()));
-      if(nmPtr == netMap.end()) {
-        netMap[string(curPin.netName())].push_back(
-            NetInfo(INT_MAX, INT_MAX, &curPin - &__ckt.defPinStor[0]));
-      }
-      else {
-        // save defPinStor's index
-        nmPtr->second.push_back(
-            NetInfo(INT_MAX, INT_MAX, &curPin - &__ckt.defPinStor[0]));
-      }
-      pinCNT++;
-    }
-  }
-  // this is worst cases. It must reference all information from Verilog files
-  // TODO
-  else {
-    if(module->continuous_assignments) {
-      int assignCnt = module->continuous_assignments->items;
-      for(int i = 0; i < assignCnt; i++) {
-        //                ast_continuous_assignment*
-      }
-    }
-  }
-  //    cout << "NET MAP BUILD DONE" << endl;
-  netCNT = netMap.size();
-
-  // memory reserve
-  netInstance = (NET*)mkl_malloc(sizeof(NET) * netCNT, 64);
-  pinInstance = (PIN*)mkl_malloc(sizeof(PIN) * pinCNT, 64);
-
-  PIN* curPin = NULL;
-
-  struct MODULE* curModule = NULL;
-  struct TERM* curTerm = NULL;
-
-  int netIdx = 0;
-  int pinIdx = 0;
-
-  tPinName.resize(terminalCNT);
-  mPinName.resize(moduleCNT);
-
-  netNameMap.set_empty_key(INIT_STR);
-
-  // net traverse
-  // netMap is silimar with __ckt.defNetStor
-  for(auto& net : netMap) {
-    if(net.first == "iccad_clk" || net.first == "clk" || net.first == "clock") {
-      cout << "** WARNING:  " << net.first << " is detected. "
-           << " It'll be automatically excluded"
-           << " (defNetStor)" << endl;
-
-      clockNetsVerilog.push_back(net.first);
-      continue;
-    }
-    //        cout << net.first << endl;
-    NET* curNet = &netInstance[netIdx];
-    netNameMap[net.first] = netIdx;
-    curNet->idx = netIdx;
-
-    curNet->pinCNTinObject = net.second.size();
-    curNet->pin = (PIN**)mkl_malloc(sizeof(PIN*) * net.second.size(), 64);
-    // net name initialize
-//    strcpy(curNet->name, net.first.c_str());
-    netNameStor.push_back( net.first.c_str() );
-    // all names are saved in here.;
-    for(auto& connection : net.second) {
-      int connectIdx = &connection - &net.second[0];
-      /////////////// Net Info Mapping part
-      //
-      // This means external PIN cases
-      if(connection.macroIdx == INT_MAX && connection.compIdx == INT_MAX) {
-        string pinName = string(__ckt.defPinStor[connection.pinIdx].pinName());
-        auto mtPtr = moduleTermMap.find(pinName);
-        if(mtPtr == moduleTermMap.end()) {
-          cout << "** ERROR:  Net Instance ( " << pinName
-               << " ) does not exist in COMPONENTS/PINS statement "
-               << "(moduleTermMap) " << endl;
-          exit(1);
-        }
-
-        // terminal Index setting
-        int termIdx = mtPtr->second.second;
-
-        int io = INT_MAX;
-        if(!__ckt.defPinStor[connection.pinIdx].hasDirection()) {
-          io = 2;  // both direction
-        }
-        else {
-          // input : 0
-          // output : 1
-          io = (strcmp(__ckt.defPinStor[connection.pinIdx].direction(),
-                       "INPUT") == 0)
-                   ? 0
-                   : 1;
-        }
-
-        // pin Instnace mapping
-        curPin = &pinInstance[pinIdx];
-        curNet->pin[connectIdx] = curPin;
-
-        curTerm = &terminalInstance[termIdx];
-
-        // save terminal pin Name into tPinName
-        tPinName[termIdx].push_back(pinName);
-
-        AddPinInfoForModuleAndTerminal(&curTerm->pin, &curTerm->pof,
-                                       curTerm->pinCNTinObject++, FPOS(0, 0),
-                                       curTerm->idx, netIdx, connectIdx,
-                                       pinIdx++, io, true);
-      }
-      else {
-        //
-        // find current component is in module or terminal
-        //
-        auto mtPtr = moduleTermMap.find(
-            string(__ckt.defComponentStor[connection.compIdx].id()));
-        if(mtPtr == moduleTermMap.end()) {
-          cout << "** ERROR:  Net Instance ( "
-               << __ckt.defComponentStor[connection.compIdx].id()
-               << " ) does not exist in COMPONENTS/PINS statement "
-               << "(moduleTermMap) " << endl;
-          exit(1);
-        }
-
-        // pin Info set
-        curPin = &pinInstance[pinIdx];
-        curNet->pin[connectIdx] = curPin;
-
-        string compName =
-            string(__ckt.defComponentStor[connection.compIdx].id());
-        string pinName = string(
-            __ckt.lefPinStor[connection.macroIdx][connection.pinIdx].name());
-
-        FPOS curOffset =
-            GetOffset(__ckt, compName, pinName, connection.macroIdx);
-        int io = GetIO(__ckt, compName, pinName, connection.macroIdx);
-
-        // module case
-        if(mtPtr->second.first) {
-          curModule = &moduleInstance[mtPtr->second.second];
-          mPinName[mtPtr->second.second].push_back(pinName);
-
-          AddPinInfoForModuleAndTerminal(&curModule->pin, &curModule->pof,
-                                         curModule->pinCNTinObject++, curOffset,
-                                         curModule->idx, netIdx, connectIdx,
-                                         pinIdx++, io, false);
-        }
-        // terminal case
-        else {
-          curTerm = &terminalInstance[mtPtr->second.second];
-          tPinName[mtPtr->second.second].push_back(pinName);
-
-          AddPinInfoForModuleAndTerminal(
-              &curTerm->pin, &curTerm->pof, curTerm->pinCNTinObject++,
-              curOffset, curTerm->idx, netIdx, connectIdx, pinIdx++, io, true);
-        }
-      }
-      // curOffset.Dump("curOffset");
-      // cout << macroName << " " << compName << " " << pinName << endl;
-    }
-    netIdx++;
-  }
-  netCNT = netIdx;
-  pinCNT = pinIdx;
-
-  netInstance = (NET*)mkl_realloc(netInstance, sizeof(NET) * netCNT);
-  // pinInstance is not re-allocable!!!
-
-  /*
-  // fully traverse
-  for(int i=0; i<module->module_instantiations->items; i++) {
-      ast_module_instantiation* inst =
-          (ast_module_instantiation*) ast_list_get(
-module->module_instantiations, i);
-
-      char* macroNamePtr = ast_identifier_tostring( inst->module_identifier );
-      string macroName(macroNamePtr);
-      free(macroNamePtr);
-
-      //
-      // it is only composed of module-module pair
-      //
-      ast_module_instance* innerInst =
-          (ast_module_instance*) ast_list_get( inst->module_instances, 0 );
-
-      char* compNamePtr = ast_identifier_tostring( innerInst->
-instance_identifier );
-      string compName(compNamePtr);
-      free(compNamePtr);
-
-      //
-      // find current component is in module or terminal
-      //
-      auto mtPtr = moduleTermMap.find( compName );
-      if(mtPtr == moduleTermMap.end()) {
-          cout << "** ERROR:  Net Instance ( "<< compName
-              << " ) does not exist in COMPONENTS/PINS statement "
-              << "(moduleTermMap) " << endl;
-          exit(1);
-      }
-
-      for(int j=0; j<innerInst->port_connections->items; j++) {
-          ast_port_connection* port =
-              (ast_port_connection*) ast_list_get( innerInst->port_connections,
-j );
-
-          char* pinNamePtr = ast_identifier_tostring(port->port_name);
-          string pinName( pintNamePtr );
-          free(pinNamePtr);
-
-          char* netNamePtr = ast_identifier_tostring(
-                              port->expression->primary->value.identifier);
-          string netName( netNamePtr );
-          free(netNamePtr);
-
-//            ast_identifier_tostring( port-> );
-
-      }
-  }
-
-
-  */
-  //    ast_free_all();
-  cout << "INFO:  SUCCESSFULLY VERILOG PARSED" << endl;
 }
 
 //
