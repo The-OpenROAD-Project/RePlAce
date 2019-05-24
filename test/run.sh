@@ -12,7 +12,7 @@ LIB="a2a_wb_dma_top/contest.lib"
 SDC="a2a_wb_dma_top/wb_dma_top.sdc"
 VERILOG="a2a_wb_dma_top/wb_dma_top_soce.v"
 OUT="a2a_wb_dma_top_out"
-DETAIL_PLACE_LOC=$(get_abs_filename "../ntuplace4")
+DETAIL_PLACE_LOC=$(get_abs_filename "../ntuplace/ntuplace4h")
 
 ../src/RePlAce -bmflag etc \
   -lef $LEF -def $DEF -verilog $VERILOG -lib $LIB -sdc $SDC \

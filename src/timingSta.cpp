@@ -206,8 +206,9 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   evalTclInit(_interp, tcl_inits);
   // initialize TCL commands
   Tcl_Eval(_interp, "sta::show_splash");
-  Tcl_Eval(_interp, "sta::define_sta_cmds");
   Tcl_Eval(_interp, "namespace import sta::*");
+  
+  Tcl_Eval(_interp, "define_sta_cmds");
 
   // initialize STA objects
   initSta();
