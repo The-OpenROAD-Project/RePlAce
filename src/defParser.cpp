@@ -129,12 +129,12 @@ static vector< defiPin >* defPinStorPtr = 0;
 
 static double* defUnitPtr = 0;
 
-static dense_hash_map< string, int >* defComponentMapPtr = 0;
-static dense_hash_map< string, int >* defPinMapPtr = 0;
-static dense_hash_map< int, int >* defRowY2OrientMapPtr = 0;
+static HASH_MAP< string, int >* defComponentMapPtr = 0;
+static HASH_MAP< string, int >* defPinMapPtr = 0;
+static HASH_MAP< int, int >* defRowY2OrientMapPtr = 0;
 
-static vector< dense_hash_map< string, int > >* defComponentPinToNetPtr = 0;
-static dense_hash_map< string, int >* currentPinMap = 0;
+static vector< HASH_MAP< string, int > >* defComponentPinToNetPtr = 0;
+static HASH_MAP< string, int >* currentPinMap = 0;
 
 // TX_DIR:TRANSLATION ON
 
@@ -218,8 +218,10 @@ int compMSL(defrCallbackType_e c, defiComponentMaskShiftLayer* co,
 }
 
 int compf(defrCallbackType_e c, defiComponent* co, defiUserData ud) {
-  currentPinMap = new dense_hash_map< string, int >;
+  currentPinMap = new HASH_MAP< string, int >;
+#ifdef USE_GOOGLE_HASH
   currentPinMap->set_empty_key(INIT_STR);
+#endif
 
   (*defComponentMapPtr)[string(co->id())] = defComponentStorPtr->size();
   defComponentStorPtr->push_back(*co);
@@ -417,7 +419,7 @@ int netf(defrCallbackType_e c, defiNet* net, defiUserData ud) {
 
     // skip for PIN instance
     if(strcmp(net->instance(i), "PIN") != 0) {
-      dense_hash_map< string, int >* currentPinMap =
+      HASH_MAP< string, int >* currentPinMap =
           &(*defComponentPinToNetPtr)[(
               *defComponentMapPtr)[string(net->instance(i))]];
 

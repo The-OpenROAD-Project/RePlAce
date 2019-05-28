@@ -5,4 +5,4 @@ sudo sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources
 sudo dpkg --add-architecture i386
 sudo apt-get update
 sudo apt-get install -y intel-mkl-2018.2-046 
-sudo apt-get install -y libx11-dev libboost-dev autoconf automake swig flex libtool zlib1g-dev tcl-dev
+sudo apt-get install -y libx11-dev libboost-dev cmake swig flex libtool zlib1g-dev tcl-dev

@@ -50,10 +50,18 @@
 #include <tuple>
 #include <vector>
 #include <iomanip>
+
+#ifdef USE_GOOGLE_HASH
 #include <google/dense_hash_map>
 #include <google/dense_hash_set>
+#else
+#include <unordered_map>
+#include <unordered_set>
+#endif
+
 #include <cfloat>
 #include <cstring>
+#include <cassert>
 
 #define PI 3.141592653589793238462L
 #define SQRT2 1.414213562373095048801L
@@ -88,6 +96,14 @@ typedef double prec;
 #define UNSIGNED_CONVERT(a) (unsigned)(1.0 * (a) + 0.5f)
 
 #define IS_PRECISION_EQUAL(a, b) (fabs((a)-(b)) <= PREC_EPSILON)
+
+#ifdef USE_GOOGLE_HASH
+#define HASH_MAP dense_hash_map
+#define HASH_SET dense_hash_set
+#else
+#define HASH_MAP unordered_map
+#define HASH_SET unordered_set
+#endif
 
 #define TSV_CAP 30.0  // fF
 // data from M. Jung et al. "How to Reduce Power in 3D IC Designs:
@@ -150,8 +166,14 @@ using std::to_string;
 
 using std::numeric_limits;
 using std::make_pair;
+
+#ifdef USE_GOOGLE_HASH
 using google::dense_hash_map;
 using google::dense_hash_set;
+#else
+using std::unordered_map;
+using std::unordered_set;
+#endif
 
 struct POS;
 
@@ -776,7 +798,7 @@ extern int g_rrr;
 extern int STAGE;
 
 extern vector< SHAPE > shapeStor;
-extern dense_hash_map< string, vector< int > > shapeMap;
+extern HASH_MAP< string, vector< int > > shapeMap;
 
 // STAGE's possible inner variables
 enum {
@@ -1014,7 +1036,7 @@ extern CELL *gcell_st;
 extern TERM *terminalInstance;
 
 extern NET *netInstance;
-extern dense_hash_map< string, int > netNameMap;
+extern HASH_MAP< string, int > netNameMap;
 
 // structure for *.scl
 extern ROW *row_st;

@@ -113,7 +113,7 @@ static prec offsetY = PREC_MAX;
 // second, first : isModule (true -> moduleInst // false -> termInst)
 // second, second : corresponding index
 //
-static dense_hash_map< string, pair< bool, int > > moduleTermMap;
+static HASH_MAP< string, pair< bool, int > > moduleTermMap;
 
 //
 // Metal1 Name.
@@ -213,7 +213,7 @@ GetOrientSize( float w, float h, int orient ) {
 
 // for Saving verilog information
 // declaired here to send verilog -> timing inst..
-static dense_hash_map< string, vector< NetInfo >, boost::hash< std::string > >
+static HASH_MAP< string, vector< NetInfo >, boost::hash< std::string > >
     netMap;
 
 // save clockNets' index
@@ -327,11 +327,13 @@ void SetParameter() {
   }
   cout << "INFO:  METAL1 NAME IN LEF: " << metal1Name << endl;
 
+#ifdef USE_GOOGLE_HASH
   // required for FIXED components(DEF) -> *.shape bookshelf
   shapeMap.set_empty_key(INIT_STR);
 
   // required for net(DEF) -> module fast access
   moduleTermMap.set_empty_key(INIT_STR);
+#endif
 
   // unitX, unitY setting : RowHeight / 9 --> Converted Height: 9
   // RePlAce's Nesterov iteration parameter is optimized when cell height is around 9.
@@ -1634,7 +1636,9 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
   tPinName.resize(terminalCNT);
   mPinName.resize(moduleCNT);
 
+#ifdef USE_GOOGLE_HASH
   netNameMap.set_empty_key(INIT_STR);
+#endif
   for(auto& net : __ckt.defNetStor) {
     if(strcmp(net.name(), "iccad_clk") == 0 || strcmp(net.name(), "clk") == 0 ||
        strcmp(net.name(), "clock") == 0) {

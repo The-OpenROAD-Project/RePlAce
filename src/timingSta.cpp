@@ -434,15 +434,17 @@ void Timing::FillSpefForSta() {
   sta::spef_reader->setResScale(1, resStr);
   sta::spef_reader->setInductScale(1, inductStr);
 
-  dense_hash_map< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
+  HASH_MAP< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
   // map from pin name -> cap
-  dense_hash_map< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
+  HASH_MAP< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
 
   PinInfo tmpPin;
   tmpPin.SetImpossible();
 
+#ifdef USE_GOOGLE_HASH
   pin_cap_written.set_empty_key(tmpPin);
   lumped_cap_at_pin.set_empty_key(tmpPin);
+#endif
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
@@ -646,8 +648,10 @@ void Timing::UpdateNetWeightSta() {
   netWeightMin = FLT_MAX;
   netWeightMax = FLT_MIN;
 
-  dense_hash_set<sta::Net*> netSet;
+  HASH_SET<sta::Net*> netSet;
+#ifdef USE_GOOGLE_HASH
   netSet.set_empty_key(NULL);
+#endif
 
   // Reported path check based on reportPath5 function (search/ReportPath.cc)
   for(int i = 0; i < limintCnt; i++) {

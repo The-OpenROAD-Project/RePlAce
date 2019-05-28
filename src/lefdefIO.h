@@ -71,7 +71,6 @@
 #include <cfloat>
 #include <limits>
 #include <queue>
-#include <sparsehash/dense_hash_map>
 
 #include <stdint.h>
 
@@ -92,13 +91,13 @@ using std::endl;
 using std::string;
 using std::vector;
 using std::pair;
-using google::dense_hash_map;
 
 REPLACE_NAMESPACE_OPEN
 
 class Circuit {
  public:
   Circuit() : lefManufacturingGrid(DBL_MIN) {
+#ifdef USE_GOOGLE_HASH
     lefMacroMap.set_empty_key(INIT_STR);
     lefViaMap.set_empty_key(INIT_STR);
     lefLayerMap.set_empty_key(INIT_STR);
@@ -107,6 +106,7 @@ class Circuit {
     defComponentMap.set_empty_key(INIT_STR);
     defPinMap.set_empty_key(INIT_STR);
     defRowY2OrientMap.set_empty_key(INT_MAX);
+#endif
   }
 
   //
@@ -115,6 +115,7 @@ class Circuit {
   //
   Circuit(vector< string >& lefStor, string defFilename, bool isVerbose = false)
       : lefManufacturingGrid(DBL_MIN) {
+#ifdef USE_GOOGLE_HASH
     lefMacroMap.set_empty_key(INIT_STR);
     lefViaMap.set_empty_key(INIT_STR);
     lefLayerMap.set_empty_key(INIT_STR);
@@ -123,6 +124,7 @@ class Circuit {
     defComponentMap.set_empty_key(INIT_STR);
     defPinMap.set_empty_key(INIT_STR);
     defRowY2OrientMap.set_empty_key(INT_MAX);
+#endif
 
     Init(lefStor, defFilename, isVerbose);
   }
@@ -151,10 +153,10 @@ class Circuit {
   vector< lefiSite > lefSiteStor;
 
   // Macro, via, Layer's unique name -> index of lefXXXStor.
-  dense_hash_map< string, int > lefMacroMap;
-  dense_hash_map< string, int > lefViaMap;
-  dense_hash_map< string, int > lefLayerMap;
-  dense_hash_map< string, int > lefSiteMap;
+  HASH_MAP< string, int > lefMacroMap;
+  HASH_MAP< string, int > lefViaMap;
+  HASH_MAP< string, int > lefLayerMap;
+  HASH_MAP< string, int > lefSiteMap;
 
   // this will maps
   // current lefMacroStor's index
@@ -162,7 +164,7 @@ class Circuit {
   //
   // below index is same with lefMacroStor
   vector< vector< lefiPin > > lefPinStor;  // macroIdx -> pinIdx -> pinObj
-  vector< dense_hash_map< string, int > >
+  vector< HASH_MAP< string, int > >
       lefPinMapStor;  // macroIdx -> pinName -> pinIdx
   vector< vector< lefiObstruction > >
       lefObsStor;  // macroIdx -> obsIdx -> obsObj
@@ -192,18 +194,18 @@ class Circuit {
   vector< defiNet > defSpecialNetStor;
 
   // Component's unique name -> index of defComponentStor.
-  dense_hash_map< string, int > defComponentMap;
-  dense_hash_map< string, int > defPinMap;
+  HASH_MAP< string, int > defComponentMap;
+  HASH_MAP< string, int > defPinMap;
 
   // ROW's Y coordinate --> Orient info
-  dense_hash_map< int, int > defRowY2OrientMap;
+  HASH_MAP< int, int > defRowY2OrientMap;
 
   // this will maps
   // current defComponentStor's index + string pin Name
   // -> defNetStor indexes.
   //
   // below index is same with defComponentStor
-  vector< dense_hash_map< string, int > > defComponentPinToNet;
+  vector< HASH_MAP< string, int > > defComponentPinToNet;
 
  private:
   // Parsing function

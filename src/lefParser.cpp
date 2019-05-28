@@ -80,8 +80,6 @@
 
 #include <unistd.h>
 
-#include <sparsehash/dense_hash_map>
-
 #include "lefrReader.hpp"
 #include "lefwWriter.hpp"
 #include "lefiDebug.hpp"
@@ -115,18 +113,18 @@ static vector< lefiVia >* lefViaStorPtr = 0;
 
 // cursor of PIN & OBS
 static vector< lefiPin >* curPinStorPtr = 0;
-static dense_hash_map< string, int >* curPinMapPtr = 0;
+static HASH_MAP< string, int >* curPinMapPtr = 0;
 static vector< lefiObstruction >* curObsStorPtr = 0;
 
 // PIN & OBS info
 static vector< vector< lefiPin > >* lefPinStorPtr = 0;
-static vector< dense_hash_map< string, int > >* lefPinMapStorPtr = 0;
+static vector< HASH_MAP< string, int > >* lefPinMapStorPtr = 0;
 static vector< vector< lefiObstruction > >* lefObsStorPtr = 0;
 
-static dense_hash_map< string, int >* lefMacroMapPtr = 0;
-static dense_hash_map< string, int >* lefViaMapPtr = 0;
-static dense_hash_map< string, int >* lefLayerMapPtr = 0;
-static dense_hash_map< string, int >* lefSiteMapPtr = 0;
+static HASH_MAP< string, int >* lefMacroMapPtr = 0;
+static HASH_MAP< string, int >* lefViaMapPtr = 0;
+static HASH_MAP< string, int >* lefLayerMapPtr = 0;
+static HASH_MAP< string, int >* lefSiteMapPtr = 0;
 
 static void dataError() {
   CIRCUIT_FPRINTF(fout, "ERROR: returned user data is not correct!\n");
@@ -858,8 +856,10 @@ int macroBeginCB(lefrCallbackType_e c, const char* macroName, lefiUserData) {
 
   curPinStorPtr = new vector< lefiPin >;
   curObsStorPtr = new vector< lefiObstruction >;
-  curPinMapPtr = new dense_hash_map< string, int >;
+  curPinMapPtr = new HASH_MAP< string, int >;
+#ifdef USE_GOOGLE_HASH
   curPinMapPtr->set_empty_key(INIT_STR);
+#endif
 
   CIRCUIT_FPRINTF(fout, "MACRO %s\n", macroName);
   return 0;

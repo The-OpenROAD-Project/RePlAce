@@ -73,7 +73,7 @@
 #undef YY_INPUT
 #endif
 
-#include "parasitics/SpefReaderPvt.hh"
+#include "SpefReaderPvt.hh"
 using namespace sta;
 
 // to import Swig

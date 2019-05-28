@@ -61,7 +61,9 @@ RouteInstance routeInst;
 using std::ifstream;
 
 void RouteInstance::Init(){
+#ifdef USE_GOOGLE_HASH
   _layerMap.set_empty_key(INIT_STR);
+#endif
   SetReplaceStructure(); 
   SetScaleFactor();
   SetCircuitInst();
@@ -169,7 +171,9 @@ void RouteInstance::FillGCellXY() {
 }
 
 void RouteInstance::FillLayerCapacityRatio( string fileName ) {
+#ifdef USE_GOOGLE_HASH
   _layerCapacityMap.set_empty_key(INIT_STR);
+#endif
   ifstream inputFile( fileName );
   if( !inputFile.is_open() ) {
     cout << "INFO: FILE: " << fileName << " DOES NOT EXIST" << endl;

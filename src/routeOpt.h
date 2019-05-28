@@ -73,10 +73,10 @@ class RouteInstance {
 
     float _gridOriginX, _gridOriginY;
 
-    dense_hash_map< string, int > _layerMap; 
+    HASH_MAP< string, int > _layerMap; 
   
     // Layer Name -> Metal Layer Resources control 
-    dense_hash_map< string, float > _layerCapacityMap;
+    HASH_MAP< string, float > _layerCapacityMap;
 
     // below is for bookshelf 
     vector< ReducedTrack > _bsReducedTrackStor;
@@ -123,7 +123,7 @@ class RouteInstance {
     float GetGridOriginX() {return _gridOriginX; };
     float GetGridOriginY() {return _gridOriginY; };
     Replace::Circuit* GetCircuitInst() { return _ckt; };
-    dense_hash_map<string, int>& GetLayerMap() {return _layerMap; };
+    HASH_MAP<string, int>& GetLayerMap() {return _layerMap; };
     
     int GetReducedTrackCount() { return _bsReducedTrackStor.size(); };
     ReducedTrack& GetReducedTrack( int idx ) { return _bsReducedTrackStor[idx]; };

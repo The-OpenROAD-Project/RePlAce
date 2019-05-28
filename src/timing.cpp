@@ -82,9 +82,11 @@ void Timing::BuildSteiner(bool scaleApplied) {
       int* mapping = new int[curNet->pinCNTinObject];
 
       // x, y coordi --> pin's index
-      dense_hash_map< pair< DBU, DBU >, PinInfo, MyHash< pair< DBU, DBU > > >
+      HASH_MAP< pair< DBU, DBU >, PinInfo, MyHash< pair< DBU, DBU > > >
           pinMap;
+#ifdef USE_GOOGLE_HASH
       pinMap.set_empty_key(make_pair(DBU_MAX, DBU_MAX));
+#endif
 
       //            cout << "pinMapBuilding" << endl;
       for(int j = 0; j < curNet->pinCNTinObject; j++) {
@@ -225,16 +227,18 @@ void Timing::WriteSpef(const string& spefLoc) {
   feed << "*R_UNIT 1 OHM" << endl;
   feed << "*L_UNIT 1 UH" << endl << endl;
 
-  dense_hash_map< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
+  HASH_MAP< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
 
   // map from pin name -> cap
-  dense_hash_map< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
+  HASH_MAP< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
 
   PinInfo tmpPin;
   tmpPin.SetImpossible();
 
+#ifdef USE_GOOGLE_HASH
   pin_cap_written.set_empty_key(tmpPin);
   lumped_cap_at_pin.set_empty_key(tmpPin);
+#endif
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {

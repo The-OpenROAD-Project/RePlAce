@@ -15,3 +15,9 @@ include/*.hpp
 lib/*.a
 *.a
 **/*.a
+
+Makefile
+CMakeCache.txt
+*.cmake
+CMakeFiles
+install_manifest.txt

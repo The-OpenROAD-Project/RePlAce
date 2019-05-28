@@ -22,22 +22,21 @@
 
 ### Pre-requisite
 * Intel MKL packages [Link](https://software.intel.com/en-us/articles/free-ipsxe-tools-and-libraries) >= 2016.3.210
-* GCC compiler and libstdc++ static library >= 5.4.0
+* GCC compiler and libstdc++ static library >= 4.8.5
 * boost library >= 1.41
-* bison (for verilog parser) >= 3.0.4
+* bison (for lef/def parsers) >= 3.0.4
 * tcl (for OpenSTA) >= 8.4
 * X11 library (for CImg library to visualize) >= 1.6.5
 * Recommended OS: Centos6, Centos7 or Ubuntu 16.04
 
 ### Clone repo and submodules 
     $ git clone --recursive https://github.com/abk-openroad/RePlAce.git
-    
-Then, modify the __MKLROOT__ to the corresponding install paths in [src/Makefile](src/Makefile)
-
     $ cd ~/RePlAce
-    $ make clean
     $ ./prerequisite/install_centos7.sh   // for centos 7
     $ ./prerequisite/install_ubuntu16.sh  // for ubuntu 16
+    $ mkdir build
+    $ cd build
+    $ cmake ..                            // you may specify -DCMAKE_INSTALL_PREFIX to avoid installing in /usr/local/*
     $ make 
     $ make install
 

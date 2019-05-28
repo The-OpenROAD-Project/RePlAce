@@ -14,7 +14,7 @@ VERILOG="a2a_wb_dma_top/wb_dma_top_soce.v"
 OUT="a2a_wb_dma_top_out"
 DETAIL_PLACE_LOC=$(get_abs_filename "../ntuplace/ntuplace4h")
 
-../src/RePlAce -bmflag etc \
+./replace -bmflag etc \
   -lef $LEF -def $DEF -verilog $VERILOG -lib $LIB -sdc $SDC \
   -output $OUT \
   -dpflag $DETAIL_PLACER_FLAG -dploc $DETAIL_PLACE_LOC \

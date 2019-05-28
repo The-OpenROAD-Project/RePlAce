@@ -57,9 +57,6 @@
 #include <string>
 #include <vector>
 
-#include <sparsehash/dense_hash_map>
-using google::dense_hash_map;
-
 #include <mkl.h>
 
 // this is shared with lefdefIO.cpp
@@ -77,7 +74,7 @@ static FPOS terminal_size_max;
 static FPOS module_size_max;
 static POS max_mac_dim;
 
-static dense_hash_map< string, NODES > nodesMap;
+static HASH_MAP< string, NODES > nodesMap;
 
 
 void ParseBookShelf() {
@@ -398,6 +395,16 @@ endl;
   }
 }
 
+bool SortRowByCoordinate(const ROW& lhs, const ROW& rhs) {
+  if(lhs.pmin.x < rhs.pmin.x) {
+    return true;
+  }
+  if(lhs.pmin.x > rhs.pmin.x) {
+    return false;
+  }
+  return (lhs.pmin.y < rhs.pmin.y);
+}
+
 void GetSortedRowStor(ROW *origRowStor, int rowCnt) {
   // sort the Y-order and X-order
   vector< ROW > tmpRowStor;
@@ -406,15 +413,7 @@ void GetSortedRowStor(ROW *origRowStor, int rowCnt) {
   }
 
   // sort function
-  sort(tmpRowStor.begin(), tmpRowStor.end(), [](ROW &lhs, ROW &rhs) {
-    if(lhs.pmin.x < rhs.pmin.x) {
-      return true;
-    }
-    if(lhs.pmin.x > rhs.pmin.x) {
-      return false;
-    }
-    return (lhs.pmin.y < rhs.pmin.y);
-  });
+  sort(tmpRowStor.begin(), tmpRowStor.end(), SortRowByCoordinate);
 
   // copy back
   for(auto &curRow : tmpRowStor) {
@@ -1126,7 +1125,9 @@ int read_shapes_3D(char *input) {
   int curShapeIdx = 0;
   totalShapeCount = 0;
 
-  shapeMap.set_empty_key("!@#!@#");
+#ifdef USE_GOOGLE_HASH
+  shapeMap.set_empty_key(INIT_STR);
+#endif
 
   char instName[255] = {
       0,
@@ -1345,7 +1346,9 @@ int read_routes_3D(char *input) {
 //
 
 int read_nodes_3D(char *input) {
-  nodesMap.set_empty_key("!@#!@#");
+#ifdef USE_GOOGLE_HASH
+  nodesMap.set_empty_key(INIT_STR);
+#endif
 
   FILE *fp = fopen(input, "r");
   char *token = NULL;
@@ -2844,8 +2847,10 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
   }
 
   fprintf( fp_route, "NumBlockageNodes   : %d\n", blockageCnt);
-  dense_hash_map<int, vector<int>> macroBlockageMap;
+  HASH_MAP<int, vector<int>> macroBlockageMap;
+#ifdef USE_GOOGLE_HASH
   macroBlockageMap.set_empty_key(INT_MAX);
+#endif
 
   string blockagePrefix = "replace_blockage_";
   string dummyInstPrefix = "dummy_inst_";
@@ -3021,7 +3026,7 @@ void BsNetInfo::Print( FILE* file ) {
 }
 
 // net name sorting function
-bool CompareBsNetInfo( BsNetInfo& a, BsNetInfo& b) {
+bool CompareBsNetInfo( const BsNetInfo& a, const BsNetInfo& b) {
   char prefixA = a.name.c_str()[0];
   char prefixB = b.name.c_str()[0];
   int idxA = atoi( a.name.substr(1, a.name.length()).c_str()); 
@@ -3265,8 +3270,7 @@ void WriteScl(char *dir_tier, int curLayer) {
   for(int i = 0; i < tier->row_cnt; i++) {
     tmpRowStor.push_back(row_st[i]);
   }
-  sort(tmpRowStor.begin(), tmpRowStor.end(),
-       [](ROW &lhs, ROW &rhs) { return (lhs.pmin.y < rhs.pmin.y); });
+  sort(tmpRowStor.begin(), tmpRowStor.end(), SortRowByCoordinate) ;
   
   fputs("\n", fp_scl);
   fprintf(fp_scl, "NumRows :  \t%d\n", tmpRowStor.size() );
@@ -3372,12 +3376,14 @@ void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing,
 }
 
 void BookshelfNameMap::Init() {
+#ifdef USE_GOOGLE_HASH
   moduleToBsMap.set_empty_key(INIT_STR);
   bsToModuleMap.set_empty_key(INIT_STR);
   terminalToBsMap.set_empty_key(INIT_STR);
   bsToTerminalMap.set_empty_key(INIT_STR);
   netToBsMap.set_empty_key(INIT_STR);
   bsToNetMap.set_empty_key(INIT_STR); 
+#endif
 
   bsModuleCnt = 0;
   for(int i=0; i<moduleCNT; i++) {

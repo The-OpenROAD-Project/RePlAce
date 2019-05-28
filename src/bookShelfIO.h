@@ -41,7 +41,6 @@
 #ifndef __PL_IO__
 #define __PL_IO__
 
-#include <sparsehash/dense_hash_map>
 #include "global.h"
 #include "lefdefIO.h"
 #include "routeOpt.h"
@@ -49,7 +48,6 @@
 #define BUFFERSIZE 1000
 #define LINESIZE 2000
 
-using google::dense_hash_map;
 using std::vector;
 using std::tuple;
 
@@ -108,9 +106,9 @@ struct ROW {
 class BookshelfNameMap {
   public:
     // bs means Bookshelf
-    dense_hash_map<string, string> moduleToBsMap, bsToModuleMap;
-    dense_hash_map<string, string> terminalToBsMap, bsToTerminalMap;
-    dense_hash_map<string, string> netToBsMap, bsToNetMap;
+    HASH_MAP<string, string> moduleToBsMap, bsToModuleMap;
+    HASH_MAP<string, string> terminalToBsMap, bsToTerminalMap;
+    HASH_MAP<string, string> netToBsMap, bsToNetMap;
     int bsModuleCnt, bsTerminalCnt, bsNetCnt;
     void Init();
 

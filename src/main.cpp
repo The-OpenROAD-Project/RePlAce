@@ -105,7 +105,7 @@ vector<string> cellNameStor;
 
 TERM *terminalInstance;
 NET *netInstance;
-dense_hash_map< string, int > netNameMap;
+HASH_MAP< string, int > netNameMap;
 int terminalCNT;
 int netCNT;
 
@@ -317,7 +317,7 @@ POS dim_bin_mGP2D;
 vector< SHAPE > shapeStor;
 
 // nodes String -> shapeStor's index.
-dense_hash_map< string, vector< int > > shapeMap;
+HASH_MAP< string, vector< int > > shapeMap;
 POS dim_bin_cGP2D;
 
 ///  ARGUMENTS  ///////////////////////////////////////////

@@ -805,7 +805,7 @@ bool argument(int argc, char *argv[]) {
         printf("currently support 3 detail placer : NTU3, and NTU4.\n");
         printf("You must specify Detail Placer between these two.\n");
         printf(
-            "example : ./RePlACE -input @@ -output @@ -dpflag NTU4 -dploc "
+            "example : ./replace -input @@ -output @@ -dpflag NTU4 -dploc "
             "./ntuplacer4h\n");
         return false;
       }
@@ -822,7 +822,7 @@ bool argument(int argc, char *argv[]) {
         printf("currently support 2 detail placer : NTU3, and NTU4.\n");
         printf("You must specify Detail Placer between these two.\n");
         printf(
-            "example : ./RePlACE -input @@ -output @@ -dpflag NTU4 -dploc "
+            "example : ./replace -input @@ -output @@ -dpflag NTU4 -dploc "
             "./ntuplacer4h\n");
         return false;
       }
