@@ -1000,16 +1000,8 @@ void printCMD(int argc, char *argv[]) {
 
 void printUsage() {
   cout << endl;
-  cout << "[Bookshelf]" << endl;
-  cout << " Usage: ./RePlACE -bmflag <mms/ispd/sb/ibm/etc> -aux <*.aux> "
-          "-output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> "
-          "[Options]"
-       << endl
-       << endl;
-  cout << "  -bmflag     : Specify which Benchmark is Used" << endl;
-  cout << "  -aux        : *.aux Location" << endl << endl;
   cout << "[Lef/Def/Verilog]" << endl;
-  cout << " Usage: ./RePlACE -bmflag <mms/ispd/sb/ibm/etc> -lef <*.lef> -def "
+  cout << " Usage: replace -bmflag etc -lef <*.lef> -def "
           "<*.def> [-verilog <*.v>] -output <outputLocation> -dpflag "
           "<NTU3/NTU4> -dploc <dpLocation> [Options]"
        << endl
@@ -1056,12 +1048,7 @@ void printUsage() {
   cout << "  -onlyLG     : Call Detailed Placement in Legalization Mode" << endl
        << endl;
   cout << " Router" << endl;
-  cout << "  -R          : Enable Routability Flow" << endl << endl;
-  cout << " Other" << endl;
-  cout << "  -unitY      : Custom scaledown param for LEF/DEF/Verilog "
-          "(Especially for ASAP N7 library)"
-       << endl
-       << endl;
+  cout << "  -routabiliy : Enable Routability Flow" << endl << endl;
 }
 
 bool criticalArgumentError() {

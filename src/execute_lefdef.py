@@ -15,10 +15,10 @@ import time
 #####################################
 # configure 
 bmflag = "etc"
-dpflag = "NTU4"
-dploc = "../ntuplace/ntuplace4h"
+dpflag = "NTU3"
+dploc = "../ntuplace/ntuplace3"
 dirpos = "../bench/ispd18"
-binaryName = "./RePlAce"
+binaryName = "replace"
 outpos = "../output"
 logpos = "../logdir"
 
@@ -34,8 +34,6 @@ isAplot = False
 
 ## configure done 
 #####################################
-
-dploc = os.path.abspath(dploc)
 
 
 def ExecuteCommand( command ):
