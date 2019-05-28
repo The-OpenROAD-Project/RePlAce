@@ -39,6 +39,7 @@ add_subdirectory(${FLUTE_HOME})
 add_subdirectory(${OPENSTA_HOME})
 
 
+
 ## configure settings
 find_package(GoogleHash)
 find_package(MKL REQUIRED)
@@ -108,6 +109,7 @@ set (REPLACE_HEADER
 # include directories 
 ############################################################
 include_directories(
+  ${MKL_INCLUDE_DIR}
   ${BOOST_INCLUDEDIR}
 
   ${EIGEN_HOME}
