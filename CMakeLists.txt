@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -32,11 +33,18 @@ set(CIMG_HOME
 set(EIGEN_HOME
   ${PROJECT_SOURCE_DIR}/module/eigen-git-mirror 
 )
+set(IOPLACER_HOME
+  ${PROJECT_SOURCE_DIR}/module/ioPlacer  
+)
 
 add_subdirectory(${DEFLIB_HOME})
 add_subdirectory(${LEFLIB_HOME})
 add_subdirectory(${FLUTE_HOME})
 add_subdirectory(${OPENSTA_HOME})
+
+set(ENV{TYPE_CALL} library)
+add_subdirectory(${IOPLACER_HOME})
+
 
 
 
@@ -50,11 +58,12 @@ find_package(SWIG REQUIRED)
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
+# for cimg
 find_package(X11 REQUIRED)
+find_package(jpeg REQUIRED)
 
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
-
 
 set (REPLACE_SRC 
   src/argument.cpp
@@ -83,6 +92,7 @@ set (REPLACE_SRC
   src/timingSta.cpp
   src/trial.cpp
   src/wlen.cpp
+  src/pinPlace.cpp
   )
 
 
@@ -103,6 +113,7 @@ set (REPLACE_HEADER
   src/timing.h
   src/timingSta.h
   src/wlen.h
+  src/pinPlace.h
 )
 
 ############################################################
@@ -139,6 +150,8 @@ include_directories(
   ${OPENSTA_HOME}/tcl
   ${OPENSTA_HOME}/util
   ${OPENSTA_HOME}/verilog
+
+  ${IOPLACER_HOME}/include 
 
   )
 
@@ -183,11 +196,15 @@ target_link_libraries( replace
   clef
   clefzlib
 
+  ioPlace
+
   ${ZLIB_LIBRARIES}
   ${X11_LIBRARIES}
   ${MKL_LIBRARIES}
+  ${JPEG_LIBRARIES}
   ${TCL_LIB}
-  Threads::Threads 
+  Threads::Threads
+  -static-libstdc++ 
   )
 
 ############################################################
