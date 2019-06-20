@@ -62,6 +62,23 @@ void ShowPlot(string circuitName = "");
 
 enum { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE };
 
+struct PlotColor { 
+  private:
+  int r_;
+  int g_;
+  int b_;
+
+  public:
+  PlotColor() : r_(0), g_(0), b_(0) {};
+  PlotColor(int r, int g, int b) :
+    r_(r), g_(g), b_(b) {};
+  
+  int r() { return r_; };
+  int g() { return g_; };
+  int b() { return b_; };
+};
+
+
 // for X11 drawing
 class PlotEnv {
  public:
@@ -79,8 +96,15 @@ class PlotEnv {
   float dispWidth;
   float dispHeight;
 
+  bool hasCellColor;
+  // color information for each cells.
+  // Needed for cell coloring
+  vector<PlotColor> colors;
+
+  // constructor
   PlotEnv();
   void Init();
+  void InitCellColors(string colorFile);
   int GetTotalImageWidth();
   int GetTotalImageHeight();
   int GetX(FPOS &coord);

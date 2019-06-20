@@ -47,6 +47,7 @@
 #include "bookShelfIO.h"
 
 #include <sstream>
+#include <fstream>
 #include <cfloat>
 #include <cstdio>
 #include <cstdlib>
@@ -78,6 +79,7 @@ PlotEnv::PlotEnv() {
 }
 
 void PlotEnv::Init() {
+  hasCellColor = false;
   origWidth = gmax.x - gmin.x;
   origHeight = gmax.y - gmin.y;
   minLength = 1000;
@@ -106,6 +108,51 @@ void PlotEnv::Init() {
 
   dispWidth = imageWidth * 0.2;
   dispHeight = imageHeight * 0.2;
+
+  if( plotColorFile != "" ) {
+    hasCellColor = true;
+    InitCellColors(plotColorFile);
+  }
+}
+
+// Resize and initialize the vectors
+// takes colorSet files
+void PlotEnv::InitCellColors(string cFileName) {
+  colors.resize(gcell_cnt);
+
+  HASH_MAP<string, int> gcellMap;
+  for(int i=0; i<gcell_cnt; i++) {
+    new (&colors[i]) PlotColor();
+
+    CELL* curGcell = &gcell_st[i]; 
+    if( curGcell->flg != StdCell ) {
+      continue;
+    }
+
+    // Now only stdcell is survived.
+    // Fill in the gcellMap
+    gcellMap[curGcell->Name()] = i;
+  }
+  
+  std::ifstream cFile(cFileName);
+  if( !cFile.good() ) {
+    cout << "** ERROR : Cannot Open Colorset File : " << cFileName << endl;
+    exit(1);
+  }
+  
+  string cellName = "";
+  int r = 0, g = 0, b = 0;
+
+  // keep fill in the cellName/r/g/b variable in the colorset file
+  while( cFile >> cellName >> r >> g >> b ) {
+    auto gPtr = gcellMap.find(cellName);
+    if( gPtr == gcellMap.end() ) {
+      cout << "ERROR: Cannot find cell : " << cellName << endl;
+    } 
+
+    // save into colors vectors    
+    colors[gPtr->second] = PlotColor(r, g, b);
+  }
 }
 
 int PlotEnv::GetTotalImageWidth() {
@@ -196,16 +243,34 @@ void DrawGcell(CImgObj &img, const unsigned char fillerColor[],
     int y1 = pe.GetY(curGCell->pmin);
     int y3 = pe.GetY(curGCell->pmax);
 
+    // skip drawing for FillerCell
     if(curGCell->flg == FillerCell) {
       continue;
     }
 
-    // img.draw_rectangle( x1, y1, x3, y3,
-    //        (curGCell->flg == FillerCell)? fillerColor: cellColor, opacity );
-    img.draw_rectangle(x1, y1, x3, y3,
-                       (curGCell->flg == Macro) ? macroColor : cellColor,
-                       opacity);
+    // Color settings for Macro / StdCells
+    unsigned char color[3] = {0, };
+    if( curGCell->flg == Macro ) {
+      for(int j=0; j<3; j++) {
+        color[j] = macroColor[j];
+      }
+    }
+    else if( curGCell->flg == StdCell) {
+      if( pe.hasCellColor ) {
+        color[0] = pe.colors[i].r();
+        color[1] = pe.colors[i].g();
+        color[2] = pe.colors[i].b();
+      }
+      else {
+        for(int j=0; j<3; j++) {
+          color[j] = cellColor[j];
+        }
+      } 
+    }
+//    cout << "color: " << (int)color[0] << " " << (int)color[1] << " " << (int)color[2] << endl;
+    img.draw_rectangle(x1, y1, x3, y3, color, opacity);
 
+    // drawing boundary for Macro cells
     if(curGCell->flg == Macro) {
       img.draw_rectangle(x1, y1, x3, y3, black, opacity, ~0U);
       // img.draw_text((x1+x3)/2, (y1+y3)/2, curGCell->name, black, NULL, 1,
@@ -229,7 +294,19 @@ void DrawModule(CImgObj &img, const unsigned char color[], float opacity) {
     int x3 = pe.GetX(curModule->pmax);
     int y1 = pe.GetY(curModule->pmin);
     int y3 = pe.GetY(curModule->pmax);
-    img.draw_rectangle(x1, y1, x3, y3, color, opacity);
+
+    unsigned char cColor[3] = {0, };
+    if( pe.hasCellColor ) {
+      cColor[0] = pe.colors[i].r();
+      cColor[1] = pe.colors[i].g();
+      cColor[2] = pe.colors[i].b();
+    }
+    else {
+      for(int j=0; j<3; j++) {
+        cColor[j] = color[j];
+      }
+    }
+    img.draw_rectangle(x1, y1, x3, y3, cColor, opacity);
   }
 }
 

@@ -426,6 +426,7 @@ struct MODULE {
     pmax_lg.SetZero();
   }
   void Dump(string a) {
+    cout << a << endl;
     cout << "tier: " << tier << endl;
     cout << "mac_idx: " << mac_idx << endl;
     cout << "ovlp_flg: " << ovlp_flg << endl;
@@ -778,6 +779,9 @@ extern prec resPerMicron;
 extern bool isClockGiven;
 extern prec timingClock;
 extern string clockPinName;
+
+extern bool isInitSeed;
+extern string plotColorFile;
 
 extern int timingUpdateIter;
 extern int pinCNT;
@@ -1343,7 +1347,7 @@ inline char *GetEscapedStr(const char *name, bool isEscape = true) {
 
 inline string GetRealPath(string path ) {
   char tmp[PATH_MAX] = {0, };
-  char* ptr = realpath(path.c_str(), tmp);
+  realpath(path.c_str(), tmp);
   return string(tmp);
 }
 

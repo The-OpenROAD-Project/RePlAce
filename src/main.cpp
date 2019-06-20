@@ -82,6 +82,9 @@ bool isClockGiven;
 prec timingClock;
 string clockPinName;
 
+bool isInitSeed;
+string plotColorFile;
+
 int timingUpdateIter;
 PIN *pinInstance;
 MODULE *moduleInstance;
@@ -457,7 +460,7 @@ int main(int argc, char *argv[]) {
     ///// IP:  INITIAL PLACEMENT //////////////////////////////////////////
     printf("PROC:  BEGIN INITIAL PLACEMENT (IP)\n");
     time_start(&time_ip);
-    build_data_struct();
+    build_data_struct(!isInitSeed);
     initialPlacement_main();
     time_end(&time_ip);
     printf("PROC:  END INITIAL PLACEMENT (IP)\n\n\n");

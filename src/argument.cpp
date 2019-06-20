@@ -105,6 +105,9 @@ void initArgument(int argc, char *argv[]) {
   isTiming = false;
   isDummyFill =  true;
 
+  isInitSeed = false;
+  plotColorFile = "";
+
   isARbyUserCMD = false;         // bool
   thermalAwarePlaceCMD = false;  // bool
   trialRunCMD = false;           // bool
@@ -501,6 +504,18 @@ bool argument(int argc, char *argv[]) {
         return false;
       }
     }
+    else if(!strcmp(argv[i], "-initSeed")) {
+      isInitSeed = true;
+    }
+    else if(!strcmp(argv[i], "-plotColor")) {
+      i++;
+      if(argv[i][0] != '-') {
+        plotColorFile = argv[i]; 
+      }
+      else {
+        return false;
+      }
+    }
 
     /*
     else if(!strcmp(argv[i], "-numLayer")) {
@@ -632,6 +647,16 @@ bool argument(int argc, char *argv[]) {
       else {
         printf("\n**ERROR: Option %s requires pCof_Max", argv[i - 1]);
         printf("(FLT<1.1).\n");
+        return false;
+      }
+    }
+    else if(!strcmp(argv[i], "-initCoef")) {
+      i++;
+      if(argv[i][0] != '-') {
+        INIT_LAMBDA_COF_GP = atof(argv[i]);
+      }
+      else {
+        printf("\n**ERROR: Option %s init_Coef", argv[i - 1]);
         return false;
       }
     }
