@@ -118,20 +118,16 @@ void PlotEnv::Init() {
 // Resize and initialize the vectors
 // takes colorSet files
 void PlotEnv::InitCellColors(string cFileName) {
-  colors.resize(gcell_cnt);
+  colors.resize(moduleCNT);
 
-  HASH_MAP<string, int> gcellMap;
-  for(int i=0; i<gcell_cnt; i++) {
+  HASH_MAP<string, int> colorMap;
+  for(int i=0; i<moduleCNT; i++) {
     new (&colors[i]) PlotColor();
 
-    CELL* curGcell = &gcell_st[i]; 
-    if( curGcell->flg != StdCell ) {
-      continue;
-    }
+    MODULE* curModule = &moduleInstance[i]; 
 
-    // Now only stdcell is survived.
-    // Fill in the gcellMap
-    gcellMap[curGcell->Name()] = i;
+    // Fill in the colorMap
+    colorMap[curModule ->Name()] = i;
   }
   
   std::ifstream cFile(cFileName);
@@ -145,8 +141,8 @@ void PlotEnv::InitCellColors(string cFileName) {
 
   // keep fill in the cellName/r/g/b variable in the colorset file
   while( cFile >> cellName >> r >> g >> b ) {
-    auto gPtr = gcellMap.find(cellName);
-    if( gPtr == gcellMap.end() ) {
+    auto gPtr = colorMap.find(cellName);
+    if( gPtr == colorMap.end() ) {
       cout << "ERROR: Cannot find cell : " << cellName << endl;
     } 
 

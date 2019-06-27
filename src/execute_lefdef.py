@@ -145,8 +145,9 @@ else:
     libStr = GetFileStr( dirpos, benchName, 'lib', '-lib')
     libStr += GetFileStr( dirpos, benchName, 'lib_ccs_tn', '-lib')
     sdcStr = GetFileStr( dirpos, benchName, 'sdc', '-sdc')
+    pColorStr = GetFileStr( dirpos, benchName, 'dat', '-plotColor')
         
-    exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr + sdcStr )
+    exeFormat = origFormat.replace( "FILESTR", lefStr + defStr + verilogStr + libStr + sdcStr + pColorStr )
     exeFormat = "screen -S %s -X stuff \"" + exeFormat + "\n\"" if useScreen else exeFormat
    
     if useScreen: 

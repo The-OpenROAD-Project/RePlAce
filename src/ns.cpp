@@ -1413,7 +1413,7 @@ void myNesterov::UpdateNesterovIter(int iter, struct ITER *it,
     it->tot_wlen = 0;
   }
 
-  if((iter % 10 == 0) && (isPlot || plotCellCMD)) {
+  if((iter == 1 || iter % 10 == 0) && (isPlot || plotCellCMD)) {
     cell_update(x_st, N);
 
     // For circuit viewer
