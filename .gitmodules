@@ -6,4 +6,10 @@
 	url = https://github.com/dtschump/CImg
 [submodule "module/OpenSTA"]
 	path = module/OpenSTA
-	url = https://github.com/mgwoo/OpenSTA
+	url = https://github.com/the-OpenROAD-Project/OpenSTA
+[submodule "module/lef"]
+	path = module/lef
+	url = https://github.com/The-OpenROAD-Project/lef
+[submodule "module/def"]
+	path = module/def
+	url = https://github.com/The-OpenROAD-Project/def
