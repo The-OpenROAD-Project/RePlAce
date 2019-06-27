@@ -55,7 +55,6 @@
 #include "Liberty.hh"
 #include "Network.hh"
 #include "VerilogNamespace.hh"
-#include "Verilog.hh"
 #include "VerilogReader.hh"
 #include "CheckMinPulseWidths.hh"
 #include "CheckMinPeriods.hh"

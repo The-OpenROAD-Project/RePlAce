@@ -249,8 +249,7 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   // Parsing the Verilog
   _sta->readNetlistBefore();
 
-  bool readVerilog = readVerilogFile(verilogName.c_str(), _sta->report(),
-                                  _sta->debug(), _sta->networkReader());
+  bool readVerilog = readVerilogFile(verilogName.c_str(), _sta->networkReader());
 
   // link_design
   cout << "INFO:  Now linking: " << topCellName << endl;
