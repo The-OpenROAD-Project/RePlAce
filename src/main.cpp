@@ -418,7 +418,7 @@ int main(int argc, char *argv[]) {
   double time_cGP2D = 0;
   double time_cGP = 0;
   double time_dp = 0;
-
+  
   time_t rawtime;
   struct tm *timeinfo;
 
@@ -574,6 +574,8 @@ int main(int argc, char *argv[]) {
     tier_assign(STDCELLonly);
     setup_before_opt();
   }
+  
+  PrintUnscaledHpwl("GlobalPlacer");
 
   // Write BookShelf format
   WriteBookshelf();
@@ -640,6 +642,8 @@ int main(int argc, char *argv[]) {
   printf(" ### CPU_TOT is %.2lf seconds (%.2lf min).\n\n", tot_cpu,
          tot_cpu / 60);
   fflush(stdout);
+  
+  PrintUnscaledHpwl("Final");
 
   //    SavePlot( "Final Placement Result");
   if(isPlot) {

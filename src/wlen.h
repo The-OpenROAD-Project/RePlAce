@@ -163,6 +163,12 @@ prec get_modu_hpwl();
 void update_pin2(void);
 
 enum { LSE, WA };
+
+
+pair<double, double> GetUnscaledHpwl();
+void PrintUnscaledHpwl(string mode);
+
+
 #define WLEN_MODEL WA /* LSE */ /* NTU */
 // #define TSV_WEIGHT /* 16.0 */ /* 1.00 */ /* 1.50 */ /* 0.73 */ /* 3.33 */ /*
 // 10.00 */ /* 0.1 */ /* 0.01 */

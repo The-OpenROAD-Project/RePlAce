@@ -42,6 +42,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
 #include <omp.h>
 
 #include "global.h"
@@ -49,6 +50,8 @@
 #include "mkl.h"
 #include "opt.h"
 #include "wlen.h"
+
+#include "lefdefIO.h"
 
 int wcof_flg;
 int MAX_EXP;
@@ -1254,4 +1257,43 @@ int HPWL_count() {
   // exit(0);
   tot_HPWL = tx_HPWL + ty_HPWL;
   return 0;
+}
+
+
+// Get HPWL as micron units
+pair<double, double> GetUnscaledHpwl() {
+  double x = 0.0f, y = 0.0f;
+
+  NET *curNet = NULL;
+  for(int i = 0; i < netCNT; i++) {
+    curNet = &netInstance[i];
+    x += (curNet->max_x - curNet->min_x) * GetUnitX() / GetDefDbu();
+    y += (curNet->max_y - curNet->min_y) * GetUnitY() / GetDefDbu();
+
+    if(curNet->max_x - curNet->min_x < 0) {
+      cout << "NEGATIVE HPWL ERROR! " << curNet->Name() << " " << curNet->max_x
+           << " " << curNet->min_x << endl;
+    }
+    if(curNet->max_y - curNet->min_y < 0) {
+      cout << "NEGATIVE HPWL ERROR! " << curNet->Name() << " " << curNet->max_y
+           << " " << curNet->min_y << endl;
+    }
+
+    if(x < 0 || y < 0) {
+      printf("NEGATIVE HPWL ERROR! \n");
+      cout << curNet->Name() << tx_HPWL << " " << ty_HPWL << endl;
+      exit(1);
+    }
+  }
+  return make_pair(x, y);
+}
+
+void PrintUnscaledHpwl(string mode) {
+  pair<double, double> hpwl = GetUnscaledHpwl();
+  cout << "===HPWL(MICRON)====================================" << endl;
+  cout << "  Mode  : " << mode << endl;
+  cout << "  HPWL  : " << std::fixed << std::setprecision(4) 
+       << hpwl.first + hpwl.second << endl
+       << "          x= " << hpwl.first << " y= " << hpwl.second << endl;
+  cout << "===================================================" << endl;
 }

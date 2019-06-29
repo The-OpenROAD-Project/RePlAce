@@ -263,6 +263,7 @@ prec GetUnitX() { return unitX; }
 prec GetUnitY() { return unitY; }
 prec GetOffsetX() { return offsetX; }
 prec GetOffsetY() { return offsetY; }
+prec GetDefDbu() { return l2d; }
 
 int GetScaleUpSize(prec input) {
   return INT_CONVERT( input * GetUnitX() );

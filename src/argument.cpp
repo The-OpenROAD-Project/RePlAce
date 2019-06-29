@@ -504,9 +504,6 @@ bool argument(int argc, char *argv[]) {
         return false;
       }
     }
-    else if(!strcmp(argv[i], "-initSeed")) {
-      isInitSeed = true;
-    }
     else if(!strcmp(argv[i], "-plotColor")) {
       i++;
       if(argv[i][0] != '-') {
@@ -662,7 +659,9 @@ bool argument(int argc, char *argv[]) {
     }
     else if(!strcmp(argv[i], "-fast")) {
       isFastMode = true;
-      i++;
+    }
+    else if(!strcmp(argv[i], "-initSeed")) {
+      isInitSeed = true;
     }
     /*
     else if(!strcmp(argv[i], "-stnweight")) {

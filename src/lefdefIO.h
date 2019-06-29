@@ -351,6 +351,7 @@ prec GetUnitX();
 prec GetUnitY();
 prec GetOffsetX();
 prec GetOffsetY();
+prec GetDefDbu(); 
 
 int GetScaleUpSize(float input);
 int GetScaleUpPointX(float input);
