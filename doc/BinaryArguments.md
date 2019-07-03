@@ -58,6 +58,3 @@ __Legalization-Only__ mode must have same arguments as original mode, but the __
 
 ### Router
 * __-routability__ : Enable Routability flow 
-
-### Other
-* __-unitY__ : Custom scaledown param for LEF/DEF/Verilog (especially for ASAP N7 library; Recommended: 864)

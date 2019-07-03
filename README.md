@@ -1,9 +1,9 @@
 # RePlAce
 *RePlAce: Advancing Solution Quality and Routability Validation in Global Placement* 
 
-| <img src="/doc/image/adaptec2.inf.gif" width=450px> | 
-|:--:| 
-| *Visualized examples from ISPD 2006 contest; adaptec2.inf* |
+| <img src="/doc/image/adaptec2.inf.gif" width=350px> | <img src="/doc/image/coyote_TSMC16.gif" width=400px> | 
+|:--:|:--:|
+| *Visualized examples from ISPD 2006 contest; adaptec2.inf* |*Real-world Design: Coyote (TSMC16 7.5T)* |
 
 ## Getting Started
 
@@ -80,12 +80,10 @@
 ### 3rd Party Module List
 * Eigen
 * CImg
-* Google Dense Hash Map
 * [FLUTE](https://github.com/RsynTeam/rsyn-x/tree/master/rsyn/src/rsyn/3rdparty/flute) from [Rsyn-x](https://github.com/RsynTeam/rsyn-x)
-* [OpenSTA](https://github.com/abk-openroad/OpenSTA)
+* [OpenSTA](https://github.com/The-OpenROAD-Project/OpenSTA)
 * NTUPlacer3/4h (Thanks for agreeing with redistribution)
-* Ben Marshall's [verilog-parser](https://github.com/ben-marshall/verilog-parser) ([Modified version](https://github.com/mgwoo/verilog-parser) by mgwoo)
-* LEF/DEF Parser (Modified by mgwoo)
+* LEF/DEF Si2 Parser (Modified by mgwoo)
 
 
 ### Authors
