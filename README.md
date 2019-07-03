@@ -80,12 +80,10 @@
 ### 3rd Party Module List
 * Eigen
 * CImg
-* Google Dense Hash Map
 * [FLUTE](https://github.com/RsynTeam/rsyn-x/tree/master/rsyn/src/rsyn/3rdparty/flute) from [Rsyn-x](https://github.com/RsynTeam/rsyn-x)
-* [OpenSTA](https://github.com/abk-openroad/OpenSTA)
+* [OpenSTA](https://github.com/The-OpenROAD-Project/OpenSTA)
 * NTUPlacer3/4h (Thanks for agreeing with redistribution)
-* Ben Marshall's [verilog-parser](https://github.com/ben-marshall/verilog-parser) ([Modified version](https://github.com/mgwoo/verilog-parser) by mgwoo)
-* LEF/DEF Parser (Modified by mgwoo)
+* LEF/DEF Si2 Parser (Modified by mgwoo)
 
 
 ### Authors
