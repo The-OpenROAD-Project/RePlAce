@@ -1,9 +1,9 @@
 # RePlAce
 *RePlAce: Advancing Solution Quality and Routability Validation in Global Placement* 
 
-| <img src="/doc/image/adaptec2.inf.gif" width=450px> | 
-|:--:| 
-| *Visualized examples from ISPD 2006 contest; adaptec2.inf* |
+| <img src="/doc/image/adaptec2.inf.gif" width=350px> | <img src="/doc/image/coyote_TSMC16.gif" width=400px> | 
+|:--:|:--:|
+| *Visualized examples from ISPD 2006 contest; adaptec2.inf* |*Real-world Design: Coyote (TSMC16 7.5T)* |
 
 ## Getting Started
 
