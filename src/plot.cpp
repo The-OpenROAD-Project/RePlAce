@@ -566,7 +566,7 @@ to_string(int(100*curBin->den2)).c_str(), black, NULL, 1, 25);
   img.draw_text(50, 50, imgName.c_str(), black, NULL, 1, 30);
   img.save_jpeg(saveName.c_str(), 70);
   //  img.save_bmp( string(imgPosition + string(".bmp")).c_str() );
-  cout << "INFO:  JPEG HAS BEEN SAVED: " << saveName << endl;
+  cout << "INFO: " << saveName << " image has been saved" << endl;
 }
 
 //
@@ -589,7 +589,7 @@ void SaveBinPlotAsJPEG(string imgName, string imgPosition) {
   img.draw_text(50, 50, imgName.c_str(), black, NULL, 1, 30);
   img.save_jpeg(saveName.c_str(), 70);
   //  img.save_bmp( string(imgPosition + string(".bmp")).c_str() );
-  cout << "INFO:  JPEG HAS BEEN SAVED: " << saveName << endl;
+  cout << "INFO: " << saveName << " image has been saved" << endl;
 }
 //
 // save current circuit's as BMP file in imgPosition & iternumber
@@ -611,7 +611,7 @@ void SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
   img.draw_text(50, 50, imgName.c_str(), black, NULL, 1, 30);
   img.save_jpeg(saveName.c_str(), 70);
   //  img.save_bmp( string(imgPosition + string(".bmp")).c_str() );
-  cout << "INFO:  JPEG HAS BEEN SAVED: " << saveName << endl;
+  cout << "INFO: " << saveName << " image has been saved" << endl;
 }
 
 // control vector's index to plot
