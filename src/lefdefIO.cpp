@@ -547,6 +547,7 @@ bool AddShape(int defCompIdx, int lx, int ly,
          string(curGeom->getLayer(j)) == metal1Name) {
         //                cout << j << " " << curGeom->getLayer(j) << endl;
         isMetal1 = true;
+  
         continue;
       }
 
@@ -978,7 +979,7 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
   float siteSizeY_ =
        l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY;
 
-  cout << "siteSize: " << siteSizeX_ << " " << siteSizeY_ << endl;
+  // cout << "siteSize: " << siteSizeX_ << " " << siteSizeY_ << endl;
 
   //Set LayoutArea
   DieRect dieRect_ = GetCoreFromRow();
@@ -986,11 +987,11 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
   // Set Array Counts 
   int numX_ = INT_CONVERT( (dieRect_.urx - dieRect_.llx) / siteSizeX_ );
   int numY_ = INT_CONVERT( (dieRect_.ury - dieRect_.lly) / siteSizeY_ );
-  cout << "rowCnt: " << numX_ << " " << numY_ << endl;
+  // cout << "rowCnt: " << numX_ << " " << numY_ << endl;
 
   float rowSizeX_ = numX_ * siteSizeX_;
   float rowSizeY_ = siteSizeY_;
-  cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
+  // cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
  
   // Empty Array Fill 
   ArrayInfo::CellInfo* arr_ = new ArrayInfo::CellInfo[numX_ * numY_];
@@ -1004,16 +1005,15 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
   for(int i=0; i<row_cnt ; i++) {
     ROW* curRow = &row_st[i];
 
-//    curRow->pmin.Dump("curRowPmin");
-//    curRow->pmax.Dump("curRowPmax");
+    // cout << "ROW lx: " << ainfo.GetCoordiX(curRow->pmin.x) 
+    //   << " ux: " << ainfo.GetUpperX(curRow->pmax.x);
+    // cout << " ly: " << ainfo.GetCoordiY(curRow->pmin.y) 
+    //   << " uy: " << ainfo.GetUpperY(curRow->pmax.y) << endl;
 
-//    cout << "ROW lx: " << ainfo.GetCoordiX(curRow->pmin.x) << " ux: " << ainfo.GetUpperX(curRow->pmax.x);
-//    cout << " ly: " << ainfo.GetCoordiY(curRow->pmin.y) << " uy: " << ainfo.GetUpperY(curRow->pmax.y) << endl;
-
-    for(int i = ainfo.GetCoordiX(curRow->pmin.x); i < ainfo.GetCoordiX(curRow->pmax.x); i++) {
-      for(int j = ainfo.GetCoordiY(curRow->pmin.y); j < ainfo.GetCoordiY(curRow->pmax.y);
-          j++) {
-//        cout << "[Row] i: " << i << ", j: " << j << endl;
+    for(int i = ainfo.GetCoordiX(curRow->pmin.x); 
+        i < ainfo.GetCoordiX(curRow->pmax.x); i++) {
+      for(int j = ainfo.GetCoordiY(curRow->pmin.y); 
+          j < ainfo.GetCoordiY(curRow->pmax.y); j++) {
         arr_[j * numX_ + i] = ArrayInfo::CellInfo::Row;
       }
     } 
@@ -1028,16 +1028,26 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
 
     // TERM-nonShape array fill
     if( shapeMap.find( curTerm->Name() ) == shapeMap.end()) {
-//      curTerm->pmin.Dump("curTermPmin");
-//      curTerm->pmax.Dump("curTermPmax");
-//      cout << "TERM lx: " << ainfo.GetLowerX(curTerm->pmin.x) << " ux:" << ainfo.GetUpperX(curTerm->pmax.x);
-//      cout << " ly: " << ainfo.GetLowerY(curTerm->pmin.y) << " uy:" << ainfo.GetUpperY(curTerm->pmax.y)
-//        << endl;
-      for(int i = ainfo.GetLowerX(curTerm->pmin.x); i < ainfo.GetUpperX(curTerm->pmax.x);
-          i++) {
-        for(int j = ainfo.GetLowerY(curTerm->pmin.y); j < ainfo.GetUpperY(curTerm->pmax.y);
-            j++) {
-//          cout << "[Fixed] i: " << i << ", j: " << j << endl;
+      // curTerm->pmin.Dump("curTermPmin");
+      // curTerm->pmax.Dump("curTermPmax");
+      // cout << "TERM lx: " << ainfo.GetLowerX(curTerm->pmin.x) 
+      //   << " ux:" << ainfo.GetUpperX(curTerm->pmax.x);
+      // cout << " ly: " << ainfo.GetLowerY(curTerm->pmin.y) 
+      //   << " uy:" << ainfo.GetUpperY(curTerm->pmax.y)
+      //   << endl;
+      for(int i = ainfo.GetLowerX(curTerm->pmin.x); 
+          i < ainfo.GetUpperX(curTerm->pmax.x); i++) {
+        // out of CoreArea placed-cell handling
+        if( i < 0 || i >= numX_ ) {
+          continue;
+        }
+        for(int j = ainfo.GetLowerY(curTerm->pmin.y); 
+            j < ainfo.GetUpperY(curTerm->pmax.y); j++) {
+
+          // out of CoreArea placed-cell handling
+          if( j < 0 || j >= numY_ ) {
+            continue;
+          }
           arr_[j * numX_ + i] = ArrayInfo::CellInfo::Cell;
         }
       }
@@ -1049,17 +1059,27 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
               lly = shapeStor[curIdx].lly,
               width = shapeStor[curIdx].width,
               height = shapeStor[curIdx].height;
-//        cout << "SHAPE pmin: " << llx << " " << lly << endl;
-//        cout << "      pmax: " << llx + width  << " " << lly + height << endl;
-//        cout << "lx: " << ainfo.GetLowerX(llx) << " ux:" << ainfo.GetUpperX(llx + width )
-//          << " ly: " << ainfo.GetLowerY(lly) << " uy:" << ainfo.GetUpperY(lly + height)
-//          << endl;
+        // cout << "SHAPE pmin: " << llx << " " << lly << endl;
+        // cout << "      pmax: " << llx + width  << " " << lly + height << endl;
+        // cout << "lx: " << ainfo.GetLowerX(llx) 
+        //   << " ux:" << ainfo.GetUpperX(llx + width )
+        //   << " ly: " << ainfo.GetLowerY(lly) 
+        //   << " uy:" << ainfo.GetUpperY(lly + height)
+        //   << endl;
 
-        for(int i = ainfo.GetLowerX(llx); i < ainfo.GetUpperX(llx + width);
-            i++) {
-          for(int j = ainfo.GetLowerY(lly); j < ainfo.GetUpperY(lly + height);
-              j++) {
-//            cout << "[Fixed] i: " << i << ", j: " << j << endl;
+        for(int i = ainfo.GetLowerX(llx); 
+            i < ainfo.GetUpperX(llx + width); i++) {
+          // out of CoreArea placed-cell handling
+          if( i < 0 || i >= numX_ ) {
+            continue;
+          }
+          for(int j = ainfo.GetLowerY(lly); 
+              j < ainfo.GetUpperY(lly + height); j++) {
+            // out of CoreArea placed-cell handling
+            if( j < 0 || j >= numY_ ) {
+              continue;
+            }
+            // cout << "[Fixed] i: " << i << ", j: " << j << endl;
             arr_[j * numX_ + i] = ArrayInfo::CellInfo::Cell;
           }
         }
@@ -1080,8 +1100,9 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
         int endX = i;
 
         TERM curTerm;
-//        strcpy(curTerm.Name(),
-//               string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
+        // strcpy(curTerm.Name(),
+        //   string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
+        //
         terminalNameStor.push_back( 
                string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
         curTerm.pmin.Set((prec)(dieRect_.llx + siteSizeX_ * startX),
