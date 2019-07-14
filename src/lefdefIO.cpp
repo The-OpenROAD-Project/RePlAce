@@ -821,15 +821,20 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     }
     
     // check whether this nodes contains sub-rectangular sets
+    // Note that unplaced cells is regarded as North orientation (default)
     bool shapeFound =
         AddShape(curIdx, curComp->placementX(), curComp->placementY(),
                   curMacro->sizeX(), curMacro->sizeY(), // for orient 
-                  curComp->placementOrient());          // for orient 
+                  curComp->isUnplaced()?
+                  0 : curComp->placementOrient());          // for orient 
 
    
     // Orient consideration
+    // Note that unplaced cells is regarded as North orientation (default)
     std::pair<float, float> macroSize = 
-      GetOrientSize(curMacro->sizeX(), curMacro->sizeY(), curComp->placementOrient()); 
+      GetOrientSize(curMacro->sizeX(), curMacro->sizeY(), 
+          curComp->isUnplaced()? 
+          0 : curComp->placementOrient()); 
 
     curTerm->size.Set(l2d * macroSize.first   / unitX,
                       l2d * macroSize.second  / unitY, 1);
@@ -1533,12 +1538,15 @@ FPOS GetOffset(Replace::Circuit& __ckt, string& instName, string& pinName,
   int pinIdx = GetLefMacroPinIdx(__ckt, macroIdx, pinName);
   
   // extract orient information from def
-  int orient = __ckt.defComponentStor[defCompIdx].placementOrient();
+  // default: North orientation
+  int orient = 
+    (__ckt.defComponentStor[defCompIdx].isUnplaced())? 
+    0 : __ckt.defComponentStor[defCompIdx].placementOrient();
 
   // extract Macro's center points
   // orient-awareness
-  float origMacroSizeX = __ckt.lefMacroStor[macroIdx].sizeX();
-  float origMacroSizeY = __ckt.lefMacroStor[macroIdx].sizeY();
+  float origMacroSizeX = (float) __ckt.lefMacroStor[macroIdx].sizeX();
+  float origMacroSizeY = (float) __ckt.lefMacroStor[macroIdx].sizeY();
 
   std::pair<float, float> macroSize = 
     GetOrientSize( origMacroSizeX, origMacroSizeY, orient );
@@ -1677,6 +1685,20 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
         strcmp(net.use(), "GROUND") == 0 || strcmp(net.use(), "RESET") == 0)) {
       continue;
     }
+   
+    /*
+    // special detection for avoiding signal nets 
+    bool isReset = false;
+    for(int i = 0; i < net.numConnections(); i++) {
+      if( strcmp(net.pin(i), "SI") == 0 || strcmp(net.pin(i), "SE") == 0 ) {
+        isReset= true;
+        break;
+      }
+    }
+    if( isReset ) {
+      continue;
+    }*/
+
 
     curNet = &netInstance[netIdx];
     new(curNet) NET();
