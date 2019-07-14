@@ -391,9 +391,14 @@ void cell_filler_init() {
   total_move_available_area = total_WS_area * target_cell_den;
   total_filler_area = total_move_available_area - total_modu_area;
 
-  if(total_filler_area < 0) {
-    printf("ERROR -- negative filler area! \n");
-    exit(1);
+  if( total_filler_area < 0) {
+    if( fabs(total_filler_area) < total_move_available_area * 0.0001 ) {
+      total_filler_area = 0.0f;
+    }
+    else {
+      cout << "ERROR: Negative filler area has been detected: " << total_filler_area << endl;
+      exit(1);
+    }
   }
 
   filler_area = f_area;
