@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # For Multithread
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 -O3")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 -O3 ${OpenMP_CXX_FLAGS}")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -63,6 +64,9 @@ find_package(JPEG REQUIRED)
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 
+# for multi threads
+# find_package(OpenMP REQUIRED)
+
 set (REPLACE_SRC 
   src/argument.cpp
   src/bin.cpp
@@ -116,8 +120,9 @@ set (REPLACE_HEADER
 # include directories 
 ############################################################
 include_directories(
+  ${X11_INCLUDE_DIR}
   ${MKL_INCLUDE_DIR}
-  ${BOOST_INCLUDEDIR}
+  ${Boost_INCLUDE_DIR}
 
   ${EIGEN_HOME}
   ${CIMG_HOME}

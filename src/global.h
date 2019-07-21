@@ -195,7 +195,7 @@ struct FPOS {
     x = a.x;
     y = a.y;
   }
-  inline void Set(prec _x, prec _y, prec _z) {
+  inline void Set(prec _x, prec _y) {
     x = _x;
     y = _y;
   }
@@ -818,7 +818,7 @@ enum {
 
 // these variable is required to have detailPlacer settings
 extern int detailPlacer;
-enum { None, FastPlace, NTUplace3, NTUplace4h };
+enum { NoneDp, FastPlace, NTUplace3, NTUplace4h };
 extern string detailPlacerLocation;
 extern string detailPlacerFlag;
 
@@ -1125,7 +1125,7 @@ extern bool isRoutability;
 extern bool lambda2CMD;
 extern bool dynamicStepCMD;
 extern bool thermalAwarePlaceCMD;
-extern bool onlyGlobalPlaceCMD;
+extern bool isOnlyGlobalPlace;
 extern bool isSkipIP;
 extern bool isTiming;
 extern bool isARbyUserCMD;

@@ -56,7 +56,7 @@ static bool isFastMode = false;
 void initArgument(int argc, char *argv[]) {
   ///////////////////////////////////////////////////////
   //  Begin Arguments Analysis                         //
-  bmFlagCMD = "NULL";       // string
+  bmFlagCMD = "etc";       // string
   denCMD = "NULL";          // string
   bxMaxCMD = "32";          // string
   byMaxCMD = "32";          // string
@@ -100,7 +100,7 @@ void initArgument(int argc, char *argv[]) {
   stnCMD = false;               // lutong
   lambda2CMD = false;           // bool
   dynamicStepCMD = false;       // bool
-  onlyGlobalPlaceCMD = false;   // bool
+  isOnlyGlobalPlace = false;   // bool
   isSkipIP = false;             // bool
   isTiming = false;
   isDummyFill =  true;
@@ -224,7 +224,7 @@ void initArgument(int argc, char *argv[]) {
   dim_bin.y = atoi(byMaxCMD.c_str());
 
   // detailPlacer settings
-  detailPlacer = None;
+  detailPlacer = NoneDp;
   if(!strcmp(detailPlacerFlag.c_str(), "NTU3")) {
     detailPlacer = NTUplace3;
   }
@@ -237,7 +237,7 @@ void initArgument(int argc, char *argv[]) {
         "              (i.e. this program will be executed as -onlyGP)\n"
         "     If you want to have DP after GP, please specify -dpflag and "
         "-dploc.\n\n");
-    onlyGlobalPlaceCMD = true;
+    isOnlyGlobalPlace = true;
   }
 
   ///////////////////////////////////////////////////////
@@ -1001,7 +1001,7 @@ bool argument(int argc, char *argv[]) {
       isTiming = true;
     }
     else if(!strcmp(argv[i], "-onlyGP")) {
-      onlyGlobalPlaceCMD = true;
+      isOnlyGlobalPlace = true;
     }
     else if(!strcmp(argv[i], "-auto_eval_RC")) {
       autoEvalRC_CMD = true;
@@ -1076,12 +1076,6 @@ void printUsage() {
 }
 
 bool criticalArgumentError() {
-  if(bmFlagCMD == "NULL") {
-    printf("\n** ERROR: Missing benchmark flag, use -bmflag option.\n");
-    printUsage();
-    return true;
-  }
-
   // mgwoo
   if(auxCMD == "" && lefStor.size() == 0 && defName == "") {
     printf(

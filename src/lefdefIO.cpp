@@ -643,7 +643,7 @@ void SetSizeForObsMacro(int macroIdx, MODULE* curModule) {
         lefiGeomRect* rect = curGeom->getRect(j);
 
         curModule->size.Set(l2d * (rect->xh - rect->xl) / unitX,
-                            l2d * (rect->yh - rect->yl) / unitY, 1);
+                            l2d * (rect->yh - rect->yl) / unitY);
         //                cout << rect->xl << " " << rect->yl << endl;
         //                cout << rect->xh << " " << rect->yh << endl;
       }
@@ -694,8 +694,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     if(curComp->isPlaced()) {
       // only when is already placed
       curModule->pmin.Set(((prec)curComp->placementX() + offsetX) / unitX,
-                          ((prec)curComp->placementY() + offsetY) / unitY,
-                          (prec)0);
+                          ((prec)curComp->placementY() + offsetY) / unitY);
     }
     else {
       curModule->pmin.SetZero();
@@ -725,7 +724,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     else {
       // size info update from LEF Macro
       curModule->size.Set(l2d * curMacro->sizeX() / unitX,
-                          l2d * curMacro->sizeY() / unitY, 1);
+                          l2d * curMacro->sizeY() / unitY);
       //            curModule->size.Dump("size");
     }
 
@@ -735,7 +734,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     }
 
     // set half_size
-    curModule->half_size.Set(curModule->size.x / 2, curModule->size.y / 2, 0);
+    curModule->half_size.Set(curModule->size.x / 2, curModule->size.y / 2);
 
     // set center coordi
     curModule->center.SetAdd(curModule->pmin, curModule->half_size);
@@ -801,7 +800,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
 
     // pmin info update
     curTerm->pmin.Set(((prec)curComp->placementX() + offsetX) / unitX,
-                      ((prec)curComp->placementY() + offsetY) / unitY, (prec)0);
+                      ((prec)curComp->placementY() + offsetY) / unitY);
 
     //        cout << "Fixed: " << curComp->name() << endl;
     auto macroPtr = __ckt.lefMacroMap.find(string(curComp->name()));
@@ -837,7 +836,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
           0 : curComp->placementOrient()); 
 
     curTerm->size.Set(l2d * macroSize.first   / unitX,
-                      l2d * macroSize.second  / unitY, 1);
+                      l2d * macroSize.second  / unitY);
 
     // Always visible blockage: terminal
     curTerm->isTerminalNI = false;
@@ -874,7 +873,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     curTerm->idx = terminalCNT;
     curTerm->IO = (strcmp(curPin.direction(), "INPUT") == 0) ? 0 : 1;
     curTerm->pmin.Set((curPin.placementX() + offsetX) / unitX,
-                      (curPin.placementY() + offsetY) / unitY, 0);
+                      (curPin.placementY() + offsetY) / unitY);
     curTerm->isTerminalNI = true;
 
     // since size == 0, pmin == center == pmax;
@@ -902,11 +901,11 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     defiBlockage* curBlockage = &__ckt.defBlockageStor[curBlockIdx];
     if(curBlockage->numRectangles() > 0) {
       curTerm->pmin.Set((curBlockage->xl(0) + offsetX) / unitX,
-                        (curBlockage->yl(0) + offsetY) / unitY, 0);
+                        (curBlockage->yl(0) + offsetY) / unitY);
       curTerm->pmax.Set((curBlockage->xh(0) + offsetX) / unitX,
-                        (curBlockage->yh(0) + offsetY) / unitY, 1);
+                        (curBlockage->yh(0) + offsetY) / unitY);
       curTerm->center.Set((curTerm->pmin.x + curTerm->pmax.x) / 2.0,
-                          (curTerm->pmin.y + curTerm->pmax.y) / 2.0, 0);
+                          (curTerm->pmin.y + curTerm->pmax.y) / 2.0);
     }
     else {
       cout << "** ERROR: RePlAce requires RECT in BLOCKAGES (DEF) " << endl;
@@ -914,7 +913,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     }
     curTerm->isTerminalNI = false;
     curTerm->size.Set(curTerm->pmax.x - curTerm->pmin.x,
-                      curTerm->pmax.y - curTerm->pmin.y, 1);
+                      curTerm->pmax.y - curTerm->pmin.y);
     curTerm->area = curTerm->size.GetProduct();
     // since size == 0, pmin == center == pmax;
     // curTerm->pmax.Set(curTerm->pmin);
@@ -1111,15 +1110,14 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
         terminalNameStor.push_back( 
                string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
         curTerm.pmin.Set((prec)(dieRect_.llx + siteSizeX_ * startX),
-                         (prec)(dieRect_.lly + j * siteSizeY_), (prec)0.0);
+                         (prec)(dieRect_.lly + j * siteSizeY_));
         curTerm.pmax.Set((prec)(dieRect_.llx + siteSizeX_ * endX),
-                         (prec)(dieRect_.lly + j * siteSizeY_ + rowSizeY_),
-                         (prec)1.0);
+                         (prec)(dieRect_.lly + j * siteSizeY_ + rowSizeY_));
         curTerm.size.Set((prec)((endX - startX) * siteSizeX_),
-                         (prec)(rowSizeY_), (prec)1.0);
+                         (prec)(rowSizeY_));
         
         curTerm.center.Set( curTerm.pmin.x + 0.5*curTerm.size.x,
-                            curTerm.pmin.y + 0.5*curTerm.size.y, 0 ); 
+                            curTerm.pmin.y + 0.5*curTerm.size.y); 
 
         curTerm.isTerminalNI = false;
         curTerm.area = curTerm.size.GetProduct();
@@ -1255,17 +1253,15 @@ void GenerateRow(Replace::Circuit& __ckt) {
 
     new(curRow) ROW();
 
-    curRow->pmin.Set((row.x() + offsetX) / unitX, (row.y() + offsetY) / unitY,
-                     0);
+    curRow->pmin.Set((row.x() + offsetX) / unitX, (row.y() + offsetY) / unitY);
     curRow->size.Set(
         l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() / unitX *
             row.xNum(),
         l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() / unitY *
-            row.yNum(),
-        1);
+            row.yNum());
 
     curRow->pmax.Set(curRow->pmin.x + curRow->size.x,
-                     curRow->pmin.y + curRow->size.y, 1);
+                     curRow->pmin.y + curRow->size.y);
 
     if(isFirst) {
       grow_pmin.Set(curRow->pmin);
@@ -1447,10 +1443,9 @@ void GenerateFullRow(Replace::Circuit& __ckt) {
     ROW* curRow = &row_st[i];
     new(curRow) ROW();
 
-    curRow->pmin.Set(coreArea.llx, coreArea.lly + i * siteY, 0);
-    curRow->size.Set(rowSizeX, rowSizeY, 1);
-    curRow->pmax.Set(coreArea.llx + rowSizeX, coreArea.lly + i * siteY + rowSizeY,
-                     1);
+    curRow->pmin.Set(coreArea.llx, coreArea.lly + i * siteY);
+    curRow->size.Set(rowSizeX, rowSizeY);
+    curRow->pmax.Set(coreArea.llx + rowSizeX, coreArea.lly + i * siteY + rowSizeY);
 
     if(i == 0) {
       grow_pmin.Set(curRow->pmin);

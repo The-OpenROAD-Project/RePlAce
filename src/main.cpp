@@ -396,7 +396,7 @@ bool isRoutability;
 bool stnCMD;  // lutong
 bool lambda2CMD;
 bool dynamicStepCMD;
-bool onlyGlobalPlaceCMD;
+bool isOnlyGlobalPlace;
 bool isTiming;
 bool isARbyUserCMD;
 bool thermalAwarePlaceCMD;
@@ -515,27 +515,28 @@ int main(int argc, char *argv[]) {
       time_end(&time_mGP2D);
       printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP2D);
       printf("PROC:  END GLOBAL 2D PLACEMENT (mGP2D)\n\n\n");
-      if(inputMode == InputMode::lefdef) {
-        WriteDef(defGpOutput);
-      }
+      
+      WriteDef(defGpOutput);
+
+      // no need to run any other flow with MS-RePlAce
+      return 0;
       ///////////////////////////////////////////////////////////////////////
     }
     time_end(&time_mGP);
 
-    if(placementMacroCNT > 0 /*&& INPUT_FLG != ISPD*/) {
-      ///////////////////////////////////////////////////////////////////////
-      ///// mLG:  MACRO_LEGALIZATION ////////////////////////////////////////
-      cout << "PROC:  BEGIN MACRO LEGALIZATION IN EACH TIER" << endl;
-      cout << "PROC:  SA-based Macro Legalization (mLG)" << endl;
-      time_start(&time_lg);
-      // mgwoo
-      bin_init();
-      macroLegalization_main();
-      time_end(&time_lg);
-      printf("   RUNTIME(s) : %.4f\n\n\n", time_lg);
-      cout << "PROC:  END MACRO LEGALIZATION (mLG)" << endl << endl;
-      ///////////////////////////////////////////////////////////////////////
-    }
+    // if(placementMacroCNT > 0 /*&& INPUT_FLG != ISPD*/) {
+    //   ///////////////////////////////////////////////////////////////////////
+    //   ///// mLG:  MACRO_LEGALIZATION ////////////////////////////////////////
+    //   cout << "PROC:  BEGIN MACRO LEGALIZATION IN EACH TIER" << endl;
+    //   cout << "PROC:  SA-based Macro Legalization (mLG)" << endl;
+    //   time_start(&time_lg);
+    //   bin_init();
+    //   macroLegalization_main();
+    //   time_end(&time_lg);
+    //   printf("   RUNTIME(s) : %.4f\n\n\n", time_lg);
+    //   cout << "PROC:  END MACRO LEGALIZATION (mLG)" << endl << endl;
+    //   ///////////////////////////////////////////////////////////////////////
+    // }
 
     time_start(&time_cGP);
     if(numLayer > 1) {
@@ -590,8 +591,8 @@ int main(int argc, char *argv[]) {
   }
 
   ///////////////////////////////////////////////////////////////////////
-  ///// DP:  DETAILED PLACEMENT /////////////////////////////////////////
-  if(onlyGlobalPlaceCMD) {
+  ///// GP:  DETAILED PLACEMENT /////////////////////////////////////////
+  if(isOnlyGlobalPlace) {
     time_start(&time_dp);
     time_end(&time_dp);
   }
@@ -754,11 +755,6 @@ void init() {
   }
   else if(strcmp(bmFlagCMD.c_str(), "ibm") == 0) {
     INPUT_FLG = IBM;
-  }
-  else {
-    printf("***ERROR: Please check your benchmark flag, i.e., bmflag!\n");
-    printf(" SUGGEST: mms, ispd, sb, etc, ibm\n\n");
-    exit(1);
   }
 
   global_macro_area_scale = target_cell_den;
