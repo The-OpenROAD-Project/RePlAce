@@ -104,9 +104,8 @@ void bin_init();
 void bin_init_2D(int);
 
 void UpdateTerminalArea(TIER *tier, FPOS *pmin, FPOS *pmax);
-void bin_update(int N);
-void bin_update7(int N);
 
+void bin_update();
 void bin_update7_cGP2D();
 void bin_update7_mGP2D();
 

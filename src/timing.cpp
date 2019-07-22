@@ -242,9 +242,6 @@ void Timing::WriteSpef(const string& spefLoc) {
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
-    double lumpedCap = 0.0f;
-
-    int cnt = 0;
     for(auto& curWireSeg : wireSegStor[i]) {
       lumpedCapStor[i] += curWireSeg.length / (double)(_l2d)*capPerMicron;
       lumped_cap_at_pin[curWireSeg.iPin] +=

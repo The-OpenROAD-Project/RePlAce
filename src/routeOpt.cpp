@@ -314,11 +314,11 @@ void est_congest_global_router(char *dir, string plName) {
   run_global_router(dir, plName);
   
   string routeName = string(dir) + "/" + string(gbch) + ".est";
-  read_routing_file(dir, routeName);
+  read_routing_file(routeName);
 }
 
 void get_intermediate_pl_sol(char *dir, string plName) {
-  output_tier_pl_global_router(plName.c_str(), 0, 0, true);
+  output_tier_pl_global_router(plName.c_str(), 0, true);
   LinkConvertedBookshelf(dir);
 }
 

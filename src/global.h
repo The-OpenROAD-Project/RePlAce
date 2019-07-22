@@ -1242,7 +1242,6 @@ void tier_assign(int);
 void tier_assign_with_macro(void);
 void tier_assign_without_macro(void);
 int prec_cmp(const void *a, const void *b);
-int max_pinCNTinObject_cmp(const void *a, const void *b);
 int min_tier_cmp(const void *a, const void *b);
 int max_area_dis_div_cmp(const void *a, const void *b);
 

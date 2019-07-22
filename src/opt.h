@@ -179,8 +179,6 @@ void input_sol(struct FPOS *st, int N, char *fn);
 void modu_copy(void);
 void cell_copy(void);
 
-int min_sort(const void *a, const void *b);
-
 prec get_dis(struct FPOS *a, struct FPOS *b, int N);
 struct FPOS get_dis2(struct FPOS *a, struct FPOS *b, int N, prec num);
 
@@ -218,8 +216,6 @@ enum { NONE_OUTPUT, QWL_OUTPUT, ISOL_OUTPUT, WL_SOL_OUTPUT, IP_CEN_SQR_OUTPUT };
 
 #define MAX_WL_ITER 10
 
-int abc_sort(const void *a, const void *b);
-
 void getCostFuncGradient3(FPOS *dst, FPOS *wdst, FPOS *pdst, FPOS *pdstl, int n,
                           prec *cellLambdaArr);
 void getCostFuncGradient2(FPOS *dst, FPOS *wdst, FPOS *pdst, FPOS *pdstl, int n,
@@ -256,7 +252,6 @@ void smart_filler_adj(void);
 void rand_filler_adj(int idx);
 void sa_pl_shift(struct FPOS *x_st, int N);
 
-void setup_before_opt(void);
 void tier_delete_mGP2D(void);
 void tier_init_2D(int);
 void cell_init_2D(void);

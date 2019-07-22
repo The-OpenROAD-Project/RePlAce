@@ -679,7 +679,7 @@ void post_read_3d(void) {
 
   printf("INFO:  PLACE.ORIGIN = (%d, %d)\n", (int)(place.org.x + 0.5),
          (int)(place.org.y + 0.5));
-  printf("INFO:  PLACE.END = (%d, %d, %d)\n\n", (int)(place.end.x + 0.5),
+  printf("INFO:  PLACE.END = (%d, %d)\n\n", (int)(place.end.x + 0.5),
          (int)(place.end.y + 0.5));
 
   place.cnt.x = place.end.x - place.org.x;
@@ -1434,7 +1434,6 @@ int read_nodes_3D(char *input) {
     *node_type = '\0';
 
     prec x, y;
-    prec z = TIER_DEP;
 
 #if PREC_MODE == IS_FLOAT
     sscanf(line, "%s%f%f%s\n", nodeName, &x, &y, node_type);
@@ -1992,7 +1991,7 @@ void output_mGP2D_pl(char *output) {
     curModule = &moduleInstance[i];
     if(flg_3dic) {
       fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
-              curModule->pmin.x, curModule->pmin.y, 0);
+              curModule->pmin.x, curModule->pmin.y, 0.0f);
     }
     else {
       fprintf(fp, "%s\t%.6lf\t%.6lf\t: N\n", curModule->Name(), curModule->pmin.x,
@@ -2036,7 +2035,7 @@ void output_cGP2D_pl(char *output) {
     if(flg_3dic) {
       if(curModule->flg == StdCell) {
         fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
-                curModule->pmin.x, curModule->pmin.y, 0);
+                curModule->pmin.x, curModule->pmin.y, 0.0f);
       }
       else {
         fprintf(fp, "%s\t%d\t%d\t%d\t: N /FIXED\n", curModule->Name(),
@@ -2088,7 +2087,7 @@ void output_pl(char *output) {
     for(int i = 0; i < moduleCNT; i++) {
       curModule = &moduleInstance[i];
       fprintf(fp, "%s %.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
-              curModule->pmin.x, curModule->pmin.y, 0);
+              curModule->pmin.x, curModule->pmin.y, 0.0f);
     }
     for(int i = 0; i < terminalCNT; i++) {
       curTerminal = &terminalInstance[i];
@@ -2216,7 +2215,6 @@ void write_new_bench(void) {
   NET *net = NULL;
   MODULE *curModule = NULL;
   TERM *curTerminal = NULL;
-  ROW *rwp = NULL;
 
   // write aux
   FILE *fp_aux = fopen(gTMP_bch_aux, "w");
@@ -2375,17 +2373,17 @@ void write_new_bench(void) {
   fputs("\n", fp_scl);
 
   for(i = 0; i < row_cnt; i++) {
-    rwp = &row_st[i];
+    ROW* rwp = &row_st[i];
 
     fprintf(fp_scl, "CoreRow Horizontal\n");
-    fprintf(fp_scl, "  Coordinate    :   %d\n", rwp->pmin.y);
+    fprintf(fp_scl, "  Coordinate    :   %d\n", INT_CONVERT( rwp->pmin.y ));
     fprintf(fp_scl, "  Height        :   12\n");
     fprintf(fp_scl, "  Sitewidth     :    1\n");
     fprintf(fp_scl, "  Sitespacing   :    1\n");
     fprintf(fp_scl, "  Siteorient    :    1\n");
     fprintf(fp_scl, "  Sitesymmetry  :    1\n");
-    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", rwp->pmin.x,
-            rwp->x_cnt);
+    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", 
+        INT_CONVERT( rwp->pmin.x ), INT_CONVERT( rwp->x_cnt ));
     fprintf(fp_scl, "End\n");
   }
 
@@ -2402,12 +2400,11 @@ void runtimeError(string error_text) {
   exit(1);
 }
 
-void read_routing_file(char *dir, string routeName ) {
+void read_routing_file( string routeName ) {
   cout << "INFO:  READ BACK ROUTING FILE..." << endl;
   cout << "INFO:  netCNT: " << netCNT << endl;
   char route_file[BUFFERSIZE];
   char temp[BUFFERSIZE];
-  char cmd[BUFFERSIZE];
   char netName[BUFFERSIZE];
   int netIdx = 0;
   int fromX = 0, fromY = 0, fromL = 0, toX = 0, toY = 0, toL = 0, layer = 0;
@@ -2678,7 +2675,6 @@ vector<int> GetBlockageLayers(Replace::Circuit* _ckt,
   // The M1 layer always assumes to be blocked.  
   retVec.push_back(0);
 
-  bool isRoutingLayer = false;
   for(auto& curObs : _ckt->lefObsStor[macroIdx]) {
     lefiGeometries* curGeom = curObs.geometries();
 
@@ -2871,7 +2867,7 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
       isBlockage = true;
       layerIdx = new vector<int>;
       // HARDCODE: All of layers 
-      for(int i=0; i<routeInst.GetLayerStor().size(); i++) {
+      for(size_t i=0; i<routeInst.GetLayerStor().size(); i++) {
         layerIdx->push_back(i);
       }
     }
@@ -2896,9 +2892,10 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
     }
 
     fprintf( fp_route, " %s ", 
-        (isNameConvert)? _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name() );
-    fprintf( fp_route, " %d ", layerIdx->size());
-    for(int i=0; i<layerIdx->size()-1; i++) {
+        (isNameConvert)? 
+        _bsMap.GetBsTerminalName( curTerminal->Name() ) : curTerminal->Name() );
+    fprintf( fp_route, " %lu ", layerIdx->size());
+    for(size_t i=0; i<layerIdx->size()-1; i++) {
       fprintf( fp_route, "%d ", layerIdx->at(i)+1);
     }
     fprintf( fp_route, "%d\n", layerIdx->at(layerIdx->size()-1)+1);
@@ -3186,7 +3183,7 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
 }
 
 // *.pl writing
-void WritePl(char *dir_tier, int curLayer, int lab, bool isShapeDrawing,
+void WritePl(char *dir_tier, int curLayer, bool isShapeDrawing,
     bool isNameConvert) {
   char fn_pl[BUF_SZ] = {
       0,
@@ -3273,7 +3270,7 @@ void WriteScl(char *dir_tier, int curLayer) {
   sort(tmpRowStor.begin(), tmpRowStor.end(), SortRowByCoordinate) ;
   
   fputs("\n", fp_scl);
-  fprintf(fp_scl, "NumRows :  \t%d\n", tmpRowStor.size() );
+  fprintf(fp_scl, "NumRows :  \t%lu\n", tmpRowStor.size() );
   fputs("\n", fp_scl);
   // iterate based on the sorted order
   for(auto &curRow : tmpRowStor) {
@@ -3367,7 +3364,7 @@ void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing,
 
   WriteScl(dir_tier, z);
   WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing, isNameConvert);
-  WritePl(dir_tier, z, lab, isShapeDrawing, isNameConvert );
+  WritePl(dir_tier, z, isShapeDrawing, isNameConvert );
 
   WriteRoute( dir_tier, isNameConvert, routeInst, isMetal1Removed);
 
@@ -3544,14 +3541,12 @@ void ReadPlBookshelf(const char *fileName) {
   fclose(fp);
 }
 
-void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConvert) {
+void output_tier_pl_global_router(string plName, int z, bool isNameConvert) {
   FILE *fp_pl = NULL;
 
   struct TIER *tier = &tier_st[z];
   struct MODULE *modu = NULL;
-  struct MODULE *mac = NULL;
   struct TERM *curTerminal = NULL;
-  struct PIN *pin = NULL;
 
   cout << "INFO:  pl file writing: " << plName << endl; 
 

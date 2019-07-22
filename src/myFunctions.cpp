@@ -285,13 +285,6 @@ struct POS fp2p_ceil(struct FPOS a) {
   return b;
 }
 
-int max_pinCNTinObject_cmp(const void *a, const void *b) {
-  struct MODULE **aa = (struct MODULE **)a;
-  struct MODULE **bb = (struct MODULE **)b;
-
-  return (*aa)->pinCNTinObject < (*bb)->pinCNTinObject ? 1 : 0;
-}
-
 bool TwoPinNets_comp(TwoPinNets x, TwoPinNets y) {
   return x.rect_dist < y.rect_dist;
 }

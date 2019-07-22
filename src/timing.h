@@ -176,13 +176,12 @@ struct PinInfo {
     netIdx = numeric_limits< int >::max();
   }
 
-  inline string GetPinName(void* ptr, vector< vector< string > >& pNameStor, bool isEscape = true) {
-    if(isSteiner()) {
-      cout << "ERROR: GetPinName must be executed only when NOT Steiner Point"
-           << endl;
-      exit(1);
-    }
-
+  // pinName Return function
+  inline string GetPinName(
+      void* ptr, 
+      vector< vector< string > >& pNameStor, 
+      bool isEscape = true) {
+    
     if(isModule()) {
       string moduleName(((MODULE*)ptr)[GetIdx()].Name());
       if( isEscape ) {
@@ -191,14 +190,13 @@ struct PinInfo {
       return moduleName + ":" + pNameStor[GetIdx()][pNum];
     }
     else if(isTerminal()) {
-      //                cout << "data: " << data << endl;
-      //                cout << "idx: " << GetIdx() << endl;
-      //                cout << "pidx: " << pNum  << endl;
-      //                cout << "name: " << ((TERM* )ptr)[GetIdx()].name <<
-      //                endl;
-      //                cout << "pname: " << pNameStor[GetIdx()][pNum] << endl;
+      // cout << "data: " << data << endl;
+      // cout << "idx: " << GetIdx() << endl;
+      // cout << "pidx: " << pNum  << endl;
+      // cout << "name: " << ((TERM* )ptr)[GetIdx()].name <<
+      // endl;
+      // cout << "pname: " << pNameStor[GetIdx()][pNum] << endl;
 
-      ///!!!!!!
       if(((TERM*)ptr)[GetIdx()].isTerminalNI) {
         return pNameStor[GetIdx()][pNum];
       }
@@ -209,6 +207,13 @@ struct PinInfo {
         }
         return termName + ":" + pNameStor[GetIdx()][pNum];
       }
+    }
+    // Steiner cases
+    else {
+      cout << "ERROR: GetPinName must be executed only when NOT Steiner Point"
+           << endl;
+      exit(1);
+      return string("Wrong");
     }
   }
 
@@ -271,17 +276,32 @@ struct wire {
 
 class Timing {
  private:
+  
+  MODULE* _modules;
+  TERM* _terms;
+
   NET* _nets;
   int _netCnt;
 
   PIN* _pins;
   int _pinCnt;
-
-  MODULE* _modules;
-  TERM* _terms;
+  
+  // due to weird structure,
+  // it stores variable names in below structure...
+  vector< vector< string > >& _mPinName;
+  vector< vector< string > >& _tPinName;
 
   int _unitX;
   int _unitY;
+
+  // clock Info  
+  string _clkName;
+  float _clkPeriod;
+  
+  // required for script usages 
+  // for openSTA; 
+  // SPEF write
+  int scriptIterCnt;
 
   // lef to def variable
   int _l2d;
@@ -289,8 +309,6 @@ class Timing {
   sta::Sta* _sta;
   Tcl_Interp* _interp;
 
-  string _clkName;
-  float _clkPeriod;
   float _targetTop;
 
   // wire segment stor
@@ -298,16 +316,7 @@ class Timing {
 
   vector< double > lumpedCapStor;
 
-  // due to weird structure,
-  // it stores variable names in below structure...
-  vector< vector< string > >& _mPinName;
-  vector< vector< string > >& _tPinName;
-
-  // source, sink, wireLength
-  // share its idx with original net idx
-
-  // required for script usages for openSTA; SPEF write
-  int scriptIterCnt;
+  
 
   // Fill Net and Pin Information again for clock-based placement
   void FillNetPin();
@@ -362,7 +371,6 @@ class Timing {
     wireSegStor.resize(netCnt);
     lumpedCapStor.resize(netCnt);
     SetLefDefEnv();
-    //            FillNetPin();
   };
 
   /*

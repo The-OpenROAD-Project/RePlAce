@@ -792,7 +792,7 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
   return new_center;
 }
 
-void bin_update(int N) {
+void bin_update() {
   if(STAGE == cGP2D)
     return bin_update7_cGP2D();
   else if(STAGE == mGP2D)
@@ -864,10 +864,6 @@ void bin_update7(int N) {
   // gsum_phi = gsum_cell_phi + gsum_term_phi + gsum_virt_phi;
   gsum_ovfl = ovf_area / total_modu_area;
 }*/
-
-int compare(const void *p1, const void *p2) {
-  return (*(prec *)p2 - *(prec *)p1);
-}
 
 void bin_update7_mGP2D() {
   BIN *bp = NULL;
@@ -1156,14 +1152,14 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
 void get_bins(FPOS center, CELL *cell, POS *st, prec *share_st, int *bin_cnt) {
   prec *x_st = bin_share_x_st;
   prec *y_st = bin_share_y_st;
-  int x = 0, y = 0, z = 0;
+  int x = 0, y = 0;
   int bin_cnt0 = 0;
   prec sum_area = 0, diff_area = 0;
-  prec x0 = 0, y0 = 0, z0 = 0;
-  prec x1 = 0, y1 = 0, z1 = 0;
+  prec x0 = 0, y0 = 0;
+  prec x1 = 0, y1 = 0;
   prec min_x = 0, max_x = 0;
   prec min_y = 0, max_y = 0;
-  prec min_z = 0, max_z = 0;
+
   prec area_share = 0;
   POS b0 = zeroPoint, b1 = zeroPoint;
   FPOS share = zeroFPoint;
@@ -1325,7 +1321,6 @@ bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
 prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2) {
   prec eff_x = 0;
   prec eff_y = 0;
-  prec eff_z = 0;
 
   if(pmax1.x <= pmin2.x || pmin1.x >= pmax2.x || pmax1.y <= pmin2.y ||
      pmin1.y >= pmax2.y)
@@ -1479,12 +1474,14 @@ prec get_all_macro_den(void) {
 }
 
 prec get_mac_den(int idx) {
-  MODULE *mac = macro_st[idx];
-  FPOS center = mac->center;
-  prec den_cost = 0;
+//  MODULE *mac = macro_st[idx];
+//  FPOS center = mac->center;
+//  prec den_cost = 0;
 
 //  den_cost = get_bins_mac(center, mac);
-  return den_cost;
+//  return den_cost;
+
+  return 0;
 }
 
 int idx_in_bin_rect(POS *p, POS pmin, POS pmax) {

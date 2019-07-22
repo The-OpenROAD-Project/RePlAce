@@ -58,11 +58,8 @@ void initial_placement() {
   using namespace Eigen;
   printf("PROC:  Conjugate Gradient (CG) method to obtain the IP\n");
 
-  int itol = 1;
   int itmax = 100;
-  int x_iter = 0, y_iter = 0;
 
-  prec tol = 0.000001;
   prec target_tol = 0.000001;
   prec x_err = 0, y_err = 0;
 

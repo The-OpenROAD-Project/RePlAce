@@ -91,7 +91,6 @@ static int
     begOperand;  // to keep track for constraint, to print - as the 1st char
 static double curVer = 0;
 static int setSNetWireCbk = 0;
-static int isSessionless = 0;
 static int ignoreRowNames = 0;
 static int ignoreViaNames = 0;
 static int testDebugPrint = 0;  // test for ccr1488696
@@ -174,26 +173,26 @@ static int endfunc(defrCallbackType_e c, void*, defiUserData ud) {
   return 0;
 }
 
-static char* orientStr(int orient) {
+static const char* orientStr(int orient) {
   switch(orient) {
     case 0:
-      return ((char*)"N");
+      return ((const char*)"N");
     case 1:
-      return ((char*)"W");
+      return ((const char*)"W");
     case 2:
-      return ((char*)"S");
+      return ((const char*)"S");
     case 3:
-      return ((char*)"E");
+      return ((const char*)"E");
     case 4:
-      return ((char*)"FN");
+      return ((const char*)"FN");
     case 5:
-      return ((char*)"FW");
+      return ((const char*)"FW");
     case 6:
-      return ((char*)"FS");
+      return ((const char*)"FS");
     case 7:
-      return ((char*)"FE");
+      return ((const char*)"FE");
   };
-  return ((char*)"BOGUS");
+  return ((const char*)"BOGUS");
 }
 
 int compMSL(defrCallbackType_e c, defiComponentMaskShiftLayer* co,
@@ -3389,7 +3388,7 @@ void Replace::Circuit::DumpDefComponent() {
     return;
   }
 
-  CIRCUIT_FPRINTF(fout, "COMPONENTS %d ;\n", defComponentStor.size());
+  CIRCUIT_FPRINTF(fout, "COMPONENTS %lu ;\n", defComponentStor.size());
   for(auto& curCo : defComponentStor) {
     if(testDebugPrint) {
       curCo.print(fout);
@@ -3505,7 +3504,7 @@ void Replace::Circuit::DumpDefBlockage() {
   int i = 0, j = 0;
   defiPoints points;
 
-  CIRCUIT_FPRINTF(fout, "BLOCKAGES %d ;\n", defBlockageStor.size());
+  CIRCUIT_FPRINTF(fout, "BLOCKAGES %lu ;\n", defBlockageStor.size());
 
   for(auto& curBlockage : defBlockageStor) {
     if(curBlockage.hasLayer()) {
@@ -3568,7 +3567,7 @@ void Replace::Circuit::DumpDefPin() {
   int i = 0, j = 0, k = 0;
   int xl = 0, yl = 0, xh = 0, yh = 0;
 
-  CIRCUIT_FPRINTF(fout, "PINS %d ;\n", defPinStor.size());
+  CIRCUIT_FPRINTF(fout, "PINS %lu ;\n", defPinStor.size());
   for(auto& curPin : defPinStor) {
     CIRCUIT_FPRINTF(fout, "- %s + NET %s ", curPin.pinName(), curPin.netName());
     //         curPin.changePinName("pinName");
@@ -3818,7 +3817,7 @@ void Replace::Circuit::DumpDefSpecialNet() {
 
     if(netType == DEF_SPECIALNET_ORIGINAL) {
       // For net and special net.
-      int i, j, x, y, z, count, newLayer;
+      int i, j, x, y, z, count = 0, newLayer;
       char* layerName;
       double dist, left, right;
       defiPath* p;
@@ -4518,7 +4517,7 @@ void Replace::Circuit::DumpDefNet() {
   // defiShield *noShield;
   defiWire* wire;
 
-  CIRCUIT_FPRINTF(fout, "NETS %d ;\n", defNetStor.size());
+  CIRCUIT_FPRINTF(fout, "NETS %lu ;\n", defNetStor.size());
 
   for(auto& curNet : defNetStor) {
     CIRCUIT_FPRINTF(fout, "- %s \n", curNet.name());

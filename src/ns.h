@@ -124,7 +124,6 @@ class myNesterov {
   void UpdateBeta(struct ITER *it);
 
   void PrintNesterovOptStatus(int iter);
-  void PlotNesterov(int iter);
 
  public:
   void nesterov_opt(void);

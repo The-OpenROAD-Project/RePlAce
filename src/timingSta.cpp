@@ -84,17 +84,16 @@ void TimingPathPrint(sta::Sta* sta, sta::PathEnd* end) {
   cout << "pathslack: " << end->slack(sta) << " seconds" << endl;
 
   PathExpanded expanded(end->path(), sta);
-  float timeOffset = 0.0f;
 
-  for(int i = 0; i < expanded.size(); i++) {
+  for(size_t i = 0; i < expanded.size(); i++) {
     PathRef* path1 = expanded.path(i);
-    TimingArc* prevArc = expanded.prevArc(i);
+    // TimingArc* prevArc = expanded.prevArc(i);
     Vertex* vertex = path1->vertex(sta);
     Pin* pin = vertex->pin();
-    Arrival time = path1->arrival(sta) + timeOffset;
-    Arrival incr(0.0);
+    // Arrival time = path1->arrival(sta) + timeOffset;
+    // Arrival incr(0.0);
 
-    bool isClkStart = sta->network()->isRegClkPin(pin);
+    // bool isClkStart = sta->network()->isRegClkPin(pin);
     bool isClk = path1->isClock(sta->search());
 
     // if( prevArc == NULL) {
@@ -137,10 +136,10 @@ void TimingPathPrint(sta::Sta* sta, sta::PathEnd* end) {
 
       while(connPinIter->hasNext()) {
         Pin* curPin = connPinIter->next();
-        PortDirection* dir = sta->network()->direction(curPin);
-        //                if( dir->isInput() ) {
-        //                    continue;
-        //                }
+        // PortDirection* dir = sta->network()->direction(curPin);
+        // if( dir->isInput() ) {
+        //   continue;
+        // }
         cout << sta->network()->name(curPin) << " "
              << GetMaxResistor(sta, curPin) << endl;
       }
@@ -248,8 +247,10 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
 
   // Parsing the Verilog
   _sta->readNetlistBefore();
-
-  bool readVerilog = readVerilogFile(verilogName.c_str(), _sta->networkReader());
+  if( !readVerilogFile(verilogName.c_str(), _sta->networkReader()) ) {
+    cout << "ERROR: OpenSTA failed to read Verilog file!" << endl;
+    exit(1);
+  }
 
   // link_design
   cout << "INFO:  Now linking: " << topCellName << endl;
@@ -447,9 +448,6 @@ void Timing::FillSpefForSta() {
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
-    double lumpedCap = 0.0f;
-
-    int cnt = 0;
     for(auto& curWireSeg : wireSegStor[i]) {
       lumpedCapStor[i] += curWireSeg.length / (double)(_l2d)*capPerMicron;
       lumped_cap_at_pin[curWireSeg.iPin] +=
@@ -473,7 +471,6 @@ void Timing::FillSpefForSta() {
     }
   }
 
-  int stringCase = INT_MAX;
   bool isEscape = true;
   for(int i=0; i<_netCnt; i++) {
     char* tmpStr = GetEscapedStr(netInstance[i].Name(), isEscape);
@@ -666,7 +663,7 @@ void Timing::UpdateNetWeightSta() {
 
     int pinCnt = 0;
 
-    for(int j = 0; j < expanded.size(); j++) {
+    for(size_t j = 0; j < expanded.size(); j++) {
       PathRef* path1 = expanded.path(j);
       // TimingArc *prevArc = expanded.prevArc(j);
       Vertex* vertex = path1->vertex(_sta);
@@ -730,7 +727,6 @@ void Timing::UpdateNetWeightSta() {
         float highRes = 0.0f;
         while(connPinIter->hasNext()) {
           Pin* curPin = connPinIter->next();
-          PortDirection* dir = _sta->network()->direction(curPin);
           // cout << sta->network()->name(curPin) << " "
           //   << GetMaxResistor(sta, curPin) << endl;
           float curRes = GetMaxResistor(_sta, curPin);
@@ -772,18 +768,18 @@ void Timing::UpdateNetWeightSta() {
 //    return system(inp);
 //}
 
-static std::string ExecuteCommand(const char* cmd) {
-  cout << "COMMAND: " << cmd << endl;
-  std::array< char, 128 > buffer;
-  std::string result;
-  std::shared_ptr< FILE > pipe(popen(cmd, "r"), pclose);
-  if(!pipe)
-    throw std::runtime_error("popen() failed!");
-  while(!feof(pipe.get())) {
-    if(fgets(buffer.data(), 128, pipe.get()) != nullptr)
-      result += buffer.data();
-  }
-  return result;
-}
+// static std::string ExecuteCommand(const char* cmd) {
+//   cout << "COMMAND: " << cmd << endl;
+//   std::array< char, 128 > buffer;
+//   std::string result;
+//   std::shared_ptr< FILE > pipe(popen(cmd, "r"), pclose);
+//   if(!pipe)
+//     throw std::runtime_error("popen() failed!");
+//   while(!feof(pipe.get())) {
+//     if(fgets(buffer.data(), 128, pipe.get()) != nullptr)
+//       result += buffer.data();
+//   }
+//   return result;
+// }
 
 TIMING_NAMESPACE_CLOSE

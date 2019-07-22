@@ -167,11 +167,11 @@ void WriteBookshelfWithTier(char* targetDir, int z, int lab, bool isShapeDrawing
     bool isNameConvert = false, bool isMetal1Removed = false);
 void ReadPlBookshelf(const char *fileName);
 
-void output_tier_pl_global_router(string plName, int z, int lab, bool isNameConvert = false);
+void output_tier_pl_global_router(string plName, int z, bool isNameConvert = false);
 void link_original_SB_files_to_Dir(char *dir);
 void LinkConvertedBookshelf(char* newDir);
 void delete_input_files_in(char *dir);
-void read_routing_file(char *dir, string routeName);
+void read_routing_file(string routeName);
 
 // void gp_sol_trans_to_dim_one(void);
 // void gp_sol_trans_from_dim_one(void);

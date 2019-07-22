@@ -372,7 +372,6 @@ void cell_filler_init() {
   struct CELL *filler = NULL;
   prec k_f2c = 1.0;
   struct CELL *gcell_st_tmp = NULL;
-  FILE *fp = NULL;
   struct FPOS org = zeroFPoint, end = zeroFPoint, len = zeroFPoint,
               rnd = zeroFPoint;
 
@@ -458,15 +457,7 @@ void cell_filler_init() {
 
     filler->pmin = fp_add(filler->center, fp_scal(-0.5, filler->size));
     filler->pmax = fp_add(filler->center, fp_scal(0.5, filler->size));
-
-    //        if(flg_3dic)
-    //            fprintf(fp, "%.6lf %.6lf %.6lf\n", filler->center.x,
-    //                    filler->center.y, filler->center.z);
-    //        else
-    //            fprintf(fp, "%.6lf %.6lf\n", filler->center.x,
-    //            filler->center.y);
   }
-  //    fclose(fp);
 }
 
 void cell_init(void) {
@@ -666,13 +657,6 @@ void cell_copy(void) {
     cell->pmin = module->pmin;
     cell->pmax = module->pmax;
   }
-}
-
-int min_sort(const void *a, const void *b) {
-  struct DST *aa = (struct DST *)a;
-  struct DST *bb = (struct DST *)b;
-
-  return aa->dxy > bb->dxy ? 1 : 0;
 }
 
 prec get_dis(struct FPOS *a, struct FPOS *b, int N) {
@@ -1148,13 +1132,6 @@ int area_sort(const void *a, const void *b) {
   prec *aa = (prec *)a;
   prec *bb = (prec *)b;
   return *aa > *bb ? 1 : 0;
-}
-
-int abc_sort(const void *a, const void *b) {
-  struct ABC *aa = (struct ABC *)a;
-  struct ABC *bb = (struct ABC *)b;
-
-  return aa->val < bb->val ? 1 : 0;
 }
 
 void init_iter(struct ITER *it, int idx) {

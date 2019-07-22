@@ -129,7 +129,6 @@ void sa_macro_lg(void) {
 
 int sa_mac_leg_top(void) {
   int iter = 0;
-  struct MODULE *mac = NULL;
 
   for(iter = 0; iter < sa_max_iter0 && ovlp_free_flg == 0; iter++) {
     printf(
@@ -180,18 +179,17 @@ ITER mLG: %d\n\
 void sa_mac_leg(int iter) {
   int i = 0, j = 0;
   double t0 = 0;
-  struct MODULE *mac = NULL;
 
   printf(
       "  -- ITER, TEMP, Rx, Ry, Rz, HPWL-(X, Y, Z) , DEN, OVLP, # ACC, # "
       "REJ\n");
-  printf(
-      "  -- %d, %.2e, %.2e, %.2e, %.2e, (%.8e, %.8e, %.8e), %.2e, "
-      "\033[36m%d\033[0m, %d, %d \n",
-      0, sa_t, sa_r.x, sa_r.y, 
-      // tot_mac_hpwl ,
-      total_hpwl.x, total_hpwl.y, tot_mac_den, tot_mac_ovlp,
-      tot_accept_cnt, tot_reject_cnt);
+//  printf(
+//      "  -- %d, %.2e, %.2e, %.2e, %.2e, (%.8e, %.8e, %.8e), %.2e, "
+//      "\033[36m%d\033[0m, %d, %d \n",
+//      0, sa_t, sa_r.x, sa_r.y, 
+//      // tot_mac_hpwl ,
+//      total_hpwl.x, total_hpwl.y, tot_mac_den, tot_mac_ovlp,
+//      tot_accept_cnt, tot_reject_cnt);
 
 //  if(plotMacroCMD) {
 //    for(j = 0; j < macro_cnt; j++) {

@@ -82,7 +82,7 @@ void myNesterov::nesterov_opt() {
 
   net_update(y_st);
 
-  bin_update(N);
+  bin_update();
 
   // if (stnCMD == true)     buildRSMT_FLUTE(y_st);
 
@@ -111,7 +111,7 @@ void myNesterov::nesterov_opt() {
   if(isTrial == true)
     UPPER_PCOF = 1.05;
   net_update(z_st);
-  bin_update(N);  // igkang
+  bin_update();  // igkang
 
   // if (stnCMD == true) {
   //    buildRSMT_FLUTE(z_st);
@@ -634,7 +634,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
         time_start(&time);
       }
 
-      bin_update(N);  // igkang
+      bin_update();  // igkang
       if(timeon) {
         time_end(&time);
         cout << "bin update: " << time << endl;
@@ -1291,7 +1291,7 @@ void getCostFuncGradient2_filler_DEN_ONLY_PRECON(
 
 void myNesterov::z_init() {
   FPOS half_densize;
-  prec zx = 0.0f, zy = 0.0f, zz = 0.0f;
+  prec zx = 0.0f, zy = 0.0f;
   prec coeffi = z_ref_alpha * GP_SCAL;
 
   for(int j = start_idx; j < end_idx; j++) {
@@ -1300,18 +1300,14 @@ void myNesterov::z_init() {
     if(GP_DIM_ONE) {
       zx = y_st[j].x + place_backup.cnt.x * coeffi * y_dst[j].x;
       zy = y_st[j].y + place_backup.cnt.y * coeffi * y_dst[j].y;
-      //            zz = y_st[j].z + place_backup.cnt.z * coeffi * y_dst[j].z;
     }
     else {
       zx = y_st[j].x + z_ref_alpha * y_dst[j].x;
       zy = y_st[j].y + z_ref_alpha * y_dst[j].y;
-      //            zz = y_st[j].z + z_ref_alpha * y_dst[j].z;
-//      y_st[j].Dump("y_st_test");
     }
 
     z_st[j].x = valid_coor2(zx, half_densize.x, 0);
     z_st[j].y = valid_coor2(zy, half_densize.y, 1);
-    //        z_st[j].z = valid_coor2(zz, half_densize.z, 2);
   }
 //  exit(1);
 }
@@ -1677,39 +1673,3 @@ void myNesterov::PrintNesterovOptStatus(int iter) {
   printf("    CPU =%.6f\n", it->cpu_cost);
 }
 
-void myNesterov::PlotNesterov(int iter) {
-
-  /*
-  if(plotCellCMD) {
-    cell_update(x_st, N);
-    if(STAGE == mGP3D)
-      plot("S1-cell-mGP3D-", iter, 1.0, 1);
-    if(STAGE == mGP2D)
-      plot("S2-cell-mGP2D-", iter, 1.0, 1);
-    if(STAGE == cGP3D)
-      plot("S4-cell-cGP3D-", iter, 1.0, 1);
-    if(STAGE == cGP2D)
-      plot("S5-cell-cGP2D-", iter, 1.0, 1);
-  }
-  if(plotDensityCMD) {
-    if(STAGE == mGP3D)
-      plot_bin("S1-den-mGP3D-", iter, 1.0, 0);
-    if(STAGE == mGP2D)
-      plot_bin("S2-den-mGP2D-", iter, 1.0, 0);
-    if(STAGE == cGP3D)
-      plot_bin("S4-den-cGP3D-", iter, 1.0, 0);
-    if(STAGE == cGP2D)
-      plot_bin("S5-den-cGP2D-", iter, 1.0, 0);
-  }
-  if(plotFieldCMD) {
-    if(STAGE == mGP3D)
-      plot_bin("S1-field-mGP3D-", iter, 1.0, 4);
-    if(STAGE == mGP2D)
-      plot_bin("S2-field-mGP2D-", iter, 1.0, 4);
-    if(STAGE == cGP3D)
-      plot_bin("S4-field-cGP3D-", iter, 1.0, 4);
-    if(STAGE == cGP2D)
-      plot_bin("S5-field-cGP2D-", iter, 1.0, 4);
-  }
-  */
-}
