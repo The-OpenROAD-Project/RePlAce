@@ -613,8 +613,6 @@ class TwoPinNets {
 
 bool TwoPinNets_comp(TwoPinNets x, TwoPinNets y);
 
-int UFFind(class NET *net, int moduleID);
-void UFUnion(class NET *net, int idx, int idy);
 
 class ROUTRACK {
  public:
@@ -637,7 +635,7 @@ class ROUTRACK {
   }
 };
 
-class NET {
+struct NET {
   public:
   std::map< int, UFPin > mUFPin;
   vector< TwoPinNets > two_pin_nets;
@@ -687,6 +685,9 @@ class NET {
     terminalMax.SetZero();
   };
 };
+
+int UFFind(NET *net, int moduleID);
+void UFUnion(NET *net, int idx, int idy);
 
 // for *.scl files
 // ROW -> PLACE structure
