@@ -122,27 +122,27 @@ static HASH_MAP< string, pair< bool, int > > moduleTermMap;
 static string metal1Name;
 
 // helper function for LEF/DEF in siteorient
-static char* 
+static const char* 
 orientStr(int orient) {
   switch(orient) {
     case 0:
-      return ((char*)"N");
+      return ((const char*)"N");
     case 1:
-      return ((char*)"W");
+      return ((const char*)"W");
     case 2:
-      return ((char*)"S");
+      return ((const char*)"S");
     case 3:
-      return ((char*)"E");
+      return ((const char*)"E");
     case 4:
-      return ((char*)"FN");
+      return ((const char*)"FN");
     case 5:
-      return ((char*)"FW");
+      return ((const char*)"FW");
     case 6:
-      return ((char*)"FS");
+      return ((const char*)"FS");
     case 7:
-      return ((char*)"FE");
+      return ((const char*)"FE");
   };
-  return ((char*)"BOGUS");
+  return ((const char*)"BOGUS");
 }
 
 // orient coordinate shift 
@@ -166,6 +166,9 @@ GetOrientPoint( float x, float y, float w, float h, int orient ) {
     case 7: // Flipped East
       return std::make_pair(h-y, w-x); // y-flip from West
   }
+  
+  cout << "Warning: Weird Orientation: Set North... " << endl;
+  return std::make_pair(x, y); // default
 }
 
 // Get Lower-left coordinates from rectangle's definition
@@ -190,6 +193,9 @@ GetOrientLowerLeftPoint( float lx, float ly, float ux, float uy,
     case 7: // Flipped East
       return GetOrientPoint(ux, uy, w, h, orient); // y-flip from west
   }
+
+  cout << "Warning: Weird Orientation: Set North... " << endl;
+  return std::make_pair(lx, ly); // default
 }
 
 // orient coordinate shift 
@@ -209,6 +215,9 @@ GetOrientSize( float w, float h, int orient ) {
     case 6:
       return std::make_pair(w, h); 
   }
+
+  cout << "Warning: Weird Orientation: Set North... " << endl;
+  return std::make_pair(w, h); 
 }
 
 // for Saving verilog information
@@ -346,7 +355,6 @@ void SetParameter() {
     exit(1);
   }
 
-  int siteSizeX = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeX() );
   int siteSizeY = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() );
 
   unitY = 1.0 * siteSizeY / 9.0f;
@@ -679,7 +687,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
   moduleCNT = 0;
 
   // not 1-to-1 mapping (into moduleInstnace), so traverse by index
-  for(int i = 0; i < __ckt.defComponentStor.size(); i++) {
+  for(size_t i = 0; i < __ckt.defComponentStor.size(); i++) {
     curComp = &(__ckt.defComponentStor[i]);
 
     curModule = &moduleInstance[moduleCNT];
@@ -810,8 +818,8 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
       exit(1);
     }
 
-    curMacro = &__ckt.lefMacroStor[macroPtr->second];
     int macroIdx = macroPtr->second;
+    curMacro = &__ckt.lefMacroStor[macroIdx];
 
     if(!curMacro->hasSize()) {
       cout << "\n** ERROR : Cannot find MACRO SIZE in lef files: "
@@ -821,8 +829,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     
     // check whether this nodes contains sub-rectangular sets
     // Note that unplaced cells is regarded as North orientation (default)
-    bool shapeFound =
-        AddShape(curIdx, curComp->placementX(), curComp->placementY(),
+    AddShape(curIdx, curComp->placementX(), curComp->placementY(),
                   curMacro->sizeX(), curMacro->sizeY(), // for orient 
                   curComp->isUnplaced()?
                   0 : curComp->placementOrient());          // for orient 
@@ -993,7 +1000,6 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
   int numY_ = INT_CONVERT( (dieRect_.ury - dieRect_.lly) / siteSizeY_ );
   // cout << "rowCnt: " << numX_ << " " << numY_ << endl;
 
-  float rowSizeX_ = numX_ * siteSizeX_;
   float rowSizeY_ = siteSizeY_;
   // cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
  
@@ -1656,7 +1662,6 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
 
   int pinIdx = 0;
   int netIdx = 0;
-  int cNetIdx = 0;
 
   tPinName.resize(terminalCNT);
   mPinName.resize(moduleCNT);
@@ -2025,9 +2030,6 @@ void Timing::WriteSpefClockNetVerilog(stringstream& feed) {
                << "(moduleTermMap) " << endl;
           exit(1);
         }
-
-        // terminal Index setting
-        int termIdx = mtPtr->second.second;
 
         int io = INT_MAX;
         if(!__ckt.defPinStor[connection.pinIdx].hasDirection()) {
