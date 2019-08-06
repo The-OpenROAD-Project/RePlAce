@@ -936,8 +936,8 @@ extern prec total_term_area;
 extern prec total_move_available_area;
 extern prec total_filler_area;
 extern prec total_PL_area;
-extern long total_termPL_area;
-extern long total_WS_area;
+extern prec total_termPL_area;
+extern prec total_WS_area;
 
 extern prec curr_WS_area;  // lutong
 extern prec filler_area;

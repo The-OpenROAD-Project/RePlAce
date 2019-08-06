@@ -67,7 +67,6 @@ int numNonRectangularNodes;
 int totalShapeCount;
 BookshelfNameMap _bsMap;
 
-static FPOS shrunk_ratio;
 
 static char error_text[BUFFERSIZE];
 static FPOS terminal_size_max;
@@ -677,10 +676,10 @@ void post_read_3d(void) {
 
   //    gwid.Dump("gwid");
 
-  printf("INFO:  PLACE.ORIGIN = (%d, %d)\n", (int)(place.org.x + 0.5),
-         (int)(place.org.y + 0.5));
-  printf("INFO:  PLACE.END = (%d, %d)\n\n", (int)(place.end.x + 0.5),
-         (int)(place.end.y + 0.5));
+  printf("INFO:  PLACE.ORIGIN = (%f, %f)\n", place.org.x,
+         place.org.y);
+  printf("INFO:  PLACE.END = (%f, %f)\n\n", place.end.x,
+         place.end.y);
 
   place.cnt.x = place.end.x - place.org.x;
   place.cnt.y = place.end.y - place.org.y;
@@ -3592,141 +3591,12 @@ void output_tier_pl_global_router(string plName, int z, bool isNameConvert) {
        << endl;
 }
 
-void get_3d_dimension(struct POS *tier_min, struct POS *tier_max,
-                      int *tier_row_cnt) {
-  int xlen = 0;
-  int ylen = 0;
-
-  xlen = grow_pmax.x - grow_pmin.x;
-  ylen = grow_pmax.y - grow_pmin.y;
-  prec aspect_ratio = (prec)ylen / (prec)xlen;
-
-  printf("INFO:  ASPECT RATIO=%.6lf\n", aspect_ratio);
-  printf("INFO:  ROW = [(MinX=%f, MinY=%f), (MaxX=%f, MaxY=%f)]\n", grow_pmin.x,
-         grow_pmin.y, grow_pmax.x, grow_pmax.y);
-  printf("INFO:  TERM: (%lf, %lf) - (%lf, %lf)\n", terminal_pmin.x,
-         terminal_pmin.y, terminal_pmax.x, terminal_pmax.y);
-
-  shrunk_ratio = zeroFPoint;
-  struct FPOS shrunk_len = zeroFPoint;
-
-  // shrunk_len.x = pow ((1.0 + ExtraWSfor3D)*xlen*ylen
-  //// / target_cell_den
-  // / (aspect_ratio), 0.5);
-  // shrunk_len.y = pow ((1.0 + ExtraWSfor3D)*xlen*ylen
-  //// / target_cell_den
-  // * aspect_ratio, 0.5);
-
-  if(strcmp(bmFlagCMD.c_str(), "etc") == 0) {
-    shrunk_len.x = pow(xlen * ylen / aspect_ratio, 0.5);
-    shrunk_len.y = pow(xlen * ylen * aspect_ratio, 0.5);
-  }
-  else {
-    shrunk_len.x = pow((1.0 + ExtraWSfor3D) * xlen * ylen / target_cell_den /
-                           (numLayer * aspect_ratio),
-                       0.5);
-    shrunk_len.y = pow((1.0 + ExtraWSfor3D) * xlen * ylen / target_cell_den *
-                           aspect_ratio / ((prec)numLayer),
-                       0.5);
-  }
-
-  // if ((strcmp(gbch, "newblue3")==0
-  // ||strcmp(gbch, "newblue2")==0
-  // ||strcmp(gbch, "bigblue3")==0) && numLayer >= 4) {
-  // printf("bigblue3 OR newblue2 OR newblue3: accomodate all the macros by
-  // inserting %2.0f%% whitespace to each tier!\n",
-  // ExtraWSfor3D
-  // /target_cell_den
-  // *100);
-
-  // shrunk_len.x = pow ((1.0 + MaxExtraWSfor3D)*xlen*ylen
-  // / target_cell_den
-  // / ((prec)numLayer*aspect_ratio), 0.5);
-  // shrunk_len.y = pow ((1.0 + MaxExtraWSfor3D)*xlen*ylen
-  // / target_cell_den
-  // * aspect_ratio/((prec)numLayer), 0.5);
-
-  if(shrunk_len.x < max_mac_dim.x || shrunk_len.y < max_mac_dim.y) {
-    printf(
-        "Cannot accomodate the largest macro by inserting %2.0f%% "
-        "whitespace to each tier!\n",
-        ExtraWSfor3D
-            // /target_cell_den
-            * 100);
-    shrunk_len.x = pow((1.0 + MaxExtraWSfor3D) * xlen * ylen
-                           // / target_cell_den
-                           / ((prec)numLayer * aspect_ratio),
-                       0.5);
-    shrunk_len.y = pow((1.0 + MaxExtraWSfor3D) * xlen * ylen
-                           // / target_cell_den
-                           * aspect_ratio / ((prec)numLayer),
-                       0.5);
-
-    if(shrunk_len.x < max_mac_dim.x || shrunk_len.y < max_mac_dim.y) {
-      printf(
-          "INFO:  Cannot accomodate the largest macro by inserting "
-          "%2.0f%% whitespace to each tier!\n",
-          MaxExtraWSfor3D
-              // /target_cell_den
-              * 100);
-      printf(" === Cannot conduct 3D-IC placement!\n");
-      printf(" === Placement exits!\n");
-      exit(0);
-    }
-    else {
-      printf("INFO:  NOTE:  %2.0f%% Whitespace is Added to Each Tier.\n",
-             MaxExtraWSfor3D
-                 // /target_cell_den
-                 * 100);
-      printf("INFO:    LARGEST MACRO SIZE (X,Y) = (%d, %d)\n", max_mac_dim.x,
-             max_mac_dim.y);
-      printf("INFO:    TIER DIMENSION (X,Y) = (%.0lf, %.0lf)\n", shrunk_len.x,
-             shrunk_len.y);
-    }
-  }
-  else {
-    printf("INFO:  NOTE:  %2.0f%% Whitespace is Added to Each Tier.\n",
-           ExtraWSfor3D
-               // /target_cell_den
-               * 100);
-    printf("INFO:    LARGEST MACRO SIZE (X,Y) = (%d, %d)\n", max_mac_dim.x,
-           max_mac_dim.y);
-    printf("INFO:    TIER DIMENSION (X,Y) = (%.0lf, %.0lf)\n", shrunk_len.x,
-           shrunk_len.y);
-  }
-
-  shrunk_ratio.x = shrunk_len.x / xlen;
-  shrunk_ratio.y = shrunk_len.y / ylen;
-
-  *tier_row_cnt = (int)((prec)row_cnt * shrunk_ratio.y + 0.5);  //+ 1;  igkang
-
-  struct POS shrunk_len_int = zeroPoint;
-
-  shrunk_len_int.x = (int)(shrunk_len.x + 0.5);
-  shrunk_len_int.y = (*tier_row_cnt) * rowHeight;
-
-  shrunk_ratio.x = (prec)shrunk_len_int.x / xlen;
-  shrunk_ratio.y = (prec)shrunk_len_int.y / ylen;
-
-  tier_max->x = grow_pmin.x + shrunk_len_int.x;
-  tier_max->y = grow_pmin.y + shrunk_len_int.y;
-
-  tier_min->x = grow_pmin.x;
-  tier_min->y = grow_pmin.y;
-
-  printf("shrunk_(xlen, ylen) = (%d, %d)\n", shrunk_len_int.x,
-         shrunk_len_int.y);
-}
-
 //
 // update tier_min, tier_max, and tier_row_cnt
 //
 void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt) {
-  int xlen = 0;
-  int ylen = 0;
-
-  xlen = grow_pmax.x - grow_pmin.x;
-  ylen = grow_pmax.y - grow_pmin.y;
+  prec xlen = grow_pmax.x - grow_pmin.x;
+  prec ylen = grow_pmax.y - grow_pmin.y;
   prec aspect_ratio = (prec)ylen / (prec)xlen;
 
   printf("INFO:  ASPECT RATIO=%.6lf\n", aspect_ratio);
@@ -3735,130 +3605,13 @@ void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt) {
   printf("INFO:  TERM: (%lf, %lf) - (%lf, %lf)\n", terminal_pmin.x,
          terminal_pmin.y, terminal_pmax.x, terminal_pmax.y);
 
-  shrunk_ratio = zeroFPoint;
-  struct FPOS shrunk_len = zeroFPoint;
-
-  // shrunk_len.x = pow ((1.0 + ExtraWSfor3D)*xlen*ylen
-  //// / target_cell_den
-  // / (aspect_ratio), 0.5);
-  // shrunk_len.y = pow ((1.0 + ExtraWSfor3D)*xlen*ylen
-  //// / target_cell_den
-  // * aspect_ratio, 0.5);
-  if(numLayer == 1) {
-    // lutong
-    // if (strcmp(bmFlagCMD.c_str(), "etc") == 0) {
-    // shrunk_len.x = pow (xlen*ylen/aspect_ratio, 0.5);
-    // shrunk_len.y = pow (xlen*ylen*aspect_ratio, 0.5);
-    //} else {
-    shrunk_len.x = xlen;
-    shrunk_len.y = ylen;
-    //}
-  }
-  else {
-    if(strcmp(bmFlagCMD.c_str(), "etc") == 0) {
-      shrunk_len.x = pow(xlen * ylen / aspect_ratio, 0.5);
-      shrunk_len.y = pow(xlen * ylen * aspect_ratio, 0.5);
-    }
-    else {
-      shrunk_len.x = pow((1.0 + ExtraWSfor3D) * xlen * ylen / target_cell_den /
-                             (numLayer * aspect_ratio),
-                         0.5);
-      shrunk_len.y = pow((1.0 + ExtraWSfor3D) * xlen * ylen / target_cell_den *
-                             aspect_ratio / ((prec)numLayer),
-                         0.5);
-    }
-  }
-
-  // if ((strcmp(gbch, "newblue3")==0
-  // ||strcmp(gbch, "newblue2")==0
-  // ||strcmp(gbch, "bigblue3")==0) && numLayer >= 4) {
-  // printf("bigblue3 OR newblue2 OR newblue3: accomodate all the macros by
-  // inserting %2.0f%% whitespace to each tier!\n",
-  // ExtraWSfor3D
-  // /target_cell_den
-  // *100);
-
-  // shrunk_len.x = pow ((1.0 + MaxExtraWSfor3D)*xlen*ylen
-  // / target_cell_den
-  // / ((prec)numLayer*aspect_ratio), 0.5);
-  // shrunk_len.y = pow ((1.0 + MaxExtraWSfor3D)*xlen*ylen
-  // / target_cell_den
-  // * aspect_ratio/((prec)numLayer), 0.5);
-  if(shrunk_len.x < max_mac_dim.x || shrunk_len.y < max_mac_dim.y) {
-    printf(
-        "Cannot accomodate the largest macro by inserting %2.0f%% "
-        "whitespace to each tier!\n",
-        ExtraWSfor3D
-            // /target_cell_den
-            * 100);
-    shrunk_len.x = pow((1.0 + MaxExtraWSfor3D) * xlen * ylen
-                           // / target_cell_den
-                           / ((prec)numLayer * aspect_ratio),
-                       0.5);
-    shrunk_len.y = pow((1.0 + MaxExtraWSfor3D) * xlen * ylen
-                           // / target_cell_den
-                           * aspect_ratio / ((prec)numLayer),
-                       0.5);
-
-    if(shrunk_len.x < max_mac_dim.x || shrunk_len.y < max_mac_dim.y) {
-      printf(
-          "INFO:  Cannot accomodate the largest macro by inserting "
-          "%2.0f%% whitespace to each tier!\n",
-          MaxExtraWSfor3D
-              // /target_cell_den
-              * 100);
-      printf(" === Cannot conduct 3D-IC placement!\n");
-      printf(" === Placement exits!\n");
-      exit(0);
-    }
-    else {
-      printf("INFO:  NOTE:  %2.0f%% Whitespace is Added to Each Tier.\n",
-             MaxExtraWSfor3D
-                 // /target_cell_den
-                 * 100);
-      printf("INFO:    LARGEST MACRO SIZE (X,Y) = (%d, %d)\n", max_mac_dim.x,
-             max_mac_dim.y);
-      printf("INFO:    TIER DIMENSION (X,Y) = (%.0lf, %.0lf)\n", shrunk_len.x,
-             shrunk_len.y);
-    }
-  }
-  else {
-    printf("INFO:  NOTE:  %2.0f%% Whitespace is Added to Each Tier.\n",
-           ExtraWSfor3D
-               // /target_cell_den
-               * 100);
-    printf("INFO:    LARGEST MACRO SIZE (X,Y) = (%d, %d)\n", max_mac_dim.x,
-           max_mac_dim.y);
-    printf("INFO:    TIER DIMENSION (X,Y) = (%.0lf, %.0lf)\n", shrunk_len.x,
-           shrunk_len.y);
-  }
-
-  shrunk_ratio.x = shrunk_len.x / xlen;
-  shrunk_ratio.y = shrunk_len.y / ylen;
-
-  //*tier_row_cnt = (int)((prec)row_cnt * shrunk_ratio.y + 0.5);    //+ 1;
-  // igkang
-  *tier_row_cnt = row_cnt;  // lutong
-
-  struct POS shrunk_len_int = zeroPoint;
-
-  // shrunk_len_int.x = (int)(shrunk_len.x + 0.5);
-  shrunk_len_int.x = xlen;  // lutong
-  shrunk_len_int.y = (*tier_row_cnt) * rowHeight;
-
-  shrunk_ratio.x = (prec)shrunk_len_int.x / xlen;
-  shrunk_ratio.y = (prec)shrunk_len_int.y / ylen;
-
-  tier_max->x = grow_pmin.x + shrunk_len_int.x;
-  tier_max->y = grow_pmin.y + shrunk_len_int.y;
+  *tier_row_cnt = row_cnt;  
 
   tier_min->x = grow_pmin.x;
   tier_min->y = grow_pmin.y;
-
-  if(numLayer > 1) {
-    printf("shrunk_(xlen, ylen) = (%d, %d)\n", shrunk_len_int.x,
-           shrunk_len_int.y);
-  }
+  
+  tier_max->x = grow_pmax.x;
+  tier_max->y = grow_pmax.y;
 }
 
 void output_gp_net_hpwl(char *fn) {

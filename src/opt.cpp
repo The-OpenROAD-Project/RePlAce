@@ -262,21 +262,21 @@ void whitespace_init(void) {
 
   total_WS_area = total_PL_area - total_termPL_area;
   total_std_den = total_std_area / (total_WS_area - total_macro_area);
-  printf("INFO:  Chip Area: %.0lf x %.0lf = %.0lf \n", place.cnt.x, place.cnt.y, place.area);
+  printf("INFO:  Chip Area: %lf x %lf = %lf \n", place.cnt.x, place.cnt.y, place.area);
   fflush(stdout);
-  printf("INFO:  Total_PL_Area = %.0lf, %%%.2lf of chip\n", total_PL_area,
+  printf("INFO:  Total_PL_Area = %lf, %lf of chip\n", total_PL_area,
          total_PL_area / place.area * 100.0);
   fflush(stdout);
-  printf("INFO:  Total_TermPL_Area = %ld, %%%.2lf of PL\n", total_termPL_area,
+  printf("INFO:  Total_TermPL_Area = %ld, %lf of PL\n", total_termPL_area,
          1.0 * total_termPL_area / place.area * 100.0);
   fflush(stdout);
-  printf("INFO:  Total_WS_Area = %ld, %%%.2lf of PL\n", total_WS_area,
+  printf("INFO:  Total_WS_Area = %ld, %lf of PL\n", total_WS_area,
          1.0 * total_WS_area / total_PL_area * 100.0);
   fflush(stdout);
-  printf("INFO:  Total_Macro_Area = %.0lf, %%%.2lf of WS\n", total_macro_area,
+  printf("INFO:  Total_Macro_Area = %lf, %lf of WS\n", total_macro_area,
          total_macro_area / total_WS_area * 100.0);
   fflush(stdout);
-  printf("INFO:  Total_StdCell_Area = %.0lf, %%%.2lf of WS\n", total_std_area,
+  printf("INFO:  Total_StdCell_Area = %lf, %lf of WS\n", total_std_area,
          total_std_area / total_WS_area * 100.0);
   fflush(stdout);
 }

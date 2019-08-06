@@ -8,7 +8,7 @@ bench_**
 output/*
 logdir/*
 evaluation/*
-test/a2a_wb_dma_top_out/*
+test/output/*
 
 !*.gitignore
 
