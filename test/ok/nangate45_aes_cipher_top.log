@@ -1,0 +1,4511 @@
+CMD :  ./replace -bmflag etc -lef library/nangate45/NangateOpenCellLibrary.lef -def design/nangate45/aes_cipher_top/aes_cipher_top.def -output output/nangate45_aes_cipher_top -onlyGP -plot -timing -verilog design/nangate45/aes_cipher_top/aes_cipher_top.v -lib library/nangate45/NangateOpenCellLibrary_typical.lib -sdc design/nangate45/aes_cipher_top/aes_cipher_top.sdc -capPerMicron 0.23e-15 -resPerMicron 23 
+INFO:  VERSION, Compiled at Jul 21 2019 17:08:40
+INFO:  Now is Mon Aug  5 17:17:31 2019
+
+** WARNING: Your Detail Placement Step must be skipped.
+              (i.e. this program will be executed as -onlyGP)
+     If you want to have DP after GP, please specify -dpflag and -dploc.
+
+INFO:  Target Density = 1.000000
+INFO:  Experiment Index 5
+INFO:  DIR_PATH = output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005
+
+PROC:  BEGIN IMPORTING PLACEMENT INPUT
+INFO:  DEF SCALE UNIT: 2000
+INFO:  METAL1 NAME IN LEF: metal1
+INFO:  DEF SITE: FreePDK45_38x28_10R_NP_162NW_34O
+INFO:  SCALE DOWN UNIT: ( 311.111, 311.111 )
+INFO:  OFFSET COORDINATE: ( 0, 0 )
+
+INFO:  ROW SIZE: ( 1.22143, 9 ) 
+INFO:  #ROW: 351
+INFO:  #MODULE: 18883, #TERMINAL: 2848
+INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) 
+INFO:  CORE AREA: (90 90) - (3873.99 3249)
+INFO:  NEW ROW SIZE: ( 1.22143, 9 ) 
+INFO:  NEW #ROW: 351
+INFO:  EXTRACT NET INFO FROM DEF ONLY
+** WARNING:  clk is detected.  It'll be automatically excluded (defNetStor)
+INFO:  #NET: 19672, #PIN: 65566
+INFO:  SUCCESSFULLY LEF/DEF PARSED
+INFO:  ASPECT RATIO=0.835052
+INFO:  ROW = (MinX=90.000000, MinY=90.000000)
+INFO:  ROW = (MaxX=3873.985596, MaxY=3249.000000)
+INFO:  TERM: (0.000000, 0.000000) - (0.000000, 0.000000)
+INFO:  NOTE:   0% Whitespace is Added to Each Tier.
+INFO:    LARGEST MACRO SIZE (X,Y) = (0, 0)
+INFO:    TIER DIMENSION (X,Y) = (3783, 3159)
+INFO:  #STDCELL=18883,  #movableMACRO=0,  #fixedMACRO=2848
+INFO:  #ROW=351,  ROW HEIGHT=9, TIER DEPTH=1
+INFO:  GLOBAL.SPACE.MIN = (0.000000, 0.000000)
+INFO:  GLOBAL.SPACE.MAX = (3965.142822, 3342.857178)
+INFO:  PLACE.ORIGIN = (90, 90)
+INFO:  PLACE.END = (3874, 3249)
+
+PROC:  END IMPORTING PLACEMENT INPUT
+
+
+PROC:  BEGIN INITIAL PLACEMENT (IP)
+PROC:  Conjugate Gradient (CG) method to obtain the IP
+INFO:  The Initial HPWL is 1114661.250000
+INFO:  The Matrix Size is 18883
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/initPlace/initPlacement_0000.jpg image has been saved
+INFO:  IP  0,  CG Error 0.000040,  HPWL 1108447.125000,  CPUtime 0.14
+INFO:  IP  1,  CG Error 0.000028,  HPWL 1106957.250000,  CPUtime 0.12
+INFO:  IP  2,  CG Error 0.000009,  HPWL 1107521.375000,  CPUtime 0.12
+INFO:  IP  3,  CG Error 0.000014,  HPWL 1107085.000000,  CPUtime 0.12
+INFO:  IP  4,  CG Error 0.000005,  HPWL 1107308.875000,  CPUtime 0.12
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/initPlace/initPlacement_0005.jpg image has been saved
+INFO:  IP  5,  CG Error 0.000012,  HPWL 1106788.125000,  CPUtime 0.13
+INFO:  IP  6,  CG Error 0.000010,  HPWL 1107189.125000,  CPUtime 0.12
+INFO:  IP  7,  CG Error 0.000009,  HPWL 1106805.750000,  CPUtime 0.12
+INFO:  IP  8,  CG Error 0.000014,  HPWL 1107054.875000,  CPUtime 0.12
+INFO:  IP  9,  CG Error 0.000011,  HPWL 1106639.250000,  CPUtime 0.12
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/initPlace/initPlacement_0010.jpg image has been saved
+INFO:  IP 10,  CG Error 0.000009,  HPWL 1107081.125000,  CPUtime 0.13
+INFO:  IP 11,  CG Error 0.000011,  HPWL 1106611.125000,  CPUtime 0.12
+INFO:  IP 12,  CG Error 0.000008,  HPWL 1107102.625000,  CPUtime 0.12
+INFO:  IP 13,  CG Error 0.000010,  HPWL 1106633.625000,  CPUtime 0.12
+INFO:  IP 14,  CG Error 0.000008,  HPWL 1107019.000000,  CPUtime 0.12
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/initPlace/initPlacement_0015.jpg image has been saved
+INFO:  IP 15,  CG Error 0.000011,  HPWL 1106754.500000,  CPUtime 0.13
+INFO:  IP 16,  CG Error 0.000007,  HPWL 1107032.500000,  CPUtime 0.12
+INFO:  IP 17,  CG Error 0.000005,  HPWL 1106629.375000,  CPUtime 0.12
+INFO:  IP 18,  CG Error 0.000010,  HPWL 1107120.500000,  CPUtime 0.12
+INFO:  IP 19,  CG Error 0.000004,  HPWL 1106710.375000,  CPUtime 0.12
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/initPlace/initPlacement_0020.jpg image has been saved
+INFO:  IP 20,  CG Error 0.000006,  HPWL 1107074.375000,  CPUtime 0.13
+INFO:  IP 21,  CG Error 0.000005,  HPWL 1106644.750000,  CPUtime 0.12
+INFO:  IP 22,  CG Error 0.000009,  HPWL 1107091.875000,  CPUtime 0.12
+INFO:  IP 23,  CG Error 0.000003,  HPWL 1106748.750000,  CPUtime 0.12
+INFO:  IP 24,  CG Error 0.000009,  HPWL 1107106.000000,  CPUtime 0.12
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/initPlace/initPlacement_0025.jpg image has been saved
+INFO:  IP 25,  CG Error 0.000003,  HPWL 1106614.000000,  CPUtime 0.14
+INFO:  IP 26,  CG Error 0.000008,  HPWL 1107081.000000,  CPUtime 0.12
+INFO:  IP 27,  CG Error 0.000003,  HPWL 1106733.375000,  CPUtime 0.12
+INFO:  IP 28,  CG Error 0.000005,  HPWL 1107070.250000,  CPUtime 0.12
+INFO:  IP 29,  CG Error 0.000003,  HPWL 1106655.875000,  CPUtime 0.12
+RESULT:
+   HPWL(IP): 1603785.2500 (874416.6250, 729368.5625)
+
+PROC:  END INITIAL PLACEMENT (IP)
+
+
+INFO:  Chip Area: 3784 x 3159 = 11953610 
+INFO:  Total_PL_Area = 11953610, %100.00 of chip
+INFO:  Total_TermPL_Area = 24570, %0.21 of PL
+INFO:  Total_WS_Area = 11929040, %99.79 of PL
+INFO:  Total_Macro_Area = 0, %0.00 of WS
+INFO:  Total_StdCell_Area = 997462, %8.36 of WS
+INFO:  Average 80pct Cell Area = 47.6129
+INFO:  FillerCell's Area = 47.614780
+gFillerCount: 229584
+filler_area: 47.6148
+total_filler_area: : 1.09316e+07
+INFO:  FillerCell's X = 5.290531 , FillerCell's Y = 9.000000
+INFO:  #CELL = 248467 =  18883 (#MODULE) + 229584 (#FILLER)
+INFO:  Average Module Width = 5.868846, Row Height = 9.000000
+INFO:  D_MSH = 1024 
+INFO:  MSH(X, Y) = (32, 32)
+PROC:  Standard Cell 2D Global Placement (cGP2D)
+INFO:  Tier 0, Density is 0.083466
+tier->modu_cnt:18883
+gfiller_cnt: 229584
+INFO: (tier 0) area: 11950497
+INFO: (tier 0) virt_area: 0
+INFO: (tier 0) term_area: 27006
+INFO: (tier 0) modu_area: 997462
+INFO: (tier 0) filler_area: 10926029
+min_idx: 18883
+max_idx: 248350
+gcell_cnt: 248467
+tier->filler_cnt: 229467
+INFO:  dim_bin_cGP2D.(x,y) = (256, 256)
+tier->pmin: (90 90)
+INFO: TILE SIZE for GRouter in Micron: 2.1 x 2.1
+INFO: SCALED TILE SIZE for GRouter: 13.5 x 13.5
+
+INFO: LAYER metal1 #TRACK: 1499
+INFO: LAYER metal2 #TRACK: 1105
+INFO: LAYER metal3 #TRACK: 1499
+INFO: LAYER metal4 #TRACK: 749
+INFO: LAYER metal5 #TRACK: 749
+INFO: LAYER metal6 #TRACK: 749
+INFO: LAYER metal7 #TRACK: 262
+INFO: LAYER metal8 #TRACK: 262
+INFO: LAYER metal9 #TRACK: 131
+INFO: LAYER metal10 #TRACK: 131
+0 0 3965.14 3342.86
+0 0 3965.14 3342.86
+diffX: 9.64282, diffY: 8.35718
+INFO:  WRITE BOOKSHELF...output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/router_base/
+PROC:  END WRITE BOOKSHELF
+
+PROC:  Start NESTEROV's Optimization
+PROC:    Global Lagrangian Multiplier is Applied
+total Steiner HPWL: 345897155
+Execute STA
+topCellName: aes_cipher_top
+verilog    : design/nangate45/aes_cipher_top/aes_cipher_top.v
+liberty    : library/nangate45/NangateOpenCellLibrary_typical.lib
+sdcName    : design/nangate45/aes_cipher_top/aes_cipher_top.sdc
+
+OpenSTA Copyright (c) 2018, Parallax Software, Inc.
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+
+This is free software, and you are free to change and redistribute it
+under certain conditions; type `show_copying' for details. 
+This program comes with ABSOLUTELY NO WARRANTY; for details type `show_warranty'.
+INFO:  Now linking: aes_cipher_top
+INFO:  Successfully linked: aes_cipher_top
+Warning: aes_cipher_top.sdc, 8 capacitance scale 1e-12 does not match library scale 1e-15.
+Warning: aes_cipher_top.sdc, 11 set_input_delay relative to a clock defined on the same port/pin not allowed.
+INFO: Total 659 worst path!
+Critical Path Up to 0 has been updated
+WNS = 3.74413e-09 seconds
+TNS = 0 seconds
+
+ITER: 0
+    HPWL=1108046.875000
+    OVFL=0.983401
+    HPWL=(593533.000000, 514513.875000)
+    POTN=2.978541E+09
+    PHIC=1.926692E-10
+    GRAD=1.465906E-02
+    NuBT=0
+    CPU =0.000000
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0001.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0001.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0001.jpg image has been saved
+
+ITER: 1
+    HPWL=1108067.750000
+    OVFL=0.983378
+    HPWL=(593538.437500, 514529.375000)
+    POTN=2.978390E+09
+    PHIC=2.023020E-10
+    GRAD=1.514877E-02
+    NuBT=1
+    CPU =0.216882
+
+ITER: 2
+    HPWL=1108939.250000
+    OVFL=0.982259
+    HPWL=(593856.062500, 515083.125000)
+    POTN=2.973162E+09
+    PHIC=2.123910E-10
+    GRAD=1.504318E-02
+    NuBT=1
+    CPU =0.062802
+
+ITER: 3
+    HPWL=1307764.000000
+    OVFL=0.943354
+    HPWL=(695296.750000, 612467.187500)
+    POTN=2.801383E+09
+    PHIC=2.168449E-10
+    GRAD=1.250270E-02
+    NuBT=1
+    CPU =0.062218
+
+ITER: 4
+    HPWL=1433153.250000
+    OVFL=0.883663
+    HPWL=(758863.375000, 674289.937500)
+    POTN=2.603207E+09
+    PHIC=2.236967E-10
+    GRAD=7.108530E-03
+    NuBT=2
+    CPU =0.126233
+
+ITER: 5
+    HPWL=1515833.375000
+    OVFL=0.849279
+    HPWL=(797937.875000, 717895.500000)
+    POTN=2.459857E+09
+    PHIC=2.321590E-10
+    GRAD=6.046813E-03
+    NuBT=2
+    CPU =0.120137
+
+ITER: 6
+    HPWL=1574478.500000
+    OVFL=0.834032
+    HPWL=(824884.187500, 749594.312500)
+    POTN=2.375792E+09
+    PHIC=2.417594E-10
+    GRAD=4.955633E-03
+    NuBT=2
+    CPU =0.121003
+
+ITER: 7
+    HPWL=1610759.250000
+    OVFL=0.816637
+    HPWL=(839097.687500, 771661.562500)
+    POTN=2.304517E+09
+    PHIC=2.525520E-10
+    GRAD=5.010237E-03
+    NuBT=2
+    CPU =0.120145
+
+ITER: 8
+    HPWL=1631524.250000
+    OVFL=0.805441
+    HPWL=(846651.125000, 784873.187500)
+    POTN=2.257829E+09
+    PHIC=2.644042E-10
+    GRAD=4.330901E-03
+    NuBT=2
+    CPU =0.119950
+
+ITER: 9
+    HPWL=1640370.250000
+    OVFL=0.795528
+    HPWL=(849674.312500, 790695.937500)
+    POTN=2.222222E+09
+    PHIC=2.772783E-10
+    GRAD=4.251732E-03
+    NuBT=2
+    CPU =0.129971
+total Steiner HPWL: 531439625
+BuildSteiner: 0.0494326
+FillSpefForSta: 0.404274
+UpdateTimingSta: 1.46524
+INFO: Total 659 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0175175
+timing summary
+WNS = 3.10255e-09 seconds
+TNS = 0 seconds
+ExecuteStaLater: 1.88759
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0010.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0010.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0010.jpg image has been saved
+
+ITER: 10
+    HPWL=1636205.750000
+    OVFL=0.790047
+    HPWL=(846295.937500, 789909.812500)
+    POTN=2.196824E+09
+    PHIC=2.911422E-10
+    GRAD=7.208373E-03
+    NuBT=2
+    CPU =2.133795
+
+ITER: 11
+    HPWL=1609628.500000
+    OVFL=0.786545
+    HPWL=(833178.625000, 776449.812500)
+    POTN=2.177820E+09
+    PHIC=3.056993E-10
+    GRAD=4.135062E-03
+    NuBT=1
+    CPU =0.073545
+
+ITER: 12
+    HPWL=1581087.875000
+    OVFL=0.787162
+    HPWL=(818077.312500, 763010.562500)
+    POTN=2.170988E+09
+    PHIC=3.209843E-10
+    GRAD=5.515933E-03
+    NuBT=1
+    CPU =0.063596
+
+ITER: 13
+    HPWL=1554816.500000
+    OVFL=0.787707
+    HPWL=(805462.437500, 749354.062500)
+    POTN=2.163889E+09
+    PHIC=3.370335E-10
+    GRAD=5.038435E-03
+    NuBT=2
+    CPU =0.121440
+
+ITER: 14
+    HPWL=1541009.250000
+    OVFL=0.789916
+    HPWL=(798946.250000, 742062.937500)
+    POTN=2.160774E+09
+    PHIC=3.538851E-10
+    GRAD=4.733176E-03
+    NuBT=2
+    CPU =0.120266
+
+ITER: 15
+    HPWL=1530511.250000
+    OVFL=0.791877
+    HPWL=(794317.250000, 736194.000000)
+    POTN=2.156279E+09
+    PHIC=3.715794E-10
+    GRAD=4.374939E-03
+    NuBT=2
+    CPU =0.121130
+
+ITER: 16
+    HPWL=1526912.500000
+    OVFL=0.793387
+    HPWL=(793282.000000, 733630.562500)
+    POTN=2.152333E+09
+    PHIC=3.901583E-10
+    GRAD=4.395577E-03
+    NuBT=1
+    CPU =0.062284
+
+ITER: 17
+    HPWL=1523632.250000
+    OVFL=0.794323
+    HPWL=(791896.062500, 731736.187500)
+    POTN=2.146581E+09
+    PHIC=4.096662E-10
+    GRAD=4.215294E-03
+    NuBT=1
+    CPU =0.062194
+
+ITER: 18
+    HPWL=1522645.500000
+    OVFL=0.795661
+    HPWL=(791445.187500, 731200.375000)
+    POTN=2.141655E+09
+    PHIC=4.301495E-10
+    GRAD=3.635045E-03
+    NuBT=1
+    CPU =0.062193
+
+ITER: 19
+    HPWL=1521858.250000
+    OVFL=0.796626
+    HPWL=(790732.187500, 731126.000000)
+    POTN=2.135355E+09
+    PHIC=4.516569E-10
+    GRAD=3.074781E-03
+    NuBT=1
+    CPU =0.062370
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0020.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0020.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0020.jpg image has been saved
+
+ITER: 20
+    HPWL=1522027.250000
+    OVFL=0.797477
+    HPWL=(790416.375000, 731610.937500)
+    POTN=2.129881E+09
+    PHIC=4.742284E-10
+    GRAD=2.829020E-03
+    NuBT=1
+    CPU =0.121866
+
+ITER: 21
+    HPWL=1522223.750000
+    OVFL=0.797640
+    HPWL=(789920.562500, 732303.187500)
+    POTN=2.123370E+09
+    PHIC=4.979260E-10
+    GRAD=2.724074E-03
+    NuBT=1
+    CPU =0.062773
+
+ITER: 22
+    HPWL=1521715.875000
+    OVFL=0.799081
+    HPWL=(788983.875000, 732732.000000)
+    POTN=2.117509E+09
+    PHIC=5.228223E-10
+    GRAD=2.489424E-03
+    NuBT=1
+    CPU =0.063410
+
+ITER: 23
+    HPWL=1520789.500000
+    OVFL=0.799454
+    HPWL=(787789.687500, 732999.875000)
+    POTN=2.110669E+09
+    PHIC=5.489634E-10
+    GRAD=2.093055E-03
+    NuBT=1
+    CPU =0.062442
+
+ITER: 24
+    HPWL=1519667.750000
+    OVFL=0.800045
+    HPWL=(786581.625000, 733086.062500)
+    POTN=2.103822E+09
+    PHIC=5.764115E-10
+    GRAD=1.752884E-03
+    NuBT=1
+    CPU =0.062372
+
+ITER: 25
+    HPWL=1518327.625000
+    OVFL=0.800676
+    HPWL=(785346.312500, 732981.312500)
+    POTN=2.096088E+09
+    PHIC=6.052321E-10
+    GRAD=1.551173E-03
+    NuBT=1
+    CPU =0.062435
+
+ITER: 26
+    HPWL=1516760.250000
+    OVFL=0.801008
+    HPWL=(784188.125000, 732572.125000)
+    POTN=2.088182E+09
+    PHIC=6.354937E-10
+    GRAD=1.437529E-03
+    NuBT=1
+    CPU =0.065325
+
+ITER: 27
+    HPWL=1515224.250000
+    OVFL=0.801089
+    HPWL=(783127.562500, 732096.687500)
+    POTN=2.079291E+09
+    PHIC=6.672683E-10
+    GRAD=1.337261E-03
+    NuBT=1
+    CPU =0.068940
+
+ITER: 28
+    HPWL=1513560.750000
+    OVFL=0.801538
+    HPWL=(782182.562500, 731378.187500)
+    POTN=2.070051E+09
+    PHIC=7.006317E-10
+    GRAD=1.234766E-03
+    NuBT=1
+    CPU =0.062215
+
+ITER: 29
+    HPWL=1512057.500000
+    OVFL=0.801667
+    HPWL=(781423.750000, 730633.687500)
+    POTN=2.059884E+09
+    PHIC=7.356632E-10
+    GRAD=1.155726E-03
+    NuBT=1
+    CPU =0.062403
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0030.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0030.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0030.jpg image has been saved
+
+ITER: 30
+    HPWL=1510771.500000
+    OVFL=0.801471
+    HPWL=(780919.125000, 729852.437500)
+    POTN=2.049329E+09
+    PHIC=7.724463E-10
+    GRAD=1.114520E-03
+    NuBT=1
+    CPU =0.121642
+
+ITER: 31
+    HPWL=1509803.250000
+    OVFL=0.801164
+    HPWL=(780619.312500, 729183.875000)
+    POTN=2.038042E+09
+    PHIC=8.110686E-10
+    GRAD=1.100446E-03
+    NuBT=1
+    CPU =0.062736
+
+ITER: 32
+    HPWL=1508924.500000
+    OVFL=0.801171
+    HPWL=(780417.187500, 728507.312500)
+    POTN=2.026940E+09
+    PHIC=8.516220E-10
+    GRAD=1.081339E-03
+    NuBT=1
+    CPU =0.062354
+
+ITER: 33
+    HPWL=1508390.375000
+    OVFL=0.801022
+    HPWL=(780386.625000, 728003.750000)
+    POTN=2.015669E+09
+    PHIC=8.942030E-10
+    GRAD=1.040344E-03
+    NuBT=1
+    CPU =0.062182
+
+ITER: 34
+    HPWL=1508095.750000
+    OVFL=0.800796
+    HPWL=(780474.250000, 727621.500000)
+    POTN=2.004825E+09
+    PHIC=9.389132E-10
+    GRAD=9.892446E-04
+    NuBT=1
+    CPU =0.062273
+
+ITER: 35
+    HPWL=1508154.000000
+    OVFL=0.800768
+    HPWL=(780716.062500, 727437.875000)
+    POTN=1.993613E+09
+    PHIC=9.858507E-10
+    GRAD=9.514864E-04
+    NuBT=1
+    CPU =0.062224
+
+ITER: 36
+    HPWL=1508328.250000
+    OVFL=0.800476
+    HPWL=(780994.437500, 727333.875000)
+    POTN=1.982353E+09
+    PHIC=1.035118E-09
+    GRAD=9.284286E-04
+    NuBT=1
+    CPU =0.062350
+
+ITER: 37
+    HPWL=1508827.250000
+    OVFL=0.800199
+    HPWL=(781394.000000, 727433.187500)
+    POTN=1.970253E+09
+    PHIC=1.086797E-09
+    GRAD=9.072279E-04
+    NuBT=1
+    CPU =0.063297
+
+ITER: 38
+    HPWL=1509302.000000
+    OVFL=0.799812
+    HPWL=(781748.625000, 727553.437500)
+    POTN=1.957873E+09
+    PHIC=1.141061E-09
+    GRAD=8.783636E-04
+    NuBT=1
+    CPU =0.062260
+
+ITER: 39
+    HPWL=1509882.500000
+    OVFL=0.799511
+    HPWL=(782124.312500, 727758.187500)
+    POTN=1.944979E+09
+    PHIC=1.198015E-09
+    GRAD=8.484093E-04
+    NuBT=1
+    CPU =0.062159
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0040.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0040.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0040.jpg image has been saved
+
+ITER: 40
+    HPWL=1510347.500000
+    OVFL=0.799177
+    HPWL=(782405.750000, 727941.687500)
+    POTN=1.932492E+09
+    PHIC=1.257834E-09
+    GRAD=8.241808E-04
+    NuBT=1
+    CPU =0.121091
+
+ITER: 41
+    HPWL=1510829.750000
+    OVFL=0.798796
+    HPWL=(782675.437500, 728154.375000)
+    POTN=1.920127E+09
+    PHIC=1.320635E-09
+    GRAD=8.066604E-04
+    NuBT=1
+    CPU =0.078252
+
+ITER: 42
+    HPWL=1511152.750000
+    OVFL=0.798670
+    HPWL=(782831.000000, 728321.812500)
+    POTN=1.908601E+09
+    PHIC=1.386604E-09
+    GRAD=7.933476E-04
+    NuBT=1
+    CPU =0.078013
+
+ITER: 43
+    HPWL=1511398.500000
+    OVFL=0.798369
+    HPWL=(782936.500000, 728462.000000)
+    POTN=1.897268E+09
+    PHIC=1.455884E-09
+    GRAD=7.785322E-04
+    NuBT=1
+    CPU =0.078035
+
+ITER: 44
+    HPWL=1511523.000000
+    OVFL=0.798252
+    HPWL=(782946.250000, 728576.812500)
+    POTN=1.886413E+09
+    PHIC=1.528651E-09
+    GRAD=7.680430E-04
+    NuBT=1
+    CPU =0.063849
+
+ITER: 45
+    HPWL=1511537.000000
+    OVFL=0.798077
+    HPWL=(782899.187500, 728637.750000)
+    POTN=1.875480E+09
+    PHIC=1.605080E-09
+    GRAD=7.592482E-04
+    NuBT=1
+    CPU =0.071820
+
+ITER: 46
+    HPWL=1511416.000000
+    OVFL=0.798026
+    HPWL=(782758.250000, 728657.812500)
+    POTN=1.865155E+09
+    PHIC=1.685334E-09
+    GRAD=7.568350E-04
+    NuBT=1
+    CPU =0.064178
+
+ITER: 47
+    HPWL=1511231.500000
+    OVFL=0.797908
+    HPWL=(782593.562500, 728637.875000)
+    POTN=1.854800E+09
+    PHIC=1.769601E-09
+    GRAD=7.535470E-04
+    NuBT=1
+    CPU =0.063304
+
+ITER: 48
+    HPWL=1510941.875000
+    OVFL=0.797787
+    HPWL=(782353.500000, 728588.375000)
+    POTN=1.844551E+09
+    PHIC=1.858081E-09
+    GRAD=7.517477E-04
+    NuBT=1
+    CPU =0.062293
+
+ITER: 49
+    HPWL=1510617.000000
+    OVFL=0.797608
+    HPWL=(782112.000000, 728505.000000)
+    POTN=1.833885E+09
+    PHIC=1.950985E-09
+    GRAD=7.482863E-04
+    NuBT=1
+    CPU =0.062370
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0050.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0050.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0050.jpg image has been saved
+
+ITER: 50
+    HPWL=1510175.375000
+    OVFL=0.797537
+    HPWL=(781796.687500, 728378.687500)
+    POTN=1.823605E+09
+    PHIC=2.048534E-09
+    GRAD=7.479629E-04
+    NuBT=1
+    CPU =0.122603
+
+ITER: 51
+    HPWL=1509710.500000
+    OVFL=0.797566
+    HPWL=(781490.500000, 728219.937500)
+    POTN=1.813486E+09
+    PHIC=2.150960E-09
+    GRAD=7.478931E-04
+    NuBT=1
+    CPU =0.062578
+
+ITER: 52
+    HPWL=1509183.125000
+    OVFL=0.797591
+    HPWL=(781136.312500, 728046.812500)
+    POTN=1.804245E+09
+    PHIC=2.258508E-09
+    GRAD=7.478731E-04
+    NuBT=1
+    CPU =0.062443
+
+ITER: 53
+    HPWL=1508723.875000
+    OVFL=0.797647
+    HPWL=(780849.875000, 727874.000000)
+    POTN=1.795439E+09
+    PHIC=2.371433E-09
+    GRAD=7.456655E-04
+    NuBT=1
+    CPU =0.062440
+
+ITER: 54
+    HPWL=1508228.125000
+    OVFL=0.797688
+    HPWL=(780535.000000, 727693.125000)
+    POTN=1.787297E+09
+    PHIC=2.490005E-09
+    GRAD=7.422310E-04
+    NuBT=1
+    CPU =0.062263
+
+ITER: 55
+    HPWL=1507821.250000
+    OVFL=0.797647
+    HPWL=(780302.687500, 727518.500000)
+    POTN=1.779077E+09
+    PHIC=2.614505E-09
+    GRAD=7.390196E-04
+    NuBT=1
+    CPU =0.062237
+
+ITER: 56
+    HPWL=1507396.625000
+    OVFL=0.797647
+    HPWL=(780048.937500, 727347.687500)
+    POTN=1.771037E+09
+    PHIC=2.745230E-09
+    GRAD=7.363051E-04
+    NuBT=1
+    CPU =0.062243
+
+ITER: 57
+    HPWL=1507037.625000
+    OVFL=0.797558
+    HPWL=(779866.687500, 727170.937500)
+    POTN=1.762481E+09
+    PHIC=2.882492E-09
+    GRAD=7.347214E-04
+    NuBT=1
+    CPU =0.062315
+
+ITER: 58
+    HPWL=1506662.000000
+    OVFL=0.797540
+    HPWL=(779661.437500, 727000.625000)
+    POTN=1.753741E+09
+    PHIC=3.026616E-09
+    GRAD=7.318620E-04
+    NuBT=1
+    CPU =0.063399
+
+ITER: 59
+    HPWL=1506346.625000
+    OVFL=0.797380
+    HPWL=(779521.875000, 726824.750000)
+    POTN=1.744614E+09
+    PHIC=3.177947E-09
+    GRAD=7.293153E-04
+    NuBT=1
+    CPU =0.062291
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0060.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0060.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0060.jpg image has been saved
+
+ITER: 60
+    HPWL=1506019.250000
+    OVFL=0.797353
+    HPWL=(779356.312500, 726662.937500)
+    POTN=1.735714E+09
+    PHIC=3.336844E-09
+    GRAD=7.263154E-04
+    NuBT=1
+    CPU =0.121148
+
+ITER: 61
+    HPWL=1505727.000000
+    OVFL=0.797127
+    HPWL=(779242.937500, 726484.000000)
+    POTN=1.726782E+09
+    PHIC=3.503686E-09
+    GRAD=7.246271E-04
+    NuBT=1
+    CPU =0.062688
+
+ITER: 62
+    HPWL=1505432.000000
+    OVFL=0.797067
+    HPWL=(779109.562500, 726322.375000)
+    POTN=1.718370E+09
+    PHIC=3.678870E-09
+    GRAD=7.225258E-04
+    NuBT=1
+    CPU =0.062374
+
+ITER: 63
+    HPWL=1505156.750000
+    OVFL=0.796886
+    HPWL=(779019.750000, 726137.062500)
+    POTN=1.710017E+09
+    PHIC=3.862814E-09
+    GRAD=7.209144E-04
+    NuBT=1
+    CPU =0.062495
+
+ITER: 64
+    HPWL=1504874.250000
+    OVFL=0.796873
+    HPWL=(778900.437500, 725973.875000)
+    POTN=1.702125E+09
+    PHIC=4.055954E-09
+    GRAD=7.186342E-04
+    NuBT=1
+    CPU =0.062397
+
+ITER: 65
+    HPWL=1504644.750000
+    OVFL=0.796692
+    HPWL=(778840.687500, 725804.125000)
+    POTN=1.694250E+09
+    PHIC=4.258752E-09
+    GRAD=7.167141E-04
+    NuBT=1
+    CPU =0.063483
+
+ITER: 66
+    HPWL=1504420.000000
+    OVFL=0.796681
+    HPWL=(778749.062500, 725670.937500)
+    POTN=1.686649E+09
+    PHIC=4.471689E-09
+    GRAD=7.148443E-04
+    NuBT=1
+    CPU =0.062150
+
+ITER: 67
+    HPWL=1504247.000000
+    OVFL=0.796480
+    HPWL=(778714.687500, 725532.250000)
+    POTN=1.678803E+09
+    PHIC=4.695273E-09
+    GRAD=7.135645E-04
+    NuBT=1
+    CPU =0.062354
+
+ITER: 68
+    HPWL=1504084.000000
+    OVFL=0.796451
+    HPWL=(778647.625000, 725436.312500)
+    POTN=1.671133E+09
+    PHIC=4.930036E-09
+    GRAD=7.123612E-04
+    NuBT=1
+    CPU =0.062304
+
+ITER: 69
+    HPWL=1503963.500000
+    OVFL=0.796204
+    HPWL=(778631.812500, 725331.750000)
+    POTN=1.663363E+09
+    PHIC=5.176538E-09
+    GRAD=7.113249E-04
+    NuBT=1
+    CPU =0.062377
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0070.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0070.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0070.jpg image has been saved
+
+ITER: 70
+    HPWL=1503837.500000
+    OVFL=0.796109
+    HPWL=(778573.187500, 725264.250000)
+    POTN=1.656081E+09
+    PHIC=5.435365E-09
+    GRAD=7.105562E-04
+    NuBT=1
+    CPU =0.121160
+
+ITER: 71
+    HPWL=1503739.500000
+    OVFL=0.795839
+    HPWL=(778553.687500, 725185.750000)
+    POTN=1.648917E+09
+    PHIC=5.707133E-09
+    GRAD=7.098541E-04
+    NuBT=1
+    CPU =0.078299
+
+ITER: 72
+    HPWL=1503615.875000
+    OVFL=0.795737
+    HPWL=(778480.625000, 725135.250000)
+    POTN=1.642139E+09
+    PHIC=5.992489E-09
+    GRAD=7.095625E-04
+    NuBT=1
+    CPU =0.072678
+
+ITER: 73
+    HPWL=1503507.000000
+    OVFL=0.795467
+    HPWL=(778440.062500, 725066.937500)
+    POTN=1.635231E+09
+    PHIC=6.292113E-09
+    GRAD=7.087180E-04
+    NuBT=1
+    CPU =0.066339
+
+ITER: 74
+    HPWL=1503362.000000
+    OVFL=0.795322
+    HPWL=(778339.562500, 725022.375000)
+    POTN=1.628310E+09
+    PHIC=6.606718E-09
+    GRAD=7.080592E-04
+    NuBT=1
+    CPU =0.066953
+
+ITER: 75
+    HPWL=1503237.500000
+    OVFL=0.795029
+    HPWL=(778278.937500, 724958.562500)
+    POTN=1.621019E+09
+    PHIC=6.937054E-09
+    GRAD=7.070299E-04
+    NuBT=1
+    CPU =0.063201
+
+ITER: 76
+    HPWL=1503053.750000
+    OVFL=0.794858
+    HPWL=(778147.312500, 724906.500000)
+    POTN=1.613808E+09
+    PHIC=7.283906E-09
+    GRAD=7.063796E-04
+    NuBT=1
+    CPU =0.062387
+
+ITER: 77
+    HPWL=1502878.250000
+    OVFL=0.794612
+    HPWL=(778051.562500, 724826.687500)
+    POTN=1.606429E+09
+    PHIC=7.648102E-09
+    GRAD=7.052187E-04
+    NuBT=1
+    CPU =0.062302
+
+ITER: 78
+    HPWL=1502633.000000
+    OVFL=0.794548
+    HPWL=(777878.250000, 724754.687500)
+    POTN=1.599503E+09
+    PHIC=8.030506E-09
+    GRAD=7.039570E-04
+    NuBT=1
+    CPU =0.062388
+
+ITER: 79
+    HPWL=1502414.875000
+    OVFL=0.794283
+    HPWL=(777752.187500, 724662.687500)
+    POTN=1.592662E+09
+    PHIC=8.432031E-09
+    GRAD=7.016191E-04
+    NuBT=1
+    CPU =0.062381
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0080.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0080.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0080.jpg image has been saved
+
+ITER: 80
+    HPWL=1502161.000000
+    OVFL=0.794233
+    HPWL=(777571.562500, 724589.437500)
+    POTN=1.586161E+09
+    PHIC=8.853632E-09
+    GRAD=6.991692E-04
+    NuBT=1
+    CPU =0.122516
+
+ITER: 81
+    HPWL=1501919.250000
+    OVFL=0.793991
+    HPWL=(777431.187500, 724488.000000)
+    POTN=1.579639E+09
+    PHIC=9.296314E-09
+    GRAD=6.961050E-04
+    NuBT=1
+    CPU =0.078270
+
+ITER: 82
+    HPWL=1501649.000000
+    OVFL=0.793925
+    HPWL=(777240.437500, 724408.562500)
+    POTN=1.573375E+09
+    PHIC=9.761129E-09
+    GRAD=6.931841E-04
+    NuBT=1
+    CPU =0.078175
+
+ITER: 83
+    HPWL=1501401.250000
+    OVFL=0.793662
+    HPWL=(777100.625000, 724300.562500)
+    POTN=1.567063E+09
+    PHIC=1.024918E-08
+    GRAD=6.896271E-04
+    NuBT=1
+    CPU =0.078098
+
+ITER: 84
+    HPWL=1501120.125000
+    OVFL=0.793657
+    HPWL=(776907.812500, 724212.312500)
+    POTN=1.561158E+09
+    PHIC=1.076164E-08
+    GRAD=6.861303E-04
+    NuBT=1
+    CPU =0.078067
+
+ITER: 85
+    HPWL=1500856.000000
+    OVFL=0.793402
+    HPWL=(776763.062500, 724092.937500)
+    POTN=1.555378E+09
+    PHIC=1.129972E-08
+    GRAD=6.819933E-04
+    NuBT=1
+    CPU =0.077985
+
+ITER: 86
+    HPWL=1500582.250000
+    OVFL=0.793297
+    HPWL=(776580.437500, 724001.875000)
+    POTN=1.549924E+09
+    PHIC=1.186471E-08
+    GRAD=6.780364E-04
+    NuBT=1
+    CPU =0.065371
+
+ITER: 87
+    HPWL=1500331.250000
+    OVFL=0.793081
+    HPWL=(776450.750000, 723880.500000)
+    POTN=1.544332E+09
+    PHIC=1.245794E-08
+    GRAD=6.737697E-04
+    NuBT=1
+    CPU =0.062403
+
+ITER: 88
+    HPWL=1500033.750000
+    OVFL=0.793070
+    HPWL=(776262.687500, 723771.000000)
+    POTN=1.538910E+09
+    PHIC=1.308084E-08
+    GRAD=6.697500E-04
+    NuBT=1
+    CPU =0.062378
+
+ITER: 89
+    HPWL=1499783.250000
+    OVFL=0.792876
+    HPWL=(776142.500000, 723640.687500)
+    POTN=1.533428E+09
+    PHIC=1.373488E-08
+    GRAD=6.650487E-04
+    NuBT=1
+    CPU =0.062307
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0090.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0090.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0090.jpg image has been saved
+
+ITER: 90
+    HPWL=1499518.375000
+    OVFL=0.792869
+    HPWL=(775980.000000, 723538.375000)
+    POTN=1.528143E+09
+    PHIC=1.442163E-08
+    GRAD=6.601490E-04
+    NuBT=1
+    CPU =0.120683
+
+ITER: 91
+    HPWL=1499306.625000
+    OVFL=0.792708
+    HPWL=(775888.937500, 723417.687500)
+    POTN=1.522604E+09
+    PHIC=1.514271E-08
+    GRAD=6.547162E-04
+    NuBT=1
+    CPU =0.062533
+
+ITER: 92
+    HPWL=1499076.750000
+    OVFL=0.792728
+    HPWL=(775753.562500, 723323.250000)
+    POTN=1.517176E+09
+    PHIC=1.589984E-08
+    GRAD=6.495291E-04
+    NuBT=1
+    CPU =0.062371
+
+ITER: 93
+    HPWL=1498913.375000
+    OVFL=0.792577
+    HPWL=(775695.875000, 723217.500000)
+    POTN=1.511709E+09
+    PHIC=1.669483E-08
+    GRAD=6.440898E-04
+    NuBT=1
+    CPU =0.063393
+
+ITER: 94
+    HPWL=1498741.500000
+    OVFL=0.792581
+    HPWL=(775597.750000, 723143.812500)
+    POTN=1.506546E+09
+    PHIC=1.752957E-08
+    GRAD=6.383369E-04
+    NuBT=1
+    CPU =0.062434
+
+ITER: 95
+    HPWL=1498636.500000
+    OVFL=0.792418
+    HPWL=(775577.500000, 723058.937500)
+    POTN=1.501458E+09
+    PHIC=1.840605E-08
+    GRAD=6.323326E-04
+    NuBT=1
+    CPU =0.062377
+
+ITER: 96
+    HPWL=1498507.750000
+    OVFL=0.792378
+    HPWL=(775502.750000, 723005.062500)
+    POTN=1.496655E+09
+    PHIC=1.932635E-08
+    GRAD=6.264981E-04
+    NuBT=1
+    CPU =0.062409
+
+ITER: 97
+    HPWL=1498446.875000
+    OVFL=0.792173
+    HPWL=(775509.812500, 722937.062500)
+    POTN=1.491781E+09
+    PHIC=2.029267E-08
+    GRAD=6.210355E-04
+    NuBT=1
+    CPU =0.062437
+
+ITER: 98
+    HPWL=1498336.875000
+    OVFL=0.792126
+    HPWL=(775447.437500, 722889.437500)
+    POTN=1.487029E+09
+    PHIC=2.130730E-08
+    GRAD=6.158375E-04
+    NuBT=1
+    CPU =0.062389
+
+ITER: 99
+    HPWL=1498278.250000
+    OVFL=0.791954
+    HPWL=(775455.812500, 722822.500000)
+    POTN=1.482197E+09
+    PHIC=2.237267E-08
+    GRAD=6.105327E-04
+    NuBT=1
+    CPU =0.062428
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0100.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0100.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0100.jpg image has been saved
+
+ITER: 100
+    HPWL=1498172.000000
+    OVFL=0.791878
+    HPWL=(775392.937500, 722779.062500)
+    POTN=1.477410E+09
+    PHIC=2.349130E-08
+    GRAD=6.049880E-04
+    NuBT=1
+    CPU =0.122553
+
+ITER: 101
+    HPWL=1498124.750000
+    OVFL=0.791689
+    HPWL=(775407.625000, 722717.187500)
+    POTN=1.472502E+09
+    PHIC=2.466586E-08
+    GRAD=5.993882E-04
+    NuBT=1
+    CPU =0.079858
+
+ITER: 102
+    HPWL=1498010.500000
+    OVFL=0.791580
+    HPWL=(775337.562500, 722672.875000)
+    POTN=1.467779E+09
+    PHIC=2.589915E-08
+    GRAD=5.941793E-04
+    NuBT=1
+    CPU =0.086508
+
+ITER: 103
+    HPWL=1497951.500000
+    OVFL=0.791357
+    HPWL=(775343.062500, 722608.500000)
+    POTN=1.463012E+09
+    PHIC=2.719411E-08
+    GRAD=5.892526E-04
+    NuBT=1
+    CPU =0.079283
+
+ITER: 104
+    HPWL=1497809.750000
+    OVFL=0.791264
+    HPWL=(775257.000000, 722552.812500)
+    POTN=1.458502E+09
+    PHIC=2.855382E-08
+    GRAD=5.844005E-04
+    NuBT=1
+    CPU =0.079023
+
+ITER: 105
+    HPWL=1497720.750000
+    OVFL=0.791107
+    HPWL=(775243.375000, 722477.375000)
+    POTN=1.454047E+09
+    PHIC=2.998150E-08
+    GRAD=5.791145E-04
+    NuBT=1
+    CPU =0.078048
+
+ITER: 106
+    HPWL=1497553.750000
+    OVFL=0.791038
+    HPWL=(775139.250000, 722414.437500)
+    POTN=1.449813E+09
+    PHIC=3.148058E-08
+    GRAD=5.737813E-04
+    NuBT=1
+    CPU =0.074336
+
+ITER: 107
+    HPWL=1497464.250000
+    OVFL=0.790839
+    HPWL=(775122.687500, 722341.500000)
+    POTN=1.445575E+09
+    PHIC=3.305460E-08
+    GRAD=5.683025E-04
+    NuBT=1
+    CPU =0.062299
+
+ITER: 108
+    HPWL=1497299.875000
+    OVFL=0.790712
+    HPWL=(775012.625000, 722287.250000)
+    POTN=1.441492E+09
+    PHIC=3.470733E-08
+    GRAD=5.631418E-04
+    NuBT=1
+    CPU =0.062317
+
+ITER: 109
+    HPWL=1497201.000000
+    OVFL=0.790484
+    HPWL=(774985.812500, 722215.125000)
+    POTN=1.437375E+09
+    PHIC=3.644270E-08
+    GRAD=5.578148E-04
+    NuBT=1
+    CPU =0.062427
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0110.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0110.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0110.jpg image has been saved
+
+ITER: 110
+    HPWL=1497002.250000
+    OVFL=0.790397
+    HPWL=(774855.125000, 722147.125000)
+    POTN=1.433333E+09
+    PHIC=3.826483E-08
+    GRAD=5.529074E-04
+    NuBT=1
+    CPU =0.120602
+
+ITER: 111
+    HPWL=1496867.000000
+    OVFL=0.790278
+    HPWL=(774807.500000, 722059.437500)
+    POTN=1.429209E+09
+    PHIC=4.017807E-08
+    GRAD=5.478627E-04
+    NuBT=1
+    CPU =0.062665
+
+ITER: 112
+    HPWL=1496654.625000
+    OVFL=0.790229
+    HPWL=(774665.125000, 721989.500000)
+    POTN=1.425221E+09
+    PHIC=4.218698E-08
+    GRAD=5.429792E-04
+    NuBT=1
+    CPU =0.062168
+
+ITER: 113
+    HPWL=1496547.000000
+    OVFL=0.790126
+    HPWL=(774630.250000, 721916.812500)
+    POTN=1.421220E+09
+    PHIC=4.429632E-08
+    GRAD=5.374031E-04
+    NuBT=1
+    CPU =0.063248
+
+ITER: 114
+    HPWL=1496356.500000
+    OVFL=0.790100
+    HPWL=(774495.312500, 721861.125000)
+    POTN=1.417329E+09
+    PHIC=4.651114E-08
+    GRAD=5.317164E-04
+    NuBT=1
+    CPU =0.062430
+
+ITER: 115
+    HPWL=1496276.250000
+    OVFL=0.789988
+    HPWL=(774473.000000, 721803.312500)
+    POTN=1.413385E+09
+    PHIC=4.883669E-08
+    GRAD=5.259358E-04
+    NuBT=1
+    CPU =0.062215
+
+ITER: 116
+    HPWL=1496118.625000
+    OVFL=0.789958
+    HPWL=(774354.375000, 721764.250000)
+    POTN=1.409491E+09
+    PHIC=5.127852E-08
+    GRAD=5.209406E-04
+    NuBT=1
+    CPU =0.062337
+
+ITER: 117
+    HPWL=1496067.125000
+    OVFL=0.789890
+    HPWL=(774346.937500, 721720.187500)
+    POTN=1.405587E+09
+    PHIC=5.384245E-08
+    GRAD=5.162425E-04
+    NuBT=1
+    CPU =0.062190
+
+ITER: 118
+    HPWL=1495933.125000
+    OVFL=0.789838
+    HPWL=(774241.812500, 721691.312500)
+    POTN=1.401842E+09
+    PHIC=5.653456E-08
+    GRAD=5.114856E-04
+    NuBT=1
+    CPU =0.062233
+
+ITER: 119
+    HPWL=1495920.250000
+    OVFL=0.789715
+    HPWL=(774259.062500, 721661.187500)
+    POTN=1.398091E+09
+    PHIC=5.936129E-08
+    GRAD=5.067141E-04
+    NuBT=1
+    CPU =0.062246
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0120.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0120.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0120.jpg image has been saved
+
+ITER: 120
+    HPWL=1495806.500000
+    OVFL=0.789666
+    HPWL=(774166.312500, 721640.125000)
+    POTN=1.394466E+09
+    PHIC=6.232935E-08
+    GRAD=5.025104E-04
+    NuBT=1
+    CPU =0.121721
+
+ITER: 121
+    HPWL=1495799.500000
+    OVFL=0.789550
+    HPWL=(774189.125000, 721610.375000)
+    POTN=1.390822E+09
+    PHIC=6.544581E-08
+    GRAD=4.989151E-04
+    NuBT=1
+    CPU =0.062687
+
+ITER: 122
+    HPWL=1495691.125000
+    OVFL=0.789479
+    HPWL=(774102.812500, 721588.312500)
+    POTN=1.387243E+09
+    PHIC=6.871810E-08
+    GRAD=4.955346E-04
+    NuBT=1
+    CPU =0.062508
+
+ITER: 123
+    HPWL=1495692.250000
+    OVFL=0.789350
+    HPWL=(774133.500000, 721558.750000)
+    POTN=1.383588E+09
+    PHIC=7.215399E-08
+    GRAD=4.924207E-04
+    NuBT=1
+    CPU =0.062302
+
+ITER: 124
+    HPWL=1495577.500000
+    OVFL=0.789279
+    HPWL=(774048.437500, 721529.062500)
+    POTN=1.379963E+09
+    PHIC=7.576169E-08
+    GRAD=4.895701E-04
+    NuBT=1
+    CPU =0.062292
+
+ITER: 125
+    HPWL=1495567.500000
+    OVFL=0.789159
+    HPWL=(774079.437500, 721488.062500)
+    POTN=1.376306E+09
+    PHIC=7.954977E-08
+    GRAD=4.874612E-04
+    NuBT=1
+    CPU =0.062441
+
+ITER: 126
+    HPWL=1495449.000000
+    OVFL=0.789113
+    HPWL=(773996.375000, 721452.625000)
+    POTN=1.372690E+09
+    PHIC=8.352725E-08
+    GRAD=4.858940E-04
+    NuBT=1
+    CPU =0.062272
+
+ITER: 127
+    HPWL=1495440.000000
+    OVFL=0.789006
+    HPWL=(774034.812500, 721405.125000)
+    POTN=1.369028E+09
+    PHIC=8.770361E-08
+    GRAD=4.851719E-04
+    NuBT=1
+    CPU =0.062238
+
+ITER: 128
+    HPWL=1495322.625000
+    OVFL=0.788953
+    HPWL=(773957.125000, 721365.500000)
+    POTN=1.365452E+09
+    PHIC=9.208879E-08
+    GRAD=4.846838E-04
+    NuBT=1
+    CPU =0.063312
+
+ITER: 129
+    HPWL=1495320.125000
+    OVFL=0.788846
+    HPWL=(774001.062500, 721319.062500)
+    POTN=1.361744E+09
+    PHIC=9.669323E-08
+    GRAD=4.848677E-04
+    NuBT=1
+    CPU =0.062293
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0130.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0130.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0130.jpg image has been saved
+
+ITER: 130
+    HPWL=1495213.375000
+    OVFL=0.788778
+    HPWL=(773931.750000, 721281.625000)
+    POTN=1.357981E+09
+    PHIC=1.015279E-07
+    GRAD=4.858135E-04
+    NuBT=1
+    CPU =0.121199
+
+ITER: 131
+    HPWL=1495220.000000
+    OVFL=0.788666
+    HPWL=(773982.750000, 721237.312500)
+    POTN=1.354080E+09
+    PHIC=1.066042E-07
+    GRAD=4.881769E-04
+    NuBT=1
+    CPU =0.078301
+
+ITER: 132
+    HPWL=1495116.250000
+    OVFL=0.788615
+    HPWL=(773916.187500, 721200.062500)
+    POTN=1.350152E+09
+    PHIC=1.119344E-07
+    GRAD=4.908364E-04
+    NuBT=1
+    CPU =0.078117
+
+ITER: 133
+    HPWL=1495123.500000
+    OVFL=0.788507
+    HPWL=(773966.312500, 721157.125000)
+    POTN=1.346157E+09
+    PHIC=1.175310E-07
+    GRAD=4.942913E-04
+    NuBT=1
+    CPU =0.078119
+
+ITER: 134
+    HPWL=1495026.125000
+    OVFL=0.788434
+    HPWL=(773900.562500, 721125.562500)
+    POTN=1.342216E+09
+    PHIC=1.234075E-07
+    GRAD=4.982623E-04
+    NuBT=1
+    CPU =0.078604
+
+ITER: 135
+    HPWL=1495042.750000
+    OVFL=0.788318
+    HPWL=(773952.000000, 721090.687500)
+    POTN=1.338201E+09
+    PHIC=1.295776E-07
+    GRAD=5.035651E-04
+    NuBT=1
+    CPU =0.062410
+
+ITER: 136
+    HPWL=1494943.500000
+    OVFL=0.788250
+    HPWL=(773882.000000, 721061.437500)
+    POTN=1.334201E+09
+    PHIC=1.360564E-07
+    GRAD=5.099738E-04
+    NuBT=1
+    CPU =0.062453
+
+ITER: 137
+    HPWL=1494953.125000
+    OVFL=0.788114
+    HPWL=(773924.812500, 721028.312500)
+    POTN=1.330146E+09
+    PHIC=1.428591E-07
+    GRAD=5.178525E-04
+    NuBT=1
+    CPU =0.062370
+
+ITER: 138
+    HPWL=1494854.000000
+    OVFL=0.788074
+    HPWL=(773852.875000, 721001.062500)
+    POTN=1.326090E+09
+    PHIC=1.500020E-07
+    GRAD=5.264427E-04
+    NuBT=1
+    CPU =0.062413
+
+ITER: 139
+    HPWL=1494847.500000
+    OVFL=0.787962
+    HPWL=(773884.750000, 720962.750000)
+    POTN=1.321972E+09
+    PHIC=1.575021E-07
+    GRAD=5.363978E-04
+    NuBT=1
+    CPU =0.062298
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0140.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0140.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0140.jpg image has been saved
+
+ITER: 140
+    HPWL=1494745.000000
+    OVFL=0.787894
+    HPWL=(773811.437500, 720933.500000)
+    POTN=1.317854E+09
+    PHIC=1.653772E-07
+    GRAD=5.469777E-04
+    NuBT=1
+    CPU =0.121062
+
+ITER: 141
+    HPWL=1494739.625000
+    OVFL=0.787755
+    HPWL=(773842.562500, 720897.062500)
+    POTN=1.313654E+09
+    PHIC=1.736460E-07
+    GRAD=5.590363E-04
+    NuBT=1
+    CPU =0.063486
+
+ITER: 142
+    HPWL=1494632.125000
+    OVFL=0.787681
+    HPWL=(773768.812500, 720863.312500)
+    POTN=1.309398E+09
+    PHIC=1.823283E-07
+    GRAD=5.720907E-04
+    NuBT=1
+    CPU =0.062437
+
+ITER: 143
+    HPWL=1494614.250000
+    OVFL=0.787542
+    HPWL=(773791.187500, 720823.062500)
+    POTN=1.305061E+09
+    PHIC=1.914447E-07
+    GRAD=5.872606E-04
+    NuBT=1
+    CPU =0.062347
+
+ITER: 144
+    HPWL=1494502.500000
+    OVFL=0.787459
+    HPWL=(773714.562500, 720787.875000)
+    POTN=1.300680E+09
+    PHIC=2.010170E-07
+    GRAD=6.030414E-04
+    NuBT=1
+    CPU =0.062279
+
+ITER: 145
+    HPWL=1494478.625000
+    OVFL=0.787318
+    HPWL=(773731.250000, 720747.375000)
+    POTN=1.296133E+09
+    PHIC=2.110678E-07
+    GRAD=6.208707E-04
+    NuBT=1
+    CPU =0.062387
+
+ITER: 146
+    HPWL=1494366.750000
+    OVFL=0.787240
+    HPWL=(773654.812500, 720712.000000)
+    POTN=1.291426E+09
+    PHIC=2.216212E-07
+    GRAD=6.396047E-04
+    NuBT=1
+    CPU =0.065364
+
+ITER: 147
+    HPWL=1494330.500000
+    OVFL=0.787085
+    HPWL=(773663.437500, 720667.125000)
+    POTN=1.286487E+09
+    PHIC=2.327022E-07
+    GRAD=6.608604E-04
+    NuBT=1
+    CPU =0.068942
+
+ITER: 148
+    HPWL=1494225.000000
+    OVFL=0.787023
+    HPWL=(773593.375000, 720631.562500)
+    POTN=1.281397E+09
+    PHIC=2.443373E-07
+    GRAD=6.828977E-04
+    NuBT=1
+    CPU =0.062339
+
+ITER: 149
+    HPWL=1494179.250000
+    OVFL=0.786906
+    HPWL=(773594.000000, 720585.250000)
+    POTN=1.276109E+09
+    PHIC=2.565542E-07
+    GRAD=7.076226E-04
+    NuBT=1
+    CPU =0.063307
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0150.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0150.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0150.jpg image has been saved
+
+ITER: 150
+    HPWL=1494082.875000
+    OVFL=0.786850
+    HPWL=(773528.250000, 720554.625000)
+    POTN=1.270686E+09
+    PHIC=2.693819E-07
+    GRAD=7.319934E-04
+    NuBT=1
+    CPU =0.121050
+
+ITER: 151
+    HPWL=1494049.500000
+    OVFL=0.786737
+    HPWL=(773529.875000, 720519.687500)
+    POTN=1.265086E+09
+    PHIC=2.828509E-07
+    GRAD=7.590806E-04
+    NuBT=1
+    CPU =0.062536
+
+ITER: 152
+    HPWL=1493976.375000
+    OVFL=0.786685
+    HPWL=(773479.812500, 720496.562500)
+    POTN=1.259406E+09
+    PHIC=2.969935E-07
+    GRAD=7.872102E-04
+    NuBT=1
+    CPU =0.062332
+
+ITER: 153
+    HPWL=1493959.250000
+    OVFL=0.786545
+    HPWL=(773487.812500, 720471.375000)
+    POTN=1.253536E+09
+    PHIC=3.118431E-07
+    GRAD=8.193423E-04
+    NuBT=1
+    CPU =0.062308
+
+ITER: 154
+    HPWL=1493905.500000
+    OVFL=0.786467
+    HPWL=(773445.687500, 720459.812500)
+    POTN=1.247608E+09
+    PHIC=3.274353E-07
+    GRAD=8.514756E-04
+    NuBT=1
+    CPU =0.062415
+
+ITER: 155
+    HPWL=1493910.250000
+    OVFL=0.786271
+    HPWL=(773469.187500, 720441.125000)
+    POTN=1.241449E+09
+    PHIC=3.438068E-07
+    GRAD=8.870608E-04
+    NuBT=1
+    CPU =0.062340
+
+ITER: 156
+    HPWL=1493850.375000
+    OVFL=0.786177
+    HPWL=(773415.250000, 720435.125000)
+    POTN=1.235200E+09
+    PHIC=3.609971E-07
+    GRAD=9.226188E-04
+    NuBT=1
+    CPU =0.063433
+
+ITER: 157
+    HPWL=1493850.750000
+    OVFL=0.785978
+    HPWL=(773437.562500, 720413.125000)
+    POTN=1.228727E+09
+    PHIC=3.790470E-07
+    GRAD=9.633828E-04
+    NuBT=1
+    CPU =0.062380
+
+ITER: 158
+    HPWL=1493768.000000
+    OVFL=0.785919
+    HPWL=(773368.500000, 720399.437500)
+    POTN=1.222097E+09
+    PHIC=3.979993E-07
+    GRAD=1.004148E-03
+    NuBT=1
+    CPU =0.062415
+
+ITER: 159
+    HPWL=1493756.750000
+    OVFL=0.785704
+    HPWL=(773393.375000, 720363.312500)
+    POTN=1.215145E+09
+    PHIC=4.178992E-07
+    GRAD=1.048612E-03
+    NuBT=1
+    CPU =0.062238
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0160.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0160.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0160.jpg image has been saved
+
+ITER: 160
+    HPWL=1493648.250000
+    OVFL=0.785686
+    HPWL=(773313.125000, 720335.187500)
+    POTN=1.208000E+09
+    PHIC=4.387942E-07
+    GRAD=1.091917E-03
+    NuBT=1
+    CPU =0.120519
+
+ITER: 161
+    HPWL=1493635.625000
+    OVFL=0.785444
+    HPWL=(773349.500000, 720286.125000)
+    POTN=1.200527E+09
+    PHIC=4.607338E-07
+    GRAD=1.140995E-03
+    NuBT=1
+    CPU =0.078211
+
+ITER: 162
+    HPWL=1493529.000000
+    OVFL=0.785446
+    HPWL=(773267.875000, 720261.187500)
+    POTN=1.192819E+09
+    PHIC=4.837705E-07
+    GRAD=1.189668E-03
+    NuBT=1
+    CPU =0.078019
+
+ITER: 163
+    HPWL=1493531.500000
+    OVFL=0.785198
+    HPWL=(773323.312500, 720208.125000)
+    POTN=1.184724E+09
+    PHIC=5.079589E-07
+    GRAD=1.244772E-03
+    NuBT=1
+    CPU =0.067763
+
+ITER: 164
+    HPWL=1493429.875000
+    OVFL=0.785184
+    HPWL=(773240.000000, 720189.875000)
+    POTN=1.176341E+09
+    PHIC=5.333568E-07
+    GRAD=1.297343E-03
+    NuBT=1
+    CPU =0.062263
+
+ITER: 165
+    HPWL=1493460.000000
+    OVFL=0.784936
+    HPWL=(773315.750000, 720144.250000)
+    POTN=1.167459E+09
+    PHIC=5.600223E-07
+    GRAD=1.356485E-03
+    NuBT=1
+    CPU =0.062343
+
+ITER: 166
+    HPWL=1493368.000000
+    OVFL=0.784881
+    HPWL=(773228.312500, 720139.687500)
+    POTN=1.158217E+09
+    PHIC=5.880233E-07
+    GRAD=1.412887E-03
+    NuBT=1
+    CPU =0.062212
+
+ITER: 167
+    HPWL=1493427.500000
+    OVFL=0.784657
+    HPWL=(773325.062500, 720102.437500)
+    POTN=1.148492E+09
+    PHIC=6.174193E-07
+    GRAD=1.477570E-03
+    NuBT=1
+    CPU =0.062345
+
+ITER: 168
+    HPWL=1493318.500000
+    OVFL=0.784545
+    HPWL=(773228.375000, 720090.187500)
+    POTN=1.138471E+09
+    PHIC=6.482902E-07
+    GRAD=1.537988E-03
+    NuBT=1
+    CPU =0.062231
+
+ITER: 169
+    HPWL=1493392.000000
+    OVFL=0.784219
+    HPWL=(773337.875000, 720054.187500)
+    POTN=1.127966E+09
+    PHIC=6.806977E-07
+    GRAD=1.608603E-03
+    NuBT=1
+    CPU =0.062280
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0170.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0170.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0170.jpg image has been saved
+
+ITER: 170
+    HPWL=1493268.250000
+    OVFL=0.784039
+    HPWL=(773229.000000, 720039.187500)
+    POTN=1.117231E+09
+    PHIC=7.147325E-07
+    GRAD=1.676640E-03
+    NuBT=1
+    CPU =0.121249
+
+ITER: 171
+    HPWL=1493306.750000
+    OVFL=0.783704
+    HPWL=(773321.875000, 719984.875000)
+    POTN=1.106149E+09
+    PHIC=7.504650E-07
+    GRAD=1.754730E-03
+    NuBT=1
+    CPU =0.062438
+
+ITER: 172
+    HPWL=1493131.000000
+    OVFL=0.783533
+    HPWL=(773179.687500, 719951.250000)
+    POTN=1.094894E+09
+    PHIC=7.879882E-07
+    GRAD=1.824113E-03
+    NuBT=1
+    CPU =0.062182
+
+ITER: 173
+    HPWL=1493144.250000
+    OVFL=0.783130
+    HPWL=(773258.062500, 719886.250000)
+    POTN=1.083193E+09
+    PHIC=8.273861E-07
+    GRAD=1.905347E-03
+    NuBT=1
+    CPU =0.062109
+
+ITER: 174
+    HPWL=1492941.000000
+    OVFL=0.782961
+    HPWL=(773098.812500, 719842.125000)
+    POTN=1.071236E+09
+    PHIC=8.687554E-07
+    GRAD=1.980118E-03
+    NuBT=1
+    CPU =0.062234
+
+ITER: 175
+    HPWL=1492935.250000
+    OVFL=0.782631
+    HPWL=(773175.187500, 719760.125000)
+    POTN=1.058802E+09
+    PHIC=9.121931E-07
+    GRAD=2.068154E-03
+    NuBT=1
+    CPU =0.062179
+
+ITER: 176
+    HPWL=1492697.125000
+    OVFL=0.782493
+    HPWL=(772992.062500, 719705.062500)
+    POTN=1.046083E+09
+    PHIC=9.578027E-07
+    GRAD=2.145660E-03
+    NuBT=1
+    CPU =0.062291
+
+ITER: 177
+    HPWL=1492698.250000
+    OVFL=0.782121
+    HPWL=(773084.312500, 719613.875000)
+    POTN=1.032755E+09
+    PHIC=1.005693E-06
+    GRAD=2.238492E-03
+    NuBT=1
+    CPU =0.062295
+
+ITER: 178
+    HPWL=1492444.625000
+    OVFL=0.782040
+    HPWL=(772896.812500, 719547.812500)
+    POTN=1.018996E+09
+    PHIC=1.055977E-06
+    GRAD=2.321053E-03
+    NuBT=1
+    CPU =0.063318
+
+ITER: 179
+    HPWL=1492467.375000
+    OVFL=0.781619
+    HPWL=(773022.000000, 719445.375000)
+    POTN=1.004558E+09
+    PHIC=1.108773E-06
+    GRAD=2.420508E-03
+    NuBT=1
+    CPU =0.062177
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0180.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0180.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0180.jpg image has been saved
+
+ITER: 180
+    HPWL=1492248.500000
+    OVFL=0.781451
+    HPWL=(772841.250000, 719407.312500)
+    POTN=9.898051E+08
+    PHIC=1.164211E-06
+    GRAD=2.506576E-03
+    NuBT=1
+    CPU =0.121028
+
+ITER: 181
+    HPWL=1492351.125000
+    OVFL=0.781002
+    HPWL=(773025.812500, 719325.312500)
+    POTN=9.745222E+08
+    PHIC=1.222404E-06
+    GRAD=2.615092E-03
+    NuBT=1
+    CPU =0.078278
+
+ITER: 182
+    HPWL=1492142.625000
+    OVFL=0.780841
+    HPWL=(772826.187500, 719316.437500)
+    POTN=9.589388E+08
+    PHIC=1.283524E-06
+    GRAD=2.705939E-03
+    NuBT=1
+    CPU =0.077964
+
+ITER: 183
+    HPWL=1492288.750000
+    OVFL=0.780449
+    HPWL=(773033.437500, 719255.375000)
+    POTN=9.426959E+08
+    PHIC=1.347673E-06
+    GRAD=2.817885E-03
+    NuBT=1
+    CPU =0.077902
+
+ITER: 184
+    HPWL=1492086.125000
+    OVFL=0.780179
+    HPWL=(772809.000000, 719277.125000)
+    POTN=9.259960E+08
+    PHIC=1.415056E-06
+    GRAD=2.910127E-03
+    NuBT=1
+    CPU =0.072520
+
+ITER: 185
+    HPWL=1492276.750000
+    OVFL=0.779570
+    HPWL=(773059.062500, 719217.625000)
+    POTN=9.085756E+08
+    PHIC=1.485769E-06
+    GRAD=3.030542E-03
+    NuBT=1
+    CPU =0.062350
+
+ITER: 186
+    HPWL=1492041.375000
+    OVFL=0.779309
+    HPWL=(772822.687500, 719218.687500)
+    POTN=8.907574E+08
+    PHIC=1.560057E-06
+    GRAD=3.134783E-03
+    NuBT=1
+    CPU =0.062264
+
+ITER: 187
+    HPWL=1492108.625000
+    OVFL=0.778748
+    HPWL=(773056.250000, 719052.375000)
+    POTN=8.721997E+08
+    PHIC=1.638044E-06
+    GRAD=3.269864E-03
+    NuBT=1
+    CPU =0.062262
+
+ITER: 188
+    HPWL=1491854.500000
+    OVFL=0.778563
+    HPWL=(772788.125000, 719066.437500)
+    POTN=8.533873E+08
+    PHIC=1.719947E-06
+    GRAD=3.391464E-03
+    NuBT=1
+    CPU =0.062264
+
+ITER: 189
+    HPWL=1491890.250000
+    OVFL=0.777953
+    HPWL=(773011.687500, 718878.500000)
+    POTN=8.339996E+08
+    PHIC=1.805935E-06
+    GRAD=3.548775E-03
+    NuBT=1
+    CPU =0.062304
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0190.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0190.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0190.jpg image has been saved
+
+ITER: 190
+    HPWL=1491921.375000
+    OVFL=0.777921
+    HPWL=(772773.250000, 719148.125000)
+    POTN=8.147750E+08
+    PHIC=1.896223E-06
+    GRAD=3.730578E-03
+    NuBT=1
+    CPU =0.120558
+
+ITER: 191
+    HPWL=1491901.250000
+    OVFL=0.777250
+    HPWL=(772940.187500, 718961.125000)
+    POTN=7.950384E+08
+    PHIC=1.991034E-06
+    GRAD=3.958498E-03
+    NuBT=1
+    CPU =0.071471
+
+ITER: 192
+    HPWL=1492411.750000
+    OVFL=0.777174
+    HPWL=(772750.250000, 719661.500000)
+    POTN=7.753929E+08
+    PHIC=2.090435E-06
+    GRAD=4.244678E-03
+    NuBT=1
+    CPU =0.071779
+
+ITER: 193
+    HPWL=1492429.125000
+    OVFL=0.776252
+    HPWL=(772847.625000, 719581.500000)
+    POTN=7.548533E+08
+    PHIC=2.194951E-06
+    GRAD=4.442547E-03
+    NuBT=1
+    CPU =0.064433
+
+ITER: 194
+    HPWL=1492879.750000
+    OVFL=0.776266
+    HPWL=(772646.000000, 720233.687500)
+    POTN=7.342293E+08
+    PHIC=2.304552E-06
+    GRAD=4.637977E-03
+    NuBT=1
+    CPU =0.063222
+
+ITER: 195
+    HPWL=1492685.000000
+    OVFL=0.775243
+    HPWL=(772791.250000, 719893.812500)
+    POTN=7.122602E+08
+    PHIC=2.419780E-06
+    GRAD=4.777532E-03
+    NuBT=1
+    CPU =0.062190
+
+ITER: 196
+    HPWL=1493227.500000
+    OVFL=0.775045
+    HPWL=(772786.937500, 720440.500000)
+    POTN=6.906044E+08
+    PHIC=2.540574E-06
+    GRAD=4.960365E-03
+    NuBT=1
+    CPU =0.062325
+
+ITER: 197
+    HPWL=1493004.875000
+    OVFL=0.773995
+    HPWL=(773033.500000, 719971.375000)
+    POTN=6.681871E+08
+    PHIC=2.667603E-06
+    GRAD=5.202049E-03
+    NuBT=1
+    CPU =0.062328
+
+ITER: 198
+    HPWL=1493464.000000
+    OVFL=0.773652
+    HPWL=(773061.937500, 720402.000000)
+    POTN=6.466399E+08
+    PHIC=2.800802E-06
+    GRAD=5.425036E-03
+    NuBT=1
+    CPU =0.062188
+
+ITER: 199
+    HPWL=1492938.750000
+    OVFL=0.772357
+    HPWL=(773148.937500, 719789.875000)
+    POTN=6.244354E+08
+    PHIC=2.940842E-06
+    GRAD=5.615875E-03
+    NuBT=1
+    CPU =0.063183
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0200.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0200.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0200.jpg image has been saved
+
+ITER: 200
+    HPWL=1493395.125000
+    OVFL=0.771713
+    HPWL=(773134.562500, 720260.562500)
+    POTN=6.027757E+08
+    PHIC=3.087685E-06
+    GRAD=5.822754E-03
+    NuBT=1
+    CPU =0.120813
+
+ITER: 201
+    HPWL=1492908.500000
+    OVFL=0.770595
+    HPWL=(773194.750000, 719713.812500)
+    POTN=5.802336E+08
+    PHIC=3.242069E-06
+    GRAD=6.034510E-03
+    NuBT=1
+    CPU =0.062305
+
+ITER: 202
+    HPWL=1493174.250000
+    OVFL=0.770179
+    HPWL=(772917.937500, 720256.312500)
+    POTN=5.586663E+08
+    PHIC=3.404044E-06
+    GRAD=6.261148E-03
+    NuBT=1
+    CPU =0.062104
+
+ITER: 203
+    HPWL=1492739.750000
+    OVFL=0.768676
+    HPWL=(773045.687500, 719694.062500)
+    POTN=5.366915E+08
+    PHIC=3.574247E-06
+    GRAD=6.441637E-03
+    NuBT=1
+    CPU =0.062242
+
+ITER: 204
+    HPWL=1492742.500000
+    OVFL=0.767897
+    HPWL=(772553.250000, 720189.250000)
+    POTN=5.156781E+08
+    PHIC=3.752958E-06
+    GRAD=6.638906E-03
+    NuBT=1
+    CPU =0.062035
+
+ITER: 205
+    HPWL=1492212.750000
+    OVFL=0.766426
+    HPWL=(772740.500000, 719472.312500)
+    POTN=4.938863E+08
+    PHIC=3.940605E-06
+    GRAD=6.844903E-03
+    NuBT=1
+    CPU =0.062004
+
+ITER: 206
+    HPWL=1491959.000000
+    OVFL=0.766099
+    HPWL=(772217.000000, 719742.062500)
+    POTN=4.728943E+08
+    PHIC=4.137636E-06
+    GRAD=7.056798E-03
+    NuBT=1
+    CPU =0.063024
+
+ITER: 207
+    HPWL=1491332.750000
+    OVFL=0.765145
+    HPWL=(772459.312500, 718873.375000)
+    POTN=4.519126E+08
+    PHIC=4.344517E-06
+    GRAD=7.233859E-03
+    NuBT=1
+    CPU =0.061996
+
+ITER: 208
+    HPWL=1491167.875000
+    OVFL=0.764559
+    HPWL=(772025.750000, 719142.125000)
+    POTN=4.318816E+08
+    PHIC=4.561743E-06
+    GRAD=7.381123E-03
+    NuBT=1
+    CPU =0.062078
+
+ITER: 209
+    HPWL=1490998.750000
+    OVFL=0.762476
+    HPWL=(772443.437500, 718555.312500)
+    POTN=4.116709E+08
+    PHIC=4.789829E-06
+    GRAD=7.539986E-03
+    NuBT=1
+    CPU =0.062002
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0210.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0210.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0210.jpg image has been saved
+
+ITER: 210
+    HPWL=1491165.500000
+    OVFL=0.761619
+    HPWL=(772096.250000, 719069.187500)
+    POTN=3.923597E+08
+    PHIC=5.029202E-06
+    GRAD=7.762355E-03
+    NuBT=1
+    CPU =0.120003
+
+ITER: 211
+    HPWL=1490821.750000
+    OVFL=0.760086
+    HPWL=(772388.187500, 718433.500000)
+    POTN=3.731800E+08
+    PHIC=5.280662E-06
+    GRAD=7.986196E-03
+    NuBT=1
+    CPU =0.062270
+
+ITER: 212
+    HPWL=1490763.250000
+    OVFL=0.759932
+    HPWL=(771921.250000, 718842.000000)
+    POTN=3.551619E+08
+    PHIC=5.544695E-06
+    GRAD=8.149817E-03
+    NuBT=1
+    CPU =0.062126
+
+ITER: 213
+    HPWL=1490462.000000
+    OVFL=0.757705
+    HPWL=(772019.125000, 718442.937500)
+    POTN=3.371091E+08
+    PHIC=5.821929E-06
+    GRAD=8.257227E-03
+    NuBT=1
+    CPU =0.062916
+
+ITER: 214
+    HPWL=1490683.625000
+    OVFL=0.757566
+    HPWL=(771650.125000, 719033.500000)
+    POTN=3.200521E+08
+    PHIC=6.112835E-06
+    GRAD=8.418936E-03
+    NuBT=1
+    CPU =0.062064
+
+ITER: 215
+    HPWL=1490140.750000
+    OVFL=0.755314
+    HPWL=(771743.437500, 718397.312500)
+    POTN=3.036284E+08
+    PHIC=6.418476E-06
+    GRAD=8.612748E-03
+    NuBT=1
+    CPU =0.061959
+
+ITER: 216
+    HPWL=1490309.125000
+    OVFL=0.755004
+    HPWL=(771293.625000, 719015.500000)
+    POTN=2.886258E+08
+    PHIC=6.739240E-06
+    GRAD=8.774680E-03
+    NuBT=1
+    CPU =0.061929
+
+ITER: 217
+    HPWL=1489779.250000
+    OVFL=0.753390
+    HPWL=(771150.562500, 718628.687500)
+    POTN=2.734136E+08
+    PHIC=7.076202E-06
+    GRAD=8.893170E-03
+    NuBT=1
+    CPU =0.061932
+
+ITER: 218
+    HPWL=1490071.250000
+    OVFL=0.752247
+    HPWL=(770761.250000, 719310.062500)
+    POTN=2.596906E+08
+    PHIC=7.429706E-06
+    GRAD=9.000894E-03
+    NuBT=1
+    CPU =0.062073
+
+ITER: 219
+    HPWL=1489750.750000
+    OVFL=0.750459
+    HPWL=(770891.375000, 718859.312500)
+    POTN=2.468896E+08
+    PHIC=7.801191E-06
+    GRAD=9.139208E-03
+    NuBT=1
+    CPU =0.061920
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0220.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0220.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0220.jpg image has been saved
+
+ITER: 220
+    HPWL=1490540.500000
+    OVFL=0.749471
+    HPWL=(770857.562500, 719683.000000)
+    POTN=2.354144E+08
+    PHIC=8.190338E-06
+    GRAD=9.292245E-03
+    NuBT=1
+    CPU =0.119920
+
+ITER: 221
+    HPWL=1490432.375000
+    OVFL=0.748096
+    HPWL=(771056.687500, 719375.687500)
+    POTN=2.239448E+08
+    PHIC=8.599854E-06
+    GRAD=9.390684E-03
+    NuBT=1
+    CPU =0.077915
+
+ITER: 222
+    HPWL=1491234.250000
+    OVFL=0.747418
+    HPWL=(770855.187500, 720379.062500)
+    POTN=2.138774E+08
+    PHIC=9.028826E-06
+    GRAD=9.449354E-03
+    NuBT=1
+    CPU =0.077672
+
+ITER: 223
+    HPWL=1490723.750000
+    OVFL=0.745664
+    HPWL=(770820.562500, 719903.250000)
+    POTN=2.046552E+08
+    PHIC=9.480266E-06
+    GRAD=9.491226E-03
+    NuBT=1
+    CPU =0.077569
+
+ITER: 224
+    HPWL=1491384.625000
+    OVFL=0.744748
+    HPWL=(770720.687500, 720663.937500)
+    POTN=1.966861E+08
+    PHIC=9.953351E-06
+    GRAD=9.529750E-03
+    NuBT=1
+    CPU =0.077635
+
+ITER: 225
+    HPWL=1490848.375000
+    OVFL=0.743298
+    HPWL=(770664.687500, 720183.687500)
+    POTN=1.890844E+08
+    PHIC=1.045102E-05
+    GRAD=9.557181E-03
+    NuBT=1
+    CPU =0.077534
+
+ITER: 226
+    HPWL=1491266.375000
+    OVFL=0.741475
+    HPWL=(770490.750000, 720775.625000)
+    POTN=1.830846E+08
+    PHIC=1.097292E-05
+    GRAD=9.538421E-03
+    NuBT=1
+    CPU =0.077313
+
+ITER: 227
+    HPWL=1490746.000000
+    OVFL=0.739084
+    HPWL=(770448.625000, 720297.375000)
+    POTN=1.771961E+08
+    PHIC=1.152157E-05
+    GRAD=9.495507E-03
+    NuBT=1
+    CPU =0.064494
+
+ITER: 228
+    HPWL=1491636.500000
+    OVFL=0.738350
+    HPWL=(770461.187500, 721175.250000)
+    POTN=1.727019E+08
+    PHIC=1.209613E-05
+    GRAD=9.485665E-03
+    NuBT=1
+    CPU =0.061719
+
+ITER: 229
+    HPWL=1490889.375000
+    OVFL=0.735859
+    HPWL=(770177.562500, 720711.812500)
+    POTN=1.687083E+08
+    PHIC=1.270093E-05
+    GRAD=9.412360E-03
+    NuBT=1
+    CPU =0.061837
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0230.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0230.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0230.jpg image has been saved
+
+ITER: 230
+    HPWL=1491662.500000
+    OVFL=0.735570
+    HPWL=(770145.875000, 721516.562500)
+    POTN=1.655213E+08
+    PHIC=1.333452E-05
+    GRAD=9.236627E-03
+    NuBT=1
+    CPU =0.118023
+
+ITER: 231
+    HPWL=1491008.500000
+    OVFL=0.732473
+    HPWL=(770024.312500, 720984.250000)
+    POTN=1.629754E+08
+    PHIC=1.400125E-05
+    GRAD=9.035371E-03
+    NuBT=1
+    CPU =0.077606
+
+ITER: 232
+    HPWL=1492238.375000
+    OVFL=0.731369
+    HPWL=(770043.062500, 722195.312500)
+    POTN=1.608694E+08
+    PHIC=1.469876E-05
+    GRAD=8.857375E-03
+    NuBT=1
+    CPU =0.077436
+
+ITER: 233
+    HPWL=1492245.375000
+    OVFL=0.729586
+    HPWL=(769843.812500, 722401.562500)
+    POTN=1.588387E+08
+    PHIC=1.543368E-05
+    GRAD=8.690582E-03
+    NuBT=1
+    CPU =0.073518
+
+ITER: 234
+    HPWL=1493426.750000
+    OVFL=0.728324
+    HPWL=(769943.750000, 723483.000000)
+    POTN=1.576085E+08
+    PHIC=1.620267E-05
+    GRAD=8.416941E-03
+    NuBT=1
+    CPU =0.061757
+
+ITER: 235
+    HPWL=1492950.750000
+    OVFL=0.725187
+    HPWL=(769748.375000, 723202.437500)
+    POTN=1.564531E+08
+    PHIC=1.701280E-05
+    GRAD=8.087089E-03
+    NuBT=1
+    CPU =0.061638
+
+ITER: 236
+    HPWL=1494241.750000
+    OVFL=0.724209
+    HPWL=(769958.687500, 724283.062500)
+    POTN=1.552415E+08
+    PHIC=1.786019E-05
+    GRAD=7.798888E-03
+    NuBT=1
+    CPU =0.061685
+
+ITER: 237
+    HPWL=1494009.250000
+    OVFL=0.722053
+    HPWL=(770135.000000, 723874.250000)
+    POTN=1.542179E+08
+    PHIC=1.875320E-05
+    GRAD=7.503435E-03
+    NuBT=1
+    CPU =0.061537
+
+ITER: 238
+    HPWL=1495557.500000
+    OVFL=0.719895
+    HPWL=(770697.562500, 724859.937500)
+    POTN=1.530638E+08
+    PHIC=1.968656E-05
+    GRAD=7.140190E-03
+    NuBT=1
+    CPU =0.061766
+
+ITER: 239
+    HPWL=1495956.250000
+    OVFL=0.717890
+    HPWL=(770943.187500, 725013.062500)
+    POTN=1.515124E+08
+    PHIC=2.066973E-05
+    GRAD=6.765192E-03
+    NuBT=1
+    CPU =0.061631
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0240.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0240.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0240.jpg image has been saved
+
+ITER: 240
+    HPWL=1497324.750000
+    OVFL=0.716846
+    HPWL=(771442.625000, 725882.187500)
+    POTN=1.497028E+08
+    PHIC=2.169902E-05
+    GRAD=6.438523E-03
+    NuBT=1
+    CPU =0.119240
+
+ITER: 241
+    HPWL=1497570.750000
+    OVFL=0.714276
+    HPWL=(771723.125000, 725847.562500)
+    POTN=1.475089E+08
+    PHIC=2.278318E-05
+    GRAD=6.096779E-03
+    NuBT=1
+    CPU =0.061862
+
+ITER: 242
+    HPWL=1499406.500000
+    OVFL=0.713839
+    HPWL=(772482.062500, 726924.500000)
+    POTN=1.448355E+08
+    PHIC=2.391615E-05
+    GRAD=5.778368E-03
+    NuBT=1
+    CPU =0.061780
+
+ITER: 243
+    HPWL=1500495.250000
+    OVFL=0.712170
+    HPWL=(772916.562500, 727578.687500)
+    POTN=1.415428E+08
+    PHIC=2.510810E-05
+    GRAD=5.517118E-03
+    NuBT=1
+    CPU =0.061737
+
+ITER: 244
+    HPWL=1503302.750000
+    OVFL=0.710244
+    HPWL=(773915.500000, 729387.187500)
+    POTN=1.376687E+08
+    PHIC=2.635307E-05
+    GRAD=5.368236E-03
+    NuBT=1
+    CPU =0.061641
+
+ITER: 245
+    HPWL=1505726.875000
+    OVFL=0.709194
+    HPWL=(775128.875000, 730598.000000)
+    POTN=1.329939E+08
+    PHIC=2.766126E-05
+    GRAD=5.387577E-03
+    NuBT=1
+    CPU =0.062255
+
+ITER: 246
+    HPWL=1508836.250000
+    OVFL=0.707946
+    HPWL=(776402.375000, 732433.812500)
+    POTN=1.278388E+08
+    PHIC=2.903159E-05
+    GRAD=5.631971E-03
+    NuBT=1
+    CPU =0.061719
+
+ITER: 247
+    HPWL=1512207.750000
+    OVFL=0.706543
+    HPWL=(778029.000000, 734178.812500)
+    POTN=1.218456E+08
+    PHIC=3.046868E-05
+    GRAD=5.981423E-03
+    NuBT=1
+    CPU =0.061899
+
+ITER: 248
+    HPWL=1517039.500000
+    OVFL=0.705019
+    HPWL=(780132.937500, 736906.500000)
+    POTN=1.153560E+08
+    PHIC=3.197032E-05
+    GRAD=6.463460E-03
+    NuBT=1
+    CPU =0.062782
+
+ITER: 249
+    HPWL=1521488.750000
+    OVFL=0.702462
+    HPWL=(782248.312500, 739240.500000)
+    POTN=1.082988E+08
+    PHIC=3.354778E-05
+    GRAD=7.063017E-03
+    NuBT=1
+    CPU =0.061647
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0250.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0250.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0250.jpg image has been saved
+
+ITER: 250
+    HPWL=1526810.000000
+    OVFL=0.701366
+    HPWL=(784733.812500, 742076.187500)
+    POTN=1.008296E+08
+    PHIC=3.519875E-05
+    GRAD=7.783716E-03
+    NuBT=1
+    CPU =0.117757
+
+ITER: 251
+    HPWL=1530990.625000
+    OVFL=0.698990
+    HPWL=(787032.437500, 743958.187500)
+    POTN=9.299914E+07
+    PHIC=3.693690E-05
+    GRAD=8.466859E-03
+    NuBT=1
+    CPU =0.062014
+
+ITER: 252
+    HPWL=1536561.125000
+    OVFL=0.698297
+    HPWL=(789602.812500, 746958.312500)
+    POTN=8.508941E+07
+    PHIC=3.875329E-05
+    GRAD=9.160735E-03
+    NuBT=1
+    CPU =0.061913
+
+ITER: 253
+    HPWL=1541389.250000
+    OVFL=0.695149
+    HPWL=(791946.812500, 749442.437500)
+    POTN=7.714071E+07
+    PHIC=4.066326E-05
+    GRAD=9.844759E-03
+    NuBT=1
+    CPU =0.061869
+
+ITER: 254
+    HPWL=1547605.250000
+    OVFL=0.694131
+    HPWL=(794696.812500, 752908.437500)
+    POTN=6.947326E+07
+    PHIC=4.265902E-05
+    GRAD=1.062134E-02
+    NuBT=1
+    CPU =0.061778
+
+ITER: 255
+    HPWL=1552485.500000
+    OVFL=0.691684
+    HPWL=(797251.187500, 755234.312500)
+    POTN=6.216646E+07
+    PHIC=4.476115E-05
+    GRAD=1.135387E-02
+    NuBT=1
+    CPU =0.061757
+
+ITER: 256
+    HPWL=1558632.750000
+    OVFL=0.690773
+    HPWL=(800034.312500, 758598.437500)
+    POTN=5.552985E+07
+    PHIC=4.695848E-05
+    GRAD=1.195444E-02
+    NuBT=1
+    CPU =0.062901
+
+ITER: 257
+    HPWL=1562954.625000
+    OVFL=0.688359
+    HPWL=(802103.250000, 760851.375000)
+    POTN=4.970942E+07
+    PHIC=4.927637E-05
+    GRAD=1.244298E-02
+    NuBT=1
+    CPU =0.061890
+
+ITER: 258
+    HPWL=1568695.500000
+    OVFL=0.686440
+    HPWL=(804624.000000, 764071.437500)
+    POTN=4.482657E+07
+    PHIC=5.169831E-05
+    GRAD=1.285127E-02
+    NuBT=1
+    CPU =0.061864
+
+ITER: 259
+    HPWL=1572729.375000
+    OVFL=0.684771
+    HPWL=(806596.250000, 766133.125000)
+    POTN=4.093967E+07
+    PHIC=5.425236E-05
+    GRAD=1.322572E-02
+    NuBT=1
+    CPU =0.061965
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0260.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0260.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0260.jpg image has been saved
+
+ITER: 260
+    HPWL=1577745.000000
+    OVFL=0.682800
+    HPWL=(808752.000000, 768993.000000)
+    POTN=3.821313E+07
+    PHIC=5.692470E-05
+    GRAD=1.343607E-02
+    NuBT=1
+    CPU =0.118211
+
+ITER: 261
+    HPWL=1580456.000000
+    OVFL=0.680475
+    HPWL=(809813.312500, 770642.625000)
+    POTN=3.657526E+07
+    PHIC=5.974808E-05
+    GRAD=1.347359E-02
+    NuBT=1
+    CPU =0.062712
+
+ITER: 262
+    HPWL=1584464.000000
+    OVFL=0.679330
+    HPWL=(811400.937500, 773063.125000)
+    POTN=3.595031E+07
+    PHIC=6.270003E-05
+    GRAD=1.339231E-02
+    NuBT=1
+    CPU =0.062082
+
+ITER: 263
+    HPWL=1586237.125000
+    OVFL=0.678292
+    HPWL=(812055.125000, 774182.000000)
+    POTN=3.617697E+07
+    PHIC=6.581857E-05
+    GRAD=1.314276E-02
+    NuBT=1
+    CPU =0.062979
+
+ITER: 264
+    HPWL=1589565.750000
+    OVFL=0.676200
+    HPWL=(813471.312500, 776094.437500)
+    POTN=3.711744E+07
+    PHIC=6.907707E-05
+    GRAD=1.259659E-02
+    NuBT=1
+    CPU =0.061982
+
+ITER: 265
+    HPWL=1590911.750000
+    OVFL=0.674370
+    HPWL=(814137.562500, 776774.125000)
+    POTN=3.848707E+07
+    PHIC=7.251715E-05
+    GRAD=1.197536E-02
+    NuBT=1
+    CPU =0.065475
+
+ITER: 266
+    HPWL=1593754.625000
+    OVFL=0.674306
+    HPWL=(815600.000000, 778154.625000)
+    POTN=4.007200E+07
+    PHIC=7.611249E-05
+    GRAD=1.127036E-02
+    NuBT=1
+    CPU =0.067381
+
+ITER: 267
+    HPWL=1594553.000000
+    OVFL=0.672512
+    HPWL=(816183.562500, 778369.375000)
+    POTN=4.159916E+07
+    PHIC=7.990911E-05
+    GRAD=1.034560E-02
+    NuBT=1
+    CPU =0.064155
+
+ITER: 268
+    HPWL=1597350.750000
+    OVFL=0.671192
+    HPWL=(817645.062500, 779705.625000)
+    POTN=4.284455E+07
+    PHIC=8.387147E-05
+    GRAD=9.237657E-03
+    NuBT=1
+    CPU =0.062486
+
+ITER: 269
+    HPWL=1598476.000000
+    OVFL=0.667884
+    HPWL=(818569.875000, 779906.187500)
+    POTN=4.359403E+07
+    PHIC=8.805107E-05
+    GRAD=8.265963E-03
+    NuBT=1
+    CPU =0.062107
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0270.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0270.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0270.jpg image has been saved
+
+ITER: 270
+    HPWL=1601950.500000
+    OVFL=0.666366
+    HPWL=(820497.937500, 781452.562500)
+    POTN=4.371170E+07
+    PHIC=9.240834E-05
+    GRAD=7.448148E-03
+    NuBT=1
+    CPU =0.119818
+
+ITER: 271
+    HPWL=1603628.250000
+    OVFL=0.664226
+    HPWL=(821647.250000, 781981.000000)
+    POTN=4.312008E+07
+    PHIC=9.700579E-05
+    GRAD=6.819187E-03
+    NuBT=1
+    CPU =0.062198
+
+ITER: 272
+    HPWL=1607918.250000
+    OVFL=0.662668
+    HPWL=(824047.437500, 783870.812500)
+    POTN=4.179315E+07
+    PHIC=1.017945E-04
+    GRAD=6.518370E-03
+    NuBT=1
+    CPU =0.062189
+
+ITER: 273
+    HPWL=1610898.000000
+    OVFL=0.660679
+    HPWL=(825946.062500, 784951.875000)
+    POTN=3.973773E+07
+    PHIC=1.068393E-04
+    GRAD=6.833241E-03
+    NuBT=1
+    CPU =0.061978
+
+ITER: 274
+    HPWL=1617003.750000
+    OVFL=0.658935
+    HPWL=(829335.250000, 787668.562500)
+    POTN=3.711750E+07
+    PHIC=1.120847E-04
+    GRAD=8.040110E-03
+    NuBT=1
+    CPU =0.062187
+
+ITER: 275
+    HPWL=1621992.500000
+    OVFL=0.656857
+    HPWL=(832238.750000, 789753.687500)
+    POTN=3.412636E+07
+    PHIC=1.176062E-04
+    GRAD=9.572998E-03
+    NuBT=1
+    CPU =0.061870
+
+ITER: 276
+    HPWL=1629058.000000
+    OVFL=0.655429
+    HPWL=(835770.875000, 793287.062500)
+    POTN=3.104391E+07
+    PHIC=1.233635E-04
+    GRAD=1.087019E-02
+    NuBT=1
+    CPU =0.061939
+
+ITER: 277
+    HPWL=1633741.250000
+    OVFL=0.652537
+    HPWL=(838474.812500, 795266.437500)
+    POTN=2.808991E+07
+    PHIC=1.294462E-04
+    GRAD=1.168074E-02
+    NuBT=1
+    CPU =0.062119
+
+ITER: 278
+    HPWL=1640281.500000
+    OVFL=0.651520
+    HPWL=(841702.250000, 798579.187500)
+    POTN=2.554561E+07
+    PHIC=1.357932E-04
+    GRAD=1.252070E-02
+    NuBT=1
+    CPU =0.062935
+
+ITER: 279
+    HPWL=1645111.250000
+    OVFL=0.648291
+    HPWL=(844460.375000, 800650.937500)
+    POTN=2.355754E+07
+    PHIC=1.424858E-04
+    GRAD=1.332545E-02
+    NuBT=1
+    CPU =0.061814
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0280.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0280.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0280.jpg image has been saved
+
+ITER: 280
+    HPWL=1651392.750000
+    OVFL=0.646179
+    HPWL=(847389.875000, 804002.875000)
+    POTN=2.227144E+07
+    PHIC=1.494776E-04
+    GRAD=1.382325E-02
+    NuBT=1
+    CPU =0.117993
+
+ITER: 281
+    HPWL=1654510.625000
+    OVFL=0.643502
+    HPWL=(849297.187500, 805213.437500)
+    POTN=2.170935E+07
+    PHIC=1.568825E-04
+    GRAD=1.398786E-02
+    NuBT=1
+    CPU =0.062146
+
+ITER: 282
+    HPWL=1658612.625000
+    OVFL=0.641458
+    HPWL=(851260.250000, 807352.375000)
+    POTN=2.182469E+07
+    PHIC=1.646313E-04
+    GRAD=1.373089E-02
+    NuBT=1
+    CPU =0.062019
+
+ITER: 283
+    HPWL=1659831.125000
+    OVFL=0.638569
+    HPWL=(852021.812500, 807809.312500)
+    POTN=2.243750E+07
+    PHIC=1.728332E-04
+    GRAD=1.319409E-02
+    NuBT=1
+    CPU =0.061831
+
+ITER: 284
+    HPWL=1662071.500000
+    OVFL=0.637568
+    HPWL=(852980.312500, 809091.187500)
+    POTN=2.333013E+07
+    PHIC=1.814175E-04
+    GRAD=1.234431E-02
+    NuBT=1
+    CPU =0.061899
+
+ITER: 285
+    HPWL=1662108.250000
+    OVFL=0.633636
+    HPWL=(853206.937500, 808901.375000)
+    POTN=2.423960E+07
+    PHIC=1.904874E-04
+    GRAD=1.123865E-02
+    NuBT=1
+    CPU =0.062921
+
+ITER: 286
+    HPWL=1664011.375000
+    OVFL=0.632461
+    HPWL=(854129.250000, 809882.125000)
+    POTN=2.498628E+07
+    PHIC=1.999581E-04
+    GRAD=9.952212E-03
+    NuBT=1
+    CPU =0.061892
+
+ITER: 287
+    HPWL=1664228.875000
+    OVFL=0.629889
+    HPWL=(854618.875000, 809610.000000)
+    POTN=2.535665E+07
+    PHIC=2.099496E-04
+    GRAD=8.753952E-03
+    NuBT=1
+    CPU =0.061960
+
+ITER: 288
+    HPWL=1666749.500000
+    OVFL=0.627709
+    HPWL=(856079.125000, 810670.437500)
+    POTN=2.524796E+07
+    PHIC=2.203687E-04
+    GRAD=7.684324E-03
+    NuBT=1
+    CPU =0.061907
+
+ITER: 289
+    HPWL=1668713.000000
+    OVFL=0.624597
+    HPWL=(857458.312500, 811254.625000)
+    POTN=2.458448E+07
+    PHIC=2.313231E-04
+    GRAD=7.102964E-03
+    NuBT=1
+    CPU =0.061774
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0290.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0290.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0290.jpg image has been saved
+
+ITER: 290
+    HPWL=1673499.750000
+    OVFL=0.621588
+    HPWL=(860249.187500, 813250.625000)
+    POTN=2.341157E+07
+    PHIC=2.427253E-04
+    GRAD=7.554790E-03
+    NuBT=1
+    CPU =0.118972
+
+ITER: 291
+    HPWL=1678598.750000
+    OVFL=0.618695
+    HPWL=(863352.125000, 815246.625000)
+    POTN=2.185244E+07
+    PHIC=2.546784E-04
+    GRAD=9.434043E-03
+    NuBT=1
+    CPU =0.062105
+
+ITER: 292
+    HPWL=1686498.000000
+    OVFL=0.616559
+    HPWL=(867586.375000, 818911.687500)
+    POTN=2.018988E+07
+    PHIC=2.671146E-04
+    GRAD=1.208234E-02
+    NuBT=1
+    CPU =0.062880
+
+ITER: 293
+    HPWL=1691723.500000
+    OVFL=0.612931
+    HPWL=(870738.687500, 820984.875000)
+    POTN=1.863702E+07
+    PHIC=2.802637E-04
+    GRAD=1.355901E-02
+    NuBT=1
+    CPU =0.061970
+
+ITER: 294
+    HPWL=1697253.750000
+    OVFL=0.610902
+    HPWL=(873672.562500, 823581.125000)
+    POTN=1.745308E+07
+    PHIC=2.940475E-04
+    GRAD=1.396695E-02
+    NuBT=1
+    CPU =0.061825
+
+ITER: 295
+    HPWL=1700685.250000
+    OVFL=0.607986
+    HPWL=(876013.937500, 824671.250000)
+    POTN=1.672628E+07
+    PHIC=3.086005E-04
+    GRAD=1.422187E-02
+    NuBT=1
+    CPU =0.061911
+
+ITER: 296
+    HPWL=1706035.250000
+    OVFL=0.605039
+    HPWL=(878999.375000, 827035.875000)
+    POTN=1.645113E+07
+    PHIC=3.237862E-04
+    GRAD=1.428584E-02
+    NuBT=1
+    CPU =0.061830
+
+ITER: 297
+    HPWL=1709155.750000
+    OVFL=0.601350
+    HPWL=(881038.625000, 828117.125000)
+    POTN=1.653689E+07
+    PHIC=3.398259E-04
+    GRAD=1.398112E-02
+    NuBT=1
+    CPU =0.061905
+
+ITER: 298
+    HPWL=1712350.625000
+    OVFL=0.599848
+    HPWL=(883008.687500, 829341.937500)
+    POTN=1.683552E+07
+    PHIC=3.566565E-04
+    GRAD=1.304067E-02
+    NuBT=1
+    CPU =0.061949
+
+ITER: 299
+    HPWL=1713495.500000
+    OVFL=0.596154
+    HPWL=(884142.937500, 829352.562500)
+    POTN=1.711319E+07
+    PHIC=3.744288E-04
+    GRAD=1.161822E-02
+    NuBT=1
+    CPU =0.061885
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0300.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0300.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0300.jpg image has been saved
+
+ITER: 300
+    HPWL=1716591.375000
+    OVFL=0.592516
+    HPWL=(886220.375000, 830371.000000)
+    POTN=1.719624E+07
+    PHIC=3.929787E-04
+    GRAD=1.003236E-02
+    NuBT=1
+    CPU =0.118717
+
+ITER: 301
+    HPWL=1718757.000000
+    OVFL=0.589412
+    HPWL=(887836.312500, 830920.687500)
+    POTN=1.698621E+07
+    PHIC=4.125016E-04
+    GRAD=8.805838E-03
+    NuBT=1
+    CPU =0.062110
+
+ITER: 302
+    HPWL=1722511.000000
+    OVFL=0.586228
+    HPWL=(889963.437500, 832547.562500)
+    POTN=1.643855E+07
+    PHIC=4.328974E-04
+    GRAD=8.114072E-03
+    NuBT=1
+    CPU =0.061866
+
+ITER: 303
+    HPWL=1726602.250000
+    OVFL=0.583116
+    HPWL=(892383.437500, 834218.750000)
+    POTN=1.562519E+07
+    PHIC=4.542801E-04
+    GRAD=8.401931E-03
+    NuBT=1
+    CPU =0.061946
+
+ITER: 304
+    HPWL=1733256.250000
+    OVFL=0.580652
+    HPWL=(895806.687500, 837449.625000)
+    POTN=1.467990E+07
+    PHIC=4.765468E-04
+    GRAD=1.035709E-02
+    NuBT=1
+    CPU =0.061890
+
+ITER: 305
+    HPWL=1740364.000000
+    OVFL=0.577395
+    HPWL=(899463.812500, 840900.250000)
+    POTN=1.377122E+07
+    PHIC=4.998728E-04
+    GRAD=1.276114E-02
+    NuBT=1
+    CPU =0.061921
+
+ITER: 306
+    HPWL=1747470.250000
+    OVFL=0.575209
+    HPWL=(902604.875000, 844865.312500)
+    POTN=1.306164E+07
+    PHIC=5.243407E-04
+    GRAD=1.388154E-02
+    NuBT=1
+    CPU =0.061885
+
+ITER: 307
+    HPWL=1751656.500000
+    OVFL=0.570643
+    HPWL=(904556.062500, 847100.437500)
+    POTN=1.257315E+07
+    PHIC=5.502328E-04
+    GRAD=1.368882E-02
+    NuBT=1
+    CPU =0.062935
+
+ITER: 308
+    HPWL=1756419.500000
+    OVFL=0.567365
+    HPWL=(906781.250000, 849638.187500)
+    POTN=1.230740E+07
+    PHIC=5.773565E-04
+    GRAD=1.320158E-02
+    NuBT=1
+    CPU =0.061787
+
+ITER: 309
+    HPWL=1759985.750000
+    OVFL=0.564496
+    HPWL=(908613.312500, 851372.437500)
+    POTN=1.220003E+07
+    PHIC=6.059196E-04
+    GRAD=1.280874E-02
+    NuBT=1
+    CPU =0.061683
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0310.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0310.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0310.jpg image has been saved
+
+ITER: 310
+    HPWL=1763776.750000
+    OVFL=0.561129
+    HPWL=(910395.500000, 853381.312500)
+    POTN=1.209442E+07
+    PHIC=6.358755E-04
+    GRAD=1.183691E-02
+    NuBT=1
+    CPU =0.118337
+
+ITER: 311
+    HPWL=1766073.875000
+    OVFL=0.556513
+    HPWL=(911698.375000, 854375.500000)
+    POTN=1.192000E+07
+    PHIC=6.674530E-04
+    GRAD=1.049755E-02
+    NuBT=1
+    CPU =0.062123
+
+ITER: 312
+    HPWL=1769424.000000
+    OVFL=0.553370
+    HPWL=(913147.000000, 856277.062500)
+    POTN=1.163099E+07
+    PHIC=7.004946E-04
+    GRAD=9.416597E-03
+    NuBT=1
+    CPU =0.061851
+
+ITER: 313
+    HPWL=1773002.750000
+    OVFL=0.550649
+    HPWL=(915329.125000, 857673.687500)
+    POTN=1.121313E+07
+    PHIC=7.351482E-04
+    GRAD=9.035609E-03
+    NuBT=1
+    CPU =0.061805
+
+ITER: 314
+    HPWL=1778280.125000
+    OVFL=0.547655
+    HPWL=(917884.187500, 860395.937500)
+    POTN=1.070219E+07
+    PHIC=7.713314E-04
+    GRAD=9.870114E-03
+    NuBT=1
+    CPU =0.062770
+
+ITER: 315
+    HPWL=1784338.250000
+    OVFL=0.543791
+    HPWL=(921421.125000, 862917.125000)
+    POTN=1.017269E+07
+    PHIC=8.092063E-04
+    GRAD=1.152509E-02
+    NuBT=1
+    CPU =0.061920
+
+ITER: 316
+    HPWL=1791815.000000
+    OVFL=0.539943
+    HPWL=(925411.062500, 866404.000000)
+    POTN=9.715217E+06
+    PHIC=8.487712E-04
+    GRAD=1.294140E-02
+    NuBT=1
+    CPU =0.061877
+
+ITER: 317
+    HPWL=1796808.500000
+    OVFL=0.535756
+    HPWL=(928303.062500, 868505.500000)
+    POTN=9.374279E+06
+    PHIC=8.905825E-04
+    GRAD=1.320049E-02
+    NuBT=1
+    CPU =0.061919
+
+ITER: 318
+    HPWL=1800942.500000
+    OVFL=0.533635
+    HPWL=(930280.625000, 870661.875000)
+    POTN=9.146351E+06
+    PHIC=9.345666E-04
+    GRAD=1.271528E-02
+    NuBT=1
+    CPU =0.061937
+
+ITER: 319
+    HPWL=1804078.500000
+    OVFL=0.529736
+    HPWL=(932076.375000, 872002.187500)
+    POTN=8.957604E+06
+    PHIC=9.808610E-04
+    GRAD=1.207643E-02
+    NuBT=1
+    CPU =0.061879
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0320.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0320.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0320.jpg image has been saved
+
+ITER: 320
+    HPWL=1808777.875000
+    OVFL=0.526814
+    HPWL=(934336.125000, 874441.750000)
+    POTN=8.750148E+06
+    PHIC=1.029222E-03
+    GRAD=1.118770E-02
+    NuBT=1
+    CPU =0.118311
+
+ITER: 321
+    HPWL=1812941.500000
+    OVFL=0.522728
+    HPWL=(936674.375000, 876267.187500)
+    POTN=8.494916E+06
+    PHIC=1.080049E-03
+    GRAD=1.047580E-02
+    NuBT=1
+    CPU =0.062272
+
+ITER: 322
+    HPWL=1818683.500000
+    OVFL=0.518515
+    HPWL=(939232.375000, 879451.062500)
+    POTN=8.182588E+06
+    PHIC=1.133133E-03
+    GRAD=1.030027E-02
+    NuBT=1
+    CPU =0.063009
+
+ITER: 323
+    HPWL=1823793.500000
+    OVFL=0.514604
+    HPWL=(941510.562500, 882282.937500)
+    POTN=7.860712E+06
+    PHIC=1.188932E-03
+    GRAD=1.083474E-02
+    NuBT=1
+    CPU =0.061951
+
+ITER: 324
+    HPWL=1829782.500000
+    OVFL=0.510337
+    HPWL=(943878.250000, 885904.250000)
+    POTN=7.570342E+06
+    PHIC=1.247325E-03
+    GRAD=1.194912E-02
+    NuBT=1
+    CPU =0.061964
+
+ITER: 325
+    HPWL=1834560.750000
+    OVFL=0.506083
+    HPWL=(945799.437500, 888761.250000)
+    POTN=7.332970E+06
+    PHIC=1.308809E-03
+    GRAD=1.258578E-02
+    NuBT=1
+    CPU =0.061850
+
+ITER: 326
+    HPWL=1839158.125000
+    OVFL=0.503693
+    HPWL=(947288.187500, 891869.937500)
+    POTN=7.145835E+06
+    PHIC=1.373359E-03
+    GRAD=1.255929E-02
+    NuBT=1
+    CPU =0.061972
+total Steiner HPWL: 600881686
+BuildSteiner: 0.0399265
+FillSpefForSta: 0.386599
+UpdateTimingSta: 1.60356
+INFO: Total 659 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0158159
+timing summary
+WNS = 3.06023e-09 seconds
+TNS = 0 seconds
+ExecuteStaLater: 2.00647
+
+ITER: 327
+    HPWL=1842428.500000
+    OVFL=0.499303
+    HPWL=(948571.625000, 893856.937500)
+    POTN=6.982301E+06
+    PHIC=1.441362E-03
+    GRAD=1.029879E-02
+    NuBT=1
+    CPU =2.116891
+
+ITER: 328
+    HPWL=1845565.500000
+    OVFL=0.497059
+    HPWL=(949583.500000, 895982.062500)
+    POTN=6.800056E+06
+    PHIC=1.512761E-03
+    GRAD=8.836429E-03
+    NuBT=1
+    CPU =0.063535
+
+ITER: 329
+    HPWL=1851313.625000
+    OVFL=0.493525
+    HPWL=(952600.187500, 898713.437500)
+    POTN=6.596666E+06
+    PHIC=1.587112E-03
+    GRAD=1.034310E-02
+    NuBT=1
+    CPU =0.063769
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0330.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0330.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0330.jpg image has been saved
+
+ITER: 330
+    HPWL=1857927.000000
+    OVFL=0.487684
+    HPWL=(955592.812500, 902334.125000)
+    POTN=6.362544E+06
+    PHIC=1.664914E-03
+    GRAD=1.096269E-02
+    NuBT=1
+    CPU =0.118304
+
+ITER: 331
+    HPWL=1863302.500000
+    OVFL=0.482399
+    HPWL=(958166.250000, 905136.187500)
+    POTN=6.135873E+06
+    PHIC=1.746835E-03
+    GRAD=1.062507E-02
+    NuBT=1
+    CPU =0.062120
+
+ITER: 332
+    HPWL=1867327.625000
+    OVFL=0.479508
+    HPWL=(960001.562500, 907326.062500)
+    POTN=5.963516E+06
+    PHIC=1.833136E-03
+    GRAD=1.058589E-02
+    NuBT=1
+    CPU =0.061997
+
+ITER: 333
+    HPWL=1870612.000000
+    OVFL=0.476113
+    HPWL=(961332.250000, 909279.687500)
+    POTN=5.822438E+06
+    PHIC=1.923902E-03
+    GRAD=1.073747E-02
+    NuBT=1
+    CPU =0.061960
+
+ITER: 334
+    HPWL=1874828.750000
+    OVFL=0.472838
+    HPWL=(963489.437500, 911339.250000)
+    POTN=5.674318E+06
+    PHIC=2.018896E-03
+    GRAD=1.059779E-02
+    NuBT=1
+    CPU =0.061785
+
+ITER: 335
+    HPWL=1879365.875000
+    OVFL=0.468566
+    HPWL=(966002.375000, 913363.500000)
+    POTN=5.509083E+06
+    PHIC=2.118485E-03
+    GRAD=1.061420E-02
+    NuBT=1
+    CPU =0.062029
+
+ITER: 336
+    HPWL=1884350.000000
+    OVFL=0.464607
+    HPWL=(968207.375000, 916142.562500)
+    POTN=5.344955E+06
+    PHIC=2.222846E-03
+    GRAD=1.069507E-02
+    NuBT=1
+    CPU =0.063117
+
+ITER: 337
+    HPWL=1889838.000000
+    OVFL=0.458684
+    HPWL=(971021.562500, 918816.375000)
+    POTN=5.182610E+06
+    PHIC=2.332183E-03
+    GRAD=1.083459E-02
+    NuBT=1
+    CPU =0.061956
+
+ITER: 338
+    HPWL=1895377.250000
+    OVFL=0.454761
+    HPWL=(973364.187500, 922013.062500)
+    POTN=5.026311E+06
+    PHIC=2.446880E-03
+    GRAD=1.106881E-02
+    NuBT=1
+    CPU =0.062075
+
+ITER: 339
+    HPWL=1898909.250000
+    OVFL=0.451429
+    HPWL=(975091.125000, 923818.062500)
+    POTN=4.907968E+06
+    PHIC=2.567944E-03
+    GRAD=1.136190E-02
+    NuBT=1
+    CPU =0.061879
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0340.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0340.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0340.jpg image has been saved
+
+ITER: 340
+    HPWL=1902503.375000
+    OVFL=0.447907
+    HPWL=(976685.062500, 925818.312500)
+    POTN=4.789678E+06
+    PHIC=2.694975E-03
+    GRAD=1.127307E-02
+    NuBT=1
+    CPU =0.118371
+
+ITER: 341
+    HPWL=1906523.750000
+    OVFL=0.443481
+    HPWL=(978567.187500, 927956.562500)
+    POTN=4.666261E+06
+    PHIC=2.828120E-03
+    GRAD=1.144400E-02
+    NuBT=1
+    CPU =0.078657
+
+ITER: 342
+    HPWL=1911411.000000
+    OVFL=0.438939
+    HPWL=(980605.875000, 930805.125000)
+    POTN=4.520570E+06
+    PHIC=2.967480E-03
+    GRAD=1.163080E-02
+    NuBT=1
+    CPU =0.078689
+
+ITER: 343
+    HPWL=1915943.000000
+    OVFL=0.433615
+    HPWL=(982849.625000, 933093.312500)
+    POTN=4.390454E+06
+    PHIC=3.113864E-03
+    GRAD=1.185991E-02
+    NuBT=1
+    CPU =0.062002
+
+ITER: 344
+    HPWL=1919909.500000
+    OVFL=0.429694
+    HPWL=(984653.250000, 935256.312500)
+    POTN=4.259846E+06
+    PHIC=3.267728E-03
+    GRAD=1.210863E-02
+    NuBT=1
+    CPU =0.061860
+
+ITER: 345
+    HPWL=1923153.750000
+    OVFL=0.426085
+    HPWL=(986551.750000, 936601.937500)
+    POTN=4.153536E+06
+    PHIC=3.429545E-03
+    GRAD=1.221072E-02
+    NuBT=1
+    CPU =0.061757
+
+ITER: 346
+    HPWL=1927048.875000
+    OVFL=0.422546
+    HPWL=(988453.000000, 938595.875000)
+    POTN=4.023399E+06
+    PHIC=3.599045E-03
+    GRAD=1.234861E-02
+    NuBT=1
+    CPU =0.061826
+
+ITER: 347
+    HPWL=1931723.750000
+    OVFL=0.418478
+    HPWL=(991164.312500, 940559.500000)
+    POTN=3.900856E+06
+    PHIC=3.776507E-03
+    GRAD=1.251045E-02
+    NuBT=1
+    CPU =0.061938
+
+ITER: 348
+    HPWL=1937231.500000
+    OVFL=0.413215
+    HPWL=(993862.125000, 943369.312500)
+    POTN=3.765159E+06
+    PHIC=3.962254E-03
+    GRAD=1.268096E-02
+    NuBT=1
+    CPU =0.061928
+
+ITER: 349
+    HPWL=1942121.500000
+    OVFL=0.408075
+    HPWL=(996623.875000, 945497.625000)
+    POTN=3.631106E+06
+    PHIC=4.157498E-03
+    GRAD=1.287344E-02
+    NuBT=1
+    CPU =0.061970
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0350.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0350.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0350.jpg image has been saved
+
+ITER: 350
+    HPWL=1946629.250000
+    OVFL=0.404067
+    HPWL=(998953.687500, 947675.625000)
+    POTN=3.518105E+06
+    PHIC=4.362599E-03
+    GRAD=1.322621E-02
+    NuBT=1
+    CPU =0.118915
+
+ITER: 351
+    HPWL=1949738.500000
+    OVFL=0.400129
+    HPWL=(1001096.437500, 948642.062500)
+    POTN=3.419323E+06
+    PHIC=4.578721E-03
+    GRAD=1.346779E-02
+    NuBT=1
+    CPU =0.077881
+
+ITER: 352
+    HPWL=1954726.000000
+    OVFL=0.394051
+    HPWL=(1003729.937500, 950996.062500)
+    POTN=3.301384E+06
+    PHIC=4.804277E-03
+    GRAD=1.377858E-02
+    NuBT=1
+    CPU =0.077734
+
+ITER: 353
+    HPWL=1959039.500000
+    OVFL=0.390480
+    HPWL=(1006253.312500, 952786.250000)
+    POTN=3.198887E+06
+    PHIC=5.041424E-03
+    GRAD=1.397107E-02
+    NuBT=1
+    CPU =0.077797
+
+ITER: 354
+    HPWL=1963253.500000
+    OVFL=0.386427
+    HPWL=(1007995.375000, 955258.062500)
+    POTN=3.090180E+06
+    PHIC=5.290350E-03
+    GRAD=1.400857E-02
+    NuBT=1
+    CPU =0.077863
+
+ITER: 355
+    HPWL=1968325.500000
+    OVFL=0.381250
+    HPWL=(1010991.437500, 957334.000000)
+    POTN=2.985789E+06
+    PHIC=5.550896E-03
+    GRAD=1.432144E-02
+    NuBT=1
+    CPU =0.077690
+
+ITER: 356
+    HPWL=1972026.375000
+    OVFL=0.377637
+    HPWL=(1012643.625000, 959382.750000)
+    POTN=2.888066E+06
+    PHIC=5.825400E-03
+    GRAD=1.471166E-02
+    NuBT=1
+    CPU =0.073606
+
+ITER: 357
+    HPWL=1976919.000000
+    OVFL=0.372254
+    HPWL=(1015514.562500, 961404.437500)
+    POTN=2.789575E+06
+    PHIC=6.112451E-03
+    GRAD=1.496159E-02
+    NuBT=1
+    CPU =0.061949
+
+ITER: 358
+    HPWL=1982376.750000
+    OVFL=0.366967
+    HPWL=(1018184.937500, 964191.812500)
+    POTN=2.682434E+06
+    PHIC=6.413136E-03
+    GRAD=1.524763E-02
+    NuBT=1
+    CPU =0.062005
+
+ITER: 359
+    HPWL=1986271.750000
+    OVFL=0.362911
+    HPWL=(1020872.437500, 965399.250000)
+    POTN=2.593722E+06
+    PHIC=6.730095E-03
+    GRAD=1.573030E-02
+    NuBT=1
+    CPU =0.061985
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0360.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0360.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0360.jpg image has been saved
+
+ITER: 360
+    HPWL=1990244.500000
+    OVFL=0.358640
+    HPWL=(1022582.375000, 967662.125000)
+    POTN=2.498220E+06
+    PHIC=7.062642E-03
+    GRAD=1.605017E-02
+    NuBT=1
+    CPU =0.117027
+
+ITER: 361
+    HPWL=1994691.500000
+    OVFL=0.352498
+    HPWL=(1025399.625000, 969291.812500)
+    POTN=2.403971E+06
+    PHIC=7.411125E-03
+    GRAD=1.636364E-02
+    NuBT=1
+    CPU =0.062123
+
+ITER: 362
+    HPWL=1999611.375000
+    OVFL=0.347206
+    HPWL=(1027813.812500, 971797.562500)
+    POTN=2.301726E+06
+    PHIC=7.776284E-03
+    GRAD=1.695266E-02
+    NuBT=1
+    CPU =0.062078
+
+ITER: 363
+    HPWL=2003583.500000
+    OVFL=0.342221
+    HPWL=(1030337.187500, 973246.312500)
+    POTN=2.223670E+06
+    PHIC=8.160526E-03
+    GRAD=1.735731E-02
+    NuBT=1
+    CPU =0.062825
+
+ITER: 364
+    HPWL=2006388.250000
+    OVFL=0.339203
+    HPWL=(1031455.500000, 974932.812500)
+    POTN=2.150469E+06
+    PHIC=8.565163E-03
+    GRAD=1.776291E-02
+    NuBT=1
+    CPU =0.061984
+
+ITER: 365
+    HPWL=2010273.250000
+    OVFL=0.334308
+    HPWL=(1033662.187500, 976611.000000)
+    POTN=2.077989E+06
+    PHIC=8.988496E-03
+    GRAD=1.821627E-02
+    NuBT=1
+    CPU =0.061955
+
+ITER: 366
+    HPWL=2016310.125000
+    OVFL=0.329655
+    HPWL=(1036305.437500, 980004.687500)
+    POTN=1.974762E+06
+    PHIC=9.429890E-03
+    GRAD=1.855071E-02
+    NuBT=1
+    CPU =0.061904
+
+ITER: 367
+    HPWL=2021622.250000
+    OVFL=0.323037
+    HPWL=(1039331.875000, 982290.312500)
+    POTN=1.883721E+06
+    PHIC=9.893971E-03
+    GRAD=1.930213E-02
+    NuBT=1
+    CPU =0.061861
+
+ITER: 368
+    HPWL=2027213.375000
+    OVFL=0.316400
+    HPWL=(1041462.625000, 985750.750000)
+    POTN=1.783131E+06
+    PHIC=1.038048E-02
+    GRAD=2.012832E-02
+    NuBT=1
+    CPU =0.061904
+
+ITER: 369
+    HPWL=2030661.625000
+    OVFL=0.312204
+    HPWL=(1043289.187500, 987372.437500)
+    POTN=1.712363E+06
+    PHIC=1.089421E-02
+    GRAD=2.082779E-02
+    NuBT=1
+    CPU =0.061898
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0370.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0370.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0370.jpg image has been saved
+
+ITER: 370
+    HPWL=2034951.000000
+    OVFL=0.306656
+    HPWL=(1045147.062500, 989803.875000)
+    POTN=1.639231E+06
+    PHIC=1.143200E-02
+    GRAD=2.138984E-02
+    NuBT=1
+    CPU =0.118942
+
+ITER: 371
+    HPWL=2038760.250000
+    OVFL=0.301328
+    HPWL=(1047247.312500, 991512.937500)
+    POTN=1.568056E+06
+    PHIC=1.199715E-02
+    GRAD=2.190101E-02
+    NuBT=1
+    CPU =0.062300
+total Steiner HPWL: 677068330
+BuildSteiner: 0.0358047
+FillSpefForSta: 0.377147
+UpdateTimingSta: 1.62342
+INFO: Total 659 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0156694
+timing summary
+WNS = 2.97963e-09 seconds
+TNS = 0 seconds
+ExecuteStaLater: 2.0167
+
+ITER: 372
+    HPWL=2043382.500000
+    OVFL=0.295359
+    HPWL=(1049116.500000, 994266.000000)
+    POTN=1.487719E+06
+    PHIC=1.258880E-02
+    GRAD=2.270804E-02
+    NuBT=1
+    CPU =2.114648
+
+ITER: 373
+    HPWL=2049264.000000
+    OVFL=0.288130
+    HPWL=(1052395.750000, 996868.312500)
+    POTN=1.408119E+06
+    PHIC=1.320728E-02
+    GRAD=2.362304E-02
+    NuBT=1
+    CPU =0.062049
+
+ITER: 374
+    HPWL=2052992.875000
+    OVFL=0.281858
+    HPWL=(1053927.125000, 999065.750000)
+    POTN=1.332704E+06
+    PHIC=1.386036E-02
+    GRAD=2.433229E-02
+    NuBT=1
+    CPU =0.062012
+
+ITER: 375
+    HPWL=2056113.500000
+    OVFL=0.276982
+    HPWL=(1055592.375000, 1000521.125000)
+    POTN=1.273373E+06
+    PHIC=1.454697E-02
+    GRAD=2.505993E-02
+    NuBT=1
+    CPU =0.062025
+
+ITER: 376
+    HPWL=2059319.750000
+    OVFL=0.271743
+    HPWL=(1057059.125000, 1002260.687500)
+    POTN=1.208073E+06
+    PHIC=1.526742E-02
+    GRAD=2.573146E-02
+    NuBT=1
+    CPU =0.061964
+
+ITER: 377
+    HPWL=2063266.875000
+    OVFL=0.266372
+    HPWL=(1058708.500000, 1004558.375000)
+    POTN=1.146817E+06
+    PHIC=1.602187E-02
+    GRAD=2.633298E-02
+    NuBT=1
+    CPU =0.062042
+
+ITER: 378
+    HPWL=2068420.750000
+    OVFL=0.259385
+    HPWL=(1061092.125000, 1007328.687500)
+    POTN=1.071315E+06
+    PHIC=1.681074E-02
+    GRAD=2.710269E-02
+    NuBT=1
+    CPU =0.063133
+
+ITER: 379
+    HPWL=2074179.375000
+    OVFL=0.253524
+    HPWL=(1063725.250000, 1010454.125000)
+    POTN=1.003064E+06
+    PHIC=1.763695E-02
+    GRAD=2.813577E-02
+    NuBT=1
+    CPU =0.061927
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0380.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0380.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0380.jpg image has been saved
+
+ITER: 380
+    HPWL=2078312.750000
+    OVFL=0.246877
+    HPWL=(1065104.500000, 1013208.250000)
+    POTN=9.374266E+05
+    PHIC=1.850800E-02
+    GRAD=2.905783E-02
+    NuBT=1
+    CPU =0.118303
+
+ITER: 381
+    HPWL=2082819.875000
+    OVFL=0.241118
+    HPWL=(1067189.375000, 1015630.500000)
+    POTN=8.753785E+05
+    PHIC=1.942105E-02
+    GRAD=2.983130E-02
+    NuBT=1
+    CPU =0.062347
+
+ITER: 382
+    HPWL=2086368.375000
+    OVFL=0.234823
+    HPWL=(1068437.750000, 1017930.625000)
+    POTN=8.189729E+05
+    PHIC=2.038191E-02
+    GRAD=3.072751E-02
+    NuBT=1
+    CPU =0.062202
+
+ITER: 383
+    HPWL=2091080.750000
+    OVFL=0.229036
+    HPWL=(1070729.250000, 1020351.500000)
+    POTN=7.648574E+05
+    PHIC=2.138678E-02
+    GRAD=3.129071E-02
+    NuBT=1
+    CPU =0.062133
+
+ITER: 384
+    HPWL=2093942.500000
+    OVFL=0.222760
+    HPWL=(1071680.500000, 1022262.000000)
+    POTN=7.138709E+05
+    PHIC=2.244706E-02
+    GRAD=3.189998E-02
+    NuBT=1
+    CPU =0.062222
+
+ITER: 385
+    HPWL=2098615.750000
+    OVFL=0.217599
+    HPWL=(1074330.750000, 1024285.000000)
+    POTN=6.633060E+05
+    PHIC=2.355389E-02
+    GRAD=3.252800E-02
+    NuBT=1
+    CPU =0.063060
+
+ITER: 386
+    HPWL=2103130.500000
+    OVFL=0.211321
+    HPWL=(1076094.875000, 1027035.500000)
+    POTN=6.125889E+05
+    PHIC=2.471584E-02
+    GRAD=3.334156E-02
+    NuBT=1
+    CPU =0.062025
+
+ITER: 387
+    HPWL=2107926.000000
+    OVFL=0.205442
+    HPWL=(1078248.250000, 1029677.875000)
+    POTN=5.684238E+05
+    PHIC=2.593409E-02
+    GRAD=3.414582E-02
+    NuBT=1
+    CPU =0.062041
+
+ITER: 388
+    HPWL=2111713.000000
+    OVFL=0.200086
+    HPWL=(1080004.625000, 1031708.312500)
+    POTN=5.249150E+05
+    PHIC=2.721625E-02
+    GRAD=3.459786E-02
+    NuBT=1
+    CPU =0.062038
+
+ITER: 389
+    HPWL=2116058.000000
+    OVFL=0.193324
+    HPWL=(1082128.250000, 1033929.750000)
+    POTN=4.841673E+05
+    PHIC=2.855956E-02
+    GRAD=3.504939E-02
+    NuBT=1
+    CPU =0.062187
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0390.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0390.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0390.jpg image has been saved
+
+ITER: 390
+    HPWL=2119801.000000
+    OVFL=0.188104
+    HPWL=(1083744.750000, 1036056.250000)
+    POTN=4.475754E+05
+    PHIC=2.997171E-02
+    GRAD=3.557390E-02
+    NuBT=1
+    CPU =0.117799
+
+ITER: 391
+    HPWL=2124083.500000
+    OVFL=0.181720
+    HPWL=(1086002.000000, 1038081.500000)
+    POTN=4.108906E+05
+    PHIC=3.145130E-02
+    GRAD=3.607964E-02
+    NuBT=1
+    CPU =0.062344
+
+ITER: 392
+    HPWL=2127258.000000
+    OVFL=0.176385
+    HPWL=(1087142.500000, 1040115.500000)
+    POTN=3.780315E+05
+    PHIC=3.300908E-02
+    GRAD=3.652384E-02
+    NuBT=1
+    CPU =0.063103
+
+ITER: 393
+    HPWL=2130669.000000
+    OVFL=0.171181
+    HPWL=(1088820.875000, 1041848.125000)
+    POTN=3.465670E+05
+    PHIC=3.464287E-02
+    GRAD=3.661712E-02
+    NuBT=1
+    CPU =0.061970
+
+ITER: 394
+    HPWL=2133914.750000
+    OVFL=0.166227
+    HPWL=(1090097.000000, 1043817.687500)
+    POTN=3.183968E+05
+    PHIC=3.635837E-02
+    GRAD=3.693062E-02
+    NuBT=1
+    CPU =0.061954
+
+ITER: 395
+    HPWL=2137596.000000
+    OVFL=0.161065
+    HPWL=(1092014.875000, 1045581.000000)
+    POTN=2.915614E+05
+    PHIC=3.815647E-02
+    GRAD=3.710522E-02
+    NuBT=1
+    CPU =0.062209
+total Steiner HPWL: 718156252
+BuildSteiner: 0.0347836
+FillSpefForSta: 0.388612
+UpdateTimingSta: 1.62933
+INFO: Total 659 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0160101
+timing summary
+WNS = 2.99911e-09 seconds
+TNS = 0 seconds
+ExecuteStaLater: 2.03443
+
+ITER: 396
+    HPWL=2140272.500000
+    OVFL=0.157382
+    HPWL=(1093278.250000, 1046994.312500)
+    POTN=2.694520E+05
+    PHIC=4.004917E-02
+    GRAD=3.709046E-02
+    NuBT=1
+    CPU =2.137329
+
+ITER: 397
+    HPWL=2143489.500000
+    OVFL=0.150834
+    HPWL=(1094905.500000, 1048584.125000)
+    POTN=2.446737E+05
+    PHIC=4.203256E-02
+    GRAD=3.687584E-02
+    NuBT=1
+    CPU =0.062057
+
+ITER: 398
+    HPWL=2146272.000000
+    OVFL=0.147019
+    HPWL=(1096470.500000, 1049801.625000)
+    POTN=2.238950E+05
+    PHIC=4.411687E-02
+    GRAD=3.706653E-02
+    NuBT=1
+    CPU =0.061981
+
+ITER: 399
+    HPWL=2149967.750000
+    OVFL=0.143478
+    HPWL=(1098106.250000, 1051861.500000)
+    POTN=2.058017E+05
+    PHIC=4.629858E-02
+    GRAD=3.730909E-02
+    NuBT=1
+    CPU =0.063089
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0400.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0400.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0400.jpg image has been saved
+
+ITER: 400
+    HPWL=2151553.000000
+    OVFL=0.139572
+    HPWL=(1099262.875000, 1052290.250000)
+    POTN=1.890326E+05
+    PHIC=4.860264E-02
+    GRAD=3.693968E-02
+    NuBT=1
+    CPU =0.117719
+
+ITER: 401
+    HPWL=2153322.000000
+    OVFL=0.134600
+    HPWL=(1099981.000000, 1053341.000000)
+    POTN=1.733248E+05
+    PHIC=5.102004E-02
+    GRAD=3.642095E-02
+    NuBT=1
+    CPU =0.062286
+
+ITER: 402
+    HPWL=2155676.250000
+    OVFL=0.130777
+    HPWL=(1101178.500000, 1054497.750000)
+    POTN=1.589626E+05
+    PHIC=5.355326E-02
+    GRAD=3.640946E-02
+    NuBT=1
+    CPU =0.061954
+
+ITER: 403
+    HPWL=2159394.000000
+    OVFL=0.126054
+    HPWL=(1103089.000000, 1056305.000000)
+    POTN=1.451715E+05
+    PHIC=5.620145E-02
+    GRAD=3.645937E-02
+    NuBT=1
+    CPU =0.062047
+
+ITER: 404
+    HPWL=2161620.500000
+    OVFL=0.122697
+    HPWL=(1104224.250000, 1057396.375000)
+    POTN=1.325985E+05
+    PHIC=5.899300E-02
+    GRAD=3.637130E-02
+    NuBT=1
+    CPU =0.062016
+
+ITER: 405
+    HPWL=2164027.000000
+    OVFL=0.118684
+    HPWL=(1105721.500000, 1058305.375000)
+    POTN=1.208724E+05
+    PHIC=6.192163E-02
+    GRAD=3.583458E-02
+    NuBT=1
+    CPU =0.062143
+
+ITER: 406
+    HPWL=2164618.750000
+    OVFL=0.116731
+    HPWL=(1106220.750000, 1058398.000000)
+    POTN=1.116208E+05
+    PHIC=6.501228E-02
+    GRAD=3.537078E-02
+    NuBT=1
+    CPU =0.063033
+
+ITER: 407
+    HPWL=2167742.500000
+    OVFL=0.112231
+    HPWL=(1107541.250000, 1060201.375000)
+    POTN=1.015770E+05
+    PHIC=6.823283E-02
+    GRAD=3.508396E-02
+    NuBT=1
+    CPU =0.062100
+
+ITER: 408
+    HPWL=2169004.000000
+    OVFL=0.108965
+    HPWL=(1108536.750000, 1060467.125000)
+    POTN=9.374778E+04
+    PHIC=7.163173E-02
+    GRAD=3.474155E-02
+    NuBT=1
+    CPU =0.062035
+
+ITER: 409
+    HPWL=2171350.500000
+    OVFL=0.106067
+    HPWL=(1109512.125000, 1061838.250000)
+    POTN=8.612467E+04
+    PHIC=7.518843E-02
+    GRAD=3.438195E-02
+    NuBT=1
+    CPU =0.062118
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/cell/cGP2D_cell_0410.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/bin/cGP2D_bin_0410.jpg image has been saved
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/arrow/cGP2D_arrow_0410.jpg image has been saved
+
+ITER: 410
+    HPWL=2172712.250000
+    OVFL=0.103126
+    HPWL=(1110410.250000, 1062302.000000)
+    POTN=7.963638E+04
+    PHIC=7.893269E-02
+    GRAD=3.390793E-02
+    NuBT=1
+    CPU =0.119136
+
+ITER: 411
+    HPWL=2174752.500000
+    OVFL=0.099965
+    HPWL=(1111163.250000, 1063589.250000)
+    POTN=7.255572E+04
+    PHIC=8.285548E-02
+    GRAD=3.344303E-02
+    NuBT=1
+    CPU =0.078089
+
+INFO:    SUMMARY cGP2D
+INFO:    #iterations = 411
+INFO:        cGP2D ITERATION HPWL 2174752.5000
+INFO:        cGP2D ITERATION OVFL 0.1000
+INFO:        cGP2D      POTENTIAL 72555.7188
+INFO:    TOTAL HPWL (U_k, V_k) = 2130752.250000, 2174752.500000
+total Steiner HPWL: 722104177
+FillSpefForSta: 0.375104
+UpdateTimingSta: 1.61543
+INFO: Total 659 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0157331
+timing summary
+WNS = 3.00889e-09 seconds
+TNS = 0 seconds
+RESULT:
+   HPWL(cGP2D): 2130752.2500 (1089095.0000, 1041657.3125)
+
+   RUNTIME(s) : 43.0974
+
+
+PROC:  END GLOBAL 2D PLACEMENT
+
+===HPWL(MICRON)====================================
+  Mode  : GlobalPlacer
+  HPWL  : 331450.1865
+          x= 169414.6261 y= 162035.5604
+===================================================
+INFO:  WRITE BOOKSHELF...output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/tiers/0
+PROC:  END WRITE BOOKSHELF
+
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/globalPlaceResult.jpg image has been saved
+INFO:  SUCCESSFULLY WRITE DEF FILE INTO output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/aes_cipher_top_gp.def
+INFO:  SUCCESSFULLY WRITE DEF FILE INTO output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/aes_cipher_top_final.def
+
+
+=== SUMMARY =========================================================
+ ### HPWL (x, y) of the design is 2130752.25 (1089095.00, 1041657.31).
+
+ ### Numbers of Iterations: 
+     cGP2D:  411 (0.1049 sec/iter)
+     ____________________________________
+     TOTAL:  411
+
+ ### CPU_{IP, TP, mGP, LG, cGP, DP} is 3.66, 0.00, 0.00, 0.00, 43.10, 0.00.
+ ### CPU_TOT is 47.29 seconds (0.79 min).
+
+===HPWL(MICRON)====================================
+  Mode  : Final
+  HPWL  : 331450.1865
+          x= 169414.6261 y= 162035.5604
+===================================================
+INFO: output/nangate45_aes_cipher_top/etc/aes_cipher_top/experiment005/finalResult.jpg image has been saved
+total Steiner HPWL: 722104177

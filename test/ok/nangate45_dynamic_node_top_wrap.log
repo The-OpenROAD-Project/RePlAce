@@ -1,0 +1,4318 @@
+CMD :  ./replace -bmflag etc -lef library/nangate45/NangateOpenCellLibrary.lef -def design/nangate45/dynamic_node_top_wrap/dynamic_node_top_wrap.def -output output/nangate45_dynamic_node_top_wrap -onlyGP -plot -timing -verilog design/nangate45/dynamic_node_top_wrap/dynamic_node_top_wrap.v -lib library/nangate45/NangateOpenCellLibrary_typical.lib -sdc design/nangate45/dynamic_node_top_wrap/dynamic_node_top_wrap.sdc -capPerMicron 0.23e-15 -resPerMicron 23 
+INFO:  VERSION, Compiled at Jul 21 2019 17:08:40
+INFO:  Now is Mon Aug  5 17:14:51 2019
+
+** WARNING: Your Detail Placement Step must be skipped.
+              (i.e. this program will be executed as -onlyGP)
+     If you want to have DP after GP, please specify -dpflag and -dploc.
+
+INFO:  Target Density = 1.000000
+INFO:  Experiment Index 5
+INFO:  DIR_PATH = output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005
+
+PROC:  BEGIN IMPORTING PLACEMENT INPUT
+INFO:  DEF SCALE UNIT: 2000
+INFO:  METAL1 NAME IN LEF: metal1
+INFO:  DEF SITE: FreePDK45_38x28_10R_NP_162NW_34O
+INFO:  SCALE DOWN UNIT: ( 311.111, 311.111 )
+INFO:  OFFSET COORDINATE: ( 2400, 2400 )
+
+INFO:  ROW SIZE: ( 1.22143, 9 ) 
+INFO:  #ROW: 342
+INFO:  #MODULE: 11505, #TERMINAL: 2745
+INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) 
+INFO:  CORE AREA: (72 72) - (3157.33 3150)
+INFO:  NEW ROW SIZE: ( 1.22143, 9 ) 
+INFO:  NEW #ROW: 342
+INFO:  EXTRACT NET INFO FROM DEF ONLY
+** WARNING:  clk is detected.  It'll be automatically excluded (defNetStor)
+INFO:  #NET: 14116, #PIN: 41510
+INFO:  SUCCESSFULLY LEF/DEF PARSED
+INFO:  ASPECT RATIO=0.997731
+INFO:  ROW = (MinX=72.000000, MinY=72.000000)
+INFO:  ROW = (MaxX=3157.328369, MaxY=3150.000000)
+INFO:  TERM: (0.000000, 0.000000) - (0.000000, 0.000000)
+INFO:  NOTE:   0% Whitespace is Added to Each Tier.
+INFO:    LARGEST MACRO SIZE (X,Y) = (0, 0)
+INFO:    TIER DIMENSION (X,Y) = (3085, 3078)
+INFO:  #STDCELL=11505,  #movableMACRO=0,  #fixedMACRO=2745
+INFO:  #ROW=342,  ROW HEIGHT=9, TIER DEPTH=1
+INFO:  GLOBAL.SPACE.MIN = (7.714286, 7.714286)
+INFO:  GLOBAL.SPACE.MAX = (3222.000000, 3222.000000)
+INFO:  PLACE.ORIGIN = (72, 72)
+INFO:  PLACE.END = (3157, 3150)
+
+PROC:  END IMPORTING PLACEMENT INPUT
+
+
+PROC:  BEGIN INITIAL PLACEMENT (IP)
+PROC:  Conjugate Gradient (CG) method to obtain the IP
+INFO:  The Initial HPWL is 1727001.000000
+INFO:  The Matrix Size is 11505
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/initPlace/initPlacement_0000.jpg image has been saved
+INFO:  IP  0,  CG Error 0.000000,  HPWL 1761397.750000,  CPUtime 0.08
+INFO:  IP  1,  CG Error 0.000000,  HPWL 1754904.500000,  CPUtime 0.06
+INFO:  IP  2,  CG Error 0.000000,  HPWL 1757536.500000,  CPUtime 0.06
+INFO:  IP  3,  CG Error 0.000001,  HPWL 1755451.000000,  CPUtime 0.06
+INFO:  IP  4,  CG Error 0.000000,  HPWL 1757660.000000,  CPUtime 0.06
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/initPlace/initPlacement_0005.jpg image has been saved
+INFO:  IP  5,  CG Error 0.000000,  HPWL 1755719.500000,  CPUtime 0.07
+RESULT:
+   HPWL(IP): 2447506.0000 (1247186.7500, 1200319.2500)
+
+PROC:  END INITIAL PLACEMENT (IP)
+
+
+INFO:  Chip Area: 3085 x 3078 = 9496641 
+INFO:  Total_PL_Area = 9496641, %100.00 of chip
+INFO:  Total_TermPL_Area = 20520, %0.22 of PL
+INFO:  Total_WS_Area = 9476121, %99.78 of PL
+INFO:  Total_Macro_Area = 0, %0.00 of WS
+INFO:  Total_StdCell_Area = 980972, %10.35 of WS
+INFO:  Average 80pct Cell Area = 82.3725
+INFO:  FillerCell's Area = 82.380951
+gFillerCount: 103120
+filler_area: 82.381
+total_filler_area: : 8.49515e+06
+INFO:  FillerCell's X = 9.153439 , FillerCell's Y = 9.000000
+INFO:  #CELL = 114625 =  11505 (#MODULE) + 103120 (#FILLER)
+INFO:  Average Module Width = 9.474587, Row Height = 9.000000
+INFO:  D_MSH = 1024 
+INFO:  MSH(X, Y) = (32, 32)
+PROC:  Standard Cell 2D Global Placement (cGP2D)
+INFO:  Tier 0, Density is 0.103308
+tier->modu_cnt:11505
+gfiller_cnt: 103120
+INFO: (tier 0) area: 9495630
+INFO: (tier 0) virt_area: 0
+INFO: (tier 0) term_area: 22555
+INFO: (tier 0) modu_area: 980972
+INFO: (tier 0) filler_area: 8492103
+min_idx: 11505
+max_idx: 114588
+gcell_cnt: 114625
+tier->filler_cnt: 103083
+INFO:  dim_bin_cGP2D.(x,y) = (256, 256)
+tier->pmin: (72 72)
+INFO: TILE SIZE for GRouter in Micron: 2.1 x 2.1
+INFO: SCALED TILE SIZE for GRouter: 13.5 x 13.5
+
+INFO: LAYER metal1 #TRACK: 1499
+INFO: LAYER metal2 #TRACK: 1105
+INFO: LAYER metal3 #TRACK: 1499
+INFO: LAYER metal4 #TRACK: 749
+INFO: LAYER metal5 #TRACK: 749
+INFO: LAYER metal6 #TRACK: 749
+INFO: LAYER metal7 #TRACK: 262
+INFO: LAYER metal8 #TRACK: 262
+INFO: LAYER metal9 #TRACK: 131
+INFO: LAYER metal10 #TRACK: 131
+7.71429 7.71429 3222 3222
+7.71429 7.71429 3222 3222
+diffX: 1.28564, diffY: 1.28564
+INFO:  WRITE BOOKSHELF...output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/router_base/
+PROC:  END WRITE BOOKSHELF
+
+PROC:  Start NESTEROV's Optimization
+PROC:    Global Lagrangian Multiplier is Applied
+total Steiner HPWL: 549802305
+Execute STA
+topCellName: dynamic_node_top_wrap
+verilog    : design/nangate45/dynamic_node_top_wrap/dynamic_node_top_wrap.v
+liberty    : library/nangate45/NangateOpenCellLibrary_typical.lib
+sdcName    : design/nangate45/dynamic_node_top_wrap/dynamic_node_top_wrap.sdc
+
+OpenSTA Copyright (c) 2018, Parallax Software, Inc.
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+
+This is free software, and you are free to change and redistribute it
+under certain conditions; type `show_copying' for details. 
+This program comes with ABSOLUTELY NO WARRANTY; for details type `show_warranty'.
+INFO:  Now linking: dynamic_node_top_wrap
+INFO:  Successfully linked: dynamic_node_top_wrap
+Warning: dynamic_node_top_wrap.sdc, 8 capacitance scale 1e-12 does not match library scale 1e-15.
+Warning: dynamic_node_top_wrap.sdc, 10 set_input_delay relative to a clock defined on the same port/pin not allowed.
+Warning: dynamic_node_top_wrap.sdc, 11 set_input_delay relative to a clock defined on the same port/pin not allowed.
+INFO: Total 2581 worst path!
+Critical Path Up to 0 has been updated
+WNS = -1.03217e-09 seconds
+TNS = -1.60788e-07 seconds
+
+ITER: 0
+    HPWL=1755920.500000
+    OVFL=0.991012
+    HPWL=(896727.125000, 859193.437500)
+    POTN=4.116961E+09
+    PHIC=3.045123E-10
+    GRAD=2.367262E-02
+    NuBT=0
+    CPU =0.000000
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0001.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0001.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0001.jpg image has been saved
+
+ITER: 1
+    HPWL=1756123.500000
+    OVFL=0.990996
+    HPWL=(896806.375000, 859317.125000)
+    POTN=4.116563E+09
+    PHIC=3.197287E-10
+    GRAD=2.412617E-02
+    NuBT=1
+    CPU =0.160582
+
+ITER: 2
+    HPWL=1769516.750000
+    OVFL=0.989355
+    HPWL=(902057.625000, 867459.062500)
+    POTN=4.091109E+09
+    PHIC=3.350817E-10
+    GRAD=2.352651E-02
+    NuBT=1
+    CPU =0.047058
+
+ITER: 3
+    HPWL=2612524.750000
+    OVFL=0.932440
+    HPWL=(1316695.625000, 1295829.125000)
+    POTN=3.587242E+09
+    PHIC=3.183276E-10
+    GRAD=1.603213E-02
+    NuBT=1
+    CPU =0.052935
+
+ITER: 4
+    HPWL=2795720.000000
+    OVFL=0.852241
+    HPWL=(1403716.875000, 1392003.250000)
+    POTN=2.687064E+09
+    PHIC=3.257201E-10
+    GRAD=8.744101E-03
+    NuBT=2
+    CPU =0.081103
+
+ITER: 5
+    HPWL=2998727.000000
+    OVFL=0.810576
+    HPWL=(1504333.625000, 1494393.250000)
+    POTN=2.327276E+09
+    PHIC=3.323545E-10
+    GRAD=8.909184E-03
+    NuBT=2
+    CPU =0.069265
+
+ITER: 6
+    HPWL=2965697.000000
+    OVFL=0.793386
+    HPWL=(1491265.000000, 1474432.000000)
+    POTN=2.104993E+09
+    PHIC=3.489722E-10
+    GRAD=9.666473E-03
+    NuBT=2
+    CPU =0.069233
+total Steiner HPWL: 992778173
+BuildSteiner: 0.0296246
+FillSpefForSta: 0.235718
+UpdateTimingSta: 1.41615
+INFO: Total 2581 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0890321
+timing summary
+WNS = -9.60591e-10 seconds
+TNS = -2.15799e-07 seconds
+ExecuteStaLater: 1.74236
+
+ITER: 7
+    HPWL=2928772.000000
+    OVFL=0.773911
+    HPWL=(1474888.125000, 1453883.750000)
+    POTN=2.003758E+09
+    PHIC=3.664208E-10
+    GRAD=1.374081E-02
+    NuBT=2
+    CPU =1.848311
+
+ITER: 8
+    HPWL=2804705.000000
+    OVFL=0.777552
+    HPWL=(1419440.125000, 1385265.000000)
+    POTN=1.952975E+09
+    PHIC=3.847418E-10
+    GRAD=1.612700E-02
+    NuBT=1
+    CPU =0.036037
+
+ITER: 9
+    HPWL=2710538.000000
+    OVFL=0.777151
+    HPWL=(1373767.750000, 1336770.250000)
+    POTN=1.941192E+09
+    PHIC=4.039789E-10
+    GRAD=1.404881E-02
+    NuBT=2
+    CPU =0.068758
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0010.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0010.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0010.jpg image has been saved
+
+ITER: 10
+    HPWL=2634458.750000
+    OVFL=0.775078
+    HPWL=(1336854.250000, 1297604.500000)
+    POTN=1.938471E+09
+    PHIC=4.241779E-10
+    GRAD=1.061324E-02
+    NuBT=2
+    CPU =0.121276
+
+ITER: 11
+    HPWL=2585249.000000
+    OVFL=0.771766
+    HPWL=(1313089.750000, 1272159.125000)
+    POTN=1.938211E+09
+    PHIC=4.453867E-10
+    GRAD=8.882752E-03
+    NuBT=2
+    CPU =0.068722
+
+ITER: 12
+    HPWL=2550747.750000
+    OVFL=0.769542
+    HPWL=(1295792.625000, 1254955.125000)
+    POTN=1.944257E+09
+    PHIC=4.676560E-10
+    GRAD=7.684348E-03
+    NuBT=2
+    CPU =0.068313
+
+ITER: 13
+    HPWL=2526982.750000
+    OVFL=0.768610
+    HPWL=(1283562.125000, 1243420.625000)
+    POTN=1.951971E+09
+    PHIC=4.910388E-10
+    GRAD=6.901037E-03
+    NuBT=2
+    CPU =0.069244
+
+ITER: 14
+    HPWL=2511403.000000
+    OVFL=0.769639
+    HPWL=(1274631.250000, 1236771.875000)
+    POTN=1.962597E+09
+    PHIC=5.155907E-10
+    GRAD=6.903011E-03
+    NuBT=1
+    CPU =0.035386
+
+ITER: 15
+    HPWL=2502177.000000
+    OVFL=0.768655
+    HPWL=(1268947.500000, 1233229.500000)
+    POTN=1.973418E+09
+    PHIC=5.413702E-10
+    GRAD=6.472488E-03
+    NuBT=1
+    CPU =0.035466
+
+ITER: 16
+    HPWL=2497146.500000
+    OVFL=0.767698
+    HPWL=(1265131.625000, 1232014.750000)
+    POTN=1.983350E+09
+    PHIC=5.684387E-10
+    GRAD=5.470773E-03
+    NuBT=1
+    CPU =0.035322
+
+ITER: 17
+    HPWL=2494201.000000
+    OVFL=0.768591
+    HPWL=(1262924.625000, 1231276.500000)
+    POTN=1.991607E+09
+    PHIC=5.968606E-10
+    GRAD=4.654046E-03
+    NuBT=1
+    CPU =0.035440
+
+ITER: 18
+    HPWL=2491413.000000
+    OVFL=0.769750
+    HPWL=(1260874.250000, 1230538.875000)
+    POTN=1.998598E+09
+    PHIC=6.267036E-10
+    GRAD=4.264771E-03
+    NuBT=1
+    CPU =0.035395
+
+ITER: 19
+    HPWL=2491251.000000
+    OVFL=0.771722
+    HPWL=(1260426.125000, 1230824.750000)
+    POTN=2.003711E+09
+    PHIC=6.580388E-10
+    GRAD=4.011377E-03
+    NuBT=1
+    CPU =0.035377
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0020.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0020.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0020.jpg image has been saved
+
+ITER: 20
+    HPWL=2492116.750000
+    OVFL=0.772419
+    HPWL=(1260509.750000, 1231607.000000)
+    POTN=2.006793E+09
+    PHIC=6.908564E-10
+    GRAD=3.654224E-03
+    NuBT=1
+    CPU =0.086485
+
+ITER: 21
+    HPWL=2495618.500000
+    OVFL=0.771952
+    HPWL=(1262237.750000, 1233380.625000)
+    POTN=2.007172E+09
+    PHIC=7.250411E-10
+    GRAD=3.241463E-03
+    NuBT=1
+    CPU =0.035675
+
+ITER: 22
+    HPWL=2499055.000000
+    OVFL=0.771650
+    HPWL=(1264009.500000, 1235045.375000)
+    POTN=2.004852E+09
+    PHIC=7.609243E-10
+    GRAD=2.954327E-03
+    NuBT=1
+    CPU =0.035371
+
+ITER: 23
+    HPWL=2502141.500000
+    OVFL=0.771538
+    HPWL=(1265901.000000, 1236240.375000)
+    POTN=2.000462E+09
+    PHIC=7.986228E-10
+    GRAD=2.819336E-03
+    NuBT=1
+    CPU =0.035377
+
+ITER: 24
+    HPWL=2504079.250000
+    OVFL=0.771347
+    HPWL=(1267159.875000, 1236919.375000)
+    POTN=1.994690E+09
+    PHIC=8.383249E-10
+    GRAD=2.645792E-03
+    NuBT=1
+    CPU =0.035502
+
+ITER: 25
+    HPWL=2506078.000000
+    OVFL=0.771805
+    HPWL=(1268519.750000, 1237558.125000)
+    POTN=1.987922E+09
+    PHIC=8.799930E-10
+    GRAD=2.420323E-03
+    NuBT=1
+    CPU =0.036785
+
+ITER: 26
+    HPWL=2507014.000000
+    OVFL=0.770419
+    HPWL=(1269281.000000, 1237732.875000)
+    POTN=1.980449E+09
+    PHIC=9.238708E-10
+    GRAD=2.208569E-03
+    NuBT=1
+    CPU =0.035640
+
+ITER: 27
+    HPWL=2508672.250000
+    OVFL=0.769055
+    HPWL=(1270389.500000, 1238282.750000)
+    POTN=1.972264E+09
+    PHIC=9.698374E-10
+    GRAD=2.097160E-03
+    NuBT=1
+    CPU =0.035286
+
+ITER: 28
+    HPWL=2508013.000000
+    OVFL=0.767186
+    HPWL=(1270380.500000, 1237632.625000)
+    POTN=1.964019E+09
+    PHIC=1.018329E-09
+    GRAD=2.069771E-03
+    NuBT=1
+    CPU =0.035970
+
+ITER: 29
+    HPWL=2506368.500000
+    OVFL=0.765928
+    HPWL=(1269872.625000, 1236495.750000)
+    POTN=1.956099E+09
+    PHIC=1.069246E-09
+    GRAD=2.055701E-03
+    NuBT=1
+    CPU =0.035402
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0030.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0030.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0030.jpg image has been saved
+
+ITER: 30
+    HPWL=2502521.750000
+    OVFL=0.764440
+    HPWL=(1268202.625000, 1234319.125000)
+    POTN=1.948919E+09
+    PHIC=1.122708E-09
+    GRAD=2.018586E-03
+    NuBT=1
+    CPU =0.087838
+
+ITER: 31
+    HPWL=2498298.250000
+    OVFL=0.763312
+    HPWL=(1266254.625000, 1232043.625000)
+    POTN=1.942904E+09
+    PHIC=1.178843E-09
+    GRAD=2.000757E-03
+    NuBT=1
+    CPU =0.043621
+
+ITER: 32
+    HPWL=2492669.000000
+    OVFL=0.762599
+    HPWL=(1263504.500000, 1229164.375000)
+    POTN=1.938073E+09
+    PHIC=1.237785E-09
+    GRAD=2.023346E-03
+    NuBT=1
+    CPU =0.043372
+
+ITER: 33
+    HPWL=2487172.500000
+    OVFL=0.761804
+    HPWL=(1260781.750000, 1226390.625000)
+    POTN=1.934249E+09
+    PHIC=1.299674E-09
+    GRAD=2.026557E-03
+    NuBT=1
+    CPU =0.037817
+
+ITER: 34
+    HPWL=2481553.750000
+    OVFL=0.761220
+    HPWL=(1257866.875000, 1223686.875000)
+    POTN=1.931417E+09
+    PHIC=1.364658E-09
+    GRAD=1.993559E-03
+    NuBT=1
+    CPU =0.035584
+
+ITER: 35
+    HPWL=2476667.500000
+    OVFL=0.760908
+    HPWL=(1255309.375000, 1221358.250000)
+    POTN=1.929335E+09
+    PHIC=1.432891E-09
+    GRAD=1.869931E-03
+    NuBT=1
+    CPU =0.035656
+
+ITER: 36
+    HPWL=2472047.500000
+    OVFL=0.760524
+    HPWL=(1252768.375000, 1219279.000000)
+    POTN=1.927874E+09
+    PHIC=1.504535E-09
+    GRAD=1.754034E-03
+    NuBT=1
+    CPU =0.035304
+
+ITER: 37
+    HPWL=2468717.000000
+    OVFL=0.760281
+    HPWL=(1250878.250000, 1217838.625000)
+    POTN=1.926997E+09
+    PHIC=1.579762E-09
+    GRAD=1.654041E-03
+    NuBT=1
+    CPU =0.036669
+
+ITER: 38
+    HPWL=2465817.000000
+    OVFL=0.759896
+    HPWL=(1249127.625000, 1216689.500000)
+    POTN=1.926508E+09
+    PHIC=1.658750E-09
+    GRAD=1.576109E-03
+    NuBT=1
+    CPU =0.035334
+
+ITER: 39
+    HPWL=2463982.000000
+    OVFL=0.759752
+    HPWL=(1247971.875000, 1216010.250000)
+    POTN=1.926294E+09
+    PHIC=1.741688E-09
+    GRAD=1.491035E-03
+    NuBT=1
+    CPU =0.035318
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0040.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0040.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0040.jpg image has been saved
+
+ITER: 40
+    HPWL=2462340.000000
+    OVFL=0.760136
+    HPWL=(1246872.875000, 1215467.125000)
+    POTN=1.926173E+09
+    PHIC=1.828772E-09
+    GRAD=1.417625E-03
+    NuBT=1
+    CPU =0.087434
+
+ITER: 41
+    HPWL=2461527.500000
+    OVFL=0.760198
+    HPWL=(1246252.750000, 1215274.750000)
+    POTN=1.926145E+09
+    PHIC=1.920210E-09
+    GRAD=1.361234E-03
+    NuBT=1
+    CPU =0.035566
+
+ITER: 42
+    HPWL=2461390.250000
+    OVFL=0.760214
+    HPWL=(1245933.000000, 1215457.250000)
+    POTN=1.926122E+09
+    PHIC=2.016221E-09
+    GRAD=1.318910E-03
+    NuBT=1
+    CPU =0.035454
+
+ITER: 43
+    HPWL=2461892.250000
+    OVFL=0.760231
+    HPWL=(1246034.375000, 1215857.875000)
+    POTN=1.926105E+09
+    PHIC=2.116882E-09
+    GRAD=1.290439E-03
+    NuBT=1
+    CPU =0.035320
+
+ITER: 44
+    HPWL=2462371.000000
+    OVFL=0.760640
+    HPWL=(1246143.750000, 1216227.375000)
+    POTN=1.925929E+09
+    PHIC=2.222576E-09
+    GRAD=1.268173E-03
+    NuBT=1
+    CPU =0.035315
+
+ITER: 45
+    HPWL=2463199.500000
+    OVFL=0.761065
+    HPWL=(1246503.375000, 1216696.125000)
+    POTN=1.925671E+09
+    PHIC=2.333432E-09
+    GRAD=1.242663E-03
+    NuBT=1
+    CPU =0.035438
+
+ITER: 46
+    HPWL=2464234.000000
+    OVFL=0.761412
+    HPWL=(1246937.500000, 1217296.500000)
+    POTN=1.925142E+09
+    PHIC=2.449746E-09
+    GRAD=1.210426E-03
+    NuBT=1
+    CPU =0.042820
+
+ITER: 47
+    HPWL=2465830.750000
+    OVFL=0.761714
+    HPWL=(1247707.250000, 1218123.500000)
+    POTN=1.924340E+09
+    PHIC=2.571654E-09
+    GRAD=1.186358E-03
+    NuBT=1
+    CPU =0.040347
+
+ITER: 48
+    HPWL=2467365.250000
+    OVFL=0.762034
+    HPWL=(1248443.625000, 1218921.625000)
+    POTN=1.923297E+09
+    PHIC=2.699653E-09
+    GRAD=1.177194E-03
+    NuBT=1
+    CPU =0.035725
+
+ITER: 49
+    HPWL=2469188.750000
+    OVFL=0.762546
+    HPWL=(1249374.375000, 1219814.375000)
+    POTN=1.921931E+09
+    PHIC=2.833906E-09
+    GRAD=1.167534E-03
+    NuBT=1
+    CPU =0.036404
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0050.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0050.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0050.jpg image has been saved
+
+ITER: 50
+    HPWL=2470845.500000
+    OVFL=0.762707
+    HPWL=(1250208.250000, 1220637.375000)
+    POTN=1.920300E+09
+    PHIC=2.974906E-09
+    GRAD=1.148866E-03
+    NuBT=1
+    CPU =0.089711
+
+ITER: 51
+    HPWL=2472941.500000
+    OVFL=0.762445
+    HPWL=(1251278.625000, 1221663.000000)
+    POTN=1.918329E+09
+    PHIC=3.122728E-09
+    GRAD=1.124980E-03
+    NuBT=1
+    CPU =0.037279
+
+ITER: 52
+    HPWL=2474637.500000
+    OVFL=0.762472
+    HPWL=(1252146.500000, 1222490.875000)
+    POTN=1.916128E+09
+    PHIC=3.278080E-09
+    GRAD=1.129205E-03
+    NuBT=1
+    CPU =0.035343
+
+ITER: 53
+    HPWL=2475882.500000
+    OVFL=0.762610
+    HPWL=(1252844.250000, 1223038.375000)
+    POTN=1.913862E+09
+    PHIC=3.441380E-09
+    GRAD=1.132156E-03
+    NuBT=1
+    CPU =0.035265
+
+ITER: 54
+    HPWL=2476637.250000
+    OVFL=0.762568
+    HPWL=(1253249.375000, 1223387.875000)
+    POTN=1.911727E+09
+    PHIC=3.613064E-09
+    GRAD=1.108517E-03
+    NuBT=1
+    CPU =0.035496
+
+ITER: 55
+    HPWL=2477424.000000
+    OVFL=0.762760
+    HPWL=(1253676.000000, 1223748.125000)
+    POTN=1.909652E+09
+    PHIC=3.793296E-09
+    GRAD=1.071120E-03
+    NuBT=1
+    CPU =0.035315
+
+ITER: 56
+    HPWL=2477683.000000
+    OVFL=0.763036
+    HPWL=(1253814.250000, 1223868.750000)
+    POTN=1.907692E+09
+    PHIC=3.982815E-09
+    GRAD=1.059518E-03
+    NuBT=1
+    CPU =0.035370
+
+ITER: 57
+    HPWL=2478107.500000
+    OVFL=0.763195
+    HPWL=(1254038.250000, 1224069.375000)
+    POTN=1.905773E+09
+    PHIC=4.181706E-09
+    GRAD=1.058339E-03
+    NuBT=1
+    CPU =0.035462
+
+ITER: 58
+    HPWL=2478470.250000
+    OVFL=0.763187
+    HPWL=(1254191.625000, 1224278.625000)
+    POTN=1.903884E+09
+    PHIC=4.390566E-09
+    GRAD=1.052547E-03
+    NuBT=1
+    CPU =0.035427
+
+ITER: 59
+    HPWL=2479004.500000
+    OVFL=0.763031
+    HPWL=(1254450.500000, 1224554.000000)
+    POTN=1.902030E+09
+    PHIC=4.609746E-09
+    GRAD=1.028673E-03
+    NuBT=1
+    CPU =0.035576
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0060.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0060.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0060.jpg image has been saved
+
+ITER: 60
+    HPWL=2479267.750000
+    OVFL=0.762948
+    HPWL=(1254554.375000, 1224713.375000)
+    POTN=1.900265E+09
+    PHIC=4.840054E-09
+    GRAD=1.005739E-03
+    NuBT=1
+    CPU =0.088523
+
+ITER: 61
+    HPWL=2479448.750000
+    OVFL=0.762817
+    HPWL=(1254637.500000, 1224811.250000)
+    POTN=1.898682E+09
+    PHIC=5.081926E-09
+    GRAD=9.837968E-04
+    NuBT=1
+    CPU =0.035783
+
+ITER: 62
+    HPWL=2479342.500000
+    OVFL=0.762874
+    HPWL=(1254544.000000, 1224798.375000)
+    POTN=1.897243E+09
+    PHIC=5.336023E-09
+    GRAD=9.660666E-04
+    NuBT=1
+    CPU =0.035837
+
+ITER: 63
+    HPWL=2479188.000000
+    OVFL=0.763293
+    HPWL=(1254442.000000, 1224745.875000)
+    POTN=1.896074E+09
+    PHIC=5.602824E-09
+    GRAD=9.421613E-04
+    NuBT=1
+    CPU =0.035363
+
+ITER: 64
+    HPWL=2478918.750000
+    OVFL=0.763583
+    HPWL=(1254251.875000, 1224666.875000)
+    POTN=1.895096E+09
+    PHIC=5.882964E-09
+    GRAD=9.191473E-04
+    NuBT=1
+    CPU =0.035329
+
+ITER: 65
+    HPWL=2479185.500000
+    OVFL=0.763767
+    HPWL=(1254326.000000, 1224859.500000)
+    POTN=1.894259E+09
+    PHIC=6.176880E-09
+    GRAD=8.948941E-04
+    NuBT=1
+    CPU =0.035351
+
+ITER: 66
+    HPWL=2479573.500000
+    OVFL=0.764065
+    HPWL=(1254458.000000, 1225115.375000)
+    POTN=1.893384E+09
+    PHIC=6.485369E-09
+    GRAD=8.793010E-04
+    NuBT=1
+    CPU =0.035407
+
+ITER: 67
+    HPWL=2480228.000000
+    OVFL=0.764294
+    HPWL=(1254750.500000, 1225477.375000)
+    POTN=1.892482E+09
+    PHIC=6.809009E-09
+    GRAD=8.716509E-04
+    NuBT=1
+    CPU =0.035319
+
+ITER: 68
+    HPWL=2481030.500000
+    OVFL=0.764325
+    HPWL=(1255102.750000, 1225927.875000)
+    POTN=1.891506E+09
+    PHIC=7.148650E-09
+    GRAD=8.620478E-04
+    NuBT=1
+    CPU =0.035986
+
+ITER: 69
+    HPWL=2482116.500000
+    OVFL=0.764197
+    HPWL=(1255619.500000, 1226497.000000)
+    POTN=1.890458E+09
+    PHIC=7.504932E-09
+    GRAD=8.522003E-04
+    NuBT=1
+    CPU =0.035501
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0070.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0070.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0070.jpg image has been saved
+
+ITER: 70
+    HPWL=2482976.250000
+    OVFL=0.764150
+    HPWL=(1256030.375000, 1226945.875000)
+    POTN=1.889379E+09
+    PHIC=7.879223E-09
+    GRAD=8.439515E-04
+    NuBT=1
+    CPU =0.087433
+
+ITER: 71
+    HPWL=2483653.500000
+    OVFL=0.764167
+    HPWL=(1256376.500000, 1227277.000000)
+    POTN=1.888324E+09
+    PHIC=8.272393E-09
+    GRAD=8.282500E-04
+    NuBT=1
+    CPU =0.035623
+
+ITER: 72
+    HPWL=2483996.250000
+    OVFL=0.764136
+    HPWL=(1256549.125000, 1227447.125000)
+    POTN=1.887339E+09
+    PHIC=8.685593E-09
+    GRAD=8.025003E-04
+    NuBT=1
+    CPU =0.035626
+
+ITER: 73
+    HPWL=2484282.250000
+    OVFL=0.764159
+    HPWL=(1256701.875000, 1227580.375000)
+    POTN=1.886413E+09
+    PHIC=9.119504E-09
+    GRAD=7.783864E-04
+    NuBT=1
+    CPU =0.036339
+
+ITER: 74
+    HPWL=2484265.000000
+    OVFL=0.764277
+    HPWL=(1256696.750000, 1227568.125000)
+    POTN=1.885547E+09
+    PHIC=9.575479E-09
+    GRAD=7.663894E-04
+    NuBT=1
+    CPU =0.035664
+
+ITER: 75
+    HPWL=2484237.500000
+    OVFL=0.764372
+    HPWL=(1256698.125000, 1227539.500000)
+    POTN=1.884771E+09
+    PHIC=1.005425E-08
+    GRAD=7.587745E-04
+    NuBT=1
+    CPU =0.035353
+
+ITER: 76
+    HPWL=2484143.000000
+    OVFL=0.764342
+    HPWL=(1256649.875000, 1227493.125000)
+    POTN=1.883983E+09
+    PHIC=1.055697E-08
+    GRAD=7.491731E-04
+    NuBT=1
+    CPU =0.035827
+
+ITER: 77
+    HPWL=2484177.000000
+    OVFL=0.764249
+    HPWL=(1256673.625000, 1227503.500000)
+    POTN=1.883218E+09
+    PHIC=1.108476E-08
+    GRAD=7.344803E-04
+    NuBT=1
+    CPU =0.035230
+
+ITER: 78
+    HPWL=2484056.500000
+    OVFL=0.764176
+    HPWL=(1256615.125000, 1227441.375000)
+    POTN=1.882400E+09
+    PHIC=1.163900E-08
+    GRAD=7.245051E-04
+    NuBT=1
+    CPU =0.035282
+
+ITER: 79
+    HPWL=2483944.750000
+    OVFL=0.764050
+    HPWL=(1256571.875000, 1227372.875000)
+    POTN=1.881645E+09
+    PHIC=1.222095E-08
+    GRAD=7.184186E-04
+    NuBT=1
+    CPU =0.035464
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0080.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0080.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0080.jpg image has been saved
+
+ITER: 80
+    HPWL=2483692.000000
+    OVFL=0.763920
+    HPWL=(1256436.875000, 1227255.125000)
+    POTN=1.880910E+09
+    PHIC=1.283199E-08
+    GRAD=7.170008E-04
+    NuBT=1
+    CPU =0.086387
+
+ITER: 81
+    HPWL=2483436.000000
+    OVFL=0.763656
+    HPWL=(1256307.375000, 1227128.750000)
+    POTN=1.880282E+09
+    PHIC=1.347359E-08
+    GRAD=7.118392E-04
+    NuBT=1
+    CPU =0.035582
+
+ITER: 82
+    HPWL=2482983.500000
+    OVFL=0.763423
+    HPWL=(1256067.000000, 1226916.375000)
+    POTN=1.879695E+09
+    PHIC=1.414727E-08
+    GRAD=7.084720E-04
+    NuBT=1
+    CPU =0.035521
+
+ITER: 83
+    HPWL=2482398.500000
+    OVFL=0.763327
+    HPWL=(1255775.500000, 1226622.875000)
+    POTN=1.879277E+09
+    PHIC=1.485463E-08
+    GRAD=7.043438E-04
+    NuBT=1
+    CPU =0.035533
+
+ITER: 84
+    HPWL=2481566.500000
+    OVFL=0.763242
+    HPWL=(1255347.625000, 1226219.000000)
+    POTN=1.878987E+09
+    PHIC=1.559737E-08
+    GRAD=7.068001E-04
+    NuBT=1
+    CPU =0.035345
+
+ITER: 85
+    HPWL=2480828.000000
+    OVFL=0.763222
+    HPWL=(1254962.625000, 1225865.375000)
+    POTN=1.878860E+09
+    PHIC=1.637723E-08
+    GRAD=7.086928E-04
+    NuBT=1
+    CPU =0.036255
+
+ITER: 86
+    HPWL=2480038.000000
+    OVFL=0.763251
+    HPWL=(1254536.750000, 1225501.375000)
+    POTN=1.878828E+09
+    PHIC=1.719609E-08
+    GRAD=7.061741E-04
+    NuBT=1
+    CPU =0.035342
+
+ITER: 87
+    HPWL=2479445.000000
+    OVFL=0.763265
+    HPWL=(1254218.875000, 1225226.125000)
+    POTN=1.878868E+09
+    PHIC=1.805590E-08
+    GRAD=6.951780E-04
+    NuBT=1
+    CPU =0.035379
+
+ITER: 88
+    HPWL=2478955.000000
+    OVFL=0.763260
+    HPWL=(1253937.500000, 1225017.500000)
+    POTN=1.878904E+09
+    PHIC=1.895869E-08
+    GRAD=6.853988E-04
+    NuBT=1
+    CPU =0.035254
+
+ITER: 89
+    HPWL=2478723.000000
+    OVFL=0.763170
+    HPWL=(1253797.125000, 1224925.750000)
+    POTN=1.878913E+09
+    PHIC=1.990663E-08
+    GRAD=6.780274E-04
+    NuBT=1
+    CPU =0.035926
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0090.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0090.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0090.jpg image has been saved
+
+ITER: 90
+    HPWL=2478536.500000
+    OVFL=0.763042
+    HPWL=(1253668.500000, 1224868.125000)
+    POTN=1.878904E+09
+    PHIC=2.090196E-08
+    GRAD=6.756264E-04
+    NuBT=1
+    CPU =0.089216
+
+ITER: 91
+    HPWL=2478464.250000
+    OVFL=0.762978
+    HPWL=(1253618.125000, 1224846.125000)
+    POTN=1.878851E+09
+    PHIC=2.194705E-08
+    GRAD=6.729831E-04
+    NuBT=1
+    CPU =0.044448
+
+ITER: 92
+    HPWL=2478274.000000
+    OVFL=0.762893
+    HPWL=(1253504.875000, 1224769.125000)
+    POTN=1.878819E+09
+    PHIC=2.304440E-08
+    GRAD=6.698693E-04
+    NuBT=1
+    CPU =0.043901
+
+ITER: 93
+    HPWL=2478177.500000
+    OVFL=0.762756
+    HPWL=(1253446.375000, 1224731.250000)
+    POTN=1.878806E+09
+    PHIC=2.419662E-08
+    GRAD=6.645824E-04
+    NuBT=1
+    CPU =0.041721
+
+ITER: 94
+    HPWL=2477961.500000
+    OVFL=0.762572
+    HPWL=(1253325.000000, 1224636.500000)
+    POTN=1.878776E+09
+    PHIC=2.540645E-08
+    GRAD=6.617118E-04
+    NuBT=1
+    CPU =0.036056
+
+ITER: 95
+    HPWL=2477726.000000
+    OVFL=0.762441
+    HPWL=(1253212.250000, 1224513.625000)
+    POTN=1.878775E+09
+    PHIC=2.667677E-08
+    GRAD=6.595110E-04
+    NuBT=1
+    CPU =0.035554
+
+ITER: 96
+    HPWL=2477247.000000
+    OVFL=0.762331
+    HPWL=(1252977.875000, 1224269.250000)
+    POTN=1.878779E+09
+    PHIC=2.801061E-08
+    GRAD=6.592444E-04
+    NuBT=1
+    CPU =0.035446
+
+ITER: 97
+    HPWL=2476774.000000
+    OVFL=0.762359
+    HPWL=(1252751.375000, 1224022.500000)
+    POTN=1.878816E+09
+    PHIC=2.941114E-08
+    GRAD=6.579501E-04
+    NuBT=1
+    CPU =0.036376
+
+ITER: 98
+    HPWL=2476167.500000
+    OVFL=0.762457
+    HPWL=(1252452.625000, 1223714.750000)
+    POTN=1.878905E+09
+    PHIC=3.088170E-08
+    GRAD=6.573492E-04
+    NuBT=1
+    CPU =0.035240
+
+ITER: 99
+    HPWL=2475744.000000
+    OVFL=0.762552
+    HPWL=(1252246.375000, 1223497.750000)
+    POTN=1.878969E+09
+    PHIC=3.242578E-08
+    GRAD=6.536138E-04
+    NuBT=1
+    CPU =0.035428
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0100.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0100.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0100.jpg image has been saved
+
+ITER: 100
+    HPWL=2475442.000000
+    OVFL=0.762653
+    HPWL=(1252087.125000, 1223354.875000)
+    POTN=1.879006E+09
+    PHIC=3.404707E-08
+    GRAD=6.479741E-04
+    NuBT=1
+    CPU =0.088391
+
+ITER: 101
+    HPWL=2475391.500000
+    OVFL=0.762721
+    HPWL=(1252068.500000, 1223322.875000)
+    POTN=1.878915E+09
+    PHIC=3.574942E-08
+    GRAD=6.401190E-04
+    NuBT=1
+    CPU =0.043380
+
+ITER: 102
+    HPWL=2475466.000000
+    OVFL=0.762749
+    HPWL=(1252100.625000, 1223365.500000)
+    POTN=1.878706E+09
+    PHIC=3.753649E-08
+    GRAD=6.365165E-04
+    NuBT=1
+    CPU =0.036348
+
+ITER: 103
+    HPWL=2475753.250000
+    OVFL=0.762736
+    HPWL=(1252251.875000, 1223501.375000)
+    POTN=1.878377E+09
+    PHIC=3.941172E-08
+    GRAD=6.367904E-04
+    NuBT=1
+    CPU =0.035269
+
+ITER: 104
+    HPWL=2476046.000000
+    OVFL=0.762673
+    HPWL=(1252402.125000, 1223643.750000)
+    POTN=1.877894E+09
+    PHIC=4.138059E-08
+    GRAD=6.394063E-04
+    NuBT=1
+    CPU =0.035282
+
+ITER: 105
+    HPWL=2476420.000000
+    OVFL=0.762569
+    HPWL=(1252600.250000, 1223819.750000)
+    POTN=1.877255E+09
+    PHIC=4.344733E-08
+    GRAD=6.387131E-04
+    NuBT=1
+    CPU =0.035317
+
+ITER: 106
+    HPWL=2476641.000000
+    OVFL=0.762507
+    HPWL=(1252724.375000, 1223916.625000)
+    POTN=1.876534E+09
+    PHIC=4.561827E-08
+    GRAD=6.363357E-04
+    NuBT=1
+    CPU =0.035368
+
+ITER: 107
+    HPWL=2476785.750000
+    OVFL=0.762460
+    HPWL=(1252823.625000, 1223962.125000)
+    POTN=1.875757E+09
+    PHIC=4.789820E-08
+    GRAD=6.326076E-04
+    NuBT=1
+    CPU =0.035486
+
+ITER: 108
+    HPWL=2476767.500000
+    OVFL=0.762437
+    HPWL=(1252835.125000, 1223932.375000)
+    POTN=1.874937E+09
+    PHIC=5.029311E-08
+    GRAD=6.318762E-04
+    NuBT=1
+    CPU =0.035445
+
+ITER: 109
+    HPWL=2476720.000000
+    OVFL=0.762410
+    HPWL=(1252841.625000, 1223878.375000)
+    POTN=1.874073E+09
+    PHIC=5.280777E-08
+    GRAD=6.321531E-04
+    NuBT=1
+    CPU =0.035280
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0110.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0110.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0110.jpg image has been saved
+
+ITER: 110
+    HPWL=2476553.750000
+    OVFL=0.762409
+    HPWL=(1252780.375000, 1223773.375000)
+    POTN=1.873161E+09
+    PHIC=5.544815E-08
+    GRAD=6.337320E-04
+    NuBT=1
+    CPU =0.088033
+
+ITER: 111
+    HPWL=2476400.500000
+    OVFL=0.762462
+    HPWL=(1252735.625000, 1223664.750000)
+    POTN=1.872181E+09
+    PHIC=5.822056E-08
+    GRAD=6.335192E-04
+    NuBT=1
+    CPU =0.043579
+
+ITER: 112
+    HPWL=2476194.000000
+    OVFL=0.762525
+    HPWL=(1252650.000000, 1223543.875000)
+    POTN=1.871130E+09
+    PHIC=6.113159E-08
+    GRAD=6.334553E-04
+    NuBT=1
+    CPU =0.043368
+
+ITER: 113
+    HPWL=2476129.500000
+    OVFL=0.762606
+    HPWL=(1252636.250000, 1223493.125000)
+    POTN=1.869945E+09
+    PHIC=6.418816E-08
+    GRAD=6.331799E-04
+    NuBT=1
+    CPU =0.043676
+
+ITER: 114
+    HPWL=2476089.250000
+    OVFL=0.762658
+    HPWL=(1252627.500000, 1223461.750000)
+    POTN=1.868685E+09
+    PHIC=6.739757E-08
+    GRAD=6.343899E-04
+    NuBT=1
+    CPU =0.043492
+
+ITER: 115
+    HPWL=2476231.500000
+    OVFL=0.762704
+    HPWL=(1252714.250000, 1223517.375000)
+    POTN=1.867240E+09
+    PHIC=7.076603E-08
+    GRAD=6.368106E-04
+    NuBT=1
+    CPU =0.043521
+
+ITER: 116
+    HPWL=2476379.250000
+    OVFL=0.762748
+    HPWL=(1252798.000000, 1223581.250000)
+    POTN=1.865654E+09
+    PHIC=7.430278E-08
+    GRAD=6.409061E-04
+    NuBT=1
+    CPU =0.043680
+
+ITER: 117
+    HPWL=2476655.500000
+    OVFL=0.762787
+    HPWL=(1252955.875000, 1223699.625000)
+    POTN=1.863916E+09
+    PHIC=7.801487E-08
+    GRAD=6.461428E-04
+    NuBT=1
+    CPU =0.037069
+
+ITER: 118
+    HPWL=2476910.000000
+    OVFL=0.762801
+    HPWL=(1253092.000000, 1223818.125000)
+    POTN=1.862006E+09
+    PHIC=8.191267E-08
+    GRAD=6.518794E-04
+    NuBT=1
+    CPU =0.035829
+
+ITER: 119
+    HPWL=2477247.000000
+    OVFL=0.762777
+    HPWL=(1253278.750000, 1223968.375000)
+    POTN=1.859914E+09
+    PHIC=8.600421E-08
+    GRAD=6.583076E-04
+    NuBT=1
+    CPU =0.035569
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0120.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0120.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0120.jpg image has been saved
+
+ITER: 120
+    HPWL=2477486.000000
+    OVFL=0.762737
+    HPWL=(1253413.375000, 1224072.625000)
+    POTN=1.857668E+09
+    PHIC=9.030138E-08
+    GRAD=6.660326E-04
+    NuBT=1
+    CPU =0.088217
+
+ITER: 121
+    HPWL=2477723.000000
+    OVFL=0.762713
+    HPWL=(1253559.125000, 1224163.875000)
+    POTN=1.855241E+09
+    PHIC=9.481327E-08
+    GRAD=6.752548E-04
+    NuBT=1
+    CPU =0.043618
+
+ITER: 122
+    HPWL=2477800.000000
+    OVFL=0.762701
+    HPWL=(1253622.500000, 1224177.625000)
+    POTN=1.852677E+09
+    PHIC=9.955285E-08
+    GRAD=6.853769E-04
+    NuBT=1
+    CPU =0.044383
+
+ITER: 123
+    HPWL=2477861.500000
+    OVFL=0.762707
+    HPWL=(1253681.625000, 1224179.875000)
+    POTN=1.849981E+09
+    PHIC=1.045296E-07
+    GRAD=6.963073E-04
+    NuBT=1
+    CPU =0.043222
+
+ITER: 124
+    HPWL=2477798.500000
+    OVFL=0.762733
+    HPWL=(1253670.000000, 1224128.500000)
+    POTN=1.847108E+09
+    PHIC=1.097561E-07
+    GRAD=7.096892E-04
+    NuBT=1
+    CPU =0.043293
+
+ITER: 125
+    HPWL=2477782.250000
+    OVFL=0.762752
+    HPWL=(1253689.500000, 1224092.750000)
+    POTN=1.844031E+09
+    PHIC=1.152439E-07
+    GRAD=7.254145E-04
+    NuBT=1
+    CPU =0.043374
+
+ITER: 126
+    HPWL=2477699.500000
+    OVFL=0.762779
+    HPWL=(1253666.500000, 1224033.125000)
+    POTN=1.840749E+09
+    PHIC=1.210060E-07
+    GRAD=7.432935E-04
+    NuBT=1
+    CPU =0.043291
+
+ITER: 127
+    HPWL=2477716.500000
+    OVFL=0.762807
+    HPWL=(1253697.000000, 1224019.500000)
+    POTN=1.837217E+09
+    PHIC=1.270560E-07
+    GRAD=7.628083E-04
+    NuBT=1
+    CPU =0.043405
+
+ITER: 128
+    HPWL=2477685.000000
+    OVFL=0.762803
+    HPWL=(1253692.375000, 1223992.500000)
+    POTN=1.833410E+09
+    PHIC=1.334088E-07
+    GRAD=7.842449E-04
+    NuBT=1
+    CPU =0.036792
+
+ITER: 129
+    HPWL=2477783.500000
+    OVFL=0.762776
+    HPWL=(1253762.500000, 1224021.125000)
+    POTN=1.829340E+09
+    PHIC=1.400773E-07
+    GRAD=8.082062E-04
+    NuBT=1
+    CPU =0.035929
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0130.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0130.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0130.jpg image has been saved
+
+ITER: 130
+    HPWL=2477811.750000
+    OVFL=0.762760
+    HPWL=(1253783.500000, 1224028.250000)
+    POTN=1.824962E+09
+    PHIC=1.470806E-07
+    GRAD=8.352726E-04
+    NuBT=1
+    CPU =0.087681
+
+ITER: 131
+    HPWL=2477915.500000
+    OVFL=0.762746
+    HPWL=(1253855.125000, 1224060.375000)
+    POTN=1.820302E+09
+    PHIC=1.544324E-07
+    GRAD=8.651445E-04
+    NuBT=1
+    CPU =0.045946
+
+ITER: 132
+    HPWL=2477921.000000
+    OVFL=0.762743
+    HPWL=(1253865.875000, 1224055.000000)
+    POTN=1.815343E+09
+    PHIC=1.621538E-07
+    GRAD=8.969284E-04
+    NuBT=1
+    CPU =0.036824
+
+ITER: 133
+    HPWL=2478025.750000
+    OVFL=0.762759
+    HPWL=(1253932.250000, 1224093.500000)
+    POTN=1.810068E+09
+    PHIC=1.702590E-07
+    GRAD=9.306577E-04
+    NuBT=1
+    CPU =0.036048
+
+ITER: 134
+    HPWL=2478036.000000
+    OVFL=0.762758
+    HPWL=(1253938.875000, 1224097.125000)
+    POTN=1.804462E+09
+    PHIC=1.787717E-07
+    GRAD=9.670421E-04
+    NuBT=1
+    CPU =0.035711
+
+ITER: 135
+    HPWL=2478177.000000
+    OVFL=0.762758
+    HPWL=(1254020.500000, 1224156.500000)
+    POTN=1.798491E+09
+    PHIC=1.877065E-07
+    GRAD=1.006948E-03
+    NuBT=1
+    CPU =0.035402
+
+ITER: 136
+    HPWL=2478217.000000
+    OVFL=0.762762
+    HPWL=(1254038.125000, 1224179.000000)
+    POTN=1.792174E+09
+    PHIC=1.970907E-07
+    GRAD=1.050476E-03
+    NuBT=1
+    CPU =0.035413
+
+ITER: 137
+    HPWL=2478384.000000
+    OVFL=0.762736
+    HPWL=(1254134.000000, 1224250.125000)
+    POTN=1.785515E+09
+    PHIC=2.069404E-07
+    GRAD=1.096385E-03
+    NuBT=1
+    CPU =0.035322
+
+ITER: 138
+    HPWL=2478451.000000
+    OVFL=0.762694
+    HPWL=(1254164.750000, 1224286.125000)
+    POTN=1.778474E+09
+    PHIC=2.172854E-07
+    GRAD=1.144289E-03
+    NuBT=1
+    CPU =0.035282
+
+ITER: 139
+    HPWL=2478624.250000
+    OVFL=0.762663
+    HPWL=(1254262.750000, 1224361.500000)
+    POTN=1.771022E+09
+    PHIC=2.281441E-07
+    GRAD=1.196204E-03
+    NuBT=1
+    CPU =0.035212
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0140.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0140.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0140.jpg image has been saved
+
+ITER: 140
+    HPWL=2478650.000000
+    OVFL=0.762623
+    HPWL=(1254273.125000, 1224376.750000)
+    POTN=1.763175E+09
+    PHIC=2.395504E-07
+    GRAD=1.251637E-03
+    NuBT=1
+    CPU =0.088000
+
+ITER: 141
+    HPWL=2478779.250000
+    OVFL=0.762599
+    HPWL=(1254348.375000, 1224430.875000)
+    POTN=1.754940E+09
+    PHIC=2.515233E-07
+    GRAD=1.310534E-03
+    NuBT=1
+    CPU =0.036143
+
+ITER: 142
+    HPWL=2478758.500000
+    OVFL=0.762579
+    HPWL=(1254329.250000, 1224429.125000)
+    POTN=1.746266E+09
+    PHIC=2.640994E-07
+    GRAD=1.371456E-03
+    NuBT=1
+    CPU =0.035419
+
+ITER: 143
+    HPWL=2478868.500000
+    OVFL=0.762541
+    HPWL=(1254392.875000, 1224475.750000)
+    POTN=1.737162E+09
+    PHIC=2.773001E-07
+    GRAD=1.434239E-03
+    NuBT=1
+    CPU =0.036646
+
+ITER: 144
+    HPWL=2478852.500000
+    OVFL=0.762490
+    HPWL=(1254373.375000, 1224479.250000)
+    POTN=1.727644E+09
+    PHIC=2.911651E-07
+    GRAD=1.500507E-03
+    NuBT=1
+    CPU =0.035507
+
+ITER: 145
+    HPWL=2478967.000000
+    OVFL=0.762415
+    HPWL=(1254437.375000, 1224529.625000)
+    POTN=1.717652E+09
+    PHIC=3.057184E-07
+    GRAD=1.572083E-03
+    NuBT=1
+    CPU =0.035698
+
+ITER: 146
+    HPWL=2478921.250000
+    OVFL=0.762345
+    HPWL=(1254400.875000, 1224520.375000)
+    POTN=1.707164E+09
+    PHIC=3.210043E-07
+    GRAD=1.648237E-03
+    NuBT=1
+    CPU =0.035667
+
+ITER: 147
+    HPWL=2478991.750000
+    OVFL=0.762229
+    HPWL=(1254449.875000, 1224541.875000)
+    POTN=1.696220E+09
+    PHIC=3.370511E-07
+    GRAD=1.727545E-03
+    NuBT=1
+    CPU =0.035279
+
+ITER: 148
+    HPWL=2478877.500000
+    OVFL=0.762095
+    HPWL=(1254379.125000, 1224498.375000)
+    POTN=1.684825E+09
+    PHIC=3.539037E-07
+    GRAD=1.808468E-03
+    NuBT=1
+    CPU =0.035262
+
+ITER: 149
+    HPWL=2478861.750000
+    OVFL=0.761966
+    HPWL=(1254379.750000, 1224482.000000)
+    POTN=1.672989E+09
+    PHIC=3.715988E-07
+    GRAD=1.892602E-03
+    NuBT=1
+    CPU =0.035291
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0150.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0150.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0150.jpg image has been saved
+
+ITER: 150
+    HPWL=2478592.750000
+    OVFL=0.761839
+    HPWL=(1254231.375000, 1224361.375000)
+    POTN=1.660649E+09
+    PHIC=3.901787E-07
+    GRAD=1.982062E-03
+    NuBT=1
+    CPU =0.086597
+
+ITER: 151
+    HPWL=2478456.500000
+    OVFL=0.761734
+    HPWL=(1254175.000000, 1224281.625000)
+    POTN=1.647831E+09
+    PHIC=4.096877E-07
+    GRAD=2.076833E-03
+    NuBT=1
+    CPU =0.035561
+
+ITER: 152
+    HPWL=2478079.000000
+    OVFL=0.761581
+    HPWL=(1253969.000000, 1224109.875000)
+    POTN=1.634477E+09
+    PHIC=4.301720E-07
+    GRAD=2.173352E-03
+    NuBT=1
+    CPU =0.035466
+
+ITER: 153
+    HPWL=2477887.000000
+    OVFL=0.761451
+    HPWL=(1253875.250000, 1224011.625000)
+    POTN=1.620662E+09
+    PHIC=4.516806E-07
+    GRAD=2.272496E-03
+    NuBT=1
+    CPU =0.035378
+
+ITER: 154
+    HPWL=2477440.000000
+    OVFL=0.761358
+    HPWL=(1253643.000000, 1223796.875000)
+    POTN=1.606284E+09
+    PHIC=4.742646E-07
+    GRAD=2.374523E-03
+    NuBT=1
+    CPU =0.035348
+
+ITER: 155
+    HPWL=2477201.750000
+    OVFL=0.761281
+    HPWL=(1253522.875000, 1223678.875000)
+    POTN=1.591405E+09
+    PHIC=4.979778E-07
+    GRAD=2.483690E-03
+    NuBT=1
+    CPU =0.036321
+
+ITER: 156
+    HPWL=2476813.500000
+    OVFL=0.761171
+    HPWL=(1253310.000000, 1223503.375000)
+    POTN=1.575924E+09
+    PHIC=5.228766E-07
+    GRAD=2.593969E-03
+    NuBT=1
+    CPU =0.035263
+
+ITER: 157
+    HPWL=2476700.750000
+    OVFL=0.761078
+    HPWL=(1253240.375000, 1223460.375000)
+    POTN=1.559887E+09
+    PHIC=5.490205E-07
+    GRAD=2.707774E-03
+    NuBT=1
+    CPU =0.035345
+
+ITER: 158
+    HPWL=2476399.500000
+    OVFL=0.760982
+    HPWL=(1253077.875000, 1223321.500000)
+    POTN=1.543240E+09
+    PHIC=5.764715E-07
+    GRAD=2.823940E-03
+    NuBT=1
+    CPU =0.035300
+
+ITER: 159
+    HPWL=2476401.000000
+    OVFL=0.760886
+    HPWL=(1253056.000000, 1223345.000000)
+    POTN=1.526012E+09
+    PHIC=6.052949E-07
+    GRAD=2.946751E-03
+    NuBT=1
+    CPU =0.035261
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0160.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0160.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0160.jpg image has been saved
+
+ITER: 160
+    HPWL=2476212.250000
+    OVFL=0.760762
+    HPWL=(1252951.750000, 1223260.500000)
+    POTN=1.508037E+09
+    PHIC=6.355596E-07
+    GRAD=3.070633E-03
+    NuBT=1
+    CPU =0.086932
+
+ITER: 161
+    HPWL=2476346.000000
+    OVFL=0.760644
+    HPWL=(1252991.250000, 1223354.875000)
+    POTN=1.489433E+09
+    PHIC=6.673249E-07
+    GRAD=3.201656E-03
+    NuBT=1
+    CPU =0.035745
+
+ITER: 162
+    HPWL=2476222.250000
+    OVFL=0.760495
+    HPWL=(1252925.250000, 1223297.000000)
+    POTN=1.470211E+09
+    PHIC=7.006911E-07
+    GRAD=3.333583E-03
+    NuBT=1
+    CPU =0.035419
+
+ITER: 163
+    HPWL=2476409.500000
+    OVFL=0.760346
+    HPWL=(1252983.875000, 1223425.750000)
+    POTN=1.450312E+09
+    PHIC=7.357062E-07
+    GRAD=3.472614E-03
+    NuBT=1
+    CPU =0.035541
+
+ITER: 164
+    HPWL=2476282.500000
+    OVFL=0.760138
+    HPWL=(1252930.000000, 1223352.500000)
+    POTN=1.429717E+09
+    PHIC=7.724914E-07
+    GRAD=3.611820E-03
+    NuBT=1
+    CPU =0.035486
+
+ITER: 165
+    HPWL=2476442.750000
+    OVFL=0.759915
+    HPWL=(1252980.625000, 1223462.125000)
+    POTN=1.408607E+09
+    PHIC=8.110977E-07
+    GRAD=3.760304E-03
+    NuBT=1
+    CPU =0.035404
+
+ITER: 166
+    HPWL=2476195.000000
+    OVFL=0.759670
+    HPWL=(1252879.250000, 1223315.875000)
+    POTN=1.386777E+09
+    PHIC=8.516525E-07
+    GRAD=3.909875E-03
+    NuBT=1
+    CPU =0.035290
+
+ITER: 167
+    HPWL=2476211.750000
+    OVFL=0.759392
+    HPWL=(1252853.000000, 1223358.750000)
+    POTN=1.364516E+09
+    PHIC=8.942329E-07
+    GRAD=4.067947E-03
+    NuBT=1
+    CPU =0.035287
+
+ITER: 168
+    HPWL=2475793.500000
+    OVFL=0.759162
+    HPWL=(1252679.375000, 1223114.000000)
+    POTN=1.341645E+09
+    PHIC=9.389445E-07
+    GRAD=4.225961E-03
+    NuBT=1
+    CPU =0.036429
+
+ITER: 169
+    HPWL=2475627.000000
+    OVFL=0.758851
+    HPWL=(1252537.750000, 1223089.125000)
+    POTN=1.318315E+09
+    PHIC=9.858917E-07
+    GRAD=4.396489E-03
+    NuBT=1
+    CPU =0.035349
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0170.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0170.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0170.jpg image has been saved
+
+ITER: 170
+    HPWL=2475070.000000
+    OVFL=0.758597
+    HPWL=(1252297.125000, 1222772.875000)
+    POTN=1.294474E+09
+    PHIC=1.035186E-06
+    GRAD=4.572067E-03
+    NuBT=1
+    CPU =0.086494
+
+ITER: 171
+    HPWL=2474788.750000
+    OVFL=0.758405
+    HPWL=(1252073.500000, 1222715.250000)
+    POTN=1.270192E+09
+    PHIC=1.086945E-06
+    GRAD=4.760818E-03
+    NuBT=1
+    CPU =0.043785
+
+ITER: 172
+    HPWL=2474118.750000
+    OVFL=0.758241
+    HPWL=(1251780.250000, 1222338.500000)
+    POTN=1.245457E+09
+    PHIC=1.141293E-06
+    GRAD=4.961732E-03
+    NuBT=1
+    CPU =0.043323
+
+ITER: 173
+    HPWL=2473953.500000
+    OVFL=0.758061
+    HPWL=(1251583.250000, 1222370.375000)
+    POTN=1.220190E+09
+    PHIC=1.198357E-06
+    GRAD=5.172223E-03
+    NuBT=1
+    CPU =0.043264
+
+ITER: 174
+    HPWL=2473475.500000
+    OVFL=0.757889
+    HPWL=(1251401.500000, 1222073.875000)
+    POTN=1.194447E+09
+    PHIC=1.258275E-06
+    GRAD=5.395748E-03
+    NuBT=1
+    CPU =0.043243
+
+ITER: 175
+    HPWL=2473525.000000
+    OVFL=0.757754
+    HPWL=(1251323.750000, 1222201.375000)
+    POTN=1.168251E+09
+    PHIC=1.321180E-06
+    GRAD=5.608470E-03
+    NuBT=1
+    CPU =0.042521
+
+ITER: 176
+    HPWL=2473276.000000
+    OVFL=0.757593
+    HPWL=(1251251.500000, 1222024.500000)
+    POTN=1.141800E+09
+    PHIC=1.387238E-06
+    GRAD=5.810674E-03
+    NuBT=1
+    CPU =0.035394
+
+ITER: 177
+    HPWL=2473623.750000
+    OVFL=0.757408
+    HPWL=(1251299.875000, 1222323.875000)
+    POTN=1.114867E+09
+    PHIC=1.456529E-06
+    GRAD=5.993467E-03
+    NuBT=1
+    CPU =0.035438
+
+ITER: 178
+    HPWL=2473641.500000
+    OVFL=0.757184
+    HPWL=(1251354.125000, 1222287.250000)
+    POTN=1.087706E+09
+    PHIC=1.529351E-06
+    GRAD=6.183919E-03
+    NuBT=1
+    CPU =0.035232
+
+ITER: 179
+    HPWL=2474203.500000
+    OVFL=0.756852
+    HPWL=(1251527.375000, 1222676.000000)
+    POTN=1.060074E+09
+    PHIC=1.605692E-06
+    GRAD=6.387187E-03
+    NuBT=1
+    CPU =0.036162
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0180.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0180.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0180.jpg image has been saved
+
+ITER: 180
+    HPWL=2474317.500000
+    OVFL=0.756468
+    HPWL=(1251647.250000, 1222670.375000)
+    POTN=1.032397E+09
+    PHIC=1.685949E-06
+    GRAD=6.602668E-03
+    NuBT=1
+    CPU =0.085993
+
+ITER: 181
+    HPWL=2474776.750000
+    OVFL=0.756004
+    HPWL=(1251773.250000, 1223003.500000)
+    POTN=1.004541E+09
+    PHIC=1.770132E-06
+    GRAD=6.834665E-03
+    NuBT=1
+    CPU =0.035532
+
+ITER: 182
+    HPWL=2474609.500000
+    OVFL=0.755670
+    HPWL=(1251764.000000, 1222845.500000)
+    POTN=9.767190E+08
+    PHIC=1.858638E-06
+    GRAD=7.078145E-03
+    NuBT=1
+    CPU =0.035249
+
+ITER: 183
+    HPWL=2474660.500000
+    OVFL=0.755307
+    HPWL=(1251711.875000, 1222948.625000)
+    POTN=9.490979E+08
+    PHIC=1.951556E-06
+    GRAD=7.324701E-03
+    NuBT=1
+    CPU =0.035089
+
+ITER: 184
+    HPWL=2474208.500000
+    OVFL=0.754942
+    HPWL=(1251541.500000, 1222667.000000)
+    POTN=9.217308E+08
+    PHIC=2.049134E-06
+    GRAD=7.569613E-03
+    NuBT=1
+    CPU =0.035328
+
+ITER: 185
+    HPWL=2474077.000000
+    OVFL=0.754649
+    HPWL=(1251400.750000, 1222676.250000)
+    POTN=8.945882E+08
+    PHIC=2.151590E-06
+    GRAD=7.810778E-03
+    NuBT=1
+    CPU =0.035193
+
+ITER: 186
+    HPWL=2473507.000000
+    OVFL=0.754416
+    HPWL=(1251134.625000, 1222372.500000)
+    POTN=8.676788E+08
+    PHIC=2.259170E-06
+    GRAD=8.043026E-03
+    NuBT=1
+    CPU =0.035189
+
+ITER: 187
+    HPWL=2473327.000000
+    OVFL=0.754007
+    HPWL=(1250974.125000, 1222352.875000)
+    POTN=8.411687E+08
+    PHIC=2.372128E-06
+    GRAD=8.257461E-03
+    NuBT=1
+    CPU =0.035134
+
+ITER: 188
+    HPWL=2473056.500000
+    OVFL=0.753579
+    HPWL=(1250845.125000, 1222211.500000)
+    POTN=8.151293E+08
+    PHIC=2.490734E-06
+    GRAD=8.472190E-03
+    NuBT=1
+    CPU =0.035260
+
+ITER: 189
+    HPWL=2473015.000000
+    OVFL=0.752852
+    HPWL=(1250727.500000, 1222287.500000)
+    POTN=7.895466E+08
+    PHIC=2.615271E-06
+    GRAD=8.696728E-03
+    NuBT=1
+    CPU =0.035107
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0190.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0190.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0190.jpg image has been saved
+
+ITER: 190
+    HPWL=2472876.000000
+    OVFL=0.752159
+    HPWL=(1250658.000000, 1222218.125000)
+    POTN=7.645782E+08
+    PHIC=2.746035E-06
+    GRAD=8.927065E-03
+    NuBT=1
+    CPU =0.085425
+
+ITER: 191
+    HPWL=2472380.500000
+    OVFL=0.751341
+    HPWL=(1250327.375000, 1222053.250000)
+    POTN=7.403165E+08
+    PHIC=2.883336E-06
+    GRAD=9.140892E-03
+    NuBT=1
+    CPU =0.036304
+
+ITER: 192
+    HPWL=2471670.000000
+    OVFL=0.750789
+    HPWL=(1250011.250000, 1221658.625000)
+    POTN=7.171433E+08
+    PHIC=3.027503E-06
+    GRAD=9.339051E-03
+    NuBT=1
+    CPU =0.035187
+
+ITER: 193
+    HPWL=2470472.750000
+    OVFL=0.750079
+    HPWL=(1249305.750000, 1221167.000000)
+    POTN=6.948615E+08
+    PHIC=3.178878E-06
+    GRAD=9.514967E-03
+    NuBT=1
+    CPU =0.035031
+
+ITER: 194
+    HPWL=2469462.500000
+    OVFL=0.749086
+    HPWL=(1248832.250000, 1220630.125000)
+    POTN=6.736459E+08
+    PHIC=3.337822E-06
+    GRAD=9.676775E-03
+    NuBT=1
+    CPU =0.035355
+
+ITER: 195
+    HPWL=2467975.750000
+    OVFL=0.748000
+    HPWL=(1247940.750000, 1220035.000000)
+    POTN=6.534396E+08
+    PHIC=3.504713E-06
+    GRAD=9.849038E-03
+    NuBT=1
+    CPU =0.035034
+
+ITER: 196
+    HPWL=2466470.500000
+    OVFL=0.747367
+    HPWL=(1247261.250000, 1219209.125000)
+    POTN=6.344909E+08
+    PHIC=3.679948E-06
+    GRAD=1.003023E-02
+    NuBT=1
+    CPU =0.035062
+
+ITER: 197
+    HPWL=2464160.500000
+    OVFL=0.746629
+    HPWL=(1245991.125000, 1218169.375000)
+    POTN=6.168872E+08
+    PHIC=3.863945E-06
+    GRAD=1.017014E-02
+    NuBT=1
+    CPU =0.035147
+
+ITER: 198
+    HPWL=2462523.750000
+    OVFL=0.745676
+    HPWL=(1245177.125000, 1217346.625000)
+    POTN=6.003768E+08
+    PHIC=4.057143E-06
+    GRAD=1.026100E-02
+    NuBT=1
+    CPU =0.035009
+
+ITER: 199
+    HPWL=2460509.000000
+    OVFL=0.744752
+    HPWL=(1243990.375000, 1216518.500000)
+    POTN=5.851002E+08
+    PHIC=4.260000E-06
+    GRAD=1.036245E-02
+    NuBT=1
+    CPU =0.035015
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0200.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0200.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0200.jpg image has been saved
+
+ITER: 200
+    HPWL=2459071.250000
+    OVFL=0.744001
+    HPWL=(1243271.625000, 1215799.625000)
+    POTN=5.710640E+08
+    PHIC=4.472999E-06
+    GRAD=1.047875E-02
+    NuBT=1
+    CPU =0.085435
+
+ITER: 201
+    HPWL=2456948.500000
+    OVFL=0.743212
+    HPWL=(1241978.500000, 1214970.000000)
+    POTN=5.583537E+08
+    PHIC=4.696649E-06
+    GRAD=1.055691E-02
+    NuBT=1
+    CPU =0.035435
+
+ITER: 202
+    HPWL=2455578.750000
+    OVFL=0.742294
+    HPWL=(1241292.500000, 1214286.250000)
+    POTN=5.465619E+08
+    PHIC=4.931481E-06
+    GRAD=1.058511E-02
+    NuBT=1
+    CPU =0.035053
+
+ITER: 203
+    HPWL=2453843.500000
+    OVFL=0.741519
+    HPWL=(1240172.125000, 1213671.375000)
+    POTN=5.359478E+08
+    PHIC=5.178055E-06
+    GRAD=1.059984E-02
+    NuBT=1
+    CPU =0.035973
+
+ITER: 204
+    HPWL=2452856.500000
+    OVFL=0.740743
+    HPWL=(1239674.750000, 1213181.750000)
+    POTN=5.265477E+08
+    PHIC=5.436958E-06
+    GRAD=1.058865E-02
+    NuBT=1
+    CPU =0.034950
+
+ITER: 205
+    HPWL=2451414.000000
+    OVFL=0.739561
+    HPWL=(1238696.875000, 1212717.000000)
+    POTN=5.180713E+08
+    PHIC=5.708805E-06
+    GRAD=1.053523E-02
+    NuBT=1
+    CPU =0.034874
+
+ITER: 206
+    HPWL=2450799.000000
+    OVFL=0.738027
+    HPWL=(1238433.000000, 1212365.875000)
+    POTN=5.104356E+08
+    PHIC=5.994245E-06
+    GRAD=1.045797E-02
+    NuBT=1
+    CPU =0.034813
+
+ITER: 207
+    HPWL=2449201.000000
+    OVFL=0.736445
+    HPWL=(1237471.500000, 1211729.500000)
+    POTN=5.037979E+08
+    PHIC=6.293958E-06
+    GRAD=1.040328E-02
+    NuBT=1
+    CPU =0.034860
+
+ITER: 208
+    HPWL=2447855.500000
+    OVFL=0.734935
+    HPWL=(1236857.625000, 1210997.875000)
+    POTN=4.980152E+08
+    PHIC=6.608655E-06
+    GRAD=1.031269E-02
+    NuBT=1
+    CPU =0.034856
+
+ITER: 209
+    HPWL=2445236.750000
+    OVFL=0.733166
+    HPWL=(1235364.500000, 1209872.250000)
+    POTN=4.932283E+08
+    PHIC=6.939088E-06
+    GRAD=1.017731E-02
+    NuBT=1
+    CPU =0.035091
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0210.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0210.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0210.jpg image has been saved
+
+ITER: 210
+    HPWL=2442807.000000
+    OVFL=0.731900
+    HPWL=(1234221.875000, 1208585.000000)
+    POTN=4.891907E+08
+    PHIC=7.286042E-06
+    GRAD=9.982369E-03
+    NuBT=1
+    CPU =0.084997
+
+ITER: 211
+    HPWL=2439156.250000
+    OVFL=0.730403
+    HPWL=(1232143.375000, 1207012.875000)
+    POTN=4.857187E+08
+    PHIC=7.650343E-06
+    GRAD=9.764145E-03
+    NuBT=1
+    CPU =0.035114
+
+ITER: 212
+    HPWL=2436114.500000
+    OVFL=0.729175
+    HPWL=(1230648.375000, 1205466.125000)
+    POTN=4.828539E+08
+    PHIC=8.032860E-06
+    GRAD=9.482275E-03
+    NuBT=1
+    CPU =0.035061
+
+ITER: 213
+    HPWL=2432389.500000
+    OVFL=0.727231
+    HPWL=(1228471.375000, 1203918.000000)
+    POTN=4.799781E+08
+    PHIC=8.434503E-06
+    GRAD=9.175444E-03
+    NuBT=1
+    CPU =0.034735
+
+ITER: 214
+    HPWL=2429564.750000
+    OVFL=0.725508
+    HPWL=(1227048.625000, 1202516.125000)
+    POTN=4.772386E+08
+    PHIC=8.856227E-06
+    GRAD=8.830301E-03
+    NuBT=1
+    CPU =0.034954
+
+ITER: 215
+    HPWL=2425935.750000
+    OVFL=0.724895
+    HPWL=(1224940.125000, 1200995.625000)
+    POTN=4.743789E+08
+    PHIC=9.299039E-06
+    GRAD=8.491767E-03
+    NuBT=1
+    CPU =0.034764
+
+ITER: 216
+    HPWL=2422832.500000
+    OVFL=0.722389
+    HPWL=(1223349.875000, 1199482.625000)
+    POTN=4.711755E+08
+    PHIC=9.763990E-06
+    GRAD=8.045658E-03
+    NuBT=1
+    CPU =0.036537
+
+ITER: 217
+    HPWL=2420155.750000
+    OVFL=0.720873
+    HPWL=(1221600.000000, 1198555.750000)
+    POTN=4.673115E+08
+    PHIC=1.025219E-05
+    GRAD=7.592984E-03
+    NuBT=1
+    CPU =0.035439
+
+ITER: 218
+    HPWL=2417191.750000
+    OVFL=0.718382
+    HPWL=(1220169.500000, 1197022.250000)
+    POTN=4.631138E+08
+    PHIC=1.076480E-05
+    GRAD=7.160401E-03
+    NuBT=1
+    CPU =0.034895
+
+ITER: 219
+    HPWL=2414174.000000
+    OVFL=0.715965
+    HPWL=(1218339.125000, 1195834.875000)
+    POTN=4.581093E+08
+    PHIC=1.130304E-05
+    GRAD=6.760056E-03
+    NuBT=1
+    CPU =0.034921
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0220.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0220.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0220.jpg image has been saved
+
+ITER: 220
+    HPWL=2410910.500000
+    OVFL=0.713831
+    HPWL=(1216626.500000, 1194284.125000)
+    POTN=4.524255E+08
+    PHIC=1.186819E-05
+    GRAD=6.355569E-03
+    NuBT=1
+    CPU =0.121986
+
+ITER: 221
+    HPWL=2407017.250000
+    OVFL=0.711854
+    HPWL=(1214473.625000, 1192543.625000)
+    POTN=4.459038E+08
+    PHIC=1.246160E-05
+    GRAD=6.011458E-03
+    NuBT=1
+    CPU =0.055682
+
+ITER: 222
+    HPWL=2403237.000000
+    OVFL=0.709479
+    HPWL=(1212429.750000, 1190807.125000)
+    POTN=4.386697E+08
+    PHIC=1.308468E-05
+    GRAD=5.721088E-03
+    NuBT=1
+    CPU =0.050858
+
+ITER: 223
+    HPWL=2399436.000000
+    OVFL=0.708219
+    HPWL=(1210240.250000, 1189195.875000)
+    POTN=4.303336E+08
+    PHIC=1.373891E-05
+    GRAD=5.587798E-03
+    NuBT=1
+    CPU =0.046039
+
+ITER: 224
+    HPWL=2395655.500000
+    OVFL=0.706511
+    HPWL=(1208149.250000, 1187506.125000)
+    POTN=4.209412E+08
+    PHIC=1.442586E-05
+    GRAD=5.642003E-03
+    NuBT=1
+    CPU =0.043979
+
+ITER: 225
+    HPWL=2392778.000000
+    OVFL=0.705256
+    HPWL=(1206333.250000, 1186444.875000)
+    POTN=4.103141E+08
+    PHIC=1.514715E-05
+    GRAD=5.910794E-03
+    NuBT=1
+    CPU =0.043747
+
+ITER: 226
+    HPWL=2390570.000000
+    OVFL=0.704504
+    HPWL=(1204907.750000, 1185662.250000)
+    POTN=3.987730E+08
+    PHIC=1.590451E-05
+    GRAD=6.372710E-03
+    NuBT=1
+    CPU =0.041334
+
+ITER: 227
+    HPWL=2389315.750000
+    OVFL=0.703523
+    HPWL=(1203787.625000, 1185528.125000)
+    POTN=3.858548E+08
+    PHIC=1.669973E-05
+    GRAD=6.987977E-03
+    NuBT=1
+    CPU =0.035744
+
+ITER: 228
+    HPWL=2389450.500000
+    OVFL=0.701661
+    HPWL=(1203552.500000, 1185897.875000)
+    POTN=3.720374E+08
+    PHIC=1.753438E-05
+    GRAD=7.697604E-03
+    NuBT=1
+    CPU =0.035261
+
+ITER: 229
+    HPWL=2390403.750000
+    OVFL=0.699665
+    HPWL=(1203560.250000, 1186843.500000)
+    POTN=3.571401E+08
+    PHIC=1.840863E-05
+    GRAD=8.491688E-03
+    NuBT=1
+    CPU =0.035169
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0230.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0230.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0230.jpg image has been saved
+
+ITER: 230
+    HPWL=2391812.500000
+    OVFL=0.697472
+    HPWL=(1203912.750000, 1187899.875000)
+    POTN=3.414825E+08
+    PHIC=1.932522E-05
+    GRAD=9.378105E-03
+    NuBT=1
+    CPU =0.085928
+
+ITER: 231
+    HPWL=2392844.500000
+    OVFL=0.693831
+    HPWL=(1203948.000000, 1188896.500000)
+    POTN=3.253767E+08
+    PHIC=2.028852E-05
+    GRAD=1.027687E-02
+    NuBT=1
+    CPU =0.035507
+
+ITER: 232
+    HPWL=2393882.500000
+    OVFL=0.691305
+    HPWL=(1204263.750000, 1189618.750000)
+    POTN=3.094422E+08
+    PHIC=2.129983E-05
+    GRAD=1.120715E-02
+    NuBT=1
+    CPU =0.036519
+
+ITER: 233
+    HPWL=2392951.000000
+    OVFL=0.688802
+    HPWL=(1203362.875000, 1189588.000000)
+    POTN=2.939079E+08
+    PHIC=2.236482E-05
+    GRAD=1.202686E-02
+    NuBT=1
+    CPU =0.035933
+
+ITER: 234
+    HPWL=2392151.000000
+    OVFL=0.685430
+    HPWL=(1202810.750000, 1189340.125000)
+    POTN=2.790351E+08
+    PHIC=2.348306E-05
+    GRAD=1.277053E-02
+    NuBT=1
+    CPU =0.036197
+
+ITER: 235
+    HPWL=2390306.500000
+    OVFL=0.682092
+    HPWL=(1201321.375000, 1188985.250000)
+    POTN=2.651309E+08
+    PHIC=2.465721E-05
+    GRAD=1.339961E-02
+    NuBT=1
+    CPU =0.036065
+
+ITER: 236
+    HPWL=2388142.500000
+    OVFL=0.678948
+    HPWL=(1200102.875000, 1188039.750000)
+    POTN=2.526594E+08
+    PHIC=2.589007E-05
+    GRAD=1.407178E-02
+    NuBT=1
+    CPU =0.035689
+
+ITER: 237
+    HPWL=2384657.500000
+    OVFL=0.677698
+    HPWL=(1197717.250000, 1186940.250000)
+    POTN=2.417036E+08
+    PHIC=2.718457E-05
+    GRAD=1.457139E-02
+    NuBT=1
+    CPU =0.035815
+
+ITER: 238
+    HPWL=2381798.000000
+    OVFL=0.673855
+    HPWL=(1196144.750000, 1185653.250000)
+    POTN=2.323038E+08
+    PHIC=2.854380E-05
+    GRAD=1.486757E-02
+    NuBT=1
+    CPU =0.035966
+
+ITER: 239
+    HPWL=2379569.750000
+    OVFL=0.671145
+    HPWL=(1194217.875000, 1185351.875000)
+    POTN=2.242975E+08
+    PHIC=2.997099E-05
+    GRAD=1.520059E-02
+    NuBT=1
+    CPU =0.038242
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0240.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0240.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0240.jpg image has been saved
+
+ITER: 240
+    HPWL=2377272.750000
+    OVFL=0.667900
+    HPWL=(1192852.500000, 1184420.250000)
+    POTN=2.179266E+08
+    PHIC=3.146954E-05
+    GRAD=1.545751E-02
+    NuBT=1
+    CPU =0.087541
+
+ITER: 241
+    HPWL=2374635.500000
+    OVFL=0.665306
+    HPWL=(1190935.125000, 1183700.500000)
+    POTN=2.128776E+08
+    PHIC=3.304302E-05
+    GRAD=1.551639E-02
+    NuBT=1
+    CPU =0.036010
+
+ITER: 242
+    HPWL=2372616.000000
+    OVFL=0.663450
+    HPWL=(1189682.875000, 1182933.250000)
+    POTN=2.089529E+08
+    PHIC=3.469516E-05
+    GRAD=1.519624E-02
+    NuBT=1
+    CPU =0.035373
+
+ITER: 243
+    HPWL=2370368.750000
+    OVFL=0.660955
+    HPWL=(1188037.625000, 1182331.125000)
+    POTN=2.058472E+08
+    PHIC=3.642992E-05
+    GRAD=1.480241E-02
+    NuBT=1
+    CPU =0.035531
+
+ITER: 244
+    HPWL=2369367.500000
+    OVFL=0.657989
+    HPWL=(1187375.250000, 1181992.250000)
+    POTN=2.032506E+08
+    PHIC=3.825142E-05
+    GRAD=1.421588E-02
+    NuBT=1
+    CPU =0.035699
+
+ITER: 245
+    HPWL=2368164.000000
+    OVFL=0.655565
+    HPWL=(1186310.125000, 1181854.000000)
+    POTN=2.007057E+08
+    PHIC=4.016398E-05
+    GRAD=1.364560E-02
+    NuBT=1
+    CPU =0.035638
+
+ITER: 246
+    HPWL=2367625.500000
+    OVFL=0.654090
+    HPWL=(1185966.875000, 1181658.625000)
+    POTN=1.981796E+08
+    PHIC=4.217218E-05
+    GRAD=1.292938E-02
+    NuBT=1
+    CPU =0.035345
+
+ITER: 247
+    HPWL=2366703.500000
+    OVFL=0.651127
+    HPWL=(1185125.875000, 1181577.500000)
+    POTN=1.949634E+08
+    PHIC=4.428079E-05
+    GRAD=1.207077E-02
+    NuBT=1
+    CPU =0.035967
+
+ITER: 248
+    HPWL=2367298.500000
+    OVFL=0.647410
+    HPWL=(1185349.375000, 1181949.000000)
+    POTN=1.911434E+08
+    PHIC=4.649092E-05
+    GRAD=1.126000E-02
+    NuBT=1
+    CPU =0.036144
+
+ITER: 249
+    HPWL=2367169.500000
+    OVFL=0.644788
+    HPWL=(1185017.375000, 1182152.250000)
+    POTN=1.864086E+08
+    PHIC=4.881547E-05
+    GRAD=1.078229E-02
+    NuBT=1
+    CPU =0.036231
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0250.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0250.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0250.jpg image has been saved
+
+ITER: 250
+    HPWL=2367332.750000
+    OVFL=0.642003
+    HPWL=(1185153.375000, 1182179.375000)
+    POTN=1.810749E+08
+    PHIC=5.125506E-05
+    GRAD=1.059470E-02
+    NuBT=1
+    CPU =0.088220
+
+ITER: 251
+    HPWL=2367177.000000
+    OVFL=0.638444
+    HPWL=(1184754.375000, 1182422.750000)
+    POTN=1.748032E+08
+    PHIC=5.381781E-05
+    GRAD=1.065093E-02
+    NuBT=1
+    CPU =0.036222
+
+ITER: 252
+    HPWL=2367999.750000
+    OVFL=0.635847
+    HPWL=(1185142.875000, 1182856.875000)
+    POTN=1.678911E+08
+    PHIC=5.650214E-05
+    GRAD=1.125357E-02
+    NuBT=1
+    CPU =0.035348
+
+ITER: 253
+    HPWL=2367947.750000
+    OVFL=0.632263
+    HPWL=(1184797.375000, 1183150.375000)
+    POTN=1.605086E+08
+    PHIC=5.932724E-05
+    GRAD=1.223150E-02
+    NuBT=1
+    CPU =0.035404
+
+ITER: 254
+    HPWL=2368985.000000
+    OVFL=0.628118
+    HPWL=(1185340.750000, 1183644.250000)
+    POTN=1.529024E+08
+    PHIC=6.228449E-05
+    GRAD=1.343308E-02
+    NuBT=1
+    CPU =0.035652
+
+ITER: 255
+    HPWL=2369041.000000
+    OVFL=0.623191
+    HPWL=(1184966.125000, 1184075.000000)
+    POTN=1.454137E+08
+    PHIC=6.539819E-05
+    GRAD=1.444226E-02
+    NuBT=1
+    CPU =0.035640
+
+ITER: 256
+    HPWL=2369175.000000
+    OVFL=0.620655
+    HPWL=(1185123.375000, 1184051.750000)
+    POTN=1.384564E+08
+    PHIC=6.866681E-05
+    GRAD=1.549583E-02
+    NuBT=1
+    CPU =0.035889
+
+ITER: 257
+    HPWL=2367654.500000
+    OVFL=0.616560
+    HPWL=(1184033.625000, 1183621.000000)
+    POTN=1.324240E+08
+    PHIC=7.210014E-05
+    GRAD=1.622260E-02
+    NuBT=1
+    CPU =0.035812
+
+ITER: 258
+    HPWL=2367074.500000
+    OVFL=0.613748
+    HPWL=(1183690.750000, 1183383.750000)
+    POTN=1.273177E+08
+    PHIC=7.570515E-05
+    GRAD=1.670462E-02
+    NuBT=1
+    CPU =0.035450
+
+ITER: 259
+    HPWL=2365556.750000
+    OVFL=0.610763
+    HPWL=(1182739.000000, 1182817.750000)
+    POTN=1.230615E+08
+    PHIC=7.949040E-05
+    GRAD=1.698769E-02
+    NuBT=1
+    CPU =0.035658
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0260.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0260.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0260.jpg image has been saved
+
+ITER: 260
+    HPWL=2365295.500000
+    OVFL=0.608057
+    HPWL=(1182334.500000, 1182961.000000)
+    POTN=1.197908E+08
+    PHIC=8.346491E-05
+    GRAD=1.696518E-02
+    NuBT=1
+    CPU =0.086264
+
+ITER: 261
+    HPWL=2364305.000000
+    OVFL=0.604750
+    HPWL=(1181702.500000, 1182602.625000)
+    POTN=1.171588E+08
+    PHIC=8.763815E-05
+    GRAD=1.673220E-02
+    NuBT=1
+    CPU =0.035810
+
+ITER: 262
+    HPWL=2364521.000000
+    OVFL=0.600958
+    HPWL=(1181810.625000, 1182710.250000)
+    POTN=1.151464E+08
+    PHIC=9.201725E-05
+    GRAD=1.620742E-02
+    NuBT=1
+    CPU =0.037007
+
+ITER: 263
+    HPWL=2363884.000000
+    OVFL=0.597934
+    HPWL=(1181169.125000, 1182715.000000)
+    POTN=1.132903E+08
+    PHIC=9.661811E-05
+    GRAD=1.559953E-02
+    NuBT=1
+    CPU =0.036015
+
+ITER: 264
+    HPWL=2363767.000000
+    OVFL=0.596003
+    HPWL=(1181388.000000, 1182379.000000)
+    POTN=1.115337E+08
+    PHIC=1.014490E-04
+    GRAD=1.461380E-02
+    NuBT=1
+    CPU =0.035435
+
+ITER: 265
+    HPWL=2363566.750000
+    OVFL=0.593420
+    HPWL=(1180988.250000, 1182578.500000)
+    POTN=1.093243E+08
+    PHIC=1.065215E-04
+    GRAD=1.352544E-02
+    NuBT=1
+    CPU =0.035501
+
+ITER: 266
+    HPWL=2364875.000000
+    OVFL=0.591260
+    HPWL=(1182000.250000, 1182874.875000)
+    POTN=1.066978E+08
+    PHIC=1.118269E-04
+    GRAD=1.246368E-02
+    NuBT=1
+    CPU =0.035381
+
+ITER: 267
+    HPWL=2366109.000000
+    OVFL=0.588048
+    HPWL=(1182501.000000, 1183607.875000)
+    POTN=1.033180E+08
+    PHIC=1.173978E-04
+    GRAD=1.176019E-02
+    NuBT=1
+    CPU =0.035467
+
+ITER: 268
+    HPWL=2368267.750000
+    OVFL=0.584087
+    HPWL=(1184232.875000, 1184034.875000)
+    POTN=9.931657E+07
+    PHIC=1.232302E-04
+    GRAD=1.180681E-02
+    NuBT=1
+    CPU =0.035388
+
+ITER: 269
+    HPWL=2370487.500000
+    OVFL=0.579653
+    HPWL=(1185397.375000, 1185090.125000)
+    POTN=9.480670E+07
+    PHIC=1.293512E-04
+    GRAD=1.269252E-02
+    NuBT=1
+    CPU =0.035278
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0270.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0270.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0270.jpg image has been saved
+
+ITER: 270
+    HPWL=2373070.500000
+    OVFL=0.575353
+    HPWL=(1187336.375000, 1185734.000000)
+    POTN=9.014508E+07
+    PHIC=1.357692E-04
+    GRAD=1.449654E-02
+    NuBT=1
+    CPU =0.096174
+
+ITER: 271
+    HPWL=2374755.500000
+    OVFL=0.570043
+    HPWL=(1188408.125000, 1186347.500000)
+    POTN=8.537998E+07
+    PHIC=1.425238E-04
+    GRAD=1.602089E-02
+    NuBT=1
+    CPU =0.038091
+
+ITER: 272
+    HPWL=2376280.500000
+    OVFL=0.566688
+    HPWL=(1190083.500000, 1186197.000000)
+    POTN=8.123068E+07
+    PHIC=1.496178E-04
+    GRAD=1.730324E-02
+    NuBT=1
+    CPU =0.035954
+
+ITER: 273
+    HPWL=2376033.750000
+    OVFL=0.562238
+    HPWL=(1190559.500000, 1185474.250000)
+    POTN=7.748790E+07
+    PHIC=1.570987E-04
+    GRAD=1.811704E-02
+    NuBT=1
+    CPU =0.035352
+
+ITER: 274
+    HPWL=2376986.500000
+    OVFL=0.557772
+    HPWL=(1192011.500000, 1184974.875000)
+    POTN=7.468447E+07
+    PHIC=1.649315E-04
+    GRAD=1.881382E-02
+    NuBT=1
+    CPU =0.036374
+
+ITER: 275
+    HPWL=2376271.500000
+    OVFL=0.552285
+    HPWL=(1192442.500000, 1183829.125000)
+    POTN=7.232430E+07
+    PHIC=1.731780E-04
+    GRAD=1.917818E-02
+    NuBT=1
+    CPU =0.035403
+
+ITER: 276
+    HPWL=2375960.250000
+    OVFL=0.548893
+    HPWL=(1193515.125000, 1182445.125000)
+    POTN=7.080496E+07
+    PHIC=1.818369E-04
+    GRAD=1.899520E-02
+    NuBT=1
+    CPU =0.035370
+
+ITER: 277
+    HPWL=2372740.000000
+    OVFL=0.544362
+    HPWL=(1192792.500000, 1179947.375000)
+    POTN=6.943641E+07
+    PHIC=1.909288E-04
+    GRAD=1.682122E-02
+    NuBT=2
+    CPU =0.068553
+
+ITER: 278
+    HPWL=2371732.000000
+    OVFL=0.542128
+    HPWL=(1193590.750000, 1178141.125000)
+    POTN=6.832039E+07
+    PHIC=2.004752E-04
+    GRAD=1.552941E-02
+    NuBT=2
+    CPU =0.068536
+
+ITER: 279
+    HPWL=2371279.500000
+    OVFL=0.540166
+    HPWL=(1194497.250000, 1176782.375000)
+    POTN=6.691365E+07
+    PHIC=2.104990E-04
+    GRAD=1.507028E-02
+    NuBT=2
+    CPU =0.068499
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0280.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0280.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0280.jpg image has been saved
+
+ITER: 280
+    HPWL=2373000.500000
+    OVFL=0.536740
+    HPWL=(1196704.250000, 1176296.125000)
+    POTN=6.516061E+07
+    PHIC=2.209703E-04
+    GRAD=1.581601E-02
+    NuBT=1
+    CPU =0.085875
+
+ITER: 281
+    HPWL=2374012.500000
+    OVFL=0.532690
+    HPWL=(1198144.500000, 1175868.125000)
+    POTN=6.293692E+07
+    PHIC=2.319857E-04
+    GRAD=1.538328E-02
+    NuBT=1
+    CPU =0.035531
+
+ITER: 282
+    HPWL=2376145.500000
+    OVFL=0.530065
+    HPWL=(1200578.875000, 1175566.500000)
+    POTN=6.032576E+07
+    PHIC=2.435117E-04
+    GRAD=1.500382E-02
+    NuBT=1
+    CPU =0.035694
+
+ITER: 283
+    HPWL=2378318.500000
+    OVFL=0.526718
+    HPWL=(1202720.000000, 1175598.625000)
+    POTN=5.753670E+07
+    PHIC=2.556089E-04
+    GRAD=1.589665E-02
+    NuBT=1
+    CPU =0.035340
+
+ITER: 284
+    HPWL=2381794.500000
+    OVFL=0.524223
+    HPWL=(1205631.875000, 1176162.625000)
+    POTN=5.482326E+07
+    PHIC=2.682578E-04
+    GRAD=1.752315E-02
+    NuBT=1
+    CPU =0.036349
+
+ITER: 285
+    HPWL=2384643.500000
+    OVFL=0.519607
+    HPWL=(1208146.250000, 1176497.125000)
+    POTN=5.212890E+07
+    PHIC=2.815576E-04
+    GRAD=1.842870E-02
+    NuBT=1
+    CPU =0.035422
+
+ITER: 286
+    HPWL=2388412.000000
+    OVFL=0.513747
+    HPWL=(1211262.000000, 1177149.875000)
+    POTN=4.984674E+07
+    PHIC=2.954784E-04
+    GRAD=1.886910E-02
+    NuBT=1
+    CPU =0.035412
+
+ITER: 287
+    HPWL=2390063.500000
+    OVFL=0.508502
+    HPWL=(1213212.250000, 1176851.250000)
+    POTN=4.785079E+07
+    PHIC=3.101801E-04
+    GRAD=1.923353E-02
+    NuBT=1
+    CPU =0.035284
+
+ITER: 288
+    HPWL=2389644.000000
+    OVFL=0.504853
+    HPWL=(1214456.750000, 1175187.250000)
+    POTN=4.626683E+07
+    PHIC=3.256891E-04
+    GRAD=1.704116E-02
+    NuBT=2
+    CPU =0.068703
+total Steiner HPWL: 776744622
+BuildSteiner: 0.0254162
+FillSpefForSta: 0.239529
+UpdateTimingSta: 1.33734
+INFO: Total 2581 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.086854
+timing summary
+WNS = -1.23064e-09 seconds
+TNS = -3.73709e-07 seconds
+ExecuteStaLater: 1.66543
+
+ITER: 289
+    HPWL=2389549.750000
+    OVFL=0.499934
+    HPWL=(1215164.500000, 1174385.250000)
+    POTN=4.468547E+07
+    PHIC=3.419735E-04
+    GRAD=1.621936E-02
+    NuBT=2
+    CPU =1.760691
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0290.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0290.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0290.jpg image has been saved
+
+ITER: 290
+    HPWL=2391055.000000
+    OVFL=0.495205
+    HPWL=(1216844.500000, 1174210.625000)
+    POTN=4.307793E+07
+    PHIC=3.589960E-04
+    GRAD=1.612475E-02
+    NuBT=2
+    CPU =0.121746
+
+ITER: 291
+    HPWL=2392104.500000
+    OVFL=0.491156
+    HPWL=(1218080.125000, 1174024.375000)
+    POTN=4.127675E+07
+    PHIC=3.768900E-04
+    GRAD=1.567801E-02
+    NuBT=2
+    CPU =0.069401
+
+ITER: 292
+    HPWL=2393864.250000
+    OVFL=0.486394
+    HPWL=(1219676.750000, 1174187.500000)
+    POTN=3.936671E+07
+    PHIC=3.956363E-04
+    GRAD=1.640417E-02
+    NuBT=1
+    CPU =0.035770
+
+ITER: 293
+    HPWL=2395608.250000
+    OVFL=0.480436
+    HPWL=(1221184.250000, 1174424.000000)
+    POTN=3.731343E+07
+    PHIC=4.153159E-04
+    GRAD=1.673342E-02
+    NuBT=1
+    CPU =0.035413
+
+ITER: 294
+    HPWL=2396477.500000
+    OVFL=0.477329
+    HPWL=(1222213.500000, 1174263.875000)
+    POTN=3.535771E+07
+    PHIC=4.360282E-04
+    GRAD=1.738610E-02
+    NuBT=1
+    CPU =0.035471
+
+ITER: 295
+    HPWL=2397036.750000
+    OVFL=0.474107
+    HPWL=(1222809.250000, 1174227.500000)
+    POTN=3.351124E+07
+    PHIC=4.577935E-04
+    GRAD=1.856449E-02
+    NuBT=1
+    CPU =0.035446
+
+ITER: 296
+    HPWL=2398120.500000
+    OVFL=0.470381
+    HPWL=(1223565.500000, 1174555.125000)
+    POTN=3.188139E+07
+    PHIC=4.806097E-04
+    GRAD=1.947055E-02
+    NuBT=1
+    CPU =0.035354
+
+ITER: 297
+    HPWL=2399103.000000
+    OVFL=0.465794
+    HPWL=(1224290.125000, 1174812.750000)
+    POTN=3.036969E+07
+    PHIC=5.045703E-04
+    GRAD=1.980288E-02
+    NuBT=1
+    CPU =0.035438
+
+ITER: 298
+    HPWL=2399815.500000
+    OVFL=0.460961
+    HPWL=(1224967.750000, 1174847.625000)
+    POTN=2.903772E+07
+    PHIC=5.297455E-04
+    GRAD=2.002376E-02
+    NuBT=1
+    CPU =0.035586
+
+ITER: 299
+    HPWL=2400057.500000
+    OVFL=0.457699
+    HPWL=(1225167.500000, 1174890.125000)
+    POTN=2.779208E+07
+    PHIC=5.562138E-04
+    GRAD=1.989693E-02
+    NuBT=1
+    CPU =0.035763
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0300.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0300.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0300.jpg image has been saved
+
+ITER: 300
+    HPWL=2399678.000000
+    OVFL=0.453123
+    HPWL=(1225064.750000, 1174613.250000)
+    POTN=2.657559E+07
+    PHIC=5.840245E-04
+    GRAD=1.935585E-02
+    NuBT=1
+    CPU =0.086554
+
+ITER: 301
+    HPWL=2400275.250000
+    OVFL=0.449310
+    HPWL=(1225014.000000, 1175261.250000)
+    POTN=2.532567E+07
+    PHIC=6.131740E-04
+    GRAD=1.889054E-02
+    NuBT=1
+    CPU =0.035582
+
+ITER: 302
+    HPWL=2400442.000000
+    OVFL=0.444059
+    HPWL=(1224884.250000, 1175557.875000)
+    POTN=2.403471E+07
+    PHIC=6.438175E-04
+    GRAD=1.903691E-02
+    NuBT=1
+    CPU =0.035510
+
+ITER: 303
+    HPWL=2401717.750000
+    OVFL=0.439783
+    HPWL=(1225327.500000, 1176390.250000)
+    POTN=2.273069E+07
+    PHIC=6.758868E-04
+    GRAD=1.965178E-02
+    NuBT=1
+    CPU =0.035408
+
+ITER: 304
+    HPWL=2402664.000000
+    OVFL=0.434623
+    HPWL=(1225404.375000, 1177259.750000)
+    POTN=2.144707E+07
+    PHIC=7.095864E-04
+    GRAD=2.066539E-02
+    NuBT=1
+    CPU =0.035494
+
+ITER: 305
+    HPWL=2403678.250000
+    OVFL=0.429453
+    HPWL=(1225185.000000, 1178493.250000)
+    POTN=2.026652E+07
+    PHIC=7.449591E-04
+    GRAD=2.164395E-02
+    NuBT=1
+    CPU =0.035441
+
+ITER: 306
+    HPWL=2404336.500000
+    OVFL=0.423484
+    HPWL=(1225187.250000, 1179149.125000)
+    POTN=1.909707E+07
+    PHIC=7.821344E-04
+    GRAD=2.242291E-02
+    NuBT=1
+    CPU =0.035501
+
+ITER: 307
+    HPWL=2404387.000000
+    OVFL=0.420335
+    HPWL=(1224560.000000, 1179827.125000)
+    POTN=1.807249E+07
+    PHIC=8.212352E-04
+    GRAD=2.298600E-02
+    NuBT=1
+    CPU =0.035543
+
+ITER: 308
+    HPWL=2404080.250000
+    OVFL=0.414016
+    HPWL=(1223824.375000, 1180255.875000)
+    POTN=1.706078E+07
+    PHIC=8.622969E-04
+    GRAD=2.348145E-02
+    NuBT=1
+    CPU =0.035602
+
+ITER: 309
+    HPWL=2404809.250000
+    OVFL=0.408284
+    HPWL=(1223364.875000, 1181444.375000)
+    POTN=1.602375E+07
+    PHIC=9.053187E-04
+    GRAD=2.383666E-02
+    NuBT=1
+    CPU =0.035519
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0310.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0310.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0310.jpg image has been saved
+
+ITER: 310
+    HPWL=2404134.000000
+    OVFL=0.404830
+    HPWL=(1222378.625000, 1181755.250000)
+    POTN=1.508245E+07
+    PHIC=9.505845E-04
+    GRAD=2.469327E-02
+    NuBT=1
+    CPU =0.086077
+
+ITER: 311
+    HPWL=2404709.750000
+    OVFL=0.400703
+    HPWL=(1221616.500000, 1183093.250000)
+    POTN=1.411807E+07
+    PHIC=9.980327E-04
+    GRAD=2.534803E-02
+    NuBT=1
+    CPU =0.036397
+
+ITER: 312
+    HPWL=2405544.500000
+    OVFL=0.395778
+    HPWL=(1221337.000000, 1184207.500000)
+    POTN=1.315162E+07
+    PHIC=1.047811E-03
+    GRAD=2.579135E-02
+    NuBT=1
+    CPU =0.035890
+
+ITER: 313
+    HPWL=2406354.000000
+    OVFL=0.389927
+    HPWL=(1220768.875000, 1185585.125000)
+    POTN=1.223183E+07
+    PHIC=1.100076E-03
+    GRAD=2.643291E-02
+    NuBT=1
+    CPU =0.036863
+
+ITER: 314
+    HPWL=2407123.000000
+    OVFL=0.382687
+    HPWL=(1220348.875000, 1186774.250000)
+    POTN=1.133541E+07
+    PHIC=1.154955E-03
+    GRAD=2.760502E-02
+    NuBT=1
+    CPU =0.036407
+
+ITER: 315
+    HPWL=2407776.000000
+    OVFL=0.376551
+    HPWL=(1219932.375000, 1187843.500000)
+    POTN=1.049536E+07
+    PHIC=1.212591E-03
+    GRAD=2.866647E-02
+    NuBT=1
+    CPU =0.036367
+
+ITER: 316
+    HPWL=2406957.500000
+    OVFL=0.373256
+    HPWL=(1218780.625000, 1188176.875000)
+    POTN=9.711679E+06
+    PHIC=1.273220E-03
+    GRAD=2.943487E-02
+    NuBT=1
+    CPU =0.035921
+
+ITER: 317
+    HPWL=2407217.250000
+    OVFL=0.368461
+    HPWL=(1217898.000000, 1189319.250000)
+    POTN=8.973649E+06
+    PHIC=1.336832E-03
+    GRAD=2.978277E-02
+    NuBT=1
+    CPU =0.035883
+
+ITER: 318
+    HPWL=2407868.250000
+    OVFL=0.362726
+    HPWL=(1217041.625000, 1190826.625000)
+    POTN=8.227127E+06
+    PHIC=1.403545E-03
+    GRAD=3.034546E-02
+    NuBT=1
+    CPU =0.035459
+
+ITER: 319
+    HPWL=2408202.000000
+    OVFL=0.358773
+    HPWL=(1216323.000000, 1191879.125000)
+    POTN=7.575999E+06
+    PHIC=1.473652E-03
+    GRAD=3.119601E-02
+    NuBT=1
+    CPU =0.035440
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0320.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0320.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0320.jpg image has been saved
+
+ITER: 320
+    HPWL=2408353.250000
+    OVFL=0.353257
+    HPWL=(1215529.625000, 1192823.625000)
+    POTN=6.950303E+06
+    PHIC=1.547302E-03
+    GRAD=3.180778E-02
+    NuBT=1
+    CPU =0.085232
+
+ITER: 321
+    HPWL=2409423.000000
+    OVFL=0.347810
+    HPWL=(1215085.750000, 1194337.250000)
+    POTN=6.363468E+06
+    PHIC=1.624422E-03
+    GRAD=3.226582E-02
+    NuBT=1
+    CPU =0.035770
+
+ITER: 322
+    HPWL=2409735.500000
+    OVFL=0.343756
+    HPWL=(1214285.750000, 1195449.875000)
+    POTN=5.819697E+06
+    PHIC=1.705568E-03
+    GRAD=3.307779E-02
+    NuBT=1
+    CPU =0.035556
+
+ITER: 323
+    HPWL=2410175.000000
+    OVFL=0.339625
+    HPWL=(1213633.875000, 1196541.250000)
+    POTN=5.353906E+06
+    PHIC=1.790735E-03
+    GRAD=3.354885E-02
+    NuBT=1
+    CPU =0.035789
+
+ITER: 324
+    HPWL=2410558.500000
+    OVFL=0.335235
+    HPWL=(1213007.375000, 1197551.250000)
+    POTN=4.896692E+06
+    PHIC=1.880170E-03
+    GRAD=3.396820E-02
+    NuBT=1
+    CPU =0.035480
+
+ITER: 325
+    HPWL=2411316.500000
+    OVFL=0.330972
+    HPWL=(1212242.750000, 1199073.625000)
+    POTN=4.509408E+06
+    PHIC=1.973968E-03
+    GRAD=3.429595E-02
+    NuBT=1
+    CPU =0.035453
+
+ITER: 326
+    HPWL=2411409.750000
+    OVFL=0.324158
+    HPWL=(1211310.125000, 1200099.625000)
+    POTN=4.125228E+06
+    PHIC=2.072639E-03
+    GRAD=3.445661E-02
+    NuBT=1
+    CPU =0.036948
+
+ITER: 327
+    HPWL=2411892.000000
+    OVFL=0.319838
+    HPWL=(1210591.500000, 1201300.375000)
+    POTN=3.814296E+06
+    PHIC=2.176123E-03
+    GRAD=3.501592E-02
+    NuBT=1
+    CPU =0.036197
+
+ITER: 328
+    HPWL=2411616.250000
+    OVFL=0.315982
+    HPWL=(1209543.000000, 1202073.250000)
+    POTN=3.512333E+06
+    PHIC=2.284928E-03
+    GRAD=3.572959E-02
+    NuBT=1
+    CPU =0.036238
+
+ITER: 329
+    HPWL=2411760.000000
+    OVFL=0.311094
+    HPWL=(1208590.875000, 1203169.250000)
+    POTN=3.257764E+06
+    PHIC=2.399126E-03
+    GRAD=3.591287E-02
+    NuBT=1
+    CPU =0.035926
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0330.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0330.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0330.jpg image has been saved
+
+ITER: 330
+    HPWL=2411957.000000
+    OVFL=0.305337
+    HPWL=(1207429.625000, 1204527.375000)
+    POTN=2.998722E+06
+    PHIC=2.519012E-03
+    GRAD=3.587031E-02
+    NuBT=1
+    CPU =0.086713
+
+ITER: 331
+    HPWL=2412051.000000
+    OVFL=0.300898
+    HPWL=(1206543.375000, 1205507.625000)
+    POTN=2.778180E+06
+    PHIC=2.644927E-03
+    GRAD=3.646187E-02
+    NuBT=1
+    CPU =0.035801
+total Steiner HPWL: 793873772
+BuildSteiner: 0.0228845
+FillSpefForSta: 0.236658
+UpdateTimingSta: 1.31882
+INFO: Total 2581 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0867094
+timing summary
+WNS = -1.52711e-09 seconds
+TNS = -5.31612e-07 seconds
+ExecuteStaLater: 1.64374
+
+ITER: 332
+    HPWL=2412124.500000
+    OVFL=0.295714
+    HPWL=(1205578.125000, 1206546.500000)
+    POTN=2.564724E+06
+    PHIC=2.777145E-03
+    GRAD=3.728989E-02
+    NuBT=1
+    CPU =1.702685
+
+ITER: 333
+    HPWL=2413136.000000
+    OVFL=0.291205
+    HPWL=(1204967.250000, 1208168.625000)
+    POTN=2.393967E+06
+    PHIC=2.915586E-03
+    GRAD=3.807865E-02
+    NuBT=1
+    CPU =0.036617
+
+ITER: 334
+    HPWL=2413558.000000
+    OVFL=0.287412
+    HPWL=(1204072.750000, 1209485.125000)
+    POTN=2.223856E+06
+    PHIC=3.061183E-03
+    GRAD=3.846480E-02
+    NuBT=1
+    CPU =0.035617
+
+ITER: 335
+    HPWL=2412913.000000
+    OVFL=0.282687
+    HPWL=(1202668.375000, 1210244.750000)
+    POTN=2.068289E+06
+    PHIC=3.214243E-03
+    GRAD=3.838348E-02
+    NuBT=1
+    CPU =0.035568
+
+ITER: 336
+    HPWL=2413133.000000
+    OVFL=0.279905
+    HPWL=(1201792.500000, 1211340.625000)
+    POTN=1.924722E+06
+    PHIC=3.374850E-03
+    GRAD=3.846393E-02
+    NuBT=1
+    CPU =0.035530
+
+ITER: 337
+    HPWL=2412770.750000
+    OVFL=0.276586
+    HPWL=(1200850.000000, 1211920.750000)
+    POTN=1.789366E+06
+    PHIC=3.543592E-03
+    GRAD=3.850962E-02
+    NuBT=1
+    CPU =0.035596
+
+ITER: 338
+    HPWL=2413203.000000
+    OVFL=0.272340
+    HPWL=(1200348.875000, 1212854.250000)
+    POTN=1.663817E+06
+    PHIC=3.720545E-03
+    GRAD=3.832479E-02
+    NuBT=1
+    CPU =0.035537
+
+ITER: 339
+    HPWL=2413399.500000
+    OVFL=0.268395
+    HPWL=(1199407.375000, 1213992.125000)
+    POTN=1.537320E+06
+    PHIC=3.906464E-03
+    GRAD=3.845647E-02
+    NuBT=1
+    CPU =0.036106
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0340.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0340.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0340.jpg image has been saved
+
+ITER: 340
+    HPWL=2414131.000000
+    OVFL=0.265821
+    HPWL=(1199142.875000, 1214988.250000)
+    POTN=1.422078E+06
+    PHIC=4.101363E-03
+    GRAD=3.884126E-02
+    NuBT=1
+    CPU =0.085340
+
+ITER: 341
+    HPWL=2414253.500000
+    OVFL=0.261333
+    HPWL=(1198629.375000, 1215624.250000)
+    POTN=1.309565E+06
+    PHIC=4.306357E-03
+    GRAD=3.893926E-02
+    NuBT=1
+    CPU =0.035827
+
+ITER: 342
+    HPWL=2415059.500000
+    OVFL=0.257184
+    HPWL=(1198524.875000, 1216534.500000)
+    POTN=1.210002E+06
+    PHIC=4.521161E-03
+    GRAD=3.901170E-02
+    NuBT=1
+    CPU =0.036361
+
+ITER: 343
+    HPWL=2415066.750000
+    OVFL=0.253833
+    HPWL=(1197935.750000, 1217131.000000)
+    POTN=1.116913E+06
+    PHIC=4.747214E-03
+    GRAD=3.937694E-02
+    NuBT=1
+    CPU =0.036444
+
+ITER: 344
+    HPWL=2415561.500000
+    OVFL=0.249060
+    HPWL=(1197691.750000, 1217869.625000)
+    POTN=1.034966E+06
+    PHIC=4.984227E-03
+    GRAD=3.964295E-02
+    NuBT=1
+    CPU =0.036448
+
+ITER: 345
+    HPWL=2415601.000000
+    OVFL=0.244804
+    HPWL=(1197414.625000, 1218186.375000)
+    POTN=9.508028E+05
+    PHIC=5.233409E-03
+    GRAD=3.961889E-02
+    NuBT=1
+    CPU =0.036356
+
+ITER: 346
+    HPWL=2415900.500000
+    OVFL=0.241998
+    HPWL=(1197243.625000, 1218656.875000)
+    POTN=8.796402E+05
+    PHIC=5.494847E-03
+    GRAD=4.022184E-02
+    NuBT=1
+    CPU =0.037255
+
+ITER: 347
+    HPWL=2415998.000000
+    OVFL=0.237937
+    HPWL=(1196821.500000, 1219176.625000)
+    POTN=8.071433E+05
+    PHIC=5.769510E-03
+    GRAD=4.055577E-02
+    NuBT=1
+    CPU =0.036573
+
+ITER: 348
+    HPWL=2415985.250000
+    OVFL=0.234836
+    HPWL=(1196546.000000, 1219439.250000)
+    POTN=7.491392E+05
+    PHIC=6.057986E-03
+    GRAD=4.034504E-02
+    NuBT=1
+    CPU =0.036850
+
+ITER: 349
+    HPWL=2416051.500000
+    OVFL=0.229756
+    HPWL=(1196338.875000, 1219712.625000)
+    POTN=6.843255E+05
+    PHIC=6.360825E-03
+    GRAD=4.029414E-02
+    NuBT=1
+    CPU =0.036544
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0350.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0350.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0350.jpg image has been saved
+
+ITER: 350
+    HPWL=2416253.750000
+    OVFL=0.227822
+    HPWL=(1196426.375000, 1219827.375000)
+    POTN=6.352095E+05
+    PHIC=6.678676E-03
+    GRAD=4.082203E-02
+    NuBT=1
+    CPU =0.086847
+
+ITER: 351
+    HPWL=2416217.500000
+    OVFL=0.223771
+    HPWL=(1196031.500000, 1220186.000000)
+    POTN=5.833254E+05
+    PHIC=7.012609E-03
+    GRAD=4.109399E-02
+    NuBT=1
+    CPU =0.036014
+
+ITER: 352
+    HPWL=2416543.500000
+    OVFL=0.219603
+    HPWL=(1195937.625000, 1220605.750000)
+    POTN=5.387241E+05
+    PHIC=7.362901E-03
+    GRAD=4.093862E-02
+    NuBT=1
+    CPU =0.035734
+
+ITER: 353
+    HPWL=2416190.250000
+    OVFL=0.213965
+    HPWL=(1195544.625000, 1220645.625000)
+    POTN=4.960325E+05
+    PHIC=7.731046E-03
+    GRAD=4.142056E-02
+    NuBT=1
+    CPU =0.036070
+
+ITER: 354
+    HPWL=2416655.500000
+    OVFL=0.211909
+    HPWL=(1195672.875000, 1220982.750000)
+    POTN=4.639155E+05
+    PHIC=8.117065E-03
+    GRAD=4.241724E-02
+    NuBT=1
+    CPU =0.036069
+
+ITER: 355
+    HPWL=2416341.250000
+    OVFL=0.206641
+    HPWL=(1195194.250000, 1221147.000000)
+    POTN=4.282742E+05
+    PHIC=8.522918E-03
+    GRAD=4.272800E-02
+    NuBT=1
+    CPU =0.035997
+
+ITER: 356
+    HPWL=2416152.000000
+    OVFL=0.205056
+    HPWL=(1194977.000000, 1221175.000000)
+    POTN=4.018738E+05
+    PHIC=8.949063E-03
+    GRAD=4.255016E-02
+    NuBT=1
+    CPU =0.035881
+
+ITER: 357
+    HPWL=2416049.500000
+    OVFL=0.201995
+    HPWL=(1194695.625000, 1221354.000000)
+    POTN=3.739918E+05
+    PHIC=9.396516E-03
+    GRAD=4.285943E-02
+    NuBT=1
+    CPU =0.035734
+
+ITER: 358
+    HPWL=2416692.000000
+    OVFL=0.199956
+    HPWL=(1194963.000000, 1221729.000000)
+    POTN=3.496392E+05
+    PHIC=9.865447E-03
+    GRAD=4.332149E-02
+    NuBT=1
+    CPU =0.036815
+
+ITER: 359
+    HPWL=2416915.500000
+    OVFL=0.195698
+    HPWL=(1194836.500000, 1222079.125000)
+    POTN=3.207290E+05
+    PHIC=1.035839E-02
+    GRAD=4.351162E-02
+    NuBT=1
+    CPU =0.035862
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0360.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0360.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0360.jpg image has been saved
+
+ITER: 360
+    HPWL=2417405.250000
+    OVFL=0.192064
+    HPWL=(1195279.625000, 1222125.625000)
+    POTN=2.987510E+05
+    PHIC=1.087556E-02
+    GRAD=4.350308E-02
+    NuBT=1
+    CPU =0.087211
+
+ITER: 361
+    HPWL=2417948.250000
+    OVFL=0.187219
+    HPWL=(1195439.375000, 1222508.875000)
+    POTN=2.736064E+05
+    PHIC=1.141846E-02
+    GRAD=4.409895E-02
+    NuBT=1
+    CPU =0.035969
+
+ITER: 362
+    HPWL=2418620.750000
+    OVFL=0.184888
+    HPWL=(1196125.000000, 1222495.750000)
+    POTN=2.548266E+05
+    PHIC=1.198825E-02
+    GRAD=4.504311E-02
+    NuBT=1
+    CPU =0.035724
+
+ITER: 363
+    HPWL=2418786.500000
+    OVFL=0.180381
+    HPWL=(1196239.875000, 1222546.750000)
+    POTN=2.311934E+05
+    PHIC=1.258737E-02
+    GRAD=4.551884E-02
+    NuBT=1
+    CPU =0.035811
+
+ITER: 364
+    HPWL=2418889.000000
+    OVFL=0.177787
+    HPWL=(1196653.500000, 1222235.500000)
+    POTN=2.163356E+05
+    PHIC=1.321654E-02
+    GRAD=4.527578E-02
+    NuBT=1
+    CPU =0.035803
+
+ITER: 365
+    HPWL=2418862.500000
+    OVFL=0.173904
+    HPWL=(1196771.500000, 1222091.125000)
+    POTN=2.006604E+05
+    PHIC=1.387737E-02
+    GRAD=4.572628E-02
+    NuBT=1
+    CPU =0.035751
+
+ITER: 366
+    HPWL=2419547.250000
+    OVFL=0.171376
+    HPWL=(1197621.125000, 1221926.125000)
+    POTN=1.867759E+05
+    PHIC=1.456983E-02
+    GRAD=4.630142E-02
+    NuBT=1
+    CPU =0.036163
+
+ITER: 367
+    HPWL=2419322.000000
+    OVFL=0.168371
+    HPWL=(1197683.375000, 1221638.750000)
+    POTN=1.738778E+05
+    PHIC=1.529832E-02
+    GRAD=4.646794E-02
+    NuBT=1
+    CPU =0.035985
+
+ITER: 368
+    HPWL=2419428.000000
+    OVFL=0.165728
+    HPWL=(1198059.500000, 1221368.375000)
+    POTN=1.634214E+05
+    PHIC=1.606300E-02
+    GRAD=4.623055E-02
+    NuBT=1
+    CPU =0.035700
+
+ITER: 369
+    HPWL=2419524.000000
+    OVFL=0.161225
+    HPWL=(1198366.125000, 1221157.875000)
+    POTN=1.503915E+05
+    PHIC=1.686592E-02
+    GRAD=4.668326E-02
+    NuBT=1
+    CPU =0.035825
+total Steiner HPWL: 802549170
+BuildSteiner: 0.0218082
+FillSpefForSta: 0.241496
+UpdateTimingSta: 1.31322
+INFO: Total 2581 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0910946
+timing summary
+WNS = -1.55243e-09 seconds
+TNS = -5.56176e-07 seconds
+ExecuteStaLater: 1.64738
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0370.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0370.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0370.jpg image has been saved
+
+ITER: 370
+    HPWL=2420099.500000
+    OVFL=0.158631
+    HPWL=(1198975.625000, 1221123.875000)
+    POTN=1.406234E+05
+    PHIC=1.770778E-02
+    GRAD=4.696622E-02
+    NuBT=1
+    CPU =1.764810
+
+ITER: 371
+    HPWL=2420501.000000
+    OVFL=0.154891
+    HPWL=(1199462.875000, 1221038.125000)
+    POTN=1.293646E+05
+    PHIC=1.859211E-02
+    GRAD=4.714878E-02
+    NuBT=1
+    CPU =0.036776
+
+ITER: 372
+    HPWL=2421203.750000
+    OVFL=0.152958
+    HPWL=(1200411.000000, 1220792.750000)
+    POTN=1.230971E+05
+    PHIC=1.951978E-02
+    GRAD=4.750421E-02
+    NuBT=1
+    CPU =0.036196
+
+ITER: 373
+    HPWL=2421153.500000
+    OVFL=0.149986
+    HPWL=(1200624.750000, 1220528.625000)
+    POTN=1.143435E+05
+    PHIC=2.049577E-02
+    GRAD=4.749287E-02
+    NuBT=1
+    CPU =0.035819
+
+ITER: 374
+    HPWL=2421415.750000
+    OVFL=0.147864
+    HPWL=(1201200.875000, 1220214.875000)
+    POTN=1.073845E+05
+    PHIC=2.151976E-02
+    GRAD=4.711660E-02
+    NuBT=1
+    CPU =0.035658
+
+ITER: 375
+    HPWL=2421191.750000
+    OVFL=0.145293
+    HPWL=(1201383.250000, 1219808.500000)
+    POTN=9.895594E+04
+    PHIC=2.259575E-02
+    GRAD=4.706812E-02
+    NuBT=1
+    CPU =0.035694
+
+ITER: 376
+    HPWL=2421806.250000
+    OVFL=0.142723
+    HPWL=(1202139.500000, 1219666.750000)
+    POTN=9.336449E+04
+    PHIC=2.372348E-02
+    GRAD=4.704247E-02
+    NuBT=1
+    CPU =0.035691
+
+ITER: 377
+    HPWL=2421759.000000
+    OVFL=0.138949
+    HPWL=(1202475.625000, 1219283.375000)
+    POTN=8.610535E+04
+    PHIC=2.490965E-02
+    GRAD=4.682395E-02
+    NuBT=1
+    CPU =0.035942
+
+ITER: 378
+    HPWL=2422207.500000
+    OVFL=0.137309
+    HPWL=(1203374.375000, 1218833.000000)
+    POTN=8.139585E+04
+    PHIC=2.615348E-02
+    GRAD=4.694854E-02
+    NuBT=1
+    CPU =0.036927
+
+ITER: 379
+    HPWL=2422076.000000
+    OVFL=0.134911
+    HPWL=(1203649.375000, 1218426.500000)
+    POTN=7.549188E+04
+    PHIC=2.746116E-02
+    GRAD=4.696903E-02
+    NuBT=1
+    CPU =0.036089
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0380.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0380.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0380.jpg image has been saved
+
+ITER: 380
+    HPWL=2422405.500000
+    OVFL=0.132817
+    HPWL=(1204446.625000, 1217958.875000)
+    POTN=7.120250E+04
+    PHIC=2.883287E-02
+    GRAD=4.630981E-02
+    NuBT=1
+    CPU =0.086073
+
+ITER: 381
+    HPWL=2422160.750000
+    OVFL=0.130143
+    HPWL=(1204650.375000, 1217510.375000)
+    POTN=6.712306E+04
+    PHIC=3.027452E-02
+    GRAD=4.610121E-02
+    NuBT=1
+    CPU =0.035933
+
+ITER: 382
+    HPWL=2422725.750000
+    OVFL=0.127331
+    HPWL=(1205577.625000, 1217148.125000)
+    POTN=6.388058E+04
+    PHIC=3.178571E-02
+    GRAD=4.616737E-02
+    NuBT=1
+    CPU =0.036043
+
+ITER: 383
+    HPWL=2422531.750000
+    OVFL=0.125721
+    HPWL=(1205780.875000, 1216750.875000)
+    POTN=6.013665E+04
+    PHIC=3.337499E-02
+    GRAD=4.598237E-02
+    NuBT=1
+    CPU =0.035551
+
+ITER: 384
+    HPWL=2423004.500000
+    OVFL=0.123528
+    HPWL=(1206736.250000, 1216268.375000)
+    POTN=5.731581E+04
+    PHIC=3.504140E-02
+    GRAD=4.555812E-02
+    NuBT=1
+    CPU =0.035686
+
+ITER: 385
+    HPWL=2422718.000000
+    OVFL=0.120608
+    HPWL=(1206854.125000, 1215863.750000)
+    POTN=5.382093E+04
+    PHIC=3.679347E-02
+    GRAD=4.502325E-02
+    NuBT=1
+    CPU =0.035705
+
+ITER: 386
+    HPWL=2423378.250000
+    OVFL=0.117412
+    HPWL=(1207929.500000, 1215448.750000)
+    POTN=5.055230E+04
+    PHIC=3.862955E-02
+    GRAD=4.488200E-02
+    NuBT=1
+    CPU =0.035631
+
+ITER: 387
+    HPWL=2423342.750000
+    OVFL=0.114805
+    HPWL=(1208255.375000, 1215087.375000)
+    POTN=4.735494E+04
+    PHIC=4.056102E-02
+    GRAD=4.484807E-02
+    NuBT=1
+    CPU =0.036022
+
+ITER: 388
+    HPWL=2423820.000000
+    OVFL=0.112972
+    HPWL=(1209096.000000, 1214723.875000)
+    POTN=4.501890E+04
+    PHIC=4.258621E-02
+    GRAD=4.455611E-02
+    NuBT=1
+    CPU =0.035860
+
+ITER: 389
+    HPWL=2423516.500000
+    OVFL=0.110254
+    HPWL=(1209303.875000, 1214212.500000)
+    POTN=4.193142E+04
+    PHIC=4.471552E-02
+    GRAD=4.394071E-02
+    NuBT=1
+    CPU =0.035728
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/cell/cGP2D_cell_0390.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/bin/cGP2D_bin_0390.jpg image has been saved
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/arrow/cGP2D_arrow_0390.jpg image has been saved
+
+ITER: 390
+    HPWL=2423794.500000
+    OVFL=0.108608
+    HPWL=(1210084.000000, 1213710.500000)
+    POTN=4.005308E+04
+    PHIC=4.694945E-02
+    GRAD=4.334518E-02
+    NuBT=1
+    CPU =0.087028
+
+ITER: 391
+    HPWL=2423850.000000
+    OVFL=0.106468
+    HPWL=(1210495.125000, 1213354.875000)
+    POTN=3.810583E+04
+    PHIC=4.929654E-02
+    GRAD=4.312620E-02
+    NuBT=1
+    CPU =0.036008
+
+ITER: 392
+    HPWL=2424485.000000
+    OVFL=0.104381
+    HPWL=(1211410.125000, 1213075.000000)
+    POTN=3.629042E+04
+    PHIC=5.175672E-02
+    GRAD=4.270665E-02
+    NuBT=1
+    CPU =0.035641
+
+ITER: 393
+    HPWL=2424557.250000
+    OVFL=0.101961
+    HPWL=(1211793.125000, 1212764.125000)
+    POTN=3.454585E+04
+    PHIC=5.434400E-02
+    GRAD=4.250964E-02
+    NuBT=1
+    CPU =0.035757
+
+ITER: 394
+    HPWL=2424724.000000
+    OVFL=0.100481
+    HPWL=(1212545.250000, 1212178.875000)
+    POTN=3.310445E+04
+    PHIC=5.705986E-02
+    GRAD=4.187841E-02
+    NuBT=1
+    CPU =0.035694
+
+ITER: 395
+    HPWL=2424405.000000
+    OVFL=0.098314
+    HPWL=(1212824.500000, 1211580.625000)
+    POTN=3.147422E+04
+    PHIC=5.991285E-02
+    GRAD=4.126609E-02
+    NuBT=1
+    CPU =0.035681
+
+INFO:    SUMMARY cGP2D
+INFO:    #iterations = 395
+INFO:        cGP2D ITERATION HPWL 2424405.0000
+INFO:        cGP2D ITERATION OVFL 0.0983
+INFO:        cGP2D      POTENTIAL 31474.2246
+INFO:    TOTAL HPWL (U_k, V_k) = 2406243.750000, 2424405.000000
+total Steiner HPWL: 800702852
+FillSpefForSta: 0.240395
+UpdateTimingSta: 1.29783
+INFO: Total 2581 worst path!
+Critical Path Up to 0 has been updated
+UpdateNetWeight: 0.0874096
+timing summary
+WNS = -1.54418e-09 seconds
+TNS = -5.30623e-07 seconds
+RESULT:
+   HPWL(cGP2D): 2406243.7500 (1204358.7500, 1201885.0000)
+
+   RUNTIME(s) : 28.3276
+
+
+PROC:  END GLOBAL 2D PLACEMENT
+
+===HPWL(MICRON)====================================
+  Mode  : GlobalPlacer
+  HPWL  : 374304.8721
+          x= 187344.8139 y= 186960.0582
+===================================================
+INFO:  WRITE BOOKSHELF...output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/tiers/0
+PROC:  END WRITE BOOKSHELF
+
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/globalPlaceResult.jpg image has been saved
+INFO:  SUCCESSFULLY WRITE DEF FILE INTO output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/dynamic_node_top_wrap_gp.def
+INFO:  SUCCESSFULLY WRITE DEF FILE INTO output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/dynamic_node_top_wrap_final.def
+
+
+=== SUMMARY =========================================================
+ ### HPWL (x, y) of the design is 2406243.75 (1204358.75, 1201885.00).
+
+ ### Numbers of Iterations: 
+     cGP2D:  395 (0.0717 sec/iter)
+     ____________________________________
+     TOTAL:  395
+
+ ### CPU_{IP, TP, mGP, LG, cGP, DP} is 0.41, 0.00, 0.00, 0.00, 28.33, 0.00.
+ ### CPU_TOT is 29.07 seconds (0.48 min).
+
+===HPWL(MICRON)====================================
+  Mode  : Final
+  HPWL  : 374304.8721
+          x= 187344.8139 y= 186960.0582
+===================================================
+INFO: output/nangate45_dynamic_node_top_wrap/etc/dynamic_node_top_wrap/experiment005/finalResult.jpg image has been saved
+total Steiner HPWL: 800702852
