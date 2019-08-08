@@ -133,7 +133,6 @@ int cGP3D_tot_iter;
 int cGP2D_tot_iter;
 int flg_3dic;
 int flg_3dic_io;
-int GP_DIM_ONE;
 int trial_iterCNT = 0;
 int mGP3D_iterCNT = 0;
 int mGP2D_iterCNT = 0;
@@ -893,7 +892,6 @@ void calcTSVweight() {
 
 void initialPlacement_main() {
   STAGE = INITIAL_PLACE;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_IP;
   initial_placement();
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
@@ -906,7 +904,6 @@ void initialPlacement_main() {
 void tmGP3DglobalPlacement_main() {
   STAGE = mGP3D;
   // ALPHAmGP = initialALPHA;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_GP1;
   gp_opt();
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
@@ -918,7 +915,6 @@ void tmGP3DglobalPlacement_main() {
 void tmGP2DglobalPlacement_main() {
   STAGE = mGP2D;
   // ALPHA = initialALPHA;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_mGP2D;
   tier_assign(MIXED);
   calc_tier_WS();
   setup_before_opt_mGP2D();
@@ -935,7 +931,6 @@ void tmGP2DglobalPlacement_main() {
 void mGP3DglobalPlacement_main() {
   STAGE = mGP3D;
   // ALPHA = initialALPHA;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_GP1;
   gp_opt();
   isFirst_gp_opt = false;
   UpdateNetAndGetHpwl();
@@ -951,7 +946,6 @@ void mGP3DglobalPlacement_main() {
 void mGP2DglobalPlacement_main() {
   STAGE = mGP2D;
   // ALPHA = initialALPHA;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_mGP2D;
   tier_assign(MIXED);
   calc_tier_WS();
   setup_before_opt_mGP2D();
@@ -972,7 +966,6 @@ void mGP2DglobalPlacement_main() {
 void tcGP3DglobalPlacement_main() {
   STAGE = cGP3D;
   // ALPHA = initialALPHA;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_GP2;
   cell_copy();  // cell_macro_copy ();
   gp_opt();
   UpdateNetAndGetHpwl();
@@ -985,7 +978,6 @@ void tcGP3DglobalPlacement_main() {
 void cGP3DglobalPlacement_main() {
   STAGE = cGP3D;
   // ALPHA = initialALPHA;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_GP2;
   cell_copy();  // cell_macro_copy ();
   gp_opt();
   isFirst_gp_opt = false;
@@ -1002,7 +994,6 @@ void cGP3DglobalPlacement_main() {
 void tcGP2DglobalPlacement_main() {
   STAGE = cGP2D;
   // ALPHA = initialALPHA;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_GP3;
   tier_assign(STDCELLonly);
   setup_before_opt_cGP2D();
   gp_opt();
@@ -1016,7 +1007,6 @@ void tcGP2DglobalPlacement_main() {
 void cGP2DglobalPlacement_main() {
   STAGE = cGP2D;
   // ALPHA = initialALPHA;
-  GP_DIM_ONE = false;
 
   tier_assign(STDCELLonly);
   setup_before_opt_cGP2D();
@@ -1032,7 +1022,6 @@ void cGP2DglobalPlacement_main() {
 
 void macroLegalization_main() {
   STAGE = mLG3D;
-  GP_DIM_ONE = GP_DIM_ONE_FOR_MAC;
   pre_mac_tier();
   sa_macro_lg();
   UpdateNetAndGetHpwl();

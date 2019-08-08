@@ -133,17 +133,6 @@ typedef double prec;
 #define THETA_XY_3D_PLOT PI / 6.0
 #define Z_SCAL 1.00
 
-// GP_Dimension_one,
-// 1: true, 0: false
-#define GP_DIM_ONE_FOR_IP 1
-#define GP_DIM_ONE_FOR_GP1 1
-#define GP_DIM_ONE_FOR_GP2 1
-#define GP_DIM_ONE_FOR_MAC 1
-
-#define GP_DIM_ONE_FOR_mGP2D 0
-#define GP_DIM_ONE_FOR_GP3 0
-
-#define GP_SCAL /* 1000.0 */ /* 1.0 */ /* 0.001 */ 0.0002
 #define DEN_GRAD_SCALE 1.0 /* 0.1 */ /* 0.5 */ /* 0.25 */ /* 0.125 */
 #define LAYER_ASSIGN_3DIC MIN_TIER_ORDER                  /* MAX_AREA_DIS_DIV */
 
@@ -849,7 +838,6 @@ extern int cGP2D_tot_iter;
 extern int flg_3dic;
 extern int flg_3dic_io;
 extern int numLayer;
-extern int GP_DIM_ONE;
 enum { NoneAdj, RandomAdj, SmartAdj };
 enum { zCenterPlace, zCenterTierZero, zCenterTierMax };
 

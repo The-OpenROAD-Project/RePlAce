@@ -1292,19 +1292,12 @@ void getCostFuncGradient2_filler_DEN_ONLY_PRECON(
 void myNesterov::z_init() {
   FPOS half_densize;
   prec zx = 0.0f, zy = 0.0f;
-  prec coeffi = z_ref_alpha * GP_SCAL;
 
   for(int j = start_idx; j < end_idx; j++) {
     half_densize = gcell_st[j].half_den_size;
 
-    if(GP_DIM_ONE) {
-      zx = y_st[j].x + place_backup.cnt.x * coeffi * y_dst[j].x;
-      zy = y_st[j].y + place_backup.cnt.y * coeffi * y_dst[j].y;
-    }
-    else {
-      zx = y_st[j].x + z_ref_alpha * y_dst[j].x;
-      zy = y_st[j].y + z_ref_alpha * y_dst[j].y;
-    }
+    zx = y_st[j].x + z_ref_alpha * y_dst[j].x;
+    zy = y_st[j].y + z_ref_alpha * y_dst[j].y;
 
     z_st[j].x = valid_coor2(zx, half_densize.x, 0);
     z_st[j].y = valid_coor2(zy, half_densize.y, 1);

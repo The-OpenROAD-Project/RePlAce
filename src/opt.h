@@ -239,8 +239,6 @@ void get_lc3_filler(struct FPOS *y_st, struct FPOS *y_dst, struct FPOS *z_st,
                     struct FPOS *z_dst, struct ITER *iter, int N);
 
 void init_iter(struct ITER *it, int idx);
-void shrink_gp_to_one(void);
-void expand_gp_from_one(void);
 
 void cell_macro_copy(void);
 void gp_opt(void);

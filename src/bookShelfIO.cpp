@@ -3625,11 +3625,6 @@ void output_gp_net_hpwl(char *fn) {
     net_hpwl.x = net->max_x - net->min_x;
     net_hpwl.y = net->max_y - net->min_y;
 
-    if(GP_DIM_ONE) {
-      net_hpwl.x *= place_backup.cnt.x * GP_SCAL;
-      net_hpwl.y *= place_backup.cnt.y * GP_SCAL;
-    }
-
     fprintf(fp, "%s %.6lf %.6lf\n", net->Name(), net_hpwl.x, net_hpwl.y);
   }
 }

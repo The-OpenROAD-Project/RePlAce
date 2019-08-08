@@ -63,7 +63,6 @@ prec hpwl_cGP2D;
 prec TSV_WEIGHT;
 
 FPOS wcof00;
-FPOS wcof00_dim1;
 FPOS wcof00_org;
 FPOS total_hpwl;
 FPOS total_stnwl;  // lutong
@@ -155,14 +154,7 @@ void wlen_init(void) {
     }
   }
 
-  if(GP_DIM_ONE) {
-    gp_wlen_weight.x = 1.0;
-    gp_wlen_weight.y = place_backup.cnt.y / place_backup.cnt.x;
-    // gp_wlen_weight.y = place.cnt.y / place.cnt.x;
-  }
-  else {
-    gp_wlen_weight.x = gp_wlen_weight.y = 1.0;
-  }
+  gp_wlen_weight.x = gp_wlen_weight.y = 1.0;
 
   dp_wlen_weight.x = 1.0;
   dp_wlen_weight.y = 1.0;
@@ -185,10 +177,7 @@ void wlen_init_cGP2D(void) {
 }
 
 void wcof_init(FPOS bstp) {
-  if(GP_DIM_ONE)
-    wcof00 = wcof00_dim1;
-  else
-    wcof00 = wcof00_org;
+  wcof00 = wcof00_org;
 
   base_wcof.x = wcof00.x / (0.5 * (bstp.x + bstp.y));
   base_wcof.y = wcof00.y / (0.5 * (bstp.x + bstp.y));
@@ -227,11 +216,6 @@ prec get_wlen_wa() {
     total_wlen.y += net_wlen.y;
   }
 
-  if(GP_DIM_ONE) {
-    total_wlen.x *= place_backup.cnt.x * GP_SCAL;
-    total_wlen.y *= place_backup.cnt.y * GP_SCAL;
-  }
-
   tot_wlen = total_wlen.x + total_wlen.y;  // +
 
   return tot_wlen;
@@ -251,13 +235,6 @@ prec get_wlen_lse(void) {
     net_wlen = get_net_wlen_lse(net);
     total_wlen.x += net_wlen.x;
     total_wlen.y += net_wlen.y;
-  }
-
-  if(GP_DIM_ONE) {
-    total_wlen.x *=
-        wlen_cof_inv.x * place_backup.cnt.x * GP_SCAL;  // * gp_wlen_weight.x +
-    total_wlen.y *=
-        wlen_cof_inv.y * place_backup.cnt.y * GP_SCAL;  // * gp_wlen_weight.y +
   }
 
   tot_wlen = total_wlen.x + total_wlen.y;
@@ -325,20 +302,6 @@ prec GetHpwl() {
     // total_stnwl.x += curNet->stn_cof * (curNet->max_x - curNet->min_x) ;
     // total_stnwl.y += curNet->stn_cof * (curNet->max_y - curNet->min_y) ;
 
-    // if(GP_DIM_ONE)
-    //  {
-    //    if(curNet->max_x - curNet->min_x > 1.0 / GP_SCAL * 1.1 ||
-    //       curNet->max_x - curNet->min_x > 1.0 / GP_SCAL * 1.1 ||
-    //       curNet->max_x - curNet->min_x > 1.0 / GP_SCAL * 1.1 )
-    //      {
-    //        g_rrr ++;
-    //      }
-    //  }
-  }
-
-  if(GP_DIM_ONE) {
-    total_hpwl.x *= place_backup.cnt.x * GP_SCAL;
-    total_hpwl.y *= place_backup.cnt.y * GP_SCAL;
   }
 
   return total_hpwl.x + total_hpwl.y;
