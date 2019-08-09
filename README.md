@@ -1,11 +1,18 @@
 # RePlAce
-*RePlAce: Advancing Solution Quality and Routability Validation in Global Placement* 
+RePlAce: Advancing Solution Quality and Routability Validation in Global Placement
+## Features
+- Analytic and nonlinear placement algorithm. Solves electrostatic force equations using Nesterov's method. ([link](https://cseweb.ucsd.edu/~jlu/papers/eplace-todaes14/paper.pdf))
+- Fully supports commercial formats. (LEF/DEF format)
+- Verified and worked well with various commercial technologies. (7/14/16/28/45/55/65nm)
+- Supports timing-driven placement mode based on commercial timer (OpenSTA).
+- Fast image drawing engine is ported (CImg).
 
 | <img src="/doc/image/adaptec2.inf.gif" width=350px> | <img src="/doc/image/coyote_TSMC16.gif" width=400px> | 
 |:--:|:--:|
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |*Real-world Design: Coyote (TSMC16 7.5T)* |
 
-## Getting Started
+
+# Getting Started
 
 ## Run using Docker
 1. Install Docker on [Windows](https://docs.docker.com/docker-for-windows/), [Mac](https://docs.docker.com/docker-for-mac/) or [Linux](https://docs.docker.com/install/).
@@ -76,6 +83,7 @@
     
 ### License
 * BSD-3-clause License [[Link]](LICENSE)
+* Code found under the Modules directory (e.g., submodules) have individual copyright and license declarations.
 
 ### 3rd Party Module List
 * Eigen
