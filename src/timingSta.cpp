@@ -603,8 +603,12 @@ void Timing::UpdateNetWeightSta() {
                          true, true,         // recovery, removal
                          true, true);        // clk gating setup, hold
 
-  if(ends->empty())
-    cout << "NO PATH !" << endl;
+  if(ends->empty()) {
+    cout << "ERROR: There is no valid timing path. " << endl;
+    cout << "       Please double check your SDC and Design" << endl;
+    cout << "       or, try to use non Timing-Driven mode" << endl;
+    exit(1);
+  }
 
   PathEndSeq::Iterator tmpIter(ends), pathEndIter(ends);
   int resultCnt = 0;
