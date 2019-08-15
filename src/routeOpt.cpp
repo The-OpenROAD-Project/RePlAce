@@ -664,6 +664,10 @@ void UFUnion(struct NET *net, int idx, int idy) {
   }
 }
 
+bool TwoPinNets_comp(TwoPinNets x, TwoPinNets y) {
+  return x.rect_dist < y.rect_dist;
+}
+
 void buildRMSTPerNet_genRMST(struct NET *net) {
   int num_edges = net->pinCNTinObject - 1;
   std::vector< TwoPinNets > &two_pin_nets = net->two_pin_nets;

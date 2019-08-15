@@ -315,7 +315,7 @@ inline static bool IsPrecEqual(prec a, prec b) {
 void SetParameter() {
   // lef 2 def unit info setting
   l2d = __ckt.defUnit;
-  cout << "INFO:  DEF SCALE UNIT: " << l2d << endl;
+  PrintInfoInt("DefUnit", l2d);
 
   if(__ckt.lefLayerStor.size() == 0) {
     cout << "\n** ERROR : LAYER statements not exists in lef file!" << endl;
@@ -335,7 +335,7 @@ void SetParameter() {
       }
     }
   }
-  cout << "INFO:  METAL1 NAME IN LEF: " << metal1Name << endl;
+  PrintInfoString("LefMetal1Name", metal1Name);
 
 #ifdef USE_GOOGLE_HASH
   // required for FIXED components(DEF) -> *.shape bookshelf
@@ -347,7 +347,8 @@ void SetParameter() {
 
   // unitX, unitY setting : RowHeight / 9 --> Converted Height: 9
   // RePlAce's Nesterov iteration parameter is optimized when cell height is around 9.
-  cout << "INFO:  DEF SITE: " << __ckt.defRowStor[0].macro() << endl;
+  PrintInfoString("DefSiteName", __ckt.defRowStor[0].macro());
+
   auto sitePtr = __ckt.lefSiteMap.find(string(__ckt.defRowStor[0].macro()));
   if( sitePtr == __ckt.lefSiteMap.end() ) {
     cout << "ERROR:  CANNOT find SITE: " 
@@ -1226,7 +1227,7 @@ DieRect GetCoreFromRow() {
           curRow.xNum() * l2d * lefSite->sizeX()) / unitX );
     float curMaxY = ( (curRow.y() + offsetY + 
           curRow.yNum() * l2d * lefSite->sizeY()) / unitY );
-   
+  
     maxX = (maxX < curMaxX) ? curMaxX : maxX;
     maxY = (maxY < curMaxY) ? curMaxY : maxY;
   }
@@ -1686,7 +1687,6 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
       continue;
     }
    
-    /*
     // special detection for avoiding signal nets 
     bool isReset = false;
     for(int i = 0; i < net.numConnections(); i++) {
@@ -1697,7 +1697,7 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
     }
     if( isReset ) {
       continue;
-    }*/
+    }
 
 
     curNet = &netInstance[netIdx];

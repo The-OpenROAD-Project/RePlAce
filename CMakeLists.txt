@@ -84,7 +84,7 @@ set (REPLACE_SRC
   src/lefParser.cpp
   src/macro.cpp
   src/main.cpp
-  src/myFunctions.cpp
+  src/util.cpp
   src/ns.cpp
   src/opt.cpp
   src/plot.cpp
@@ -114,6 +114,7 @@ set (REPLACE_HEADER
   src/timing.h
   src/timingSta.h
   src/wlen.h
+  src/util.h
 )
 
 ############################################################

@@ -445,72 +445,23 @@ void post_read_3d(void) {
   placementMacroCNT = 0;
   total_macro_area = 0;
 
-  if(INPUT_FLG == ISPD) {
-    for(int i = 0; i < moduleCNT; i++) {
-      curModule = &moduleInstance[i];
-      if(get_abs(curModule->size.x - 504) < Epsilon &&
-         get_abs(curModule->size.y - 216) < Epsilon) {
-        // stupid 504 x 216 cell overlap problem (w/ terminal) ISPD 2005
-        // b3 case.
-        curModule->flg = StdCell;
-        placementStdcellCNT++;
-        // tmpMultiHeightCellCNT++;
-        // CAUTION!!
-        total_macro_area += curModule->area;
-      }
-      else if(curModule->size.y - 2 * rowHeight > Epsilon) {
-        // if (curModule->size.y - rowHeight > 24.0 + Epsilon) {
-        // //lutong
-        curModule->flg = Macro;
-        placementMacroCNT++;
-        total_macro_area += curModule->area;
-      }
-      else if(curModule->size.x - 10 * rowHeight > Epsilon &&
-              curModule->size.y - rowHeight > Epsilon) {
-        curModule->flg = Macro;
-        placementMacroCNT++;
-        total_macro_area += curModule->area;
-      }
-      else if(curModule->size.y - rowHeight < -Epsilon) {
-        printf("*** ERROR:  Cell \"%d\" Height ERROR \n", i);
-      }
-      else {
-        curModule->flg = StdCell;
-        placementStdcellCNT++;
-        // if (get_abs(curModule->size.y - 2*rowHeight) < Epsilon)
-        // tmpMultiHeightCellCNT++;
-        // stupid precision reproduction bug
-        // for mental health, you should delete the next 5 lines except
-        // for 4th line.
-        if(curModule->size.y - rowHeight > Epsilon) {
-          total_macro_area += curModule->area;
-        }
-        else {
-          total_std_area += curModule->area;
-        }
-        continue;
-      }
+  for(int i = 0; i < moduleCNT; i++) {
+    curModule = &moduleInstance[i];
+    if(curModule->size.y - rowHeight > Epsilon) {
+      // if (curModule->size.y - rowHeight > 24.0 + Epsilon) {
+      // //lutong
+      curModule->flg = Macro;
+      placementMacroCNT++;
+      total_macro_area += curModule->area;
     }
-  }
-  else {
-    for(int i = 0; i < moduleCNT; i++) {
-      curModule = &moduleInstance[i];
-      if(curModule->size.y - rowHeight > Epsilon) {
-        // if (curModule->size.y - rowHeight > 24.0 + Epsilon) {
-        // //lutong
-        curModule->flg = Macro;
-        placementMacroCNT++;
-        total_macro_area += curModule->area;
-      }
-      else if(curModule->size.y - rowHeight < -Epsilon) {
-        printf("*** ERROR:  Cell \"%d\" Height ERROR \n", i);
-      }
-      else {
-        curModule->flg = StdCell;
-        placementStdcellCNT++;
-        total_std_area += curModule->area;
-        continue;
-      }
+    else if(curModule->size.y - rowHeight < -Epsilon) {
+      printf("*** ERROR:  Cell \"%d\" Height ERROR \n", i);
+    }
+    else {
+      curModule->flg = StdCell;
+      placementStdcellCNT++;
+      total_std_area += curModule->area;
+      continue;
     }
   }
 

@@ -63,6 +63,7 @@
 #include <cstring>
 #include <cassert>
 
+
 #define PI 3.141592653589793238462L
 #define SQRT2 1.414213562373095048801L
 #define INV_SQRT2 0.707106781186547524401L
@@ -125,7 +126,6 @@ typedef double prec;
 #define MIN_LEN 25.0 /* 10.0 */ /* 5.0 */ /* 1.0 */
 #define LS_DEN
 #define DetailPlace
-#define SA_LG
 #define FILLER_ADJ RandomAdj
 #define TIER_DEP /* 64.0 */ /* 600.0 */ 1
 #define TIER_Z0 0
@@ -135,8 +135,8 @@ typedef double prec;
 
 #define DEN_GRAD_SCALE 1.0 /* 0.1 */ /* 0.5 */ /* 0.25 */ /* 0.125 */
 #define LAYER_ASSIGN_3DIC MIN_TIER_ORDER                  /* MAX_AREA_DIS_DIV */
-
 ///////////////////////////////////////////////////////////////////////////
+
 
 using std::string;
 using std::cout;
@@ -599,8 +599,6 @@ class TwoPinNets {
   ~TwoPinNets() {
   }
 };
-
-bool TwoPinNets_comp(TwoPinNets x, TwoPinNets y);
 
 
 class ROUTRACK {
@@ -1151,7 +1149,6 @@ void get1stOrderDiff_HPWL_LinearHPWLtrendforThird();
 void get1stOrderDiff_HPWL_LinearHPWLtrendforSecond(void);
 void get1stOrder_ExtremePointsforThird(void);
 void get1stOrder_ExtremePointsforSecond(void);
-prec get_abs(prec a);
 void store2ndOrder_ExtremePoints(void);
 void store_POTNs(void);
 void store1stOrder_ExtremePointsforThird(void);
@@ -1166,22 +1163,10 @@ bool argument(int, char **);
 void printCMD(int, char **);
 bool criticalArgumentError(void);
 
-string getexepath();
 int pos_eqv(struct POS p1, struct POS p2);
-int prec_eqv(prec x, prec y);
-unsigned prec2unsigned(prec a);
-int find_non_zero(prec *a, int cnt);
-int prec_le(prec x, prec y);
-int prec_ge(prec x, prec y);
-int prec_lt(prec x, prec y);
-int prec_gt(prec x, prec y);
 int HPWL_count(void);
 void overlap_count(int iter);
 void update_net_by_pin(void);
-void time_start(double *time_cost);
-void time_end(double *time_cost);
-void time_calc(double last_time, double *curr_time, double *time_cost);
-void itoa(int n, char k[]);
 
 inline int dge(prec a, prec b) {
   return (a > b || a == b) ? 1 : 0;
@@ -1195,37 +1180,6 @@ void rdft2dsort(int, int, int, prec **);
 
 void read_macro(char *fn);
 
-FPOS fp_mul(struct FPOS a, struct FPOS b);
-inline FPOS fp_add(struct FPOS a, struct FPOS b) {
-  struct FPOS c = zeroFPoint;
-  c.x = a.x + b.x;
-  c.y = a.y + b.y;
-  return c;
-}
-FPOS fp_add_abs(struct FPOS a, struct FPOS b);
-inline FPOS fp_scal(prec s, struct FPOS a) {
-  struct FPOS c = a;
-  c.x *= s;
-  c.y *= s;
-  return c;
-}
-FPOS fp_subt(struct FPOS a, struct FPOS b);
-FPOS fp_subt_const(struct FPOS a, prec b);
-prec fp_sum(struct FPOS a);
-FPOS fp_exp(struct FPOS a);
-prec fp_product(struct FPOS a);
-
-int p_product(struct POS a);
-int p_max(struct POS a);
-
-FPOS fp_min2(struct FPOS a, struct FPOS b);
-FPOS fp_max2(struct FPOS a, struct FPOS b);
-FPOS fp_div(struct FPOS a, struct FPOS b);
-FPOS fp_rand(void);
-FPOS p2fp(struct POS a);
-POS fp2p_floor(struct FPOS a);
-POS fp2p_ceil(struct FPOS a);
-FPOS fp_inv(struct FPOS a);
 
 void tier_assign(int);
 void tier_assign_with_macro(void);
@@ -1241,11 +1195,12 @@ void tot_area_comp(void);
 void calc_tier_WS(void);
 void post_mac_tier(void);
 void pre_mac_tier(void);
+
 inline prec getStepSizefromEPs(prec hpwl, prec hpwlEP, prec hpwlSTD,
                                prec basePCOF, prec baseRange) {
   return min(basePCOF + baseRange, basePCOF +
-                                       baseRange * (get_abs(hpwl - hpwlSTD) /
-                                                    get_abs(hpwlEP - hpwlSTD)));
+                                       baseRange * ((prec)fabs(hpwl - hpwlSTD) /
+                                                    (prec)fabs(hpwlEP - hpwlSTD)));
 }
 
 // writing Bookshelf function
@@ -1256,88 +1211,10 @@ void CallDetailPlace();
 void CallNtuPlacer3(const char *tier_dir, const char *tier_aux, const char *tier_pl);
 void CallNtuPlacer4h(const char *tier_dir, const char *tier_aux, const char *tier_pl);
 
-// Inline function definition
 
-
-// return Common Area
-// between Rectangle A and Rectangle B.
-// type : casted long from prec
-inline long lGetCommonAreaXY(FPOS aLL, FPOS aUR, FPOS bLL, FPOS bUR) {
-  long xLL = max(aLL.x, bLL.x), yLL = max(aLL.y, bLL.y),
-       xUR = min(aUR.x, bUR.x), yUR = min(aUR.y, bUR.y);
-
-  if(xLL >= xUR || yLL >= yUR) {
-    return 0;
-  }
-  else {
-    return (xUR - xLL) * (yUR - yLL);
-  }
-}
-
-// return Common Area
-// between Rectangle A and Rectangle B.
-// type : integer
-inline int iGetCommonAreaXY(POS aLL, POS aUR, POS bLL, POS bUR) {
-  int xLL = max(aLL.x, bLL.x), yLL = max(aLL.y, bLL.y), xUR = min(aUR.x, bUR.x),
-      yUR = min(aUR.y, bUR.y);
-
-  if(xLL >= xUR || yLL >= yUR) {
-    return 0;
-  }
-  else {
-    return (xUR - xLL) * (yUR - yLL);
-  }
-}
-
-// return Common Area
-// between Rectangle A and Rectangle B.
-// type : prec
-inline prec pGetCommonAreaXY(FPOS aLL, FPOS aUR, FPOS bLL, FPOS bUR) {
-  prec xLL = max(aLL.x, bLL.x), yLL = max(aLL.y, bLL.y),
-       xUR = min(aUR.x, bUR.x), yUR = min(aUR.y, bUR.y);
-
-  if(xLL >= xUR || yLL >= yUR) {
-    return 0;
-  }
-  else {
-    return (xUR - xLL) * (yUR - yLL);
-  }
-}
-
-// for string escape
-inline bool ReplaceStringInPlace(std::string &subject,
-                                 const std::string &search,
-                                 const std::string &replace) {
-  size_t pos = 0;
-  bool isFound = false;
-  while((pos = subject.find(search, pos)) != std::string::npos) {
-    subject.replace(pos, search.length(), replace);
-    pos += replace.length();
-    isFound = true;
-  }
-  return isFound;
-}
-
-inline void SetEscapedStr(std::string &inp) {
-  if(ReplaceStringInPlace(inp, "/", "\\/")) {
-    ReplaceStringInPlace(inp, "[", "\\[");
-    ReplaceStringInPlace(inp, "]", "\\]");
-  }
-}
-
-inline char *GetEscapedStr(const char *name, bool isEscape = true) {
-  std::string tmp(name);
-  if( isEscape ) {
-    SetEscapedStr(tmp);
-  }
-  return strdup(tmp.c_str());
-}
-
-inline string GetRealPath(string path ) {
-  char tmp[PATH_MAX] = {0, };
-  realpath(path.c_str(), tmp);
-  return string(tmp);
-}
-
+// 
+// Some utils for RePlAce.
+//
+#include "util.h"
 
 #endif

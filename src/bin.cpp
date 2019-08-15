@@ -491,10 +491,6 @@ void UpdateTerminalArea(TIER *tier, FPOS *pmin, FPOS *pmax) {
       for(int y = bin_pmin.y; y <= bin_pmax.y; y++) {
         BIN *curBin = &tier->bin_mat[x * tier->dim_bin.y + y];
 
-        // due to precision
-        //                long terminalOverlap = lGetCommonAreaXY(rect.pmin,
-        //                rect.pmax,
-        //                        curBin->pmin, curBin->pmax);
         prec terminalOverlap =
             pGetCommonAreaXY(rect.pmin, rect.pmax, curBin->pmin, curBin->pmax);
 

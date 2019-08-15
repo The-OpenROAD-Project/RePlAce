@@ -409,11 +409,9 @@ int main(int argc, char *argv[]) {
   double tot_cpu = 0;
   double time_ip = 0;
   double time_tp = 0;
-  double time_mGP3D = 0;
   double time_mGP2D = 0;
   double time_mGP = 0;
   double time_lg = 0;
-  double time_cGP3D = 0;
   double time_cGP2D = 0;
   double time_cGP = 0;
   double time_dp = 0;
@@ -426,9 +424,10 @@ int main(int argc, char *argv[]) {
   total_hpwl.SetZero();
 
   printCMD(argc, argv);
-  cout << "INFO:  VERSION, Compiled at " << compileDate << " " << compileTime
-       << endl;
-  cout << "INFO:  Now is " << asctime(timeinfo);
+  cout << endl;
+  PrintInfoString("CompileDate", compileDate);
+  PrintInfoString("CompileTime", compileTime);
+  PrintInfoString("StartingTime", asctime(timeinfo));
 
   ///////////////////////////////////////////////////////////////////////
   ///// Parse Arguments (defined in argument.cpp) ///////////////////////
@@ -439,17 +438,15 @@ int main(int argc, char *argv[]) {
   ///// Placement Initialization  ///////////////////////////////////////
 
   init();
-  printf("PROC:  BEGIN IMPORTING PLACEMENT INPUT\n");
-
+  PrintProcBegin("Importing Placement Input");
   ParseInput();
 
-  if(numLayer > 1)
-    calcTSVweight();
+//  if(numLayer > 1)
+//    calcTSVweight();
 
   net_update_init();
   init_tier();
-  printf("PROC:  END IMPORTING PLACEMENT INPUT\n\n\n");
-  fflush(stdout);
+  PrintProcEnd("Importing Placement Input");
   ///////////////////////////////////////////////////////////////////////
 
   time_start(&tot_cpu);
@@ -457,13 +454,12 @@ int main(int argc, char *argv[]) {
   if(!isSkipPlacement) {
     ///////////////////////////////////////////////////////////////////////
     ///// IP:  INITIAL PLACEMENT //////////////////////////////////////////
-    printf("PROC:  BEGIN INITIAL PLACEMENT (IP)\n");
+    PrintProcBegin("Initial Placement");
     time_start(&time_ip);
     build_data_struct(!isInitSeed);
     initialPlacement_main();
     time_end(&time_ip);
-    printf("PROC:  END INITIAL PLACEMENT (IP)\n\n\n");
-    fflush(stdout);
+    PrintProcEnd("Initial Placement");
     ///////////////////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////////////////
@@ -491,6 +487,7 @@ int main(int argc, char *argv[]) {
     }
 
     time_start(&time_mGP);
+    /*
     if(numLayer > 1 && placementMacroCNT > 0) {
       ///////////////////////////////////////////////////////////////////////
       ///// mGP3D:  MIXED_SIZE_3D_GLOBAL_PLACE //////////////////////////////
@@ -502,19 +499,20 @@ int main(int argc, char *argv[]) {
       printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP3D);
       printf("PROC:  END GLOBAL 3D PLACEMENT\n\n\n");
       ///////////////////////////////////////////////////////////////////////
-    }
+    }*/
 
     if(placementMacroCNT > 0) {
       ///////////////////////////////////////////////////////////////////////
       ///// mGP2D:  MIXED_SIZE_2D_GLOBAL_PLACE //////////////////////////////
-      printf("PROC:  BEGIN GLOBAL 2D PLACEMENT IN EACH TIER\n");
-      printf("PROC:  Mixed-Size 2D Global Placement (mGP2D)\n");
+    
+      PrintProc("Begin Mixed-Size Global Placement ...");
       time_start(&time_mGP2D);
       mGP2DglobalPlacement_main();
       time_end(&time_mGP2D);
+
       printf("   RUNTIME(s) : %.4f\n\n\n", time_mGP2D);
-      printf("PROC:  END GLOBAL 2D PLACEMENT (mGP2D)\n\n\n");
-      
+      PrintProc("End Mixed-Size Global Placement");
+
       WriteDef(defGpOutput);
 
       // no need to run any other flow with MS-RePlAce
@@ -537,7 +535,9 @@ int main(int argc, char *argv[]) {
     //   ///////////////////////////////////////////////////////////////////////
     // }
 
+
     time_start(&time_cGP);
+    /*
     if(numLayer > 1) {
       ///////////////////////////////////////////////////////////////////////
       ///// cGP3D:  STDCELL_ONLY_3D_GLOBAL_PLACE
@@ -549,7 +549,8 @@ int main(int argc, char *argv[]) {
       printf("   RUNTIME(s) : %.4f\n\n\n", time_cGP3D);
       printf("PROC:  END GLOBAL 3D PLACEMENT\n\n\n");
       ///////////////////////////////////////////////////////////////////////
-    }
+    }*/
+
 
     ///////////////////////////////////////////////////////////////////////
     ///// cGP2D:  STDCELL_ONLY_2D_GLOBAL_PLACE //////////////////////////////
@@ -707,30 +708,18 @@ void init() {
 
   switch(detailPlacer) {
     case FastPlace:
-#ifdef SA_LG
       sprintf(str_lg, "%s", "_eplace_lg");
-#else
-      sprintf(str_lg, "%s", "_FP_lg");
-#endif
       sprintf(str_dp, "%s", "_FP_dp");
       break;
 
     case NTUplace3:
-#ifdef SA_LG
       sprintf(str_lg, "%s", "_eplace_lg");
-#else
-      sprintf(str_lg, "%s", ".eplace-gp.lg");
-#endif
       sprintf(str_dp, "%s", ".eplace-gp.ntup");
       sprintf(str_dp2, "%s", ".eplace-cGP3D.ntup");
       break;
 
     case NTUplace4h:
-#ifdef SA_LG
       sprintf(str_lg, "%s", "_eplace_lg");
-#else
-      sprintf(str_lg, "%s", ".eplace-gp.lg");
-#endif
       sprintf(str_dp, "%s", ".eplace-gp.ntup");
       sprintf(str_dp2, "%s", ".eplace-cGP3D.ntup");
       break;
@@ -757,7 +746,7 @@ void init() {
   }
 
   global_macro_area_scale = target_cell_den;
-  printf("INFO:  Target Density = %.6lf\n", target_cell_den);
+  PrintInfoPrec("TargetDensity", target_cell_den);
 
   wcof_flg = /* 1 */ 2 /* 3 */;
 
@@ -769,11 +758,9 @@ void init() {
     case WA:
       if(INPUT_FLG == ISPD05 || INPUT_FLG == ISPD06 || INPUT_FLG == ISPD ||
          INPUT_FLG == MMS || INPUT_FLG == SB || INPUT_FLG == ETC) {
-        wcof00_dim1.x = wcof00_dim1.y = 0.50;  // 500.0;
         wcof00_org.x = wcof00_org.y = 0.125;
       }
       else if(INPUT_FLG == IBM) {
-        wcof00_dim1.x = wcof00_dim1.y = 0.50;
         wcof00_org.x = wcof00_org.y = 0.50;
       }
       break;
@@ -866,9 +853,8 @@ void init() {
   sprintf(defGpOutput, "%s/%s_gp.def", dir_bnd, gbch);
   sprintf(defOutput, "%s/%s_final.def", dir_bnd, gbch);
 
-  printf("INFO:  Experiment Index %d\n", ver_num);
-  printf("INFO:  DIR_PATH = %s\n\n", dir_bnd);
-  fflush(stdout);
+  PrintInfoInt("ExperimentIndex", ver_num);
+  PrintInfoString("DirectoryPath", dir_bnd);
 
   sprintf(bench_aux, "%s/%s.aux", gbch_dir, gbch);
   sprintf(gbch_aux, "%s.aux", gbch);

@@ -212,9 +212,6 @@ void whitespace_init(void) {
       for(int j = 0; j < place_st_cnt; j++) {
         PLACE *pl = &place_st[j];
 
-        //                long commonArea = lGetCommonAreaXY( curTerminal->pmin,
-        //                curTerminal->pmax,
-        //                                                   pl->org, pl->end );
         prec commonArea = pGetCommonAreaXY(curTerminal->pmin, curTerminal->pmax,
                                            pl->org, pl->end);
         curTerminal->PL_area += commonArea;

@@ -56,7 +56,6 @@ extern prec TSV_WEIGHT;
 extern int MAX_EXP;
 extern int NEG_MAX_EXP;
 extern FPOS wcof00;
-extern FPOS wcof00_dim1;
 extern FPOS wcof00_org;
 extern FPOS total_hpwl;
 extern FPOS total_stnwl;  // lutong
