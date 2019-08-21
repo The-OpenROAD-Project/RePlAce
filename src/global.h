@@ -50,6 +50,7 @@
 #include <tuple>
 #include <vector>
 #include <iomanip>
+#include <cmath>
 
 #ifdef USE_GOOGLE_HASH
 #include <google/dense_hash_map>
