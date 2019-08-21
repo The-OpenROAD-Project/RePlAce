@@ -622,8 +622,16 @@ bool AddShape(int defCompIdx, int lx, int ly,
   return (isMetal1) ? true : false;
 }
 
-void SetSizeForObsMacro(int macroIdx, MODULE* curModule) {
+void SetSizeForObsMacro(int macroIdx, MODULE* curModule, int orient) {
   bool isMetal1 = false;
+
+  prec llx = PREC_MAX, lly = PREC_MAX;
+  prec urx = PREC_MIN, ury = PREC_MIN;
+
+  // original macro size info to handle orientation 
+  float w = __ckt.lefMacroStor[macroIdx].sizeX();
+  float h = __ckt.lefMacroStor[macroIdx].sizeY();
+
   for(auto& curObs : __ckt.lefObsStor[macroIdx]) {
     lefiGeometries* curGeom = curObs.geometries();
 
@@ -650,11 +658,26 @@ void SetSizeForObsMacro(int macroIdx, MODULE* curModule) {
       // calculate BBox
       if(isMetal1 && curGeom->itemType(j) == lefiGeomRectE) {
         lefiGeomRect* rect = curGeom->getRect(j);
+        
+        // Orientation handling
+        std::pair<float, float> rectLxLy = 
+          GetOrientLowerLeftPoint( rect->xl, rect->yl, rect->xh, rect->yh, 
+                                    w, h, orient );
 
-        curModule->size.Set(l2d * (rect->xh - rect->xl) / unitX,
-                            l2d * (rect->yh - rect->yl) / unitY);
-        //                cout << rect->xl << " " << rect->yl << endl;
-        //                cout << rect->xh << " " << rect->yh << endl;
+        std::pair<float, float> rectSize = 
+          GetOrientSize( rect->xh - rect->xl, rect->yh - rect->yl, orient );
+
+        // Extract BBox information
+        llx = ( llx > rectLxLy.first )?   rectLxLy.first : llx;
+        lly = ( lly > rectLxLy.second )?  rectLxLy.second : lly;
+
+        urx = ( urx < rectLxLy.first + rectSize.first )?  
+                  rectLxLy.first + rectSize.first : urx;
+        ury = ( ury < rectLxLy.second + rectSize.second )?  
+                  rectLxLy.second + rectSize.second : ury;
+
+//        cout << rect->xl << " " << rect->yl << endl;
+//        cout << rect->xh << " " << rect->yh << endl;
       }
       // now, meets another Layer
       else if(isMetal1 && curGeom->itemType(j) == lefiGeomLayerE) {
@@ -666,7 +689,16 @@ void SetSizeForObsMacro(int macroIdx, MODULE* curModule) {
       break;
     }
   }
-  //    cout << "func end" << endl;
+
+  if( !isMetal1 || llx == PREC_MAX ) {
+    cout << "ERROR: LEF's OBS statements don't have metal1 statements!!" << endl;
+    exit(1);
+  }
+
+  // finalize modules' Size 
+  curModule->size.Set( 
+      (l2d * (urx - llx)) / unitX, 
+      (l2d * (ury - lly)) / unitY );
 }
 
 //
@@ -726,15 +758,17 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
 
     if(strcmp(curMacro->macroClass(), "BLOCK") == 0 &&
        __ckt.lefObsStor[macroPtr->second].size() != 0) {
-      //            cout << "BLOCK/OBS: " << curMacro->name() << endl;
-      SetSizeForObsMacro(macroPtr->second, curModule);
-      //            curModule.size.Set( l2d * curMacro);
+      // cout << "BLOCK/OBS: " << curMacro->name() << endl;
+
+      // Orient handling for MS-Placement
+      SetSizeForObsMacro(macroPtr->second, curModule, 
+          curComp->isUnplaced()? 
+          0 : curComp->placementOrient());
     }
     else {
       // size info update from LEF Macro
       curModule->size.Set(l2d * curMacro->sizeX() / unitX,
                           l2d * curMacro->sizeY() / unitY);
-      //            curModule->size.Dump("size");
     }
 
     if(fabs(curModule->size.y - rowHeight) > PREC_EPSILON) {
