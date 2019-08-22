@@ -514,6 +514,7 @@ int main(int argc, char *argv[]) {
       PrintProc("End Mixed-Size Global Placement");
 
       WriteDef(defGpOutput);
+      WriteDef(defOutput);
 
       // no need to run any other flow with MS-RePlAce
       return 0;
