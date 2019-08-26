@@ -165,68 +165,71 @@ using std::unordered_map;
 using std::unordered_set;
 #endif
 
-struct POS;
+class POS;
 
-struct FPOS {
+class FPOS {
+private:
   prec x;
   prec y;
-//  prec z;
+  //  prec z;
 
+public:
   FPOS() {
-    SetZero();
+    x = y = 0; 
   };
 
-  FPOS(prec _x, prec _y) : x(_x), y(_y){};
+  FPOS(prec xloc, prec yloc) : x(xloc), y(yloc) {};
 
-  inline void Set(prec a) {
+  void Set(prec a) {
     x = y = a;
   }
-  inline void Set(FPOS a) {
+  void Set(FPOS a) {
     x = a.x;
     y = a.y;
   }
-  inline void Set(prec _x, prec _y) {
-    x = _x;
-    y = _y;
+
+  void Set(prec xloc, prec yloc) {
+    x = xloc;
+    y = yloc;
   }
 
-  inline void Set(POS a);
+  void Set(POS a);
 
-  inline void SetZero() {
-    x = y = 0.0f;
-  }
-  inline void Add(FPOS a) {
+  prec GetX() { return x; };
+  prec GetY() { return y; }; 
+
+  void Add(FPOS a) {
     x += a.x;
     y += a.y;
   }
-  inline void SetAdd(FPOS a, FPOS b) {
+  void SetAdd(FPOS a, FPOS b) {
     x = a.x + b.x;
     y = a.y + b.y;
   }
-  inline void Min(FPOS a) {
+  void Min(FPOS a) {
     x = min(x, a.x);
     y = min(y, a.y);
   }
-  inline void SetMin(FPOS a, FPOS b) {
+  void SetMin(FPOS a, FPOS b) {
     x = min(a.x, b.x);
     y = min(a.y, b.y);
   }
-  inline void Max(FPOS a) {
+  void Max(FPOS a) {
     x = max(x, a.x);
     y = max(y, a.y);
   }
-  inline void SetMax(FPOS a, FPOS b) {
+  void SetMax(FPOS a, FPOS b) {
     x = max(a.x, b.x);
     y = max(a.y, b.y);
   }
 
-  inline prec GetProduct() {
+  prec GetProduct() {
     return x * y;
   }
-  inline void Dump() {
+  void Dump() {
     cout << "(" << x << " " << y << ")" << endl;
   }
-  inline void Dump(string a) {
+  void Dump(string a) {
     cout << a << ": (" << x << " " << y << ")" << endl;
   }
 };

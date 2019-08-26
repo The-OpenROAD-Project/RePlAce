@@ -57,8 +57,6 @@
 #include <string>
 #include <vector>
 
-#include <mkl.h>
-
 // this is shared with lefdefIO.cpp
 FPOS grow_pmin, grow_pmax;
 FPOS terminal_pmin, terminal_pmax;
@@ -240,7 +238,7 @@ void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
   assert(tot_row_cnt == row_cnt);
 
   //    row_st = (ROW *)realloc(row_st, sizeof(struct ROW) * tot_row_cnt);
-  tier_st = (TIER *)mkl_malloc(sizeof(struct TIER) * numLayer, 64);
+  tier_st = (TIER *)malloc(sizeof(struct TIER) * numLayer);
 
   placementMacroCNT = 0;
 
@@ -926,16 +924,16 @@ int read_nodes (char *input) {
 
     moduleCNT -= terminalCNT;
 
-    moduleInstance=(struct MODULE*)mkl_malloc(sizeof(struct
+    moduleInstance=(struct MODULE*)malloc(sizeof(struct
 MODULE)*moduleCNT,64);
-    terminalInstance=(struct TERM*)mkl_malloc(sizeof(struct
+    terminalInstance=(struct TERM*)malloc(sizeof(struct
 TERM)*terminalCNT,64);
 
     modu_map_cnt = 100000;
     term_map_cnt = 100000;
 
-    modu_map = (int*)mkl_malloc(sizeof(int)*modu_map_cnt, 64);
-    term_map = (int*)mkl_malloc(sizeof(int)*term_map_cnt, 64);
+    modu_map = (int*)malloc(sizeof(int)*modu_map_cnt, 64);
+    term_map = (int*)malloc(sizeof(int)*term_map_cnt, 64);
 
     for(i=0;i<modu_map_cnt;i++)
     {
@@ -1336,9 +1334,9 @@ int read_nodes_3D(char *input) {
 
   moduleCNT -= terminalCNT;
   moduleInstance =
-      (struct MODULE *)mkl_malloc(sizeof(struct MODULE) * moduleCNT, 64);
+      (struct MODULE *)malloc(sizeof(struct MODULE) * moduleCNT);
   terminalInstance =
-      (struct TERM *)mkl_malloc(sizeof(struct TERM) * terminalCNT, 64);
+      (struct TERM *)malloc(sizeof(struct TERM) * terminalCNT);
 
   // why this is required..
   // terminal_size_max = zeroFPoint;
@@ -1607,8 +1605,8 @@ int read_nets_3D(char *input) {
   token = strtok(NULL, " \t\n");
   pinCNT = atoi(token);
 
-  netInstance = (struct NET *)mkl_malloc(sizeof(struct NET) * netCNT, 64);
-  pinInstance = (struct PIN *)mkl_malloc(sizeof(struct PIN) * pinCNT, 64);
+  netInstance = (struct NET *)malloc(sizeof(struct NET) * netCNT);
+  pinInstance = (struct PIN *)malloc(sizeof(struct PIN) * pinCNT);
 
   int pid = 0;
   for(int i = 0; i < netCNT; i++) {
@@ -1633,8 +1631,8 @@ int read_nets_3D(char *input) {
     // lutong 05132016
     // if (strcmp(curNet->Name(), "CLK") && (strcmp(curNet->Name(), "GND"))){
 
-    curNet->pin = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * curNet->pinCNTinObject, 64);
+    curNet->pin = (struct PIN **)malloc(
+        sizeof(struct PIN *) * curNet->pinCNTinObject);
 
     if(max_net_deg < curNet->pinCNTinObject) {
       max_net_deg = curNet->pinCNTinObject;
@@ -1821,7 +1819,7 @@ int read_scl(char *input) {
   //    row_st = (struct ROW *)malloc(sizeof(struct ROW) * row_cnt);
   // call constructor
   //    row_st = new ROW[row_cnt];
-  row_st = (ROW *)mkl_malloc(sizeof(struct ROW) * row_cnt, 64);
+  row_st = (ROW *)malloc(sizeof(struct ROW) * row_cnt);
   fgets(buf, buf_size, fp);
 
   for(int i = 0; i < row_cnt; i++) {
@@ -2092,22 +2090,22 @@ void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
     currentPinCount++;
     *pin = (PIN **)realloc(*pin, sizeof(struct PIN *) * currentPinCount);
     *pof = (FPOS *)realloc(*pof, sizeof(struct FPOS) * currentPinCount);
-    //*pin_tmp = (struct PIN**)mkl_malloc(sizeof(struct
+    //*pin_tmp = (struct PIN**)malloc(sizeof(struct
     // PIN*)*currentPinCount, 64);
-    //*pof_tmp = (struct FPOS*)mkl_malloc(sizeof(struct
+    //*pof_tmp = (struct FPOS*)malloc(sizeof(struct
     // FPOS)*currentPinCount, 64);
     // memcpy(*pin_tmp, *pin, currentPinCount*(sizeof(struct PIN*)));
     // memcpy(*pof_tmp, *pof, currentPinCount*(sizeof(struct FPOS)));
-    // mkl_free(*pin);
-    // mkl_free(*pof);
-    //*pin = (struct PIN**)mkl_malloc(sizeof(struct PIN*)*currentPinCount,
+    // free(*pin);
+    // free(*pof);
+    //*pin = (struct PIN**)malloc(sizeof(struct PIN*)*currentPinCount,
     // 64);
-    //*pof = (struct FPOS*)mkl_malloc(sizeof(struct FPOS)*currentPinCount,
+    //*pof = (struct FPOS*)malloc(sizeof(struct FPOS)*currentPinCount,
     // 64);
     // memcpy(*pin, *pin_tmp, currentPinCount*(sizeof(struct PIN*)));
     // memcpy(*pof, *pof_tmp, currentPinCount*(sizeof(struct FPOS)));
-    // mkl_free(*pin_tmp);
-    // mkl_free(*pof_tmp);
+    // free(*pin_tmp);
+    // free(*pof_tmp);
   }
   else {
     currentPinCount++;

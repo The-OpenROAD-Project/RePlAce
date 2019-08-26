@@ -44,11 +44,6 @@
 #include <cfloat>
 
 #include "fft.h"
-#include "mkl.h"
-#include "mkl_service.h"
-#include "mkl_dfti.h"
-#include "mkl_trig_transforms.h"
-#include "mkl_poisson.h"
 
 int *charge_ip_2d;
 int *charge_ip_3d;
@@ -110,28 +105,28 @@ void charge_fft_init_2d(struct POS nbin, struct FPOS stp) {
   charge_dft_nbin_2d = p_product(dft_bin_2d);
   DFT_SCALE_2D = 1.0 / ((prec)charge_dft_nbin_2d);
 
-  den_2d_st2 = (prec **)mkl_malloc(sizeof(prec *) * dft_bin_2d.x, 64);
-  phi_2d_st2 = (prec **)mkl_malloc(sizeof(prec *) * dft_bin_2d.x, 64);
-  ex_2d_st2 = (prec **)mkl_malloc(sizeof(prec *) * dft_bin_2d.x, 64);
-  ey_2d_st2 = (prec **)mkl_malloc(sizeof(prec *) * dft_bin_2d.x, 64);
+  den_2d_st2 = (prec **)malloc(sizeof(prec *) * dft_bin_2d.x);
+  phi_2d_st2 = (prec **)malloc(sizeof(prec *) * dft_bin_2d.x);
+  ex_2d_st2 = (prec **)malloc(sizeof(prec *) * dft_bin_2d.x);
+  ey_2d_st2 = (prec **)malloc(sizeof(prec *) * dft_bin_2d.x);
 
   for(x = 0; x < dft_bin_2d.x; x++) {
-    den_2d_st2[x] = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.y, 64);
-    phi_2d_st2[x] = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.y, 64);
-    ex_2d_st2[x] = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.y, 64);
-    ey_2d_st2[x] = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.y, 64);
+    den_2d_st2[x] = (prec *)malloc(sizeof(prec) * dft_bin_2d.y);
+    phi_2d_st2[x] = (prec *)malloc(sizeof(prec) * dft_bin_2d.y);
+    ex_2d_st2[x] = (prec *)malloc(sizeof(prec) * dft_bin_2d.y);
+    ey_2d_st2[x] = (prec *)malloc(sizeof(prec) * dft_bin_2d.y);
   }
 
   charge_dft_nbit_2d = 2 + (int)sqrt((prec)charge_dft_n_2d + 0.5);
-  charge_ip_2d = (int *)mkl_malloc(sizeof(int) * charge_dft_nbit_2d, 64);
+  charge_ip_2d = (int *)malloc(sizeof(int) * charge_dft_nbit_2d);
   charge_dft_nw_2d = charge_dft_n_2d * 3 / 2;
-  w_2d = (prec *)mkl_malloc(sizeof(prec) * charge_dft_nw_2d, 64);
+  w_2d = (prec *)malloc(sizeof(prec) * charge_dft_nw_2d);
   charge_ip_2d[0] = 0;
 
-  wx_2d_st = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.x, 64);
-  wy_2d_st = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.y, 64);
-  wx2_2d_st = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.x, 64);
-  wy2_2d_st = (prec *)mkl_malloc(sizeof(prec) * dft_bin_2d.y, 64);
+  wx_2d_st = (prec *)malloc(sizeof(prec) * dft_bin_2d.x);
+  wy_2d_st = (prec *)malloc(sizeof(prec) * dft_bin_2d.y);
+  wx2_2d_st = (prec *)malloc(sizeof(prec) * dft_bin_2d.x);
+  wy2_2d_st = (prec *)malloc(sizeof(prec) * dft_bin_2d.y);
 
   for(x = 0; x < dft_bin_2d.x; x++) {
     // LW 05/04/17
@@ -800,21 +795,21 @@ void charge_fft_delete_3d(void) {
 
 void charge_fft_delete_2d(void) {
   // for (int i=0; i<dft_bin_2d.x; i++) {
-  //    mkl_free (den_2d_st2[i]);
-  //    mkl_free (phi_2d_st2[i]);
-  //    mkl_free (ex_2d_st2 [i]);
-  //    mkl_free (ey_2d_st2 [i]);
+  //    free (den_2d_st2[i]);
+  //    free (phi_2d_st2[i]);
+  //    free (ex_2d_st2 [i]);
+  //    free (ey_2d_st2 [i]);
   //}
-  mkl_free(den_2d_st2);
-  mkl_free(phi_2d_st2);
-  mkl_free(ex_2d_st2);
-  mkl_free(ey_2d_st2);
-  mkl_free(charge_ip_2d);
-  mkl_free(w_2d);
-  mkl_free(wx_2d_st);
-  mkl_free(wy_2d_st);
-  mkl_free(wx2_2d_st);
-  mkl_free(wy2_2d_st);
+  free(den_2d_st2);
+  free(phi_2d_st2);
+  free(ex_2d_st2);
+  free(ey_2d_st2);
+  free(charge_ip_2d);
+  free(w_2d);
+  free(wx_2d_st);
+  free(wy_2d_st);
+  free(wx2_2d_st);
+  free(wy2_2d_st);
 }
 
 // void thermal_fft_delete_2d (void) {

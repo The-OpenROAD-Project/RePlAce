@@ -47,7 +47,6 @@
 
 #include "global.h"
 #include "macro.h"
-#include "mkl.h"
 #include "opt.h"
 #include "wlen.h"
 
@@ -145,7 +144,7 @@ FPOS get_wlen_cof2(prec ovf) {
 void wlen_init(void) {
   int i = 0 /* ,cnt=exp_st_cnt */;
   /* prec interval = exp_interval ; */
-  exp_st = (EXP_ST *)mkl_malloc(sizeof(EXP_ST) * exp_st_cnt, 64);
+  exp_st = (EXP_ST *)malloc(sizeof(EXP_ST) * exp_st_cnt);
   for(i = 0; i < exp_st_cnt; i++) {
     exp_st[i].x = (prec)i * exp_interval - MAX_EXP;
     exp_st[i].val = exp(exp_st[i].x);

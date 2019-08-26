@@ -52,7 +52,6 @@
 #include "bin.h"
 #include "charge.h"
 #include "global.h"
-#include "mkl.h"
 #include "ns.h"
 #include "opt.h"
 #include "plot.h"
@@ -163,7 +162,7 @@ void myNesterov::nesterov_opt() {
     // for comparison
     //        TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, sdcCMD);
   }
-  mkl_malloc_free();
+  malloc_free();
 }
 
 void myNesterov::InitializationCommonVar() {
@@ -210,29 +209,29 @@ void myNesterov::InitializationCommonVar() {
   temp_dpre.SetZero();
   pre.SetZero();
 
-  iter_st = (struct ITER *)mkl_malloc(sizeof(struct ITER) * (max_iter + 1), 64);
+  iter_st = (struct ITER *)malloc(sizeof(struct ITER) * (max_iter + 1));
 
-  x_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  x_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  y_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_dst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_wdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_pdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_pdstl = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  y_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_dst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_wdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_pdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_pdstl = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  z_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_dst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_wdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_pdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_pdstl = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  z_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_dst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_wdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_pdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_pdstl = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  x0_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  x0_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  y0_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_dst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_wdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_pdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_pdstl = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  y0_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_dst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_wdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_pdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_pdstl = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
   memset(x_st, 0.0f, sizeof(prec) * N * 2);
   memset(y_st, 0.0f, sizeof(prec) * N * 2);
@@ -254,10 +253,10 @@ void myNesterov::InitializationCommonVar() {
   memset(y0_pdst, 0.0f, sizeof(prec) * N * 2);
   memset(y0_pdstl, 0.0f, sizeof(prec) * N * 2);
 
-  cellLambdaArr = (prec *)mkl_malloc(sizeof(prec) * N, 64);
-  pcofArr = (prec *)mkl_malloc(sizeof(prec) * 100, 64);
-  // alphaArrCD  =(prec*)mkl_malloc(sizeof(prec)*100, 64);
-  // deltaArrCD  =(prec*)mkl_malloc(sizeof(prec)*100, 64);
+  cellLambdaArr = (prec *)malloc(sizeof(prec) * N);
+  pcofArr = (prec *)malloc(sizeof(prec) * 100);
+  // alphaArrCD  =(prec*)malloc(sizeof(prec)*100);
+  // deltaArrCD  =(prec*)malloc(sizeof(prec)*100);
   // IK 05/08/17
   // if (isRoutability) MIN_PRE = 1E-15;
   // else                MIN_PRE = 1;
@@ -842,29 +841,29 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
   return -1;
 }
 
-void myNesterov::mkl_malloc_free() {
-  mkl_free(iter_st);
-  mkl_free(x_st);
-  mkl_free(y_st);
-  mkl_free(y_dst);
-  mkl_free(y_wdst);
-  mkl_free(y_pdst);
-  mkl_free(y_pdstl);
-  mkl_free(z_st);
-  mkl_free(z_dst);
-  mkl_free(z_wdst);
-  mkl_free(z_pdst);
-  mkl_free(z_pdstl);
-  mkl_free(x0_st);
-  mkl_free(y0_st);
-  mkl_free(y0_dst);
-  mkl_free(y0_wdst);
-  mkl_free(y0_pdst);
-  mkl_free(y0_pdstl);
-  mkl_free(cellLambdaArr);
-  mkl_free(pcofArr);
-  // mkl_free(alphaArrCD);
-  // mkl_free(deltaArrCD);
+void myNesterov::malloc_free() {
+  free(iter_st);
+  free(x_st);
+  free(y_st);
+  free(y_dst);
+  free(y_wdst);
+  free(y_pdst);
+  free(y_pdstl);
+  free(z_st);
+  free(z_dst);
+  free(z_wdst);
+  free(z_pdst);
+  free(z_pdstl);
+  free(x0_st);
+  free(y0_st);
+  free(y0_dst);
+  free(y0_wdst);
+  free(y0_pdst);
+  free(y0_pdstl);
+  free(cellLambdaArr);
+  free(pcofArr);
+  // free(alphaArrCD);
+  // free(deltaArrCD);
 }
 
 void myNesterov::SummarizeNesterovOpt(int last_index) {

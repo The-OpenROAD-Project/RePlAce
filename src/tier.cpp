@@ -49,7 +49,6 @@
 #include "bin.h"
 #include "global.h"
 #include "macro.h"
-#include "mkl.h"
 #include "opt.h"
 
 void tier_init_2D(int STAGE) {
@@ -61,8 +60,8 @@ void tier_init_2D(int STAGE) {
 
   for(int z = 0; z < numLayer; z++) {
     tier = &tier_st[z];
-    tier->cell_st = (struct CELL **)mkl_malloc(
-        sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt), 64);
+    tier->cell_st = (struct CELL **)malloc(
+        sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt));
     tier->cell_cnt = 0;
   }
 
@@ -124,19 +123,19 @@ void tier_init_2D(int STAGE) {
   for(int z = 0; z < numLayer; z++) {
     tier = &tier_st[z];
     if(tier->cell_cnt == 0)
-      mkl_free(tier->cell_st);
+      free(tier->cell_st);
     else {
       // igkang:  replace realloc to mkl
-      tier->cell_st_tmp = (CELL **)mkl_malloc(
-          sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt), 64);
+      tier->cell_st_tmp = (CELL **)malloc(
+          sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt));
       memcpy(tier->cell_st_tmp, tier->cell_st,
              sizeof(struct CELL *) * (tier->modu_cnt + gfiller_cnt));
-      mkl_free(tier->cell_st);
+      free(tier->cell_st);
       tier->cell_st =
-          (CELL **)mkl_malloc(sizeof(struct CELL *) * tier->cell_cnt, 64);
+          (CELL **)malloc(sizeof(struct CELL *) * tier->cell_cnt);
       memcpy(tier->cell_st, tier->cell_st_tmp,
              sizeof(struct CELL *) * tier->cell_cnt);
-      mkl_free(tier->cell_st_tmp);
+      free(tier->cell_st_tmp);
       // tier->cell_st = (CELL**)realloc(tier->cell_st, sizeof(struct
       // CELL*)*tier->cell_cnt);
     }
@@ -150,7 +149,7 @@ void tier_delete_mGP2D(void) {
   for(z = 0; z < numLayer; z++) {
     tier = &tier_st[z];
     if(tier->cell_cnt > 0 && tier->cell_st)
-      mkl_free(tier->cell_st);
+      free(tier->cell_st);
     tier->cell_cnt = 0;
     tier->cell_st = NULL;
 

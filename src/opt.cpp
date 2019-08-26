@@ -50,7 +50,6 @@
 #include "fft.h"
 #include "gcell.h"
 #include "global.h"
-#include "mkl.h"
 #include "ns.h"
 #include "opt.h"
 #include "plot.h"
@@ -414,13 +413,13 @@ void cell_filler_init() {
 
   // igkang:  replace realloc to mkl
   gcell_st_tmp =
-      (struct CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+      (struct CELL *)malloc(sizeof(struct CELL) * gcell_cnt);
   memcpy(gcell_st_tmp, gcell_st, moduleCNT * (sizeof(struct CELL)));
-  mkl_free(gcell_st);
+  free(gcell_st);
 
-  gcell_st = (CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+  gcell_st = (CELL *)malloc(sizeof(struct CELL) * gcell_cnt);
   memcpy(gcell_st, gcell_st_tmp, gcell_cnt * (sizeof(struct CELL)));
-  mkl_free(gcell_st_tmp);
+  free(gcell_st_tmp);
 
   printf("INFO:  #CELL = %d =  %d (#MODULE) + %d (#FILLER)\n", gcell_cnt,
          moduleCNT, gfiller_cnt);
@@ -469,9 +468,9 @@ void cell_init(void) {
   struct FPOS pof;
   struct PIN *pin = NULL;
   struct NET *net = NULL;
-  prec *cell_area_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
-  prec *cell_x_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
-  prec *cell_y_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
+  prec *cell_area_st = (prec *)malloc(sizeof(prec) * moduleCNT);
+  prec *cell_x_st = (prec *)malloc(sizeof(prec) * moduleCNT);
+  prec *cell_y_st = (prec *)malloc(sizeof(prec) * moduleCNT);
 
   for(i = 0; i < moduleCNT; i++) {
     mdp = &moduleInstance[i];
@@ -494,9 +493,9 @@ void cell_init(void) {
     total_y += cell_y_st[i];
   }
 
-  mkl_free(cell_area_st);
-  mkl_free(cell_x_st);
-  mkl_free(cell_y_st);
+  free(cell_area_st);
+  free(cell_x_st);
+  free(cell_y_st);
 
   avg_cell_area = total_area / ((prec)(max_idx - min_idx));
   avg_cell_x = total_x / ((prec)(max_idx - min_idx));
@@ -509,14 +508,14 @@ void cell_init(void) {
   printf("INFO:  Average 80pct Cell Area = %.4lf\n", avg80p_cell_area);
 
   gcell_cnt = moduleCNT;
-  gcell_st = (struct CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+  gcell_st = (struct CELL *)malloc(sizeof(struct CELL) * gcell_cnt);
 
   // pin2 copy loop 
   for(i = 0; i < netCNT; i++) {
     net = &netInstance[i];
     net->mod_idx = -1;
-    net->pin2 = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * net->pinCNTinObject, 64);
+    net->pin2 = (struct PIN **)malloc(
+        sizeof(struct PIN *) * net->pinCNTinObject);
     net->pinCNTinObject2 = net->pinCNTinObject;
     for(j = 0; j < net->pinCNTinObject2; j++) {
       net->pin2[j] = net->pin[j];
@@ -533,10 +532,10 @@ void cell_init(void) {
     cell->size = mdp->size;
     cell->half_size = mdp->half_size;
     cell->area = mdp->area;
-    cell->pof = (struct FPOS *)mkl_malloc(
-        sizeof(struct FPOS) * mdp->pinCNTinObject, 64);
-    cell->pin = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * mdp->pinCNTinObject, 64);
+    cell->pof = (struct FPOS *)malloc(
+        sizeof(struct FPOS) * mdp->pinCNTinObject);
+    cell->pin = (struct PIN **)malloc(
+        sizeof(struct PIN *) * mdp->pinCNTinObject);
     cell->pinCNTinObject = 0;
 
     for(j = 0; j < mdp->pinCNTinObject; j++) {
@@ -560,26 +559,26 @@ void cell_init(void) {
     }
 
     cell->netCNTinObject = cell->pinCNTinObject;
-    cell->pin_tmp = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * cell->pinCNTinObject, 64);
-    cell->pof_tmp = (struct FPOS *)mkl_malloc(
-        sizeof(struct FPOS) * cell->pinCNTinObject, 64);
+    cell->pin_tmp = (struct PIN **)malloc(
+        sizeof(struct PIN *) * cell->pinCNTinObject);
+    cell->pof_tmp = (struct FPOS *)malloc(
+        sizeof(struct FPOS) * cell->pinCNTinObject);
     memcpy(cell->pin_tmp, cell->pin,
            cell->pinCNTinObject * (sizeof(struct PIN *)));
     memcpy(cell->pof_tmp, cell->pof,
            cell->pinCNTinObject * (sizeof(struct FPOS)));
-    mkl_free(cell->pin);
-    mkl_free(cell->pof);
-    cell->pin = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * cell->pinCNTinObject, 64);
-    cell->pof = (struct FPOS *)mkl_malloc(
-        sizeof(struct FPOS) * cell->pinCNTinObject, 64);
+    free(cell->pin);
+    free(cell->pof);
+    cell->pin = (struct PIN **)malloc(
+        sizeof(struct PIN *) * cell->pinCNTinObject);
+    cell->pof = (struct FPOS *)malloc(
+        sizeof(struct FPOS) * cell->pinCNTinObject);
     memcpy(cell->pin, cell->pin_tmp,
            cell->pinCNTinObject * (sizeof(struct PIN *)));
     memcpy(cell->pof, cell->pof_tmp,
            cell->pinCNTinObject * (sizeof(struct FPOS)));
-    mkl_free(cell->pin_tmp);
-    mkl_free(cell->pof_tmp);
+    free(cell->pin_tmp);
+    free(cell->pof_tmp);
 
     cell->pmin = mdp->pmin;
     cell->pmax = mdp->pmax;
@@ -592,10 +591,10 @@ void cell_delete(void) {
 
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];
-    mkl_free(cell->pin);
-    mkl_free(cell->pof);
+    free(cell->pin);
+    free(cell->pof);
   }
-  mkl_free(gcell_st);
+  free(gcell_st);
 }
 
 void input_sol(struct FPOS *st, int N, char *fn) {

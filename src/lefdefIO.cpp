@@ -50,8 +50,6 @@
 #include "lefdefIO.h"
 #include "bookShelfIO.h"
 
-#include "mkl.h"
-
 #include "timing.h"
 #include "timingSta.h"
 #include <iostream>
@@ -708,7 +706,7 @@ void SetSizeForObsMacro(int macroIdx, MODULE* curModule, int orient) {
 // terminal_pmin & terminal_pmax must be updated...
 void GenerateModuleTerminal(Replace::Circuit& __ckt) {
   moduleInstance =
-      (MODULE*)mkl_malloc(sizeof(MODULE) * __ckt.defComponentStor.size(), 64);
+      (MODULE*)malloc(sizeof(MODULE) * __ckt.defComponentStor.size());
 
   // to fast traverse when building TerminalInstance
   vector< int > fixedComponent;
@@ -810,7 +808,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
 
   // memory cutting
   moduleInstance =
-      (MODULE*)mkl_realloc(moduleInstance, sizeof(MODULE) * moduleCNT);
+      (MODULE*)realloc(moduleInstance, sizeof(MODULE) * moduleCNT);
 
   //
   // Terminal Update
@@ -827,10 +825,9 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
 
   TERM* curTerm = NULL;
   terminalCNT = 0;
-  terminalInstance = (TERM*)mkl_malloc(
+  terminalInstance = (TERM*)malloc(
       sizeof(TERM) * (blockageIdxStor.size() + fixedComponent.size() +
-                      __ckt.defPinStor.size()),
-      64);
+                      __ckt.defPinStor.size()));
 
   // for fixed cells.
   for(auto& curIdx : fixedComponent) {
@@ -1172,7 +1169,7 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
   int prevCnt = terminalCNT;
   terminalCNT += dummyTermStor_.size();
   terminalInstance = 
-    (TERM*) mkl_realloc( terminalInstance, sizeof(TERM) * terminalCNT);
+    (TERM*) realloc( terminalInstance, sizeof(TERM) * terminalCNT);
  
   // copy into original instances 
   for(int i=prevCnt; i<terminalCNT; i++) {
@@ -1280,7 +1277,7 @@ void GenerateRow(Replace::Circuit& __ckt) {
   int i = 0;
 
   row_cnt = __ckt.defRowStor.size();
-  row_st = (ROW*)mkl_malloc(sizeof(ROW) * row_cnt, 64);
+  row_st = (ROW*)malloc(sizeof(ROW) * row_cnt);
 
   for(auto& row : __ckt.defRowStor) {
     auto sitePtr = __ckt.lefSiteMap.find(string(row.macro()));
@@ -1370,7 +1367,7 @@ void GenerateRow(Replace::Circuit& __ckt) {
 void GenerateFullRow(Replace::Circuit& __ckt) {
   cout << "INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) " << endl;
   if( row_st ) {
-    mkl_free(row_st);
+    free(row_st);
   }
   // Newly create the all ROW area for floorplan.
   // In here, I've used DESIGN FE_CORE_BOX_LL_X statements in
@@ -1420,7 +1417,7 @@ void GenerateFullRow(Replace::Circuit& __ckt) {
   float rowSizeY = rowHeight = siteY;
 
   row_cnt = rowCntY;
-  row_st = (ROW*)mkl_malloc(sizeof(ROW) * row_cnt, 64);
+  row_st = (ROW*)malloc(sizeof(ROW) * row_cnt);
 
   /////////////////////////
   // HARD CODE PART!!!!!
@@ -1683,8 +1680,8 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
   }
 
   // memory reserve
-  netInstance = (NET*)mkl_malloc(sizeof(NET) * netCNT, 64);
-  pinInstance = (PIN*)mkl_malloc(sizeof(PIN) * pinCNT, 64);
+  netInstance = (NET*)malloc(sizeof(NET) * netCNT);
+  pinInstance = (PIN*)malloc(sizeof(PIN) * pinCNT);
   for(int i = 0; i < pinCNT; i++) {
     new(&pinInstance[i]) PIN;
   }
@@ -1756,7 +1753,7 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
 
     curNet->pinCNTinObject = net.numConnections();
     //        cout << "connection: " << net.numConnections() << endl;
-    curNet->pin = (PIN**)mkl_malloc(sizeof(PIN*) * net.numConnections(), 64);
+    curNet->pin = (PIN**)malloc(sizeof(PIN*) * net.numConnections());
 
     for(int i = 0; i < net.numConnections(); i++) {
       // net.pin(i) itself exists on termInst
@@ -1868,8 +1865,8 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
   netCNT = netIdx;
 
   // memory cutting (shrink)
-  netInstance = (NET*)mkl_realloc(netInstance, sizeof(NET) * netCNT);
-  pinInstance = (PIN*)mkl_realloc(pinInstance, sizeof(PIN) * pinCNT);
+  netInstance = (NET*)realloc(netInstance, sizeof(NET) * netCNT);
+  pinInstance = (PIN*)realloc(pinInstance, sizeof(PIN) * pinCNT);
 
   cout << "INFO:  #NET: " << netCNT << ", #PIN: " << pinCNT << endl;
 }

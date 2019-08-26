@@ -42,9 +42,9 @@
 #define __PL_FFT__
 
 #include "global.h"
-#include "mkl_service.h"
-#include "mkl_dfti.h"
-#include "mkl_trig_transforms.h"
+//#include "mkl_service.h"
+//#include "mkl_dfti.h"
+//#include "mkl_trig_transforms.h"
 
 extern int *charge_ip_2d;
 extern int *charge_ip_3d;

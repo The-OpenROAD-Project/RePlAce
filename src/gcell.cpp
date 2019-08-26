@@ -351,7 +351,7 @@ void tile_init_cGP2D() {
   tier->tile_org.x = gridLLx;
   tier->tile_org.y = gridLLy;
   tile_mat =
-      (struct TILE *)mkl_malloc(sizeof(struct TILE) * tier->tot_tile_cnt, 64);
+      (struct TILE *)malloc(sizeof(struct TILE) * tier->tot_tile_cnt);
   tier->tile_mat = tile_mat;
   for(int i = 0; i < tier->tot_tile_cnt; i++) {
     new(&tier->tile_mat[i]) TILE();

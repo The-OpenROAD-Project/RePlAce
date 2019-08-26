@@ -113,7 +113,7 @@ class myNesterov {
   void InitializationIter(void);
   void InitializationCostFunctionGradient(prec *, prec *);
   int DoNesterovOptimization(Timing::Timing &TimingInst);
-  void mkl_malloc_free(void);
+  void malloc_free(void);
   void SummarizeNesterovOpt(int last_index);
   void UpdateNesterovOptStatus(void);
   void UpdateNesterovIter(int iter, struct ITER *it, struct ITER *last_it);

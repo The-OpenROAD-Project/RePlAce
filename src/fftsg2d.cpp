@@ -377,7 +377,6 @@ macro definitions
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "mkl.h"
 #define fft2d_alloc_error_check(p)                        \
   {                                                       \
     if((p) == NULL) {                                     \
@@ -473,7 +472,7 @@ void cdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 4 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)mkl_malloc(sizeof(prec) * nt, 64);
+    t = (prec *)malloc(sizeof(prec) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
@@ -490,7 +489,7 @@ void cdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     cdft2d_sub(n1, n2, isgn, a, t, ip, w);
   }
   if(itnull != 0) {
-    mkl_free(t);
+    free(t);
   }
 }
 
@@ -537,7 +536,7 @@ void rdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 4 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)mkl_malloc(sizeof(prec) * nt, 64);
+    t = (prec *)malloc(sizeof(prec) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
@@ -568,7 +567,7 @@ void rdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     }
   }
   if(itnull != 0) {
-    mkl_free(t);
+    free(t);
   }
 }
 
@@ -648,7 +647,7 @@ void ddcst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)mkl_malloc(sizeof(prec) * nt, 64);
+    t = (prec *)malloc(sizeof(prec) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
@@ -665,7 +664,7 @@ void ddcst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     ddxt2d_sub(n1, n2, 0, isgn, a, t, ip, w);
   }
   if(itnull != 0) {
-    mkl_free(t);
+    free(t);
   }
 }
 
@@ -712,7 +711,7 @@ void ddsct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)mkl_malloc(sizeof(prec) * nt, 64);
+    t = (prec *)malloc(sizeof(prec) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
@@ -729,7 +728,7 @@ void ddsct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     ddxt2d_sub(n1, n2, 1, isgn, a, t, ip, w);
   }
   if(itnull != 0) {
-    mkl_free(t);
+    free(t);
   }
 }
 
@@ -775,7 +774,7 @@ void ddct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)mkl_malloc(sizeof(prec) * nt, 64);
+    t = (prec *)malloc(sizeof(prec) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
@@ -792,7 +791,7 @@ void ddct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     ddxt2d_sub(n1, n2, 0, isgn, a, t, ip, w);
   }
   if(itnull != 0) {
-    mkl_free(t);
+    free(t);
   }
 }
 
@@ -838,7 +837,7 @@ void ddst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)mkl_malloc(sizeof(prec) * nt, 64);
+    t = (prec *)malloc(sizeof(prec) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
@@ -855,7 +854,7 @@ void ddst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     ddxt2d_sub(n1, n2, 1, isgn, a, t, ip, w);
   }
   if(itnull != 0) {
-    mkl_free(t);
+    free(t);
   }
 }
 

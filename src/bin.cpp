@@ -143,7 +143,7 @@ void bin_init() {
   inv_bin_area = 1.0 / bin_area;
 
   // update bin_mat's information
-  bin_mat = (BIN *)mkl_malloc(sizeof(BIN) * tot_bin_cnt, 64);
+  bin_mat = (BIN *)malloc(sizeof(BIN) * tot_bin_cnt);
 
   // for each allocated bin_mat
   for(int i = 0; i < tot_bin_cnt; i++) {
@@ -226,10 +226,10 @@ void bin_init() {
     }
   }
 
-  bin_st = (POS *)mkl_malloc(sizeof(POS) * tot_bin_cnt, 64);
-  bin_share_x_st = (prec *)mkl_malloc(sizeof(prec) * max_bin.x, 64);
-  bin_share_y_st = (prec *)mkl_malloc(sizeof(prec) * max_bin.y, 64);
-  bin_share_st = (prec *)mkl_malloc(sizeof(prec) * tot_bin_cnt, 64);
+  bin_st = (POS *)malloc(sizeof(POS) * tot_bin_cnt);
+  bin_share_x_st = (prec *)malloc(sizeof(prec) * max_bin.x);
+  bin_share_y_st = (prec *)malloc(sizeof(prec) * max_bin.y);
+  bin_share_st = (prec *)malloc(sizeof(prec) * tot_bin_cnt);
 }
 
 //
@@ -322,7 +322,7 @@ void bin_init_2D(int STAGE) {
            dim_bin_cGP2D.y);
   }
 
-  bin_mat_st = (BIN **)mkl_malloc(sizeof(BIN *) * numLayer, 64);
+  bin_mat_st = (BIN **)malloc(sizeof(BIN *) * numLayer);
   for(int z = 0; z < numLayer; z++) {
     TIER *tier = &tier_st[z];
 
@@ -356,7 +356,7 @@ void bin_init_2D(int STAGE) {
     tier->inv_bin_area = 1.0 / tier->bin_area;
     tier->tot_bin_area = tier->bin_area * tier->tot_bin_cnt;
 
-    bin_mat_st[z] = (BIN *)mkl_malloc(sizeof(BIN) * tier->tot_bin_cnt, 64);
+    bin_mat_st[z] = (BIN *)malloc(sizeof(BIN) * tier->tot_bin_cnt);
     tier->bin_mat = bin_mat_st[z];
 
     // for each allocated bin_mat_st..
@@ -501,14 +501,14 @@ void UpdateTerminalArea(TIER *tier, FPOS *pmin, FPOS *pmax) {
 }
 
 void bin_delete(void) {
-  mkl_free(bin_mat);
+  free(bin_mat);
 
   bin_mat = NULL;
 
-  mkl_free(bin_st);
-  mkl_free(bin_share_x_st);
-  mkl_free(bin_share_y_st);
-  mkl_free(bin_share_st);
+  free(bin_st);
+  free(bin_share_x_st);
+  free(bin_share_y_st);
+  free(bin_share_st);
 }
 
 // min_a <= a && a <= max_a
@@ -1650,8 +1650,8 @@ void bin_delete_mGP2D(void) {
     TIER *tier = &tier_st[currTier];
     tier->bin_mat = NULL;
     tier->tot_bin_cnt = 0;
-    // mkl_free (bin_mat_st[currTier]);
+    // free (bin_mat_st[currTier]);
   }
-  mkl_free(bin_mat_st);
+  free(bin_mat_st);
   bin_mat_st = NULL;
 }

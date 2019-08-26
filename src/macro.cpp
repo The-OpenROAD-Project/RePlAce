@@ -46,7 +46,6 @@
 #include "bin.h"
 #include "global.h"
 #include "macro.h"
-#include "mkl.h"
 #include "opt.h"
 #include "plot.h"
 #include "wlen.h"
@@ -346,7 +345,7 @@ void sa_init_top(void) {
   struct MODULE *mdp = NULL, *mac = NULL;
 
   macro_st =
-      (struct MODULE **)mkl_malloc(sizeof(struct MODULE *) * gmov_mac_cnt, 64);
+      (struct MODULE **)malloc(sizeof(struct MODULE *) * gmov_mac_cnt);
 
   macro_cnt = 0;
 
@@ -812,9 +811,9 @@ void sa_param_update() {
 }
 
 void sa_delete(void) {
-  mkl_free(ovlp_a);
-  mkl_free(ovlp_node);
-  mkl_free(ovlp_y);
+  free(ovlp_a);
+  free(ovlp_node);
+  free(ovlp_y);
 }
 
 prec get_mac_cost(int idx, prec *hpwl_cost, prec *den_cost, int *ovlp_cost) {
@@ -912,10 +911,10 @@ int get_tot_mac_ovlp(void) {
 }
 
 void mac_ovlp_init(int n) {
-  ovlp_a = (struct seg_tree_node *)mkl_malloc(
-      sizeof(struct seg_tree_node) * (12 * n + 3), 64);
-  ovlp_node = (struct NODE *)mkl_malloc(sizeof(struct NODE) * (2 * n + 1), 64);
-  ovlp_y = (int *)mkl_malloc(sizeof(int) * (2 * n + 1), 64);
+  ovlp_a = (struct seg_tree_node *)malloc(
+      sizeof(struct seg_tree_node) * (12 * n + 3));
+  ovlp_node = (struct NODE *)malloc(sizeof(struct NODE) * (2 * n + 1));
+  ovlp_y = (int *)malloc(sizeof(int) * (2 * n + 1));
 }
 
 int macro_area_cmp(const void *a, const void *b) {

@@ -1079,13 +1079,13 @@ void WriteBookshelf() {
 }
 
 void free_trial_mallocs() {
-  mkl_free(moduleInstance);
-  mkl_free(terminalInstance);
-  mkl_free(netInstance);
-  mkl_free(pinInstance);
-  mkl_free(gcell_st);
+  free(moduleInstance);
+  free(terminalInstance);
+  free(netInstance);
+  free(pinInstance);
+  free(gcell_st);
   free(row_st);
-  mkl_free(tier_st);
+  free(tier_st);
   free(place_st);
 
 }

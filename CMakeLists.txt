@@ -49,7 +49,6 @@ set(ENV{TYPE_CALL} library)
 
 ## configure settings
 find_package(GoogleHash)
-find_package(MKL REQUIRED)
 find_package(TCL REQUIRED)
 
 find_package(ZLIB REQUIRED)
@@ -122,7 +121,6 @@ set (REPLACE_HEADER
 ############################################################
 include_directories(
   ${X11_INCLUDE_DIR}
-  ${MKL_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
 
   ${EIGEN_HOME}
@@ -199,7 +197,6 @@ target_link_libraries( replace
 
   ${ZLIB_LIBRARIES}
   ${X11_LIBRARIES}
-  ${MKL_LIBRARIES}
   ${JPEG_LIBRARIES}
   ${TCL_LIB}
   Threads::Threads
