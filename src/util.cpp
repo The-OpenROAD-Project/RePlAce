@@ -50,7 +50,7 @@
 #include <ctime>
 
 #include "bin.h"
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 #include "util.h"
 

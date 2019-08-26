@@ -54,7 +54,7 @@
 #include "bin.h"
 #include "charge.h"
 #include "fft.h"
-#include "global.h"
+#include "replace_private.h"
 #include "initPlacement.h"
 #include "macro.h"
 #include "opt.h"

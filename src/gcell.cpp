@@ -46,7 +46,7 @@
 #include <unordered_map>
 #include <algorithm>
 
-#include "global.h"
+#include "replace_private.h"
 #include "bin.h"
 #include "charge.h"
 #include "plot.h"

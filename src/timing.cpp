@@ -1,4 +1,4 @@
-#include "global.h"
+#include "replace_private.h"
 #include "timing.h"
 #include <sstream>
 #include <fstream>

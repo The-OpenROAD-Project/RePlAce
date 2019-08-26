@@ -41,7 +41,7 @@
 #ifndef __PL_FFT__
 #define __PL_FFT__
 
-#include "global.h"
+#include "replace_private.h"
 //#include "mkl_service.h"
 //#include "mkl_dfti.h"
 //#include "mkl_trig_transforms.h"

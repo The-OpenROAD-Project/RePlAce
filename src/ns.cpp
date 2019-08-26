@@ -51,7 +51,7 @@
 #include "bookShelfIO.h"
 #include "bin.h"
 #include "charge.h"
-#include "global.h"
+#include "replace_private.h"
 #include "ns.h"
 #include "opt.h"
 #include "plot.h"

@@ -83,7 +83,7 @@
 #include <defrReader.hpp>
 #include <defiAlias.hpp>
 
-#include "global.h"
+#include "replace_private.h"
 #define INIT_STR "!@#!@#"
 
 using std::cout;

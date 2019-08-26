@@ -47,7 +47,7 @@
 
 #include "bookShelfIO.h"
 #include "bin.h"
-#include "global.h"
+#include "replace_private.h"
 #include "macro.h"
 #include "opt.h"
 

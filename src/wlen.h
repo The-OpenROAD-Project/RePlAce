@@ -41,7 +41,7 @@
 #ifndef __PL_WLEN__
 #define __PL_WLEN__
 
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 
 enum { NoneWpre, PcntWpre, WlenWpre };

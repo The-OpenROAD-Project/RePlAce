@@ -41,7 +41,7 @@
 #ifndef __NS__
 #define __NS__
 
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 #include "timing.h"
 

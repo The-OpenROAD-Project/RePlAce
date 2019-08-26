@@ -42,7 +42,7 @@
 #define __CHARGE__
 
 #include "bin.h"
-#include "global.h"
+#include "replace_private.h"
 
 // prec get_potn(struct FPOS *st, int N);
 // void get_cell_potn(struct FPOS *st, int N, prec *phi0);

@@ -46,7 +46,7 @@
 //
 ///////////////////////////////////////////////////////
 
-#include "global.h"
+#include "replace_private.h"
 #include "lefdefIO.h"
 #include "bookShelfIO.h"
 

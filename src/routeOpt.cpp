@@ -47,7 +47,7 @@
 #include <sys/stat.h>
 #include <fstream>
 
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 #include "bin.h"
 #include "gcell.h"

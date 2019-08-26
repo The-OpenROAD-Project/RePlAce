@@ -165,15 +165,13 @@ using std::unordered_map;
 using std::unordered_set;
 #endif
 
-class POS;
+struct POS;
 
-class FPOS {
-private:
+struct FPOS {
   prec x;
   prec y;
   //  prec z;
 
-public:
   FPOS() {
     x = y = 0; 
   };
@@ -194,6 +192,10 @@ public:
   }
 
   void Set(POS a);
+
+  void SetZero() {
+    x = y = 0;
+  }
 
   prec GetX() { return x; };
   prec GetY() { return y; }; 

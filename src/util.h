@@ -2,7 +2,7 @@
 #define __REPLACE_UTIL__ 0
 
 #include <iostream>
-#include "global.h"
+#include "replace_private.h"
 
 int prec_eqv(prec x, prec y);
 //int prec_le(prec x, prec y);

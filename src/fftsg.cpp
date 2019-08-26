@@ -38,7 +38,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "global.h"
+#include "replace_private.h"
 
 /*
 Fast Fourier/Cosine/Sine Transform

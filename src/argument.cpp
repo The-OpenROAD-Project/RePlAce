@@ -45,7 +45,7 @@
 #include <cstring>
 #include <ctime>
 
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 #include "lefdefIO.h"
 #include "routeOpt.h"
@@ -138,7 +138,7 @@ void initArgument(int argc, char *argv[]) {
   globalRouterCapRatio = 1.0;
 
   conges_eval_methodCMD =
-      global_router_based;  // int (enum: defined in global.h)
+      global_router_based;  // int (enum: defined in replace_private.h)
   onlyLG_CMD = (isRoutability) ? true : false;
 
 

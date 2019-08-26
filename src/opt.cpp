@@ -49,7 +49,7 @@
 #include "bin.h"
 #include "fft.h"
 #include "gcell.h"
-#include "global.h"
+#include "replace_private.h"
 #include "ns.h"
 #include "opt.h"
 #include "plot.h"

@@ -45,7 +45,7 @@
 #include <string>
 #include <ctime>
 
-#include "global.h"
+#include "replace_private.h"
 #include "initPlacement.h"
 #include "plot.h"
 

@@ -41,7 +41,7 @@
 #ifndef __PL_BIN__
 #define __PL_BIN__
 
-#include "global.h"
+#include "replace_private.h"
 
 extern int tot_bin_cnt;
 extern int bin_cnt;

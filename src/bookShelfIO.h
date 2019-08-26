@@ -41,7 +41,7 @@
 #ifndef __PL_IO__
 #define __PL_IO__
 
-#include "global.h"
+#include "replace_private.h"
 #include "lefdefIO.h"
 #include "routeOpt.h"
 

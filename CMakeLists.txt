@@ -64,7 +64,7 @@ find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 
 # for multi threads
-# find_package(OpenMP REQUIRED)
+find_package(OpenMP REQUIRED)
 
 set (REPLACE_SRC 
   src/argument.cpp
@@ -199,6 +199,8 @@ target_link_libraries( replace
   ${X11_LIBRARIES}
   ${JPEG_LIBRARIES}
   ${TCL_LIB}
+
+  ${OpenMP_CXX_LIBRARIES}
   Threads::Threads
   -static-libstdc++ 
   )

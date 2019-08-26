@@ -47,7 +47,7 @@
 #include <cfloat>
 #include <iomanip>
 
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 #include "bookShelfIO.h"
 #include "bin.h"
