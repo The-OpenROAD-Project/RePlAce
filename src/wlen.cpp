@@ -636,32 +636,11 @@ void net_update_init(void) {
         if(first_term) {
           first_term = false;
 
-          //                    net->terminalMin.x = pin->fp.x;
-          //                    net->terminalMin.y = pin->fp.y;
-          //                    net->terminalMin.z = pin->fp.z;
           net->terminalMin.Set(pin->fp);
-
-          //                    net->terminalMax.x = pin->fp.x;
-          //                    net->terminalMax.y = pin->fp.y;
-          //                    net->terminalMax.z = pin->fp.z;
           net->terminalMax.Set(pin->fp);
         }
         else {
-          //                    net->terminalMin.x = min
-          //                    (net->terminalMin.x, pin->fp.x);
-          //                    net->terminalMin.y = min
-          //                    (net->terminalMin.y, pin->fp.y);
-          //                    net->terminalMin.z = min
-          //                    (net->terminalMin.z, pin->fp.z);
-
           net->terminalMin.Min(pin->fp);
-
-          //                    net->terminalMax.x = max
-          //                    (net->terminalMax.x, pin->fp.x);
-          //                    net->terminalMax.y = max
-          //                    (net->terminalMax.y, pin->fp.y);
-          //                    net->terminalMax.z = max
-          //                    (net->terminalMax.z, pin->fp.z);
           net->terminalMax.Max(pin->fp);
         }
       }

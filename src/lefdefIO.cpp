@@ -85,7 +85,11 @@ using Replace::Circuit;
 //
 
 // global variable.. to write output as DEF
-Replace::Circuit __ckt;
+namespace Replace {
+  Circuit __ckt;
+}
+
+using Replace::__ckt;
 
 // lef 2 def unit convert
 static prec l2d = 0.0f;
@@ -807,8 +811,8 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
   //    cout << moduleCNT << endl;
 
   // memory cutting
-  moduleInstance =
-      (MODULE*)realloc(moduleInstance, sizeof(MODULE) * moduleCNT);
+//  moduleInstance =
+//      (MODULE*)realloc(moduleInstance, sizeof(MODULE) * moduleCNT);
 
   //
   // Terminal Update
@@ -1168,8 +1172,8 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
   // termCnt Updates 
   int prevCnt = terminalCNT;
   terminalCNT += dummyTermStor_.size();
-  terminalInstance = 
-    (TERM*) realloc( terminalInstance, sizeof(TERM) * terminalCNT);
+//  terminalInstance = 
+//    (TERM*) realloc( terminalInstance, sizeof(TERM) * terminalCNT);
  
   // copy into original instances 
   for(int i=prevCnt; i<terminalCNT; i++) {
@@ -1865,8 +1869,8 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
   netCNT = netIdx;
 
   // memory cutting (shrink)
-  netInstance = (NET*)realloc(netInstance, sizeof(NET) * netCNT);
-  pinInstance = (PIN*)realloc(pinInstance, sizeof(PIN) * pinCNT);
+//  netInstance = (NET*)realloc(netInstance, sizeof(NET) * netCNT);
+//  pinInstance = (PIN*)realloc(pinInstance, sizeof(PIN) * pinCNT);
 
   cout << "INFO:  #NET: " << netCNT << ", #PIN: " << pinCNT << endl;
 }

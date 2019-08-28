@@ -4798,7 +4798,7 @@ void Replace::Circuit::DumpDefComponentPinToNet() {
 //
 /////////////////////////////////////////////////////////////////////
 
-void Replace::Circuit::ParseDef(string fileName, bool isVerbose = false) {
+int Replace::Circuit::ParseDef(string fileName, bool isVerbose = false) {
   //    int num = 99;
   char* inFile[6];
   FILE* f;
@@ -5016,8 +5016,10 @@ void Replace::Circuit::ParseDef(string fileName, bool isVerbose = false) {
   fout = NULL;
   res = defrRead(f, inFile[fileCt], userData, 1);
 
-  if(res)
+  if(res) {
     CIRCUIT_FPRINTF(stderr, "Reader returns bad status.\n", inFile[fileCt]);
+    return res;
+  }
 
   // Testing the aliases API.
   defrAddAlias("alias1", "aliasValue1", 1);
@@ -5160,6 +5162,7 @@ void Replace::Circuit::ParseDef(string fileName, bool isVerbose = false) {
   defrClear();
 
   free(inFile[0]);
+  return res;
 }
 
 void Replace::Circuit::WriteDef(FILE* _fout) {

@@ -53,9 +53,7 @@
 
 static bool isFastMode = false;
 
-void initArgument(int argc, char *argv[]) {
-  ///////////////////////////////////////////////////////
-  //  Begin Arguments Analysis                         //
+void initGlobalVars() {
   bmFlagCMD = "etc";       // string
   denCMD = "NULL";          // string
   bxMaxCMD = "32";          // string
@@ -66,7 +64,6 @@ void initArgument(int argc, char *argv[]) {
   LOWER_PCOF = 0.95;
   refDeltaWL = 346000;
   INIT_LAMBDA_COF_GP = PREC_MIN;
-
 
   racntiCMD = "10";         // lutong
   maxinflCMD = "2.5";       // lutong
@@ -141,19 +138,10 @@ void initArgument(int argc, char *argv[]) {
       global_router_based;  // int (enum: defined in replace_private.h)
   onlyLG_CMD = (isRoutability) ? true : false;
 
-
   overflowMin = PREC_MAX;
+}
 
-  // parse all argument here.
-  if(argument(argc, argv) == false) {
-    printUsage();
-    exit(0);
-  }
-
-  if(criticalArgumentError() == true) {
-    exit(0);
-  }
-
+void initGlobalVarsAfterParse() {
   // density & overflowMin settings
   denCMD = (denCMD == "NULL") ? ((isRoutability) ? "0.9" : "1.0") : denCMD;
 
@@ -245,6 +233,20 @@ void initArgument(int argc, char *argv[]) {
   flg_3dic = 1;
   flg_3dic_io = 0;
   ///////////////////////////////////////////////////////
+}
+
+void initArgument(int argc, char *argv[]) {
+  initGlobalVars();
+  // parse all argument here.
+  if(argument(argc, argv) == false) {
+    printUsage();
+    exit(0);
+  }
+
+  if(criticalArgumentError() == true) {
+    exit(0);
+  }
+  initGlobalVarsAfterParse();
 }
 
 bool argument(int argc, char *argv[]) {

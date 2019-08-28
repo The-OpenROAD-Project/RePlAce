@@ -1164,6 +1164,9 @@ void printEPs(void);
 
 void printUsage(void);
 void initArgument(int, char **);
+void initGlobalVars();
+void initGlobalVarsAfterParse();
+
 void calcTSVweight(void);
 bool argument(int, char **);
 void printCMD(int, char **);

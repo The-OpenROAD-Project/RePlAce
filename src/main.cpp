@@ -62,6 +62,8 @@
 #include "wlen.h"
 #include "timing.h"
 
+#include "tcl.h"
+
 #define compileDate __DATE__
 #define compileTime __TIME__
 
@@ -404,7 +406,23 @@ bool autoEvalRC_CMD;
 bool onlyLG_CMD;
 ///////////////////////////////////////////////////////////
 
+extern "C" {
+extern int Replace_Init(Tcl_Interp *interp);
+}
+
+int 
+replaceTclAppInit(Tcl_Interp *interp) {
+  Tcl_Init(interp);
+//  Tcl_Eval(interp, "package require tclreadline");
+//  Tcl_Eval(interp, "::tclreadline::Loop");
+  Replace_Init(interp); 
+  
+  return TCL_OK;
+}
+
 int main(int argc, char *argv[]) {
+ 
+  Tcl_Main(1, argv, replaceTclAppInit);
 
   double tot_cpu = 0;
   double time_ip = 0;
