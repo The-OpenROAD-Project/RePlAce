@@ -21,6 +21,11 @@ replace_external::import_def(const char* def){
 }
 
 void 
+replace_external::import_lib(const char* lib){
+  lib_stor.push_back(lib);
+}
+
+void 
 replace_external::export_def(const char* def){
   WriteDef(def);
 }
@@ -47,12 +52,20 @@ replace_external::init_replace() {
   defName = def_stor[0];
   outputCMD = output_loc;
 
+  if( timing_driven_mode == true ) {
+    capPerMicron = unit_c;
+    resPerMicron = unit_r;
+    libStor = lib_stor;
+    sdcName = sdc_file;
+    verilogName = verilog_stor[0];
+    isTiming = true; 
+  }
+
   initGlobalVarsAfterParse();
 
   init();
 
-  inputMode = InputMode::lefdef;
-  ParseLefDef();
+  ParseInput();
 
   net_update_init();
   init_tier();
@@ -61,8 +74,8 @@ replace_external::init_replace() {
 }
 
 void
-replace_external::set_timing_driven() {
-  timing_driven_mode = true;
+replace_external::set_timing_driven(bool is_true) {
+  timing_driven_mode = is_true;
 }
 
 void 
@@ -101,6 +114,11 @@ replace_external::get_x(size_t idx) {
 float
 replace_external::get_y(size_t idx) {
   return instance_list[idx].y;
+}
+
+float
+replace_external::get_hpwl() {
+  return total_hpwl.x + total_hpwl.y;
 }
 
 bool 

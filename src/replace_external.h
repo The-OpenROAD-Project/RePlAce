@@ -6,6 +6,7 @@
 #include "lefdefIO.h"
 
 
+// SWIG refuse to be inside replace_external...
 struct instance_info {
   std::string name;
   std::string master;
@@ -16,6 +17,7 @@ struct instance_info {
 
 class replace_external {
 public:
+
   replace_external();
   ~replace_external();
   void import_lef(const char* lef);
@@ -24,9 +26,10 @@ public:
 
   void export_def(const char* def);
 
-  void set_timing_driven();
+  void set_timing_driven(bool is_true);
   void import_sdc(const char* sdc);
   void import_verilog(const char* verilog);
+  void import_lib(const char* lib);
   void set_unit_res(double unit_r);
   void set_unit_cap(double unit_c);
 
@@ -36,7 +39,9 @@ public:
   std::string get_master_name(size_t idx);
   std::string get_instance_name(size_t idx);
   float get_x(size_t idx); 
-  float get_y(size_t idx); 
+  float get_y(size_t idx);
+
+  float get_hpwl(); 
 
   bool save_jpeg(const char* jpeg);
   bool place_cell_init_place();
@@ -50,13 +55,12 @@ private:
   std::vector<std::string> lef_stor;
   std::vector<std::string> def_stor;
   std::vector<std::string> verilog_stor;
+  std::vector<std::string> lib_stor;
   std::string sdc_file;
   std::string output_loc;
   bool timing_driven_mode;
   double unit_r;
   double unit_c;
 };
-
-
 
 #endif
