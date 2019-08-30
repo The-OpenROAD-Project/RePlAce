@@ -346,11 +346,7 @@ InputMode inputMode;
 
 string benchName;
 
-string denCMD;
 string dimCMD;
-string bxMaxCMD;
-string byMaxCMD;
-string bzMaxCMD;
 string gTSVcofCMD;
 string ALPHAmGP_CMD;
 string ALPHAcGP_CMD;
@@ -709,21 +705,10 @@ void init() {
 
   inv_RAND_MAX = (prec)1.0 / RAND_MAX;
 
-  target_cell_den = atof(denCMD.c_str());
-  target_cell_den_orig = atof(denCMD.c_str());  // lutong
-  // overflowMin     = overflowMin/atof(den);
-
   zeroFPoint.SetZero();
   zeroPoint.SetZero();
 
-  //    gfft_flg = DDCT;
-
-  //    sprintf(FastDP_cmd, "FastPlace3.0_DP");
-  //    sprintf(NTUplace3_cmd, "ntuplace3");
-  //    sprintf(NTUplace4h_cmd, "ntuplace4h");
   sprintf(global_router, "NCTUgr.ICCAD2012");
-  // sprintf (global_router, "NCTUgr2_fast");
-  // sprintf (global_router, "NCTUgr2");
 
   switch(detailPlacer) {
     case FastPlace:

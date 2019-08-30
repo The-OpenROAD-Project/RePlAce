@@ -55,11 +55,9 @@ static bool isFastMode = false;
 
 void initGlobalVars() {
   bmFlagCMD = "etc";       // string
-  denCMD = "NULL";          // string
-  bxMaxCMD = "32";          // string
-  byMaxCMD = "32";          // string
-  bzMaxCMD = "32";          // string
+  target_cell_den = PREC_MAX;
 
+  dim_bin.x = dim_bin.y = 32;
   UPPER_PCOF = 1.05;
   LOWER_PCOF = 0.95;
   refDeltaWL = 346000;
@@ -143,7 +141,9 @@ void initGlobalVars() {
 
 void initGlobalVarsAfterParse() {
   // density & overflowMin settings
-  denCMD = (denCMD == "NULL") ? ((isRoutability) ? "0.9" : "1.0") : denCMD;
+  target_cell_den = 
+    (target_cell_den == PREC_MAX)? ((isRoutability) ? 0.9 : 1.0 ) : target_cell_den;
+  target_cell_den_orig = target_cell_den;
 
   overflowMin = (overflowMin == PREC_MAX)? 
                        ((isRoutability) ? 0.17 : 0.1)
@@ -208,8 +208,6 @@ void initGlobalVarsAfterParse() {
 
   ExtraWSfor3D = 0;     //.12; //0.1;
   MaxExtraWSfor3D = 0;  //.20; //0.2;
-  dim_bin.x = atoi(bxMaxCMD.c_str());
-  dim_bin.y = atoi(byMaxCMD.c_str());
 
   // detailPlacer settings
   detailPlacer = NoneDp;
@@ -358,7 +356,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-den")) {
       i++;
       if(argv[i][0] != '-') {
-        denCMD = argv[i];
+        target_cell_den = atof(argv[i]);
       }
       else {
         printf("\n**ERROR: Option %s requires density (FLT).\n", argv[i - 1]);
@@ -925,9 +923,8 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-bin")) {
       i++;
       if(argv[i][0] != '-') {
-        bxMaxCMD = argv[i];
-        byMaxCMD = argv[i];
-        bzMaxCMD = argv[i];
+        dim_bin.x = atoi(argv[i]);
+        dim_bin.y = atoi(argv[i]);
         isBinSet = true;
       }
       else {
@@ -939,7 +936,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-x")) {
       i++;
       if(argv[i][0] != '-') {
-        bxMaxCMD = argv[i];
+        dim_bin.x = atoi(argv[i]);
       }
       else {
         printf("\n**ERROR: Option %s requires the maximum X (INT).\n",
@@ -950,21 +947,10 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-y")) {
       i++;
       if(argv[i][0] != '-') {
-        byMaxCMD = argv[i];
+        dim_bin.y = atoi(argv[i]);
       }
       else {
         printf("\n**ERROR: Option %s requires the maximum Y (INT).\n",
-               argv[i - 1]);
-        return false;
-      }
-    }
-    else if(!strcmp(argv[i], "-z")) {
-      i++;
-      if(argv[i][0] != '-') {
-        bzMaxCMD = argv[i];
-      }
-      else {
-        printf("\n**ERROR: Option %s requires the maximum Z (INT).\n",
                argv[i - 1]);
         return false;
       }

@@ -31,7 +31,7 @@ rep place_cell_init_place
 # print out instances' x/y coordinates
 print_instances rep
 
-# place_cell with Nesterov method 
+# place_cell with Nesterov method
 rep place_cell_nesterov_place
 
 # print out instances' x/y coordinates

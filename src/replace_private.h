@@ -1096,10 +1096,6 @@ extern int numThread;
 enum class InputMode { bookshelf, lefdef };
 extern InputMode inputMode;
 
-extern string denCMD;
-extern string bxMaxCMD;
-extern string byMaxCMD;
-extern string bzMaxCMD;
 extern string racntiCMD;    // lutong
 extern string maxinflCMD;   // lutong
 extern string inflcoefCMD;  // lutong

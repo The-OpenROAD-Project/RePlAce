@@ -5,7 +5,9 @@
 
 replace_external::
 replace_external() : 
-  timing_driven_mode(false), ckt(&Replace::__ckt), unit_r(0.0f), unit_c(0.0f) {};
+  timing_driven_mode(false), ckt(&Replace::__ckt), unit_r(0.0f), unit_c(0.0f) {
+  initGlobalVars();
+};
 
 replace_external::
 ~replace_external() {};
@@ -46,8 +48,6 @@ replace_external::init_replace() {
     exit(1);
   }
 
-  initGlobalVars();
-
   lefStor = lef_stor;
   defName = def_stor[0];
   outputCMD = output_loc;
@@ -64,12 +64,12 @@ replace_external::init_replace() {
   initGlobalVarsAfterParse();
 
   init();
-
   ParseInput();
 
   net_update_init();
   init_tier();
-  build_data_struct(false);
+  build_data_struct();
+  update_instance_list();
   return true;
 }
 
@@ -150,6 +150,33 @@ void
 replace_external::set_unit_cap(double c) {
   unit_c = c;
 }
+
+void
+replace_external::set_lambda(double lambda) {
+  INIT_LAMBDA_COF_GP = lambda; 
+}
+
+void
+replace_external::set_pcof_min(double pcof_min) {
+  LOWER_PCOF = pcof_min;
+}
+
+void
+replace_external::set_pcof_max(double pcof_max) {
+  UPPER_PCOF = pcof_max;
+}
+
+void
+replace_external::set_bin_grid_count(size_t grid_count) {
+  dim_bin.x = dim_bin.y = grid_count;
+  isBinSet = true;
+}
+
+void
+replace_external::set_density(double density) {
+  target_cell_den = target_cell_den_orig = density;
+}
+
 
 
 void 

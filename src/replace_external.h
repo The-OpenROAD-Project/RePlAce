@@ -33,6 +33,13 @@ public:
   void set_unit_res(double unit_r);
   void set_unit_cap(double unit_c);
 
+  void set_density(double density);
+  void set_bin_grid_count(size_t grid_count);
+  
+  void set_lambda(double lambda);
+  void set_pcof_min(double pcof_min);
+  void set_pcof_max(double pcof_max);
+
   bool init_replace();
 
   size_t get_instance_list_size();
