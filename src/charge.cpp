@@ -470,12 +470,11 @@ void potn_grad_2D_local(int cell_idx, struct FPOS *grad, prec *cellLambda) {
   prec common_mul = 0;
   struct BIN *bpx = NULL;
   struct BIN *bpy = NULL;
-  struct POS b0 = zeroPoint;
-  struct POS b1 = zeroPoint;
+  struct POS b0, b1;
   struct CELL *cell = &gcell_st[cell_idx];
   struct TIER *tier = &tier_st[cell->tier];
 
-  *grad = zeroFPoint;
+  grad->x = grad->y = 0;
 
   b0.x =
       INT_CONVERT((cell->den_pmin.x - tier->bin_org.x) * tier->inv_bin_stp.x);

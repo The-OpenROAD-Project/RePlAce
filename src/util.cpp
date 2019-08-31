@@ -156,7 +156,7 @@ string getexepath() {
 }
 
 struct FPOS fp_mul(struct FPOS a, struct FPOS b) {
-  struct FPOS c = zeroFPoint;
+  struct FPOS c;
   c.x = a.x * b.x;
   c.y = a.y * b.y;
   return c;
@@ -164,7 +164,7 @@ struct FPOS fp_mul(struct FPOS a, struct FPOS b) {
 
 // struct FPOS fp_add (struct FPOS a, struct FPOS b)
 //{
-//  struct FPOS c=zeroFPoint;
+//  struct FPOS c;
 //  c.x = a.x + b.x;
 //  c.y = a.y + b.y;
 //  if(flg_3dic)    c.z = a.z + b.z;
@@ -172,7 +172,7 @@ struct FPOS fp_mul(struct FPOS a, struct FPOS b) {
 //}
 
 struct FPOS fp_add_abs(struct FPOS a, struct FPOS b) {
-  struct FPOS c = zeroFPoint;
+  struct FPOS c;
   c.x = fabs(a.x) + fabs(b.x);
   c.y = fabs(a.y) + fabs(b.y);
   return c;
@@ -187,14 +187,14 @@ struct FPOS fp_add_abs(struct FPOS a, struct FPOS b) {
 //}
 
 struct FPOS fp_subt(struct FPOS a, struct FPOS b) {
-  struct FPOS c = zeroFPoint;
+  struct FPOS c;
   c.x = a.x - b.x;
   c.y = a.y - b.y;
   return c;
 }
 
 struct FPOS fp_subt_const(struct FPOS a, prec b) {
-  struct FPOS c = zeroFPoint;
+  struct FPOS c;
   c.x = a.x - b;
   c.y = a.y - b;
   return c;
@@ -224,35 +224,35 @@ int p_max(struct POS a) {
 }
 
 struct FPOS fp_exp(struct FPOS a) {
-  struct FPOS b = zeroFPoint;
+  struct FPOS b;
   b.x = exp(a.x);
   b.y = exp(a.y);
   return b;
 }
 
 struct FPOS fp_inv(struct FPOS a) {
-  struct FPOS b = zeroFPoint;
+  struct FPOS b;
   b.x = 1.0 / a.x;
   b.y = 1.0 / a.y;
   return b;
 }
 
 struct FPOS fp_rand(void) {
-  struct FPOS r = zeroFPoint;
+  struct FPOS r;
   r.x = rand();
   r.y = rand();
   return r;
 }
 
 struct FPOS fp_div(struct FPOS a, struct FPOS b) {
-  struct FPOS c = zeroFPoint;
+  struct FPOS c;
   c.x = a.x / b.x;
   c.y = a.y / b.y;
   return c;
 }
 
 struct FPOS p2fp(struct POS a) {
-  struct FPOS b = zeroFPoint;
+  struct FPOS b;
   b.x = (prec)a.x;
   b.y = (prec)a.y;
   return b;
@@ -324,35 +324,49 @@ string GetRealPath(string path ) {
   return string(tmp);
 }
 
+#define VERBOSE_CHECK() if( gVerbose < verbose ) { return; };
+
 // Procedure message
-void PrintProc(string input) {
+void PrintProc(string input, int verbose) {
+  VERBOSE_CHECK()
   cout << "[PROC] " << input << endl;
 }
-void PrintProcBegin(string input) {
+void PrintProcBegin(string input, int verbose) {
+  VERBOSE_CHECK()
   cout << "[PROC] Begin " << input << " ..." << endl;
 }
-void PrintProcEnd(string input) {
+void PrintProcEnd(string input, int verbose) {
+  VERBOSE_CHECK()
   cout << "[PROC] End " << input << endl;
 }
 
 // Error message
-void PrintError(string input) {
+void PrintError(string input, int verbose) {
   cout << "[ERROR] " << input << endl;
   exit(1);
 }
 
 // Info message
-void PrintInfoInt(string input, int val) {
+void PrintInfoInt(string input, int val, int verbose) {
+  VERBOSE_CHECK()
   cout << "[INFO] " << input << " = " << val << endl;
 }
-void PrintInfoPrec(string input, prec val) {
+void PrintInfoPrec(string input, prec val, int verbose) {
+  VERBOSE_CHECK()
   printf("[INFO] %s = %.6f\n", input.c_str(), val);
   fflush(stdout);
 }
-void PrintInfoString(string input, string val) {
+void PrintInfoPrecPair(string input, prec val1, prec val2, int verbose) {
+  VERBOSE_CHECK()
+  printf("[INFO] %s = (%.6f, %.6f)\n", input.c_str(), val1, val2);
+  fflush(stdout);
+}
+void PrintInfoString(string input, string val, int verbose) {
+  VERBOSE_CHECK()
   cout << "[INFO] " << input << " = " << val << endl;
 }
-void PrintInfoRuntime(string input, double runtime) {
+void PrintInfoRuntime(string input, double runtime, int verbose) {
+  VERBOSE_CHECK()
   printf("[INFO] %sRuntime = %.4f\n", input.c_str(), runtime);
   fflush(stdout);
 }

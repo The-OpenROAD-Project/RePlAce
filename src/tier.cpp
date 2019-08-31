@@ -256,24 +256,6 @@ void tier_assign(int mode) {
   free(modu_st);
 }
 
-//void find_close_tier(prec z, struct T0 *st, int *z_st) {
-//  prec tier_center_z = 0;
-
-//  for(int i = 0; i < numLayer; i++) {
-//    tier_center_z = TIER_DEP * ((prec)i + 0.5);
-//    st[i].dis = fabs(tier_center_z - z);
-//    st[i].z = i;
-//  }
-
-//  qsort(st, numLayer, sizeof(struct T0), prec_cmp);
-
-//  for(int i = 0; i < numLayer; i++) {
-//    z_st[i] = st[i].z;
-//  }
-
-//  return;
-//}
-
 void init_tier(void) {
   prec pl_area = 0;
   struct TIER *tier = NULL;
@@ -341,15 +323,15 @@ void post_mac_tier(void) {
   prec bin_term_ovlp_area = 0;
   prec tot_term_area = 0;
   struct MODULE *mac = NULL;
-  struct FPOS pmin = zeroFPoint;
-  struct FPOS pmax = zeroFPoint;
-  struct POS bin_pmin = zeroPoint;
-  struct POS bin_pmax = zeroPoint;
+  struct FPOS pmin;
+  struct FPOS pmax;
+  struct POS bin_pmin;
+  struct POS bin_pmax;
   struct BIN *binp = NULL;
   struct PLACE *pl = NULL;
   struct TIER *tier = NULL;
   struct RECT rect;
-  struct POS p = zeroPoint;
+  struct POS p;
 
   for(int i = 0; i < macro_cnt; i++) {
     mac = macro_st[i];
@@ -379,7 +361,7 @@ void post_mac_tier(void) {
         binp = get_bin_from_idx(p);
 
         bin_term_ovlp_area =
-            get_common_area(rect.pmin, rect.pmax, binp->pmin, binp->pmax);
+            pGetCommonAreaXY(rect.pmin, rect.pmax, binp->pmin, binp->pmax);
 
         //              binp->term_area2 += bin_term_ovlp_area ;
         binp->term_area += bin_term_ovlp_area * global_macro_area_scale;

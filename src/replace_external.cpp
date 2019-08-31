@@ -105,6 +105,15 @@ replace_external::get_instance_name(size_t idx) {
   return instance_list[idx].name;
 }
 
+void
+replace_external::print_instances() {
+  std::cout << "Total Instance: " << instance_list.size() << endl; 
+  for(auto& cur_inst : instance_list ) {
+    std::cout << cur_inst.name << " (" << cur_inst.master << ") x:";
+    std::cout << cur_inst.x << " y:" << cur_inst.y << std::endl;
+  }
+}
+
 
 float
 replace_external::get_x(size_t idx) {
@@ -118,7 +127,18 @@ replace_external::get_y(size_t idx) {
 
 float
 replace_external::get_hpwl() {
-  return total_hpwl.x + total_hpwl.y;
+  auto res = GetUnscaledHpwl();
+  return res.first + res.second;
+}
+
+float
+replace_external::get_wns() {
+  return 0.0f;
+}
+
+float
+replace_external::get_tns() {
+  return 0.0f;
 }
 
 bool 
@@ -139,6 +159,11 @@ replace_external::place_cell_nesterov_place() {
   }
   update_instance_list();
   return true;
+}
+
+void
+replace_external::set_verbose_level(int verbose) {
+  gVerbose = verbose;
 }
 
 void

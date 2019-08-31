@@ -253,7 +253,7 @@ FPOS get_net_wlen_wa(NET *net) {
   FPOS sum_denom2 = net->sum_denom2;
 
   if(net->pinCNTinObject <= 1)
-    return zeroFPoint;
+    return FPOS(0,0);
 
   net_wlen.x = sum_num1.x / sum_denom1.x - sum_num2.x / sum_denom2.x;
   net_wlen.y = sum_num1.y / sum_denom1.y - sum_num2.y / sum_denom2.y;
@@ -304,11 +304,6 @@ prec GetHpwl() {
   }
 
   return total_hpwl.x + total_hpwl.y;
-
-  //    total_hpwl_xyz =
-  //        total_hpwl.x +
-  //        total_hpwl.y;
-  //    return total_hpwl_xyz;
 }
 
 //
@@ -339,13 +334,6 @@ prec UpdateNetAndGetHpwl() {
       MODULE *curModule = &moduleInstance[pin->moduleID];
       pin->fp.SetAdd(curModule->center, curModule->pof[pin->pinIDinModule]);
 
-      //          pof = curModule->pof[pin->pinIDinModule];
-      //          center = curModule->center;
-
-      //          fp.x = center.x + pof.x;
-      //          fp.y = center.y + pof.y;
-      //          pin->fp = fp;
-
       curNet->min_x = min(curNet->min_x, pin->fp.x);
       curNet->min_y = min(curNet->min_y, pin->fp.y);
 
@@ -363,8 +351,6 @@ prec UpdateNetAndGetHpwl() {
   }
 
   return total_hpwl.x + total_hpwl.y;
-  //    total_hpwl_xyz = total_hpwl.x + total_hpwl.y + total_hpwl.z;
-  //    return  total_hpwl_xyz;
 }
 
 void wlen_grad2(int cell_idx, FPOS *grad2) {
@@ -428,7 +414,7 @@ void wlen_grad2_lse(int cell_idx, FPOS *grad2) {
 }
 
 void wlen_grad_lse(int cell_idx, FPOS *grad) {
-  FPOS net_grad = zeroFPoint;
+  FPOS net_grad;
   CELL *cell = &gcell_st[cell_idx];
   NET *net = NULL;
   PIN *pin = NULL;
@@ -449,32 +435,11 @@ void wlen_grad_lse(int cell_idx, FPOS *grad) {
   }
 }
 
-/*
-void wlen_grad_debug ( FPOS grad)
-{
-  if(! ( grad.x >-10000000.0 &&
-         grad.x < 10000000.0 ) )
-    { g_rrr ++ ; }
-
-  if(! ( grad.y >-10000000.0 &&
-         grad.y < 10000000.0 ) )
-    { g_rrr ++ ; }
-
-  if(flg_3dic)
-    {
-      if(! ( grad.z >-10000000.0 &&
-             grad.z < 10000000.0 ) )
-        { g_rrr ++ ; }
-    }
-
-}
-*/
-
 void wlen_grad_wa(int cell_idx, FPOS *grad) {
   CELL *cell = &gcell_st[cell_idx];
   PIN *pin = NULL;
   NET *net = NULL;
-  FPOS net_grad = zeroFPoint;
+  FPOS net_grad;
 
   grad->SetZero();
 
@@ -511,7 +476,7 @@ void wlen_grad_wa(int cell_idx, FPOS *grad) {
 void get_net_wlen_grad2_lse(NET *net, PIN *pin, FPOS *grad2) {
   POS flg1 = pin->flg1, flg2 = pin->flg2;
   FPOS e1 = pin->e1, e2 = pin->e2;
-  FPOS grad2_1 = zeroFPoint, grad2_2 = zeroFPoint;
+  FPOS grad2_1, grad2_2;
   FPOS sum_denom1 = net->sum_denom1;
   FPOS sum_denom2 = net->sum_denom2;
 
@@ -540,7 +505,7 @@ void get_net_wlen_grad2_lse(NET *net, PIN *pin, FPOS *grad2) {
 
 void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad) {
   POS flg1 = pin->flg1, flg2 = pin->flg2;
-  FPOS grad1 = zeroFPoint, grad2 = zeroFPoint;
+  FPOS grad1, grad2;
   FPOS e1 = pin->e1, e2 = pin->e2;
   FPOS sum_denom1 = net->sum_denom1;
   FPOS sum_denom2 = net->sum_denom2;
@@ -572,10 +537,10 @@ void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad) {
 // obj?
 //
 void get_net_wlen_grad_wa(FPOS obj, NET *net, PIN *pin, FPOS *grad) {
-  FPOS grad_sum_num1 = zeroFPoint, grad_sum_num2 = zeroFPoint;
-  FPOS grad_sum_denom1 = zeroFPoint, grad_sum_denom2 = zeroFPoint;
-  FPOS grad1 = zeroFPoint;
-  FPOS grad2 = zeroFPoint;
+  FPOS grad_sum_num1, grad_sum_num2;
+  FPOS grad_sum_denom1, grad_sum_denom2;
+  FPOS grad1;
+  FPOS grad2;
   FPOS e1 = pin->e1;
   FPOS e2 = pin->e2;
   POS flg1 = pin->flg1;
@@ -665,7 +630,7 @@ void net_update_lse(FPOS *st) {
   NET *net = NULL;
   PIN *pin = NULL;
   MODULE *curModule = NULL;
-  FPOS fp = zeroFPoint, pof = zeroFPoint, center = zeroFPoint;
+  FPOS fp, pof, center;
   FPOS sum_denom1, sum_denom2;
   prec exp_val = 0;
   prec min_x = 0, min_y = 0;
@@ -731,8 +696,8 @@ void net_update_lse(FPOS *st) {
     max_y = net->max_y;
     // max_z = net->max_z;
 
-    sum_denom1 = zeroFPoint;
-    sum_denom2 = zeroFPoint;
+    sum_denom1.x = sum_denom1.y = 0;
+    sum_denom2.x = sum_denom2.y = 0;
 
     for(j = 0; j < net->pinCNTinObject; j++) {
       pin = net->pin[j];
@@ -796,38 +761,8 @@ void net_update_lse(FPOS *st) {
       else {
         pin->flg2.y = 0;
       }
-
-      // exp_max_z = ( fp.z - max_z ) * wlen_cof.z;
-
-      // if( fabs(exp_max_z) < MAX_EXP )
-      //  {
-      //    exp_val = get_exp ( exp_max_z ) ;
-      //    sum_denom1.z += exp_val ;
-      //    pin->flg1.z = 1;
-      //    pin->e1.z = exp_val ;
-      //  }
-      // else
-      //  {
-      //    pin->flg1.z = 0 ;
-      //  }
-
-      // exp_min_z = ( min_z - fp.z ) * wlen_cof.z;
-
-      // if( fabs(exp_min_z) < MAX_EXP )
-      //  {
-      //    exp_val = get_exp ( exp_min_z ) ;
-      //    sum_denom2.z += exp_val ;
-      //    pin->flg2.z = 1 ;
-      //    pin->e2.z = exp_val ;
-      //  }
-      // else
-      //  {
-      //    pin->flg2.z = 0 ;
-      //  }
     }
 
-    // net->sum_num1 = sum_num1 ;
-    // net->sum_num2 = sum_num2 ;
     net->sum_denom1 = sum_denom1;
     net->sum_denom2 = sum_denom2;
   }
@@ -839,9 +774,9 @@ prec net_update_hpwl_mac(void) {
   NET *net = NULL;
   PIN *pin = NULL;
   MODULE *curModule = NULL;
-  FPOS fp = zeroFPoint, pof = zeroFPoint, p0 = zeroFPoint;
+  FPOS fp, pof, p0;
 
-  total_hpwl = zeroFPoint;
+  total_hpwl.x = total_hpwl.y = 0;
 
   for(i = 0; i < netCNT; i++) {
     net = &netInstance[i];
@@ -970,8 +905,6 @@ void net_update_wa(FPOS *st) {
 
       FPOS sum_num1, sum_num2;
       FPOS sum_denom1, sum_denom2;
-      //        sum_num1.x = sum_num1.y = sum_num2.x = sum_num2.y = 0;
-      //        sum_denom1.x = sum_denom1.y = sum_denom2.x = sum_denom2.y = 0;
 
       // UPDATE
       // pin->e1 (MAX)
@@ -1048,9 +981,9 @@ prec get_mac_hpwl(int idx) {
   int i = 0, j = 0;
   int moduleID = mac->idx;
   CELL *cell = &gcell_st[moduleID];
-  FPOS fp = zeroFPoint;
+  FPOS fp;
 
-  mac_hpwl = zeroFPoint;
+  mac_hpwl.x = mac_hpwl.y = 0;
   mac_hpwl_xyz = 0;
 
   for(i = 0; i < cell->pinCNTinObject; i++) {
@@ -1099,105 +1032,43 @@ void update_pin2(void) {
 
       MODULE *curModule = &moduleInstance[pin->moduleID];
       pin->fp.SetAdd(curModule->center, curModule->pof[pin->pinIDinModule]);
-
-      //            if( i == 0 ) {
-      //                cout << j << endl;
-      //                curModule->center.Dump("curModule->center");
-      //                curModule->pof[pin->pinIDinModule].Dump("pof");
-      //                pin->fp.Dump("Added pin->fp");
-      //            }
-
-      // original code
-      // FPOS pof = curModule->pof[pin->pinIDinModule];
-      // FPOS center = curModule->center;
-
-      // fp = pin->fp;
-      // fp.x = center.x + pof.x;
-      // fp.y = center.y + pof.y;
-      // fp.z = center.z + pof.z;
-      // pin->fp = fp;
     }
   }
 }
 
-prec get_modu_hpwl(void) {
-  int i = 0, j = 0;
+// Update HPWL based on net->pin2 definition.
+void UpdateNetMinMaxPin2(void) {
   NET *net = NULL;
-  FPOS fp;
   PIN *pin = NULL;
+  FPOS fp;
 
-  tot_HPWL = tx_HPWL = ty_HPWL = tz_HPWL = 0;
-
-  for(i = 0; i < netCNT; i++) {
+  for(int i = 0; i < netCNT; i++) {
     net = &netInstance[i];
 
     net->min_x = net->terminalMin.x;
     net->min_y = net->terminalMin.y;
-    // net->min_z = net->terminalMin.z;
 
     net->max_x = net->terminalMax.x;
     net->max_y = net->terminalMax.y;
-    // net->max_z = net->terminalMax.z;
 
-    for(j = 0; j < net->pinCNTinObject2; j++) {
+    for(int j = 0; j < net->pinCNTinObject2; j++) {
       pin = net->pin2[j];
 
-      if(!pin->term) {
-        fp = pin->fp;
-
-        net->min_x = min(net->min_x, fp.x);
-        net->min_y = min(net->min_y, fp.y);
-        // net->min_z = min ( net->min_z , fp.z ) ;
-
-        net->max_x = max(net->max_x, fp.x);
-        net->max_y = max(net->max_y, fp.y);
-        // net->max_z = max ( net->max_z , fp.z ) ;
+      if(pin->term) {
+        continue;
       }
+      fp = pin->fp;
+
+      net->min_x = min(net->min_x, fp.x);
+      net->min_y = min(net->min_y, fp.y);
+
+      net->max_x = max(net->max_x, fp.x);
+      net->max_y = max(net->max_y, fp.y);
     }
 
     if(net->pinCNTinObject2 <= 1)
       continue;
-
-    tx_HPWL += net->max_x - net->min_x;
-    ty_HPWL += net->max_y - net->min_y;
-    // tz_HPWL += net->max_z - net->min_z;
   }
-
-  tot_HPWL = tx_HPWL + ty_HPWL;  // + tz_HPWL;
-
-  return tot_HPWL;
-}
-
-int HPWL_count() {
-  NET *curNet = NULL;
-
-  tot_HPWL = 0;
-  tx_HPWL = 0;
-  ty_HPWL = 0;
-
-  for(int i = 0; i < netCNT; i++) {
-    curNet = &netInstance[i];
-    tx_HPWL += (curNet->max_x - curNet->min_x);
-    ty_HPWL += (curNet->max_y - curNet->min_y);
-
-    if(curNet->max_x - curNet->min_x < 0) {
-      cout << "NEGATIVE HPWL ERROR! " << curNet->Name() << " " << curNet->max_x
-           << " " << curNet->min_x << endl;
-    }
-    if(curNet->max_y - curNet->min_y < 0) {
-      cout << "NEGATIVE HPWL ERROR! " << curNet->Name() << " " << curNet->max_y
-           << " " << curNet->min_y << endl;
-    }
-
-    if(tx_HPWL < 0 || ty_HPWL < 0) {
-      printf("NEGATIVE HPWL ERROR! \n");
-      cout << curNet->Name() << tx_HPWL << " " << ty_HPWL << endl;
-      exit(1);
-    }
-  }
-  // exit(0);
-  tot_HPWL = tx_HPWL + ty_HPWL;
-  return 0;
 }
 
 
@@ -1222,7 +1093,7 @@ pair<double, double> GetUnscaledHpwl() {
 
     if(x < 0 || y < 0) {
       printf("NEGATIVE HPWL ERROR! \n");
-      cout << curNet->Name() << tx_HPWL << " " << ty_HPWL << endl;
+      cout << curNet->Name() << x << " " << y << endl;
       exit(1);
     }
   }

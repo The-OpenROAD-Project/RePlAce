@@ -51,14 +51,14 @@
 // void get_term_potn(prec *phi);
 
 inline void potn_pre(int cell_idx, struct FPOS *charge_dpre) {
-  *charge_dpre = zeroFPoint;
+  charge_dpre->x = charge_dpre->y = 0;
 #ifdef NO_DEN
   return;
 #endif
   struct CELL *cell = &gcell_st[cell_idx];
   switch(CHARGE_PRE) {
     case NoneDpre:
-      *charge_dpre = zeroFPoint;
+      charge_dpre->x = charge_dpre->y = 0;
       break;
     case AreaDpre:
       charge_dpre->x = charge_dpre->y = (prec)(cell->area);

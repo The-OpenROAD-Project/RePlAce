@@ -22,7 +22,7 @@ string getexepath();
 
 FPOS fp_mul(struct FPOS a, struct FPOS b);
 inline FPOS fp_add(struct FPOS a, struct FPOS b) {
-  struct FPOS c = zeroFPoint;
+  struct FPOS c;
   c.x = a.x + b.x;
   c.y = a.y + b.y;
   return c;
@@ -66,14 +66,15 @@ string GetRealPath(string path );
 
 
 // Print functions
-void PrintProc(string input);
-void PrintProcBegin(string input);
-void PrintProcEnd(string input);
-void PrintError(string input); 
-void PrintInfoInt(string input, int val);
-void PrintInfoPrec(string input, prec val);
-void PrintInfoString(string input, string val);
-void PrintInfoRuntime(string input, double runtime);
+void PrintProc(string input, int verbose = 0);
+void PrintProcBegin(string input, int verbose = 0);
+void PrintProcEnd(string input, int verbose = 0);
+void PrintError(string input, int verbose = 0); 
+void PrintInfoInt(string input, int val, int verbose = 0);
+void PrintInfoPrec(string input, prec val, int verbose = 0);
+void PrintInfoPrecPair(string input, prec val1, prec val2, int verbose = 0);
+void PrintInfoString(string input, string val, int verbose = 0);
+void PrintInfoRuntime(string input, double runtime, int verbose = 0);
 
 
 

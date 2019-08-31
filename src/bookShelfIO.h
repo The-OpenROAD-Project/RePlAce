@@ -148,9 +148,6 @@ void extract_dir(char *f, char *d);
 void extract_sfx(char *f, char *s);
 
 void output_pl(char *output);
-void output_cGP3D_pl(char *output);
-void output_mGP2D_pl(char *output);
-void output_cGP2D_pl(char *output);
 
 void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
                                     FPOS offset, int curModuleIdx,
@@ -160,7 +157,6 @@ void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
 
 void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt);
 
-void write_new_bench(void);
 void write_3d_bench(void);  // useless
 
 void WriteBookshelfWithTier(char* targetDir, int z, int lab, bool isShapeDrawing = true, 

@@ -89,14 +89,12 @@ void myNesterov::nesterov_opt() {
 
   InitializationCoefficients();
 
-  //    cout << it->ovfl << endl;
   if(DEN_ONLY_PRECON) {
     InitializationPrecondition_DEN_ONLY_PRECON();
   }
   else {
     InitializationPrecondition();
   }
-  //    cout << it->ovfl << endl;
 
   InitializationIter();
 
@@ -200,9 +198,6 @@ void myNesterov::InitializationCommonVar() {
   sum_wgrad = 0;
   sum_pgrad = 0;
   sum_tgrad = 0;
-  //    u.SetZero();
-  //    v.SetZero();
-  //    half_densize.SetZero();
   wcof.SetZero();
   wpre.SetZero();
   charge_dpre.SetZero();
@@ -870,19 +865,7 @@ void myNesterov::SummarizeNesterovOpt(int last_index) {
   prec tot_hpwl_y;
   prec tot_hpwl_x;
 
-  if(STAGE == mGP3D) {
-    mGP3D_iterCNT = last_index + 1;
-    hpwl_mGP3D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY mGP3D\n");
-    printf("INFO:    #iterations = %d\n", mGP3D_iterCNT);
-    printf("INFO:        mGP3D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        mGP3D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        mGP3D      POTENTIAL %.4lf\n", it->potn);
-    mGP3D_tot_iter = last_index;
-    mGP3D_opt_phi_cof = opt_phi_cof;
-  }
-  else if(STAGE == mGP2D) {
+  if(STAGE == mGP2D) {
     mGP2D_iterCNT = last_index + 1;
     hpwl_mGP2D = it->tot_hpwl;
     printf("\n");
@@ -893,18 +876,6 @@ void myNesterov::SummarizeNesterovOpt(int last_index) {
     printf("INFO:        mGP2D      POTENTIAL %.4lf\n", it->potn);
     mGP2D_tot_iter = last_index;
     mGP2D_opt_phi_cof = opt_phi_cof;
-  }
-  else if(STAGE == cGP3D) {
-    cGP3D_iterCNT = last_index + 1;
-    hpwl_cGP3D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY cGP3D\n");
-    printf("INFO:    #iterations = %d\n", cGP3D_iterCNT);
-    printf("INFO:        cGP3D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        cGP3D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        cGP3D      POTENTIAL %.4lf\n", it->potn);
-    cGP3D_tot_iter = last_index;
-    cGP3D_opt_phi_cof = opt_phi_cof;
   }
   else if(STAGE == cGP2D) {
     cGP2D_iterCNT = last_index + 1;
@@ -917,8 +888,6 @@ void myNesterov::SummarizeNesterovOpt(int last_index) {
     printf("INFO:        cGP2D      POTENTIAL %.4lf\n", it->potn);
     cGP2D_tot_iter = last_index;
     cGP2D_opt_phi_cof = opt_phi_cof;
-  }
-  else {
   }
 
   cell_update(x_st, N_org);
@@ -1645,23 +1614,29 @@ void myNesterov::UpdateBeta(struct ITER *it) {
 }
 
 void myNesterov::PrintNesterovOptStatus(int iter) {
-  printf("\n");
-  printf("ITER: %d\n", iter);
-  printf("    HPWL=%.6f\n", it->tot_hpwl);
-  // if (stnCMD)     printf ("    STNWL=%f\n", it->tot_stnwl);
-  // printf ("    WEIGHTEDWL=%f\n", it->tot_wwl);
-  printf("    OVFL=%.6f\n", it->ovfl);
-  printf("    HPWL=(%.6f, %.6f)\n", it->hpwl.x, it->hpwl.y);
-  printf("    POTN=%.6E\n", it->potn);
-  printf("    PHIC=%.6E\n", opt_phi_cof);
-  // if (lambda2CMD) {
-  //    printf ("    LOCL=%.6E\n", opt_phi_cof_local);
-  //    printf ("    ALPH=%.6E\n", ALPHA);
-  //}
-  // if (dynamicStepCMD) printf ("    UPCF=%.6E\n", UPPER_PCOF);
-  printf("    GRAD=%.6E\n", it->grad);
-  // printf ("    Alph=%.6E\n", it->alpha00);
-  printf("    NuBT=%d\n", backtrack_cnt);
-  printf("    CPU =%.6f\n", it->cpu_cost);
+  if( gVerbose == 0 ) {
+    if( iter % 10 == 0 ) {
+      cout << "Iter: " << iter << " OverFlow: " << it->ovfl << endl;
+    } 
+  }
+  else if ( gVerbose >= 2 ) {
+    printf("\n");
+    printf("ITER: %d\n", iter);
+    printf("    HPWL=%.6f\n", it->tot_hpwl);
+    // if (stnCMD)     printf ("    STNWL=%f\n", it->tot_stnwl);
+    // printf ("    WEIGHTEDWL=%f\n", it->tot_wwl);
+    printf("    OVFL=%.6f\n", it->ovfl);
+    printf("    HPWL=(%.6f, %.6f)\n", it->hpwl.x, it->hpwl.y);
+    printf("    POTN=%.6E\n", it->potn);
+    printf("    PHIC=%.6E\n", opt_phi_cof);
+    // if (lambda2CMD) {
+    //    printf ("    LOCL=%.6E\n", opt_phi_cof_local);
+    //    printf ("    ALPH=%.6E\n", ALPHA);
+    //}
+    // if (dynamicStepCMD) printf ("    UPCF=%.6E\n", UPPER_PCOF);
+    printf("    GRAD=%.6E\n", it->grad);
+    printf("    NuBT=%d\n", backtrack_cnt);
+    printf("    CPU =%.6f\n", it->cpu_cost);
+  }
 }
 

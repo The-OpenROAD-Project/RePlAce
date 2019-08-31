@@ -288,8 +288,8 @@ void filler_adj(void) {
 
 void rand_filler_adj(int idx) {
   int i = 0;
-  struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
+  struct FPOS pmin, pmax;
+  struct FPOS rnd;
   struct CELL *filler = NULL;
 
   for(i = idx; i < gcell_cnt; i++) {
@@ -309,8 +309,8 @@ void rand_filler_adj(int idx) {
 
 void filler_adj_mGP2D(void) {
   int z = 0, i = 0;
-  struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
+  struct FPOS pmin, pmax;
+  struct FPOS rnd;
   struct CELL *filler = NULL;
   struct TIER *tier = NULL;
 
@@ -336,8 +336,8 @@ void filler_adj_mGP2D(void) {
 
 void filler_adj_cGP2D(void) {
   int z = 0, i = 0;
-  struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
+  struct FPOS pmin, pmax;
+  struct FPOS rnd;
   struct CELL *filler = NULL;
   struct TIER *tier = NULL;
 
@@ -368,8 +368,7 @@ void cell_filler_init() {
   struct CELL *filler = NULL;
   prec k_f2c = 1.0;
   struct CELL *gcell_st_tmp = NULL;
-  struct FPOS org = zeroFPoint, end = zeroFPoint, len = zeroFPoint,
-              rnd = zeroFPoint;
+  struct FPOS org, end, len, rnd;
 
   prec f_area = k_f2c * avg80p_cell_area;
 
@@ -510,7 +509,7 @@ void cell_init(void) {
   gcell_cnt = moduleCNT;
   gcell_st = (struct CELL *)malloc(sizeof(struct CELL) * gcell_cnt);
 
-  // pin2 copy loop 
+  // pin2 copy loop: pin2 is original pin info
   for(i = 0; i < netCNT; i++) {
     net = &netInstance[i];
     net->mod_idx = -1;
@@ -538,10 +537,16 @@ void cell_init(void) {
         sizeof(struct PIN *) * mdp->pinCNTinObject);
     cell->pinCNTinObject = 0;
 
+    // 
+    // pin removal is executed 
+    // when there are two duplicated pins 
+    // (connected to a same net) in a single instance 
+    //
     for(j = 0; j < mdp->pinCNTinObject; j++) {
       pin = mdp->pin[j];
       pof = mdp->pof[j];
       net = &netInstance[pin->netID];
+
       if(net->mod_idx == i) {
         for(k = pin->pinIDinNet; k < net->pinCNTinObject - 1; k++) {
           net->pin[k] = net->pin[k + 1];
@@ -702,13 +707,13 @@ void cg_input(struct FPOS *x_st, int N, int input) {
   char fn_x_isol[BUF_SZ];
   char fn_wl_sol[BUF_SZ];
 
-  struct FPOS half_den_size = zeroFPoint;
-  struct FPOS center = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
-  struct FPOS v = zeroFPoint;
-  struct FPOS sqr_org = zeroFPoint;
-  struct FPOS sqr_cnt = zeroFPoint;
-  struct FPOS sqr_end = zeroFPoint;
+  struct FPOS half_den_size;
+  struct FPOS center;
+  struct FPOS rnd;
+  struct FPOS v;
+  struct FPOS sqr_org;
+  struct FPOS sqr_cnt;
+  struct FPOS sqr_end;
 
   switch(input) {
     case QWL_ISOL:
@@ -762,18 +767,18 @@ int area_sort(const void *a, const void *b) {
 
 void init_iter(struct ITER *it, int idx) {
   it->idx = idx;
-  it->wlen = zeroFPoint;
+  it->wlen.x = it->wlen.y = 0;
   it->tot_wlen = 0;
   it->grad = 0;
-  it->hpwl = zeroFPoint;
+  it->hpwl.x = it->hpwl.y = 0;
   it->tot_hpwl = 0;
   it->ovfl = 0;
-  it->wcof = zeroFPoint;
+  it->wcof.x = it->wcof.y = 0;
   it->pcof = 0;
   it->beta = 0;
   it->alpha00 = 0;
-  it->alpha_dim = zeroFPoint;
-  it->lc_dim = zeroFPoint;
+  it->alpha_dim.x = it->alpha_dim.y = 0;
+  it->lc_dim.x = it->lc_dim.y = 0;
   it->lc_w = 0;
   it->lc_p = 0;
   it->cpu_curr = 0;
@@ -805,12 +810,6 @@ void gp_opt(void) {
   }
 
   modu_copy();
-
-  if(STAGE == mGP2D)
-    output_mGP2D_pl(gmGP2D_pl);
-  else if(STAGE == cGP2D)
-    output_cGP2D_pl(gGP3_pl);
-
   fflush(stdout);
 }
 
@@ -1007,7 +1006,7 @@ void cell_init_2D(void) {
 
 void update_cell_den() {
   struct CELL *cell = NULL;
-  struct FPOS scal = zeroFPoint;
+  struct FPOS scal;
 
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];

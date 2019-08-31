@@ -363,8 +363,7 @@ void SetParameter() {
   unitY = 1.0 * siteSizeY / 9.0f;
   unitX = unitY;
 
-  cout << "INFO:  SCALE DOWN UNIT: ( " << unitX << ", " << unitY << " )"
-       << endl;
+  PrintInfoPrec( "ScaleDownUnit", unitX );
 
   // offsetX & offsetY : Minimum coordinate of ROW's x/y
   if(IsPrecEqual(offsetX, PREC_MAX)) {
@@ -389,9 +388,7 @@ void SetParameter() {
               0 : siteSizeY - (rowMin % siteSizeY);
   }
 
-  cout << "INFO:  OFFSET COORDINATE: ( " << offsetX << ", " << offsetY << " )"
-       << endl
-       << endl;
+  PrintInfoPrecPair( "OffsetCoordi", offsetX, offsetY );
 }
 
 void SetVerilogTopModule() {
@@ -414,7 +411,6 @@ void ParseLefDef() {
   GenerateFullRow(__ckt);
 
   if(__ckt.defNetStor.size() > 0) {
-    cout << "INFO:  EXTRACT NET INFO FROM DEF ONLY" << endl;
     GenerateNetDefOnly(__ckt);
   }
   else {
@@ -423,7 +419,7 @@ void ParseLefDef() {
       exit(1);
   }
 
-  cout << "INFO:  SUCCESSFULLY LEF/DEF PARSED" << endl;
+  PrintProc("LEF/DEF Parsing Success!");
 
   // do weird things..
   FPOS tier_min, tier_max;
@@ -479,7 +475,6 @@ void WriteDef(const char* defOutput) {
   }
 
   __ckt.WriteDef(fp);
-  cout << "INFO:  SUCCESSFULLY WRITE DEF FILE INTO " << defOutput << endl;
 }
 
 ////////
@@ -967,8 +962,8 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     curTerm->Dump();
     terminalCNT++;
   }
-  cout << "INFO:  #MODULE: " << moduleCNT << ", #TERMINAL: " << terminalCNT
-       << endl;
+  PrintInfoInt("NumModules", moduleCNT);
+  PrintInfoInt("NumTerminals", terminalCNT);
 }
 
 /////////////////////////////////////////////////////
@@ -1362,14 +1357,13 @@ void GenerateRow(Replace::Circuit& __ckt) {
     //        curRow->Dump(to_string(i));
     i++;
   }
-  cout << "INFO:  ROW SIZE: ( " << SITE_SPA << ", " << rowHeight << " ) "
-       << endl;
-  cout << "INFO:  #ROW: " << row_cnt << endl;
+  PrintInfoPrecPair( "RowSize", SITE_SPA, rowHeight );
+  PrintInfoInt( "NumRows", row_cnt );
 }
 
 // MS-Placement requires this!
 void GenerateFullRow(Replace::Circuit& __ckt) {
-  cout << "INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) " << endl;
+  PrintProcBegin("Generate Un-fragmented Rows");
   if( row_st ) {
     free(row_st);
   }
@@ -1389,8 +1383,8 @@ void GenerateFullRow(Replace::Circuit& __ckt) {
 
   DieRect coreArea = GetCoreFromRow();
 
-  cout << "INFO:  CORE AREA: (" << coreArea.llx << " " << coreArea.lly << ") - ("
-       << coreArea.urx << " " << coreArea.ury << ")" << endl;
+  PrintInfoPrecPair("CoreAreaLxLy", coreArea.llx, coreArea.lly );
+  PrintInfoPrecPair("CoreAreaUxUy", coreArea.urx, coreArea.ury );
 
   // this portion is somewhat HARD_CODING
   // it regards there only one SITE definition per each design!
@@ -1500,10 +1494,10 @@ void GenerateFullRow(Replace::Circuit& __ckt) {
     curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep() / unitX;
 //    curRow->Dump(to_string(i));
   }
-
-  cout << "INFO:  NEW ROW SIZE: ( " << SITE_SPA << ", " << rowHeight << " ) "
-       << endl;
-  cout << "INFO:  NEW #ROW: " << row_cnt << endl;
+  
+  PrintInfoPrecPair( "RowSize", SITE_SPA, rowHeight );
+  PrintInfoInt( "NumRows", row_cnt );
+  PrintProcEnd("Generate Un-fragmented Rows"); 
 }
 
 
@@ -1677,6 +1671,8 @@ FPOS GetOffset(Replace::Circuit& __ckt, string& instName, string& pinName,
 // defPinStor -> pinInstance
 //
 void GenerateNetDefOnly(Replace::Circuit& __ckt) {
+  PrintProcBegin("DEF Net Parsing");
+
   pinCNT = 0;
   netCNT = __ckt.defNetStor.size();
   for(auto& curNet : __ckt.defNetStor) {
@@ -1872,7 +1868,9 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
 //  netInstance = (NET*)realloc(netInstance, sizeof(NET) * netCNT);
 //  pinInstance = (PIN*)realloc(pinInstance, sizeof(PIN) * pinCNT);
 
-  cout << "INFO:  #NET: " << netCNT << ", #PIN: " << pinCNT << endl;
+  PrintInfoInt( "NumNets", netCNT ); 
+  PrintInfoInt( "NumPins", pinCNT );
+  PrintProcEnd("DEF Net Parsing");
 }
 
 //

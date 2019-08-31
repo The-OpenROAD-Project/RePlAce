@@ -57,6 +57,8 @@ void initGlobalVars() {
   bmFlagCMD = "etc";       // string
   target_cell_den = PREC_MAX;
 
+  gVerbose = 0;
+
   dim_bin.x = dim_bin.y = 32;
   UPPER_PCOF = 1.05;
   LOWER_PCOF = 0.95;

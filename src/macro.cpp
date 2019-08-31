@@ -257,7 +257,7 @@ void sa_mac_leg_sub() {
   int flg = 0;
   int mac_idx = 0;
   prec mac_c0 = 0, mac_c1 = 0;
-  struct POS mac_mov = zeroPoint;
+  struct POS mac_mov;
 
   sa_cnt++;
 
@@ -305,7 +305,6 @@ void sa_mac_leg_sub() {
   int ovlp2 = get_tot_mac_ovlp();
   cnt2 = ovlp_mac_cnt;
   if(ovlp1 != ovlp2 || ovlp1 != tot_mac_ovlp || ovlp2 != tot_mac_ovlp) {
-    g_rrr++;
     printf(" == ERROR tot_mac_ovlp: %d != %d != %d\n", tot_mac_ovlp, ovlp1,
            ovlp2);
     for(i = 0; i < macro_cnt; i++) {
@@ -352,7 +351,7 @@ void sa_init_top(void) {
   tot_std_area = 0;
   tot_mac_area = 0;
 
-  sum_mac_size = zeroFPoint;
+  sum_mac_size.x = sum_mac_size.y = 0;
 
   for(i = 0; i < moduleCNT; i++) {
     mdp = &moduleInstance[i];
@@ -428,8 +427,8 @@ void sa_init_top(void) {
 
   sa_param_init_top();
 
-  MIN_SA_R_Z = 1.5 * TIER_DEP;
-  MAX_SA_R_Z = (prec)numLayer * TIER_DEP;
+  MIN_SA_R_Z = 1.5;
+  MAX_SA_R_Z = (prec)numLayer;
 }
 
 void sa_mac_leg_init(void) {
@@ -440,8 +439,8 @@ void sa_mac_leg_init_with_margin(void) {
   int i = 0, j = 0;
   struct MODULE *mac = NULL;
   struct TIER *tier = NULL;
-  struct FPOS pmin = zeroFPoint, center = zeroFPoint, center_lg = zeroFPoint;
-  struct POS pmin_lg = zeroPoint;
+  struct FPOS pmin, center, center_lg;
+  struct POS pmin_lg;
 
   for(i = 0; i < macro_cnt; i++) {
     mac = macro_st[i];
@@ -481,7 +480,6 @@ void sa_mac_leg_init_with_margin(void) {
       else {
         if(j == numLayer - 1) {
           printf("ERROR: no more tier to assign macro %s!\n", mac->Name());
-          g_rrr++;
           exit(1);
         }
         else
@@ -723,9 +721,9 @@ void build_seg_tree(int i, int left, int right) {
 //////////////-OVERLAP COUNT-//////////////
 
 struct POS get_mac_mov(struct FPOS r, struct POS u) {
-  struct POS rnd = zeroPoint;
-  struct FPOS drnd = zeroFPoint;
-  struct POS mov = zeroPoint;
+  struct POS rnd;
+  struct FPOS drnd;
+  struct POS mov;
   rnd.x = rand();
   rnd.y = rand();
   drnd.x = (prec)rnd.x * inv_RAND_MAX - 0.5;
@@ -750,7 +748,7 @@ struct POS get_mac_mov(struct FPOS r, struct POS u) {
 void do_mac_mov(int idx, struct POS *mov) {
   int i = 0, mx = mov->x, my = mov->y;
   struct PIN *pin = NULL;
-  struct FPOS pof = zeroFPoint;
+  struct FPOS pof;
   struct MODULE *mac = macro_st[idx];
   int moduleID = mac->idx;
   struct CELL *cell = &gcell_st[moduleID];

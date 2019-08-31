@@ -590,8 +590,8 @@ void buildRMSTPerNet_genTwoPinNets(struct FPOS *st, struct NET *net) {
       int moduleID_start = pin_start->moduleID * 2;
       int moduleID_end = pin_end->moduleID * 2;
 
-      struct FPOS pof_start = zeroFPoint;
-      struct FPOS pof_end = zeroFPoint;
+      struct FPOS pof_start;
+      struct FPOS pof_end;
       struct FPOS center_start = pin_start->fp;
       struct FPOS center_end = pin_end->fp;
       if(!pin_start->term) {
@@ -616,8 +616,8 @@ void buildRMSTPerNet_genTwoPinNets(struct FPOS *st, struct NET *net) {
       }
       // cout <<"test" <<pof_start.x <<" " <<pof_start.y <<endl;
       // cout <<"test" <<pof_end.x <<" " <<pof_end.y <<endl;
-      struct FPOS fp_start = zeroFPoint;
-      struct FPOS fp_end = zeroFPoint;
+      struct FPOS fp_start;
+      struct FPOS fp_end;
       fp_start.x = center_start.x + pof_start.x;
       fp_start.y = center_start.y + pof_start.y;
       fp_end.x = center_end.x + pof_end.x;
@@ -724,8 +724,8 @@ void buildRMSTPerNet_printRMST(struct FPOS *st, struct NET *net) {
     }
     int start_modu = net->two_pin_nets[i].start_modu / 2;
     int end_modu = net->two_pin_nets[i].end_modu / 2;
-    struct FPOS center1 = zeroFPoint;
-    struct FPOS center2 = zeroFPoint;
+    struct FPOS center1;
+    struct FPOS center2;
     if(net->two_pin_nets[i].start_modu % 2 == 0) {
       struct MODULE *tempInst1 = &moduleInstance[start_modu];
       center1 = st[start_modu];
@@ -814,9 +814,9 @@ void calcCongPerNet_grouter_based(struct NET *net) {
   prec y_min = 0;  // routing track's min and max
   prec x_max = 0;  // routing track's min and max
   prec y_max = 0;  // routing track's min and max
-  struct POS b0 = zeroPoint;
-  struct POS b1 = zeroPoint;
-  // struct  POS     bm1      = zeroPoint;
+  struct POS b0;
+  struct POS b1;
+  // struct  POS bm1;
   struct TILE *bpx = nullptr;
   // struct  TILE    *bpy    = nullptr;
   struct TIER *tier = &tier_st[0];
@@ -939,14 +939,14 @@ void calcCongPerNet_prob_based (struct FPOS *st, struct NET *net) {
     prec            max_y = 0;
     struct  TILE    *bpx = NULL;
     struct  TILE    *bpy = NULL;
-    struct  POS     b0 = zeroPoint;
-    struct  POS     b1 = zeroPoint;
+    struct  POS     b0;
+    struct  POS     b1;
     struct  TIER    *tier = &tier_st[0];
 
-    struct POS ll = zeroPoint;
+    struct POS ll;
     ll.x = INT_MAX;
     ll.y = INT_MAX;
-    struct POS ur = zeroPoint;
+    struct POS ur;
 
     std::vector<TwoPinNets> &two_pin_nets = net->two_pin_nets;
 
@@ -1348,7 +1348,7 @@ void CalcPinDensity(struct FPOS *st) {
 
   struct NET *net = NULL;
   struct TILE *bp = NULL;
-  struct POS b0 = zeroPoint;
+  struct POS b0;
   struct TIER *tier = &tier_st[0];
 
   for(int i = 0; i < netCNT; i++) {
@@ -1357,7 +1357,7 @@ void CalcPinDensity(struct FPOS *st) {
       struct PIN *pin_start = net->pin[i];
       // struct MODULE *tempInst_start = &moduleInstance[pin_start->moduleID] ;
       struct FPOS center_start = pin_start->fp;
-      struct FPOS pof_start = zeroFPoint;
+      struct FPOS pof_start;
       if(!pin_start->term) {
         struct MODULE *tempInst_start = &moduleInstance[pin_start->moduleID];
         pof_start = tempInst_start->pof[pin_start->pinIDinModule];
@@ -1369,7 +1369,7 @@ void CalcPinDensity(struct FPOS *st) {
         pof_start = tempInst_start->pof[pin_start->pinIDinModule];
         // cout <<net->name <<" " <<tempInst_start->name <<endl;
       }
-      struct FPOS p = zeroFPoint;
+      struct FPOS p;
       p.x = center_start.x + pof_start.x;
       // x1[i] = (int)(x[i] * 100.0);
       p.y = center_start.y + pof_start.y;
@@ -1397,7 +1397,7 @@ void CalcPinDensity(struct FPOS *st) {
 void MergePinDen2Route() {
   struct TIER *tier = &tier_st[0];
   struct TILE *bp = NULL;
-  struct POS b0 = zeroPoint;
+  struct POS b0;
   int minPinLayer = 1;
   int maxPinLayer = 2;
   prec pinBlkFac = 0.05;
@@ -1451,7 +1451,7 @@ void MergeBlkg2Route() {
 
 void CalcPinDensityPerCell(struct CELL *cell) {
   struct TILE *bp = NULL;
-  struct POS b0 = zeroPoint;
+  struct POS b0;
   struct TIER *tier = &tier_st[0];
 
   if(cell->flg == FillerCell)
@@ -1559,8 +1559,8 @@ void calcInflationRatio_foreachTile() {
   struct TIER *tier = &tier_st[0];
   struct TILE *bp = NULL;
   struct TILE *bp_temp = NULL;
-  struct POS bmax = zeroPoint;
-  struct POS b0 = zeroPoint;
+  struct POS bmax;
+  struct POS b0;
 
   bmax.x = tier->dim_tile.x - 1;
   bmax.y = tier->dim_tile.y - 1;
@@ -1765,7 +1765,7 @@ void printInflationRatio() {
 }
 
 void cell_calc_new_area_per_Cell(struct CELL *cell, struct TILE *bp) {
-  struct FPOS cell_size = zeroFPoint;
+  struct FPOS cell_size;
 
   // if (bp->h_inflation_ratio > 1.0 && is_inflation_h == true) {
   //    cell_size.x = cell->size.x * bp->h_inflation_ratio;
@@ -1873,7 +1873,7 @@ void cell_inflation_per_Cell(struct CELL *cell, struct TILE *bp) {
 }
 
 void cell_den_scal_update_forNewGrad_inNSopt(struct CELL *cell) {
-  struct FPOS scal = zeroFPoint;
+  struct FPOS scal;
   struct TIER *tier = &tier_st[0];
 
   if(DEN_ONLY_PRECON) {
@@ -1926,7 +1926,7 @@ void cell_den_scal_update_forNewGrad_inNSopt(struct CELL *cell) {
 void bloat_prep() {
   int idx = 0;
   struct TILE *bp = NULL;
-  struct POS b0 = zeroPoint;
+  struct POS b0;
   struct TIER *tier = &tier_st[0];
   struct CELL *cell = NULL;
 
@@ -2012,7 +2012,7 @@ void bloat_prep() {
 void bloating() {
   int idx = 0;
   struct TILE *bp = NULL;
-  struct POS b0 = zeroPoint;
+  struct POS b0;
   struct TIER *tier = &tier_st[0];
   struct CELL *cell = NULL;
 

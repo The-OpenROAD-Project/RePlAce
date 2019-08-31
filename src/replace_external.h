@@ -33,6 +33,7 @@ public:
   void set_unit_res(double unit_r);
   void set_unit_cap(double unit_c);
 
+  void set_verbose_level(int verbose);
   void set_density(double density);
   void set_bin_grid_count(size_t grid_count);
   
@@ -47,8 +48,11 @@ public:
   std::string get_instance_name(size_t idx);
   float get_x(size_t idx); 
   float get_y(size_t idx);
+  void print_instances();
 
-  float get_hpwl(); 
+  float get_hpwl();
+  float get_wns();
+  float get_tns(); 
 
   bool save_jpeg(const char* jpeg);
   bool place_cell_init_place();
@@ -59,6 +63,7 @@ private:
   void update_instance_list();
 
   Replace::Circuit* ckt;
+
   std::vector<std::string> lef_stor;
   std::vector<std::string> def_stor;
   std::vector<std::string> verilog_stor;
