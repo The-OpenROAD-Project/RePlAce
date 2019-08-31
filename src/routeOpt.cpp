@@ -204,8 +204,9 @@ void RouteInstance::FillTrack() {
         (curLayer.layerDirection == Horizontal)? 
         floor( 100.0 * currentCapRatio * _gCellSizeX / (curLayer.layerPitchY) ) :
         floor( 100.0 * currentCapRatio * _gCellSizeY / (curLayer.layerPitchX) ));
-    cout << "INFO: LAYER " << curLayer.layerName << " #TRACK: " 
-      << _trackCount[_trackCount.size()-1] << endl;
+
+    PrintInfoString("RouteInit: Layer: " + curLayer.layerName + 
+        " / numTracks: " + to_string( _trackCount[_trackCount.size()-1] ), 1);
   }
   // M1 have NO routability
 //  if( _trackCount.size() > 1) {

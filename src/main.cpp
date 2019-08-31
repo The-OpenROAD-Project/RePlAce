@@ -727,7 +727,7 @@ void init() {
   }
 
   global_macro_area_scale = target_cell_den;
-  PrintInfoPrec("TargetDensity", target_cell_den);
+  PrintInfoPrec("TargetDensity", target_cell_den, 0);
 
   wcof_flg = /* 1 */ 2 /* 3 */;
 
@@ -919,10 +919,8 @@ void mGP2DglobalPlacement_main() {
   if(dynamicStepCMD) {
     reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y);
   }
-  printf("RESULT:\n");
-  printf("   HPWL(mGP2D): %.4f (%.4f, %.4f)\n\n", total_hpwl.x + total_hpwl.y,
-         total_hpwl.x, total_hpwl.y);
-  fflush(stdout);
+  auto hpwl = GetUnscaledHpwl(); 
+  PrintInfoPrec("Nesterov: HPWL", hpwl.first + hpwl.second, 1);
 }
 
 void tcGP3DglobalPlacement_main() {
@@ -976,10 +974,9 @@ void cGP2DglobalPlacement_main() {
 
   isFirst_gp_opt = false;
   UpdateNetAndGetHpwl();
-  printf("RESULT:\n");
-  printf("   HPWL(cGP2D): %.4f (%.4f, %.4f)\n\n", total_hpwl.x + total_hpwl.y,
-         total_hpwl.x, total_hpwl.y);
-  fflush(stdout);
+
+  auto hpwl = GetUnscaledHpwl(); 
+  PrintInfoPrec("Nesterov: HPWL", hpwl.first + hpwl.second, 1);
 }
 
 void macroLegalization_main() {

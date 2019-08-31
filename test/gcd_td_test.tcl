@@ -1,13 +1,6 @@
 # 
 # Examples for Timing-driven RePlAce with TCL usage
 #
-proc print_instances {rep} {
-  set insts_cnt [rep get_instance_list_size]
-  puts "Total # Instance: $insts_cnt"
-  for {set i 0} {$i <$insts_cnt} {incr i} {
-    puts [format "%10s (%10s) x: %0.4f y: %0.4f" [rep get_instance_name $i] [rep get_master_name $i] [rep get_x $i] [rep get_y $i]]
-  }
-}
 
 set design gcd
 set lib_dir ./library/nangate45/
@@ -40,13 +33,13 @@ rep place_cell_init_place
 puts "initPlace HPWL: [rep get_hpwl]"
 
 # print out instances' x/y coordinates
-print_instances rep
+rep print_instances 
 
 # place_cell with Nesterov (RePlAce)
-rep place_cell_nesterov_place
+rep place_cell_nesterov_place 
 
 # print out instances' x/y coordinates
-print_instances rep
+rep print_instances 
 
 # Export DEF file
 rep export_def ./gcd_TD.def

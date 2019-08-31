@@ -868,24 +868,21 @@ void myNesterov::SummarizeNesterovOpt(int last_index) {
   if(STAGE == mGP2D) {
     mGP2D_iterCNT = last_index + 1;
     hpwl_mGP2D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY mGP2D\n");
-    printf("INFO:    #iterations = %d\n", mGP2D_iterCNT);
-    printf("INFO:        mGP2D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        mGP2D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        mGP2D      POTENTIAL %.4lf\n", it->potn);
+    PrintInfoInt("Nesterov: NumIters", cGP2D_iterCNT, 1);
+    PrintInfoPrec("Nesterov: ScaledHpwl", it->tot_hpwl, 1);
+    PrintInfoPrec("Nesterov: Overflow", it->ovfl, 1);
+    PrintInfoPrec("Nesterov: Potential", it->potn, 1);
     mGP2D_tot_iter = last_index;
     mGP2D_opt_phi_cof = opt_phi_cof;
   }
   else if(STAGE == cGP2D) {
     cGP2D_iterCNT = last_index + 1;
     hpwl_cGP2D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY cGP2D\n");
-    printf("INFO:    #iterations = %d\n", cGP2D_iterCNT);
-    printf("INFO:        cGP2D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        cGP2D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        cGP2D      POTENTIAL %.4lf\n", it->potn);
+    PrintInfoInt("Nesterov: NumIters", cGP2D_iterCNT, 1);
+    PrintInfoPrec("Nesterov: ScaledHpwl", it->tot_hpwl, 1);
+    PrintInfoPrec("Nesterov: Overflow", it->ovfl, 1);
+    PrintInfoPrec("Nesterov: Potential", it->potn, 1);
+
     cGP2D_tot_iter = last_index;
     cGP2D_opt_phi_cof = opt_phi_cof;
   }
@@ -898,8 +895,8 @@ void myNesterov::SummarizeNesterovOpt(int last_index) {
   net_update(x_st);
   tot_hpwl_x = GetHpwl();
 
-  printf("INFO:    TOTAL HPWL (U_k, V_k) = %.6lf, %.6lf\n", tot_hpwl_x,
-         tot_hpwl_y);
+  PrintInfoPrec("Nesterov: xInstScaledHpwl", tot_hpwl_x, 1);
+  PrintInfoPrec("Nesterov: yInstScaledHpwl", tot_hpwl_y, 1);
 }
 
 void getCostFuncGradient3(struct FPOS *dst, struct FPOS *wdst,
@@ -1614,9 +1611,9 @@ void myNesterov::UpdateBeta(struct ITER *it) {
 }
 
 void myNesterov::PrintNesterovOptStatus(int iter) {
-  if( gVerbose == 0 ) {
+  if( gVerbose <= 1 ) {
     if( iter % 10 == 0 ) {
-      cout << "Iter: " << iter << " OverFlow: " << it->ovfl << endl;
+      cout << "[INFO] Nesterov: " << iter << " OverFlow: " << it->ovfl << " ScaledHpwl: " << it->tot_hpwl << endl;
     } 
   }
   else if ( gVerbose >= 2 ) {

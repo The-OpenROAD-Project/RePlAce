@@ -73,6 +73,7 @@ void PrintError(string input, int verbose = 0);
 void PrintInfoInt(string input, int val, int verbose = 0);
 void PrintInfoPrec(string input, prec val, int verbose = 0);
 void PrintInfoPrecPair(string input, prec val1, prec val2, int verbose = 0);
+void PrintInfoString(string input, int verbose = 0);
 void PrintInfoString(string input, string val, int verbose = 0);
 void PrintInfoRuntime(string input, double runtime, int verbose = 0);
 

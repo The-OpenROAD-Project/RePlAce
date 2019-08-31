@@ -361,6 +361,10 @@ void PrintInfoPrecPair(string input, prec val1, prec val2, int verbose) {
   printf("[INFO] %s = (%.6f, %.6f)\n", input.c_str(), val1, val2);
   fflush(stdout);
 }
+void PrintInfoString(string input, int verbose) {
+  VERBOSE_CHECK()
+  cout << "[INFO] " << input << endl;
+}
 void PrintInfoString(string input, string val, int verbose) {
   VERBOSE_CHECK()
   cout << "[INFO] " << input << " = " << val << endl;

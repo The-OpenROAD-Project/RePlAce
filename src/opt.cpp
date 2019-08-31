@@ -117,14 +117,17 @@ int setup_before_opt_cGP2D(void) {
   bin_init_2D(cGP2D);
 
   // routability
-  routeInst.Init();
-  WriteBookshelfForGR();
-  char routeLoc[BUF_SZ] = {0, };
-  sprintf(routeLoc, "%s/router_base/%s.route", dir_bnd, gbch);
+  if( isRoutability ) {
+    routeInst.Init();
+    WriteBookshelfForGR();
 
-  if(isRoutability == true) {
-    read_routes_3D( routeLoc );
-    tile_init_cGP2D(); 
+    char routeLoc[BUF_SZ] = {0, };
+    sprintf(routeLoc, "%s/router_base/%s.route", dir_bnd, gbch);
+
+    if(isRoutability == true) {
+      read_routes_3D( routeLoc );
+      tile_init_cGP2D(); 
+    }
   }
 
   charge_fft_init(dim_bin_cGP2D, bin_stp_cGP2D, 0);
@@ -258,23 +261,30 @@ void whitespace_init(void) {
 
   total_WS_area = total_PL_area - total_termPL_area;
   total_std_den = total_std_area / (total_WS_area - total_macro_area);
-  printf("INFO:  Chip Area: %lf x %lf = %lf \n", place.cnt.x, place.cnt.y, place.area);
-  fflush(stdout);
-  printf("INFO:  Total_PL_Area = %lf, %lf of chip\n", total_PL_area,
-         total_PL_area / place.area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_TermPL_Area = %ld, %lf of PL\n", total_termPL_area,
-         1.0 * total_termPL_area / place.area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_WS_Area = %ld, %lf of PL\n", total_WS_area,
-         1.0 * total_WS_area / total_PL_area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_Macro_Area = %lf, %lf of WS\n", total_macro_area,
-         total_macro_area / total_WS_area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_StdCell_Area = %lf, %lf of WS\n", total_std_area,
-         total_std_area / total_WS_area * 100.0);
-  fflush(stdout);
+//  printf("INFO:  Chip Area: %lf x %lf = %lf \n", place.cnt.x, place.cnt.y, place.area);
+//  fflush(stdout);
+
+  PrintInfoPrec("TotalPlaceArea", total_PL_area);
+  PrintInfoPrec("TotalFixedArea", total_termPL_area);
+  PrintInfoPrec("TotalWhiteSpaceArea", total_WS_area);
+  PrintInfoPrec("TotalPlaceMacrosArea", total_macro_area);
+  PrintInfoPrec("TotalPlaceStdCellsArea", total_std_area); 
+  PrintInfoPrec("Util(%)", (total_macro_area + total_std_area) / total_PL_area * 100);
+
+  if( (total_macro_area + total_std_area)/total_PL_area > 1.00f ) {
+    PrintError("Utilization Exceeds 100%. Please double-check your input DEF");
+  }
+
+//  printf("INFO:  Total_PL_Area = %lf, %lf of chip\n", total_PL_area,
+//         total_PL_area / place.area * 100.0);
+//  printf("INFO:  Total_TermPL_Area = %ld, %lf of PL\n", total_termPL_area,
+//         1.0 * total_termPL_area / place.area * 100.0);
+//  printf("INFO:  Total_WS_Area = %ld, %lf of PL\n", total_WS_area,
+//         1.0 * total_WS_area / total_PL_area * 100.0);
+//  printf("INFO:  Total_Macro_Area = %lf, %lf of WS\n", total_macro_area,
+//         total_macro_area / total_WS_area * 100.0);
+//  printf("INFO:  Total_StdCell_Area = %lf, %lf of WS\n", total_std_area,
+//         total_std_area / total_WS_area * 100.0);
 }
 
 void filler_adj(void) {
@@ -398,16 +408,13 @@ void cell_filler_init() {
   filler_area = f_area;
   filler_size = f_size;
 
-  printf("INFO:  FillerCell's Area = %.6lf\n", filler_area);
-
   gfiller_cnt = (int)(total_filler_area / filler_area + 0.5);
-  cout << "gFillerCount: " << gfiller_cnt << endl;
-  cout << "filler_area: " << filler_area << endl;
-  cout << "total_filler_area: : " << total_filler_area << endl;
 
-  printf("INFO:  FillerCell's X = %.6lf , FillerCell's Y = %.6lf\n",
-           filler_size.x, filler_size.y);
-  fflush(stdout);
+  PrintInfoPrec("FillerInit: TotalFillerArea", total_filler_area);
+  PrintInfoInt("FillerInit: NumFillerCells", gfiller_cnt);
+  PrintInfoPrec("FillerInit: FillerCellArea", filler_area);
+  PrintInfoPrecPair("FillerInit: FillerCellSize", filler_size.x, filler_size.y);
+
   gcell_cnt = moduleCNT + gfiller_cnt;
 
   // igkang:  replace realloc to mkl
@@ -420,8 +427,9 @@ void cell_filler_init() {
   memcpy(gcell_st, gcell_st_tmp, gcell_cnt * (sizeof(struct CELL)));
   free(gcell_st_tmp);
 
-  printf("INFO:  #CELL = %d =  %d (#MODULE) + %d (#FILLER)\n", gcell_cnt,
-         moduleCNT, gfiller_cnt);
+  PrintInfoInt("FillerInit: NumCells", gcell_cnt);
+  PrintInfoInt("FillerInit: NumModules", moduleCNT);
+  PrintInfoInt("FillerInit: NumFillers", gfiller_cnt);
 
   for(i = moduleCNT; i < gcell_cnt; i++) {
     filler = &gcell_st[i];

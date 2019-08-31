@@ -629,7 +629,6 @@ void post_read_3d(void) {
   place.center.y = 0.5 * (place.org.y + place.end.y);
 
   place.area = place.cnt.x * place.cnt.y;
-  //    place.dump("global variable place");
 }
 
 int read_shapes_3D(char *input) {
