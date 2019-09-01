@@ -512,7 +512,7 @@ void cell_init(void) {
   avg80p_cell_dim.x = avg_cell_x;
   avg80p_cell_dim.y = avg_cell_y;
 
-  printf("INFO:  Average 80pct Cell Area = %.4lf\n", avg80p_cell_area);
+  PrintInfoPrec("80pCellArea", avg80p_cell_area);
 
   gcell_cnt = moduleCNT;
   gcell_st = (struct CELL *)malloc(sizeof(struct CELL) * gcell_cnt);

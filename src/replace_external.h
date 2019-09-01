@@ -40,7 +40,7 @@ public:
   void set_lambda(double lambda);
   void set_pcof_min(double pcof_min);
   void set_pcof_max(double pcof_max);
-
+  
   bool init_replace();
 
   size_t get_instance_list_size();
@@ -49,6 +49,10 @@ public:
   float get_x(size_t idx); 
   float get_y(size_t idx);
   void print_instances();
+
+  void set_net_weight_min(double net_weight_min);
+  void set_net_weight_max(double net_weight_max);
+  void set_net_weight_scale(double net_weight_scale);
 
   float get_hpwl();
   float get_wns();

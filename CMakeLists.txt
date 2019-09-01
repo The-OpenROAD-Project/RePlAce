@@ -163,13 +163,13 @@ include_directories(
 ############################################################
 # Create a library 
 ############################################################
-add_library( replacelib  SHARED
-  ${REPLACE_SRC}
-)
+# add_library( replacelib  SHARED
+#   ${REPLACE_SRC}
+# )
 
-set_target_properties( replacelib 
-  PROPERTIES OUTPUT_NAME "replace"
-)
+# set_target_properties( replacelib 
+#   PROPERTIES OUTPUT_NAME "replace"
+# )
 
 ############################################################
 # Create an executable
@@ -189,10 +189,10 @@ add_dependencies( replace flute )
 add_dependencies( replace def )
 add_dependencies( replace lef )
 
-add_dependencies( replacelib sta )
-add_dependencies( replacelib flute )
-add_dependencies( replacelib def )
-add_dependencies( replacelib lef )
+#add_dependencies( replacelib sta )
+#add_dependencies( replacelib flute )
+#add_dependencies( replacelib def )
+#add_dependencies( replacelib lef )
 
 target_link_libraries( replace
   PUBLIC
@@ -223,6 +223,6 @@ target_link_libraries( replace
 
 install(FILES ${REPLACE_HEADER} DESTINATION include)
 install(TARGETS replace DESTINATION bin)
-install(TARGETS replacelib DESTINATION lib)
+# install(TARGETS replacelib DESTINATION lib)
 
 

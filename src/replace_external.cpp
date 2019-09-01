@@ -202,6 +202,20 @@ replace_external::set_density(double density) {
   target_cell_den = target_cell_den_orig = density;
 }
 
+void
+replace_external::set_net_weight_min(double net_weight_min) {
+  netWeightBase = net_weight_min;
+}
+
+void
+replace_external::set_net_weight_max(double net_weight_max) {
+  netWeightBound = net_weight_max;
+}
+
+void
+replace_external::set_net_weight_scale(double net_weight_scale) {
+  netWeightScale = net_weight_scale;
+}
 
 
 void 

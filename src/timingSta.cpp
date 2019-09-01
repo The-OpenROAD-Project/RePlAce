@@ -253,14 +253,13 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   }
 
   // link_design
-  cout << "INFO:  Now linking: " << topCellName << endl;
+  PrintProcBegin("Timing: LinkDesign " + topCellName);
   Tcl_Eval(_interp, string("set link_make_black_boxes 0").c_str() ); 
   Tcl_Eval(_interp, string("link_design " + topCellName ).c_str() );
 
   bool is_linked = network->isLinked();
   if(is_linked) {
-    cout << "INFO:  Successfully linked: " 
-      << network->cellName(_sta->currentInstance()) << endl;
+    PrintProcEnd("Timing: LinkDesign " + topCellName);
   }
   else {
     cout << "ERROR:  Linking Fail. Please put liberty files ";
@@ -319,8 +318,8 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   _sta->worstSlack(cnst_min_max, wns, worstVertex);
 
   Slack tns = _sta->totalNegativeSlack(cnst_min_max);
-  cout << "WNS = " << wns << " seconds" << endl;
-  cout << "TNS = " << tns << " seconds" << endl;
+  PrintInfoPrec("Timing: WNS", wns);
+  PrintInfoPrec("Timing: TNS", tns);
 
   float tol = 0.0;
   _sta->setIncrementalDelayTolerance(tol);
@@ -350,7 +349,7 @@ void Timing::ExecuteStaLater() {
                                                                     start)
           .count();
 
-  cout << "FillSpefForSta: " << elapsed_seconds << endl;
+  PrintInfoRuntime("Timing: FillSpefForSta", elapsed_seconds, 1);
 
   _sta->setIncrementalDelayTolerance(1e-6);
 
@@ -363,7 +362,7 @@ void Timing::ExecuteStaLater() {
                                                                     start)
           .count();
 
-  cout << "UpdateTimingSta: " << elapsed_seconds << endl;
+  PrintInfoRuntime("Timing: UpdateTimingSta", elapsed_seconds, 1);
 
   start = std::chrono::steady_clock::now();
   UpdateNetWeightSta();
@@ -372,7 +371,7 @@ void Timing::ExecuteStaLater() {
       std::chrono::duration_cast< std::chrono::duration< double > >(finish -
                                                                     start)
           .count();
-  cout << "UpdateNetWeight: " << elapsed_seconds << endl;
+  PrintInfoRuntime("Timing: UpdateNetWeight", elapsed_seconds, 1);
 
   // WNS / TNS report
   const MinMax* cnst_min_max;
@@ -381,9 +380,9 @@ void Timing::ExecuteStaLater() {
   Vertex *worstVertex;
   _sta->worstSlack(cnst_min_max, wns, worstVertex);
   Slack tns = _sta->totalNegativeSlack(cnst_min_max);
-  cout << "timing summary" << endl;
-  cout << "WNS = " << wns << " seconds" << endl;
-  cout << "TNS = " << tns << " seconds" << endl;
+  
+  PrintInfoPrec("Timing: WNS", wns);
+  PrintInfoPrec("Timing: TNS", tns);
 }
 
 char* GetNewStr(const char* inp) {
@@ -620,7 +619,7 @@ void Timing::UpdateNetWeightSta() {
   //    int limintCnt = resultCnt * netCut;
   int limintCnt = resultCnt;
 
-  cout << "INFO: Total " << resultCnt << " worst path!" << endl;
+  PrintInfoInt("Timing: NumPaths", resultCnt, 1);
 
   //    _sta->setReportPathOptions(report_path_full, true, true, true, true,
   //    true, 2);
@@ -661,7 +660,7 @@ void Timing::UpdateNetWeightSta() {
 //    }
     
     if(i % 10000 == 0 ) {
-      cout << "Critical Path Up to " << i << " has been updated" << endl;
+      PrintProc("Timing: Critical path " + to_string(i) + " has been updated", 1);
     }
     PathExpanded expanded(end->path(), _sta);
 

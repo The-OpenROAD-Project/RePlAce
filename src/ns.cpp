@@ -791,7 +791,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
             std::chrono::duration_cast< std::chrono::duration< double > >(
                 finish - start)
                 .count();
-        cout << "BuildSteiner: " << elapsed_seconds << endl;
+        PrintInfoRuntime("Timing: BuildSteiner", elapsed_seconds, 1);
 
         start = std::chrono::steady_clock::now();
         TimingInst.ExecuteStaLater();
@@ -801,7 +801,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
             std::chrono::duration_cast< std::chrono::duration< double > >(
                 finish - start)
                 .count();
-        cout << "ExecuteStaLater: " << elapsed_seconds << endl;
+        PrintInfoRuntime("Timing: EsecuteStaLater", elapsed_seconds, 1);
         
         for(int j=checkIter-2; j<=checkIter+2; j++) {
           timingCheck[j] = 1;
