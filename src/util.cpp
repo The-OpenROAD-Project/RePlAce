@@ -54,9 +54,9 @@
 #include "opt.h"
 #include "util.h"
 
-int prec_eqv(prec x, prec y) {
-  return get_abs(x - y) < Epsilon;
-}
+//int prec_eqv(prec x, prec y) {
+//  return get_abs(x - y) < Epsilon;
+//}
 
 //int prec_le(prec x, prec y) {
 //  return prec_lt(x, y) | prec_eqv(x, y);
@@ -85,14 +85,6 @@ unsigned prec2unsigned(prec a) {
   return a - (prec)af < (prec)ac - a ? af : ac;
 }
 
-int find_non_zero(prec *a, int cnt) {
-  int i = 0;
-  for(i = 0; i < cnt; i++) {
-    if(!prec_eqv(a[i], 0.0))
-      return i;
-  }
-  return -1;
-}
 
 void itoa(int n, char k[]) {
   char s[BUF_SZ];
@@ -356,6 +348,13 @@ void PrintInfoPrec(string input, prec val, int verbose) {
   printf("[INFO] %s = %.6f\n", input.c_str(), val);
   fflush(stdout);
 }
+// SI format due to WNS/TNS
+void PrintInfoPrecSignificant(string input, prec val, int verbose) {
+  VERBOSE_CHECK()
+  printf("[INFO] %s = %g\n", input.c_str(), val);
+  fflush(stdout);
+}
+
 void PrintInfoPrecPair(string input, prec val1, prec val2, int verbose) {
   VERBOSE_CHECK()
   printf("[INFO] %s = (%.6f, %.6f)\n", input.c_str(), val1, val2);

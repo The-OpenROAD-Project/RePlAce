@@ -133,12 +133,12 @@ replace_external::get_hpwl() {
 
 float
 replace_external::get_wns() {
-  return 0.0f;
+  return globalWns;
 }
 
 float
 replace_external::get_tns() {
-  return 0.0f;
+  return globalTns;
 }
 
 bool 

@@ -4,13 +4,12 @@
 #include <iostream>
 #include "replace_private.h"
 
-int prec_eqv(prec x, prec y);
+//int prec_eqv(prec x, prec y);
 //int prec_le(prec x, prec y);
 //int prec_ge(prec x, prec y);
 //int prec_lt(prec x, prec y);
 //int prec_gt(prec x, prec y);
 unsigned prec2unsigned(prec a);
-int find_non_zero(prec *a, int cnt);
 void itoa(int n, char k[]);
 
 
@@ -72,6 +71,7 @@ void PrintProcEnd(string input, int verbose = 0);
 void PrintError(string input, int verbose = 0); 
 void PrintInfoInt(string input, int val, int verbose = 0);
 void PrintInfoPrec(string input, prec val, int verbose = 0);
+void PrintInfoPrecSignificant(string input, prec val, int verbose = 0);
 void PrintInfoPrecPair(string input, prec val1, prec val2, int verbose = 0);
 void PrintInfoString(string input, int verbose = 0);
 void PrintInfoString(string input, string val, int verbose = 0);

@@ -757,6 +757,8 @@ enum { STDCELLonly, MIXED };
 extern int gVerbose;
 
 // for timing
+extern prec globalWns;
+extern prec globalTns;
 extern prec netCut;
 extern bool hasNetWeight;
 extern prec netWeight;
@@ -1087,7 +1089,6 @@ extern bool thermalAwarePlaceCMD;
 extern bool isOnlyGlobalPlace;
 extern bool isSkipIP;
 extern bool isTiming;
-extern bool isARbyUserCMD;
 extern bool stnCMD;  // lutong
 extern bool trialRunCMD;
 extern bool autoEvalRC_CMD;

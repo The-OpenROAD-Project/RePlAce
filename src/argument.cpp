@@ -58,6 +58,8 @@ void initGlobalVars() {
   target_cell_den = PREC_MAX;
 
   gVerbose = 0;
+  globalWns = 0.0f;
+  globalTns = 0.0f;
 
   dim_bin.x = dim_bin.y = 32;
   UPPER_PCOF = 1.05;
@@ -105,7 +107,6 @@ void initGlobalVars() {
   isInitSeed = false;
   plotColorFile = "";
 
-  isARbyUserCMD = false;         // bool
   thermalAwarePlaceCMD = false;  // bool
   trialRunCMD = false;           // bool
   autoEvalRC_CMD = false;        // bool
@@ -526,19 +527,6 @@ bool argument(int argc, char *argv[]) {
             printf("\n**ERROR: Option %s requires the number of layers ",
                    argv[i - 1]);
             printf("(INT).\n");
-            return false;
-        }
-    }
-    else if(!strcmp(argv[i], "-ar")) {
-        i++;
-        if(argv[i][0] != '-') {
-            aspectRatioCMD = argv[i];
-            isARbyUserCMD = true;
-        }
-        else {
-            printf("\n**ERROR: Option %s requires the aspect ratio ",
-                   argv[i - 1]);
-            printf("(FLT).\n");
             return false;
         }
     }

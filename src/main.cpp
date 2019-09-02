@@ -67,6 +67,9 @@
 #define compileDate __DATE__
 #define compileTime __TIME__
 
+prec globalWns;
+prec globalTns;
+
 prec netCut;
 bool hasNetWeight;
 prec netWeight;
@@ -371,7 +374,6 @@ bool lambda2CMD;
 bool dynamicStepCMD;
 bool isOnlyGlobalPlace;
 bool isTiming;
-bool isARbyUserCMD;
 bool thermalAwarePlaceCMD;
 bool trialRunCMD;
 bool autoEvalRC_CMD;

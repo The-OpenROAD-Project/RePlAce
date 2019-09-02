@@ -318,8 +318,10 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   _sta->worstSlack(cnst_min_max, wns, worstVertex);
 
   Slack tns = _sta->totalNegativeSlack(cnst_min_max);
-  PrintInfoPrec("Timing: WNS", wns);
-  PrintInfoPrec("Timing: TNS", tns);
+  PrintInfoPrecSignificant("Timing: WNS", wns);
+  PrintInfoPrecSignificant("Timing: TNS", tns);
+  globalWns = wns;
+  globalTns = tns;
 
   float tol = 0.0;
   _sta->setIncrementalDelayTolerance(tol);
@@ -381,8 +383,10 @@ void Timing::ExecuteStaLater() {
   _sta->worstSlack(cnst_min_max, wns, worstVertex);
   Slack tns = _sta->totalNegativeSlack(cnst_min_max);
   
-  PrintInfoPrec("Timing: WNS", wns);
-  PrintInfoPrec("Timing: TNS", tns);
+  PrintInfoPrecSignificant("Timing: WNS", wns);
+  PrintInfoPrecSignificant("Timing: TNS", tns);
+  globalWns = wns;
+  globalTns = tns;
 }
 
 char* GetNewStr(const char* inp) {
