@@ -1,0 +1,1 @@
+docker run -v $(pwd):/replace replace bash -c "echo Tests are not ready yet!"
