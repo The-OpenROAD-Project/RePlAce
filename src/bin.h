@@ -41,7 +41,7 @@
 #ifndef __PL_BIN__
 #define __PL_BIN__
 
-#include "global.h"
+#include "replace_private.h"
 
 extern int tot_bin_cnt;
 extern int bin_cnt;
@@ -145,7 +145,6 @@ inline prec valid_coor2(prec da, prec half_size, int lab) {
 }
 
 inline FPOS valid_coor00(FPOS v, FPOS half_size) {
-  //    FPOS v1 = zeroFPoint;
   FPOS v1;
   v1.x = valid_coor2(v.x, half_size.x, 0);
   v1.y = valid_coor2(v.y, half_size.y, 1);
@@ -182,9 +181,6 @@ prec get_ovfl();
 void bin_den_update(FPOS *x_st, int N, int iter, int lab);
 bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
                      FPOS *p2);
-prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2);
-prec get_common_vol(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2);
-
 prec get_den(prec area_num, prec area_denom);
 prec get_den2(prec area_num, prec area_denom);
 

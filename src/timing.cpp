@@ -1,4 +1,4 @@
-#include "global.h"
+#include "replace_private.h"
 #include "timing.h"
 #include <sstream>
 #include <fstream>
@@ -185,7 +185,7 @@ void Timing::BuildSteiner(bool scaleApplied) {
     //        if( i == 2 )
     //            exit(0);
   }
-  cout << "total Steiner HPWL: " << totalStnWL << endl;
+  PrintInfoInt("Timing: SteinerHPWL(DBU)", totalStnWL, 1);
   //    exit(0);
 }
 

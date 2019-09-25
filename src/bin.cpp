@@ -48,7 +48,7 @@
 #include "bin.h"
 #include "charge.h"
 #include "fft.h"
-#include "global.h"
+#include "replace_private.h"
 #include "macro.h"
 #include "opt.h"
 #include "plot.h"
@@ -143,7 +143,7 @@ void bin_init() {
   inv_bin_area = 1.0 / bin_area;
 
   // update bin_mat's information
-  bin_mat = (BIN *)mkl_malloc(sizeof(BIN) * tot_bin_cnt, 64);
+  bin_mat = (BIN *)malloc(sizeof(BIN) * tot_bin_cnt);
 
   // for each allocated bin_mat
   for(int i = 0; i < tot_bin_cnt; i++) {
@@ -226,10 +226,10 @@ void bin_init() {
     }
   }
 
-  bin_st = (POS *)mkl_malloc(sizeof(POS) * tot_bin_cnt, 64);
-  bin_share_x_st = (prec *)mkl_malloc(sizeof(prec) * max_bin.x, 64);
-  bin_share_y_st = (prec *)mkl_malloc(sizeof(prec) * max_bin.y, 64);
-  bin_share_st = (prec *)mkl_malloc(sizeof(prec) * tot_bin_cnt, 64);
+  bin_st = (POS *)malloc(sizeof(POS) * tot_bin_cnt);
+  bin_share_x_st = (prec *)malloc(sizeof(prec) * max_bin.x);
+  bin_share_y_st = (prec *)malloc(sizeof(prec) * max_bin.y);
+  bin_share_st = (prec *)malloc(sizeof(prec) * tot_bin_cnt);
 }
 
 //
@@ -322,7 +322,7 @@ void bin_init_2D(int STAGE) {
            dim_bin_cGP2D.y);
   }
 
-  bin_mat_st = (BIN **)mkl_malloc(sizeof(BIN *) * numLayer, 64);
+  bin_mat_st = (BIN **)malloc(sizeof(BIN *) * numLayer);
   for(int z = 0; z < numLayer; z++) {
     TIER *tier = &tier_st[z];
 
@@ -348,15 +348,12 @@ void bin_init_2D(int STAGE) {
     tier->bin_org.x = tier->pmin.x - tier->bin_off.x;
     tier->bin_org.y = tier->pmin.y - tier->bin_off.y;
 
-    tier->pmin.Dump("tier->pmin");
-  
-
     tier->bin_area = tier->bin_stp.x * tier->bin_stp.y;
 
     tier->inv_bin_area = 1.0 / tier->bin_area;
     tier->tot_bin_area = tier->bin_area * tier->tot_bin_cnt;
 
-    bin_mat_st[z] = (BIN *)mkl_malloc(sizeof(BIN) * tier->tot_bin_cnt, 64);
+    bin_mat_st[z] = (BIN *)malloc(sizeof(BIN) * tier->tot_bin_cnt);
     tier->bin_mat = bin_mat_st[z];
 
     // for each allocated bin_mat_st..
@@ -366,9 +363,9 @@ void bin_init_2D(int STAGE) {
       BIN *bp = &tier->bin_mat[i];
 
       bp->den = 0;
-      bp->e = zeroFPoint;
+      bp->e.x = bp->e.y = 0;
       ////igkang
-      // bp->e_local = zeroFPoint;
+      // bp->e_local.x = bp->e_local.y = 0;
       bp->phi = 0;
       bp->pmin.x = tier->bin_org.x + (prec)p.x * tier->bin_stp.x;
       bp->pmin.y = tier->bin_org.y + (prec)p.y * tier->bin_stp.y;
@@ -399,8 +396,6 @@ void bin_init_2D(int STAGE) {
 
       for(int k = 0; k < place_st_cnt; k++) {
         PLACE *pl = &place_st[k];
-        //                bp->pl_area += get_common_area(pl->org, pl->end,
-        //                bp->pmin, bp->pmax);
         plArea += pGetCommonAreaXY(pl->org, pl->end, bp->pmin, bp->pmax);
       }
 
@@ -501,14 +496,14 @@ void UpdateTerminalArea(TIER *tier, FPOS *pmin, FPOS *pmax) {
 }
 
 void bin_delete(void) {
-  mkl_free(bin_mat);
+  free(bin_mat);
 
   bin_mat = NULL;
 
-  mkl_free(bin_st);
-  mkl_free(bin_share_x_st);
-  mkl_free(bin_share_y_st);
-  mkl_free(bin_share_st);
+  free(bin_st);
+  free(bin_share_x_st);
+  free(bin_share_y_st);
+  free(bin_share_st);
 }
 
 // min_a <= a && a <= max_a
@@ -585,12 +580,12 @@ FPOS valid_coor4(FPOS center, FPOS obj_size) {
   prec xyz_dis = 0;
   prec min_dis = dp_wlen_weight.x * place.cnt.x +
                  dp_wlen_weight.y * place.cnt.y;
-  POS flg = zeroPoint, obj_flg = zeroPoint;
+  POS flg, obj_flg;
   FPOS new_center = center;
-  FPOS dorg = zeroFPoint, dend = zeroFPoint;
-  FPOS dis = zeroFPoint, obj_dis = zeroFPoint;
+  FPOS dorg, dend;
+  FPOS dis, obj_dis;
   PLACE *place0 = NULL;
-  FPOS half_size = zeroFPoint;
+  FPOS half_size;
 
   half_size.x = obj_size.x * 0.5;
   half_size.y = obj_size.y * 0.5;
@@ -1085,8 +1080,8 @@ prec get_bins_mac(FPOS center, MODULE *mac) {
   prec area_share = 0;
   prec min_x = 0, min_y = 0, min_z = 0;
   prec max_x = 0, max_y = 0, max_z = 0;
-  POS b0 = zeroPoint, b1 = zeroPoint;
-  FPOS pmin = zeroFPoint, pmax = zeroFPoint;
+  POS b0, b1;
+  FPOS pmin, pmax;
   BIN *bpx = NULL, *bpy = NULL, *bpz = NULL;
   prec cost = 0.0;
 
@@ -1157,9 +1152,9 @@ void get_bins(FPOS center, CELL *cell, POS *st, prec *share_st, int *bin_cnt) {
   prec min_y = 0, max_y = 0;
 
   prec area_share = 0;
-  POS b0 = zeroPoint, b1 = zeroPoint;
-  FPOS share = zeroFPoint;
-  FPOS pmin = zeroFPoint, pmax = zeroFPoint;
+  POS b0, b1;
+  FPOS share;
+  FPOS pmin, pmax;
 
   pmin.x = center.x - cell->half_den_size.x;
   pmin.y = center.y - cell->half_den_size.y;
@@ -1227,9 +1222,6 @@ void get_bins(FPOS center, CELL *cell, POS *st, prec *share_st, int *bin_cnt) {
 
   diff_area = fabs(sum_area - cell->area);
 
-  if(diff_area > 0.01 * cell->area) {
-    g_rrr++;
-  }
 
   return;
 }
@@ -1283,7 +1275,6 @@ bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
       }
     }
     else {
-//      error(0, 0, "get_common_area: eff_x error");
     }
 
     if((pmax1.y > pmin2.y || pmax1.y == pmin2.y) &&
@@ -1308,59 +1299,11 @@ bool get_common_rect(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2, FPOS *p1,
       }
     }
     else {
-//      error(0, 0, "get_common_area: eff_x error");
     }
   }
   return true;
 }
 
-prec get_common_area(FPOS pmin1, FPOS pmax1, FPOS pmin2, FPOS pmax2) {
-  prec eff_x = 0;
-  prec eff_y = 0;
-
-  if(pmax1.x <= pmin2.x || pmin1.x >= pmax2.x || pmax1.y <= pmin2.y ||
-     pmin1.y >= pmax2.y)
-    return 0;
-  else {
-    if((pmax1.x > pmin2.x || pmax1.x == pmin2.x) &&
-       (pmax1.x < pmax2.x || pmax1.x == pmax2.x)) {
-      if(pmin1.x > pmin2.x || pmin1.x == pmin2.x)
-        eff_x = pmax1.x - pmin1.x;
-      else
-        eff_x = pmax1.x - pmin2.x;
-    }
-    else if(pmax1.x > pmax2.x || pmax1.x == pmax2.x) {
-      if(pmin1.x > pmin2.x || pmin1.x == pmin2.x)
-        eff_x = pmax2.x - pmin1.x;
-      else
-        eff_x = pmax2.x - pmin2.x;
-    }
-    else {
-//      error(0, 0, "get_common_area: eff_x error");
-      g_rrr++;
-    }
-
-    if((pmax1.y > pmin2.y || pmax1.y == pmin2.y) &&
-       (pmax1.y < pmax2.y || pmax1.y == pmax2.y)) {
-      if(pmin1.y > pmin2.y || pmin1.y == pmin2.y)
-        eff_y = pmax1.y - pmin1.y;
-      else
-        eff_y = pmax1.y - pmin2.y;
-    }
-    else if(pmax1.y > pmax2.y || pmax1.y == pmax2.y) {
-      if(pmin1.y > pmin2.y || pmin1.y == pmin2.y)
-        eff_y = pmax2.y - pmin1.y;
-      else
-        eff_y = pmax2.y - pmin2.y;
-    }
-    else {
-//      error(0, 0, "get_common_area: eff_x error");
-      g_rrr++;
-    }
-
-    return eff_x * eff_y;
-  }
-}
 
 int point_in_rect(FPOS p0, FPOS pmin, FPOS pmax) {
   return p0.x >= pmin.x - Epsilon && p0.x <= pmax.x + Epsilon &&
@@ -1398,9 +1341,9 @@ void bin_cell_area_update(void) {
   int i = 0, j = 0;
   prec area_share = 0;
   CELL *cell = NULL;
-  FPOS center = zeroFPoint;
-  FPOS half_size = zeroFPoint;
-  POS p = zeroPoint;
+  FPOS center;
+  FPOS half_size;
+  POS p;
 
   for(i = 0; i < moduleCNT; i++) {
     center = moduleInstance[i].center;
@@ -1450,8 +1393,8 @@ void bin_clr(void) {
 prec get_all_macro_den(void) {
   MODULE *mac = NULL;
   MODULE *mdp = NULL;
-  FPOS center = zeroFPoint;
-  FPOS half_size = zeroFPoint;
+  FPOS center;
+  FPOS half_size;
   prec den_cost = 0;
 
   for(int i = 0; i < moduleCNT; i++) {
@@ -1650,8 +1593,8 @@ void bin_delete_mGP2D(void) {
     TIER *tier = &tier_st[currTier];
     tier->bin_mat = NULL;
     tier->tot_bin_cnt = 0;
-    // mkl_free (bin_mat_st[currTier]);
+    // free (bin_mat_st[currTier]);
   }
-  mkl_free(bin_mat_st);
+  free(bin_mat_st);
   bin_mat_st = NULL;
 }

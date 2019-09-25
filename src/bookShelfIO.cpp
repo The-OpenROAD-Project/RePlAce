@@ -41,7 +41,7 @@
 #include "bin.h"
 #include "bookShelfIO.h"
 #include "lefdefIO.h"
-#include "global.h"
+#include "replace_private.h"
 #include "initPlacement.h"
 #include "macro.h"
 #include "gcell.h"
@@ -56,8 +56,6 @@
 #include <map>
 #include <string>
 #include <vector>
-
-#include <mkl.h>
 
 // this is shared with lefdefIO.cpp
 FPOS grow_pmin, grow_pmax;
@@ -240,7 +238,7 @@ void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
   assert(tot_row_cnt == row_cnt);
 
   //    row_st = (ROW *)realloc(row_st, sizeof(struct ROW) * tot_row_cnt);
-  tier_st = (TIER *)mkl_malloc(sizeof(struct TIER) * numLayer, 64);
+  tier_st = (TIER *)malloc(sizeof(struct TIER) * numLayer);
 
   placementMacroCNT = 0;
 
@@ -430,7 +428,7 @@ void GetSortedRowStor(ROW *origRowStor, int rowCnt) {
 //
 //          placementStdcellCNT, placementMacroCNT
 //
-//          gmin, gmax, gwid // global minimum, global maximum, global width
+//          gmin, gmax // global minimum, global maximum
 //          (plotting)
 //
 //  malloc : place_st, place_backup_st // place_st_cnt
@@ -465,9 +463,8 @@ void post_read_3d(void) {
     }
   }
 
-  printf("INFO:  #STDCELL=%d,  #movableMACRO=%d,  #fixedMACRO=%d\n",
-         placementStdcellCNT /* - tmpMultiHeightCellCNT*/,
-         placementMacroCNT /* + tmpMultiHeightCellCNT*/, terminalCNT);
+  PrintInfoInt("NumPlaceStdCells", placementStdcellCNT);
+  PrintInfoInt("NumPlaceMacros", placementMacroCNT);
 
   gmov_mac_cnt = placementMacroCNT;
 
@@ -539,7 +536,6 @@ void post_read_3d(void) {
   curPlace->center.x = 0.5 * (curPlace->org.x + curPlace->end.x);
   curPlace->center.y = 0.5 * (curPlace->org.y + curPlace->end.y);
 
-  //    cout << "current place_st_cnt Final: " << place_st_cnt << endl;
   //    for(int i=0; i<place_st_cnt; i++) {
   //        place_st[i].Dump(to_string(i));
   //    }
@@ -553,8 +549,8 @@ void post_read_3d(void) {
     place_backup_st[i] = place_st[i];
   }
 
-  printf("INFO:  #ROW=%d,  ROW HEIGHT=%d, TIER DEPTH=%d\n", row_cnt,
-         (int)(rowHeight + 0.5), (int)(TIER_DEP + 0.5));
+  PrintInfoPrecPair( "RowSize", SITE_SPA, rowHeight );
+  PrintInfoInt( "NumRows", row_cnt );
 
   // global variable 'place' update
   place.stp.x = SITE_SPA;
@@ -590,8 +586,6 @@ void post_read_3d(void) {
     gmax.y = max(gmax.y, curTerminal->pmax.y);
   }
 
-  gwid.x = gmax.x - gmin.x;
-  gwid.y = gmax.y - gmin.y;
 
   /*
   // setting additional margin
@@ -622,15 +616,11 @@ void post_read_3d(void) {
       gmax.y = place.end.y + max_mg;
   */
 
-  printf("INFO:  GLOBAL.SPACE.MIN = (%f, %f)\n", gmin.x, gmin.y);
-  printf("INFO:  GLOBAL.SPACE.MAX = (%f, %f)\n", gmax.x, gmax.y);
+  PrintInfoPrecPair("GlobalAreaLxLy", gmin.x, gmin.y);
+  PrintInfoPrecPair("GlobalAreaUxUy", gmax.x, gmax.y);
 
-  //    gwid.Dump("gwid");
-
-  printf("INFO:  PLACE.ORIGIN = (%f, %f)\n", place.org.x,
-         place.org.y);
-  printf("INFO:  PLACE.END = (%f, %f)\n\n", place.end.x,
-         place.end.y);
+  PrintInfoPrecPair("PlaceAreaLxLy", place.org.x, place.org.y);
+  PrintInfoPrecPair("PlaceAreaUxUy", place.end.x, place.end.y);
 
   place.cnt.x = place.end.x - place.org.x;
   place.cnt.y = place.end.y - place.org.y;
@@ -639,425 +629,7 @@ void post_read_3d(void) {
   place.center.y = 0.5 * (place.org.y + place.end.y);
 
   place.area = place.cnt.x * place.cnt.y;
-  //    place.dump("global variable place");
 }
-/*
-void post_read_2d(void) {
-    struct PLACE *place0 = NULL;
-    struct MODULE *curModule = NULL;
-    struct TERM *curTerminal = NULL;
-    struct ROW *row = NULL, *last_row = NULL;
-
-    total_std_area = 0;
-    placementStdcellCNT = 0;
-    placementMacroCNT = 0;
-    total_macro_area = 0;
-
-    for(int i = 0; i < moduleCNT; i++) {
-        curModule = &moduleInstance[i];
-        if(curModule->size.y - (prec)rowHeight > Epsilon) {
-            curModule->flg = Macro;
-            placementMacroCNT++;
-            total_macro_area += curModule->area;
-        }
-        else if(curModule->size.y - (prec)rowHeight < -Epsilon) {
-            printf("cell %d height ERROR \n", i);
-        }
-        else {
-            curModule->flg = StdCell;
-            placementStdcellCNT++;
-            total_std_area += curModule->area;
-            continue;
-        }
-    }
-
-    printf(
-        "\n\n# std_cell = %d , #mov_mac = %d , # fixed_mac = %d\n\n\n",
-        placementStdcellCNT, placementMacroCNT, terminalCNT);
-
-    gmov_mac_cnt = placementMacroCNT;
-
-    place_st_cnt = 0;
-
-    place_st = (struct PLACE *)malloc(sizeof(struct PLACE) * row_cnt);
-
-    int place_hei = 0;
-    for(int i = 0; i < row_cnt; i++) {
-        row = &row_st[i];
-
-        if(i == 0) {
-            place_hei = row->size.y;
-        }
-        else if(row->pmin.x != last_row->pmin.x ||
-                row->pmax.x != last_row->pmax.x ||
-                row->pmin.y != last_row->pmax.y ||
-                row->pmin.z != last_row->pmin.z ||
-                row->pmax.z != last_row->pmax.z) {
-            place0 = &place_st[place_st_cnt++];
-
-            place0->org.x = last_row->pmin.x;
-            place0->org.y = last_row->pmax.y - place_hei;
-            place0->org.z = last_row->pmin.z;
-
-            place0->end.x = last_row->pmax.x;
-            place0->end.y = last_row->pmax.y;
-            place0->end.z = last_row->pmax.z;
-
-            place0->stp.x = SITE_SPA;
-            place0->stp.y = rowHeight;
-            place0->stp.z = TIER_DEP;
-
-            place0->cnt.x = place0->end.x - place0->org.x;
-            place0->cnt.y = place0->end.y - place0->org.y;
-            place0->cnt.z = place0->end.z - place0->org.z;
-
-            place0->area = place0->cnt.x * place0->cnt.y * place0->cnt.z;
-
-            place0->center.x = 0.5 * (place0->org.x + place0->end.x);
-            place0->center.y = 0.5 * (place0->org.y + place0->end.y);
-            place0->center.z = 0.5 * (place0->org.z + place0->end.z);
-
-            place_hei = row->size.y;
-        }
-        else {
-            place_hei += row->size.y;
-        }
-        last_row = row;
-    }
-
-    place0 = &place_st[place_st_cnt++];
-
-    place0->org.x = last_row->pmin.x;
-    place0->org.y = last_row->pmax.y - place_hei;
-    place0->org.z = last_row->pmin.z;
-
-    place0->end.x = last_row->pmax.x;
-    place0->end.y = last_row->pmax.y;
-    place0->end.z = last_row->pmax.z;
-
-    place0->stp.x = SITE_SPA;
-    place0->stp.y = rowHeight;
-    place0->stp.z = TIER_DEP;
-
-    place0->cnt.x = place0->end.x - place0->org.x;
-    place0->cnt.y = place0->end.y - place0->org.y;
-    place0->cnt.z = place0->end.z - place0->org.z;
-
-    place0->area = place0->cnt.x * place0->cnt.y * place0->cnt.z;
-
-    place0->center.x = 0.5 * (place0->org.x + place0->end.x);
-    place0->center.y = 0.5 * (place0->org.y + place0->end.y);
-    place0->center.z = 0.5 * (place0->org.z + place0->end.z);
-
-    place_st = (PLACE *)realloc(place_st, sizeof(struct PLACE) * place_st_cnt);
-
-    total_PL_area = 0;
-
-    for(int i = 0; i < place_st_cnt; i++) {
-        place0 = &place_st[i];
-        total_PL_area += place0->area;
-    }
-
-    place_hei = 0;
-
-    place.stp.x = SITE_SPA;
-    place.stp.y = 1.0 // rowHeight //;
-    place.stp.z = TIER_DEP;
-
-    place.org = place_st[0].org;
-    place.end = place_st[0].end;
-
-    printf("# rows = %d , row_height = %d, tier_depth = %d\n", row_cnt,
-           (int)(rowHeight + 0.5), (int)(TIER_DEP + 0.5));
-
-    total_PL_area = 0;
-
-    for(int i = 0; i < place_st_cnt; i++) {
-        place0 = &place_st[i];
-
-
-        //   printf("PL rect %d --> min = (%d , %d, %d) , \
-        //   max = (%d , %d, %d) , dim = (%d , %d, %d)\n",
-        //     i+1 ,
-        //     (int) (place0->org.x + 0.5) ,
-        //     (int) (place0->org.y + 0.5) ,
-        //     (int) (place0->org.z + 0.5) ,
-        //     (int) (place0->end.x + 0.5) ,
-        //     (int) (place0->end.y + 0.5) ,
-        //     (int) (place0->end.z + 0.5) ,
-        //     (int) (place0->cnt.x + 0.5) ,
-        //     (int) (place0->cnt.y + 0.5) ,
-        //     (int) (place0->cnt.z + 0.5) );
-
-
-        place.org.x = min(place.org.x, place0->org.x);
-        place.org.y = min(place.org.y, place0->org.y);
-        place.org.z = min(place.org.z, place0->org.z);
-
-        place.end.x = max(place.end.x, place0->end.x);
-        place.end.y = max(place.end.y, place0->end.y);
-        place.end.z = max(place.end.z, place0->end.z);
-
-        total_PL_area += place0->area;
-    }
-
-    ///////////////////////
-    // exit(0);
-    // place.end.z = 2;
-    ///////////////////////
-
-    //////////////////////////////////////////
-    if(INPUT_FLG == IBM)
-        place.end.y += rowHeight;
-    //////////////////////////////////////////
-
-    gmin = place.org;
-    gmax = place.end;
-
-    // gmin = terminalInstance[0].pmin ; //
-    // gmax = terminalInstance[0].pmax ; //
-
-    for(int i = 0; i < terminalCNT; i++) {
-        curTerminal = &terminalInstance[i];
-
-        gmin.x = min(gmin.x, curTerminal->pmin.x);
-        gmin.y = min(gmin.y, curTerminal->pmin.y);
-        gmin.z = min(gmin.z, curTerminal->pmin.z);
-
-        gmax.x = max(gmax.x, curTerminal->pmax.x);
-        gmax.y = max(gmax.y, curTerminal->pmax.y);
-        gmax.z = max(gmax.z, curTerminal->pmax.z);
-    }
-
-    prec lx_mg = 0, ly_mg = 0;
-    prec rx_mg = 0, ry_mg = 0;
-    prec max_mg = 0;
-
-    lx_mg = place.org.x - gmin.x;
-    ly_mg = place.org.y - gmin.y;
-    rx_mg = gmax.x - place.end.x;
-    ry_mg = gmax.y - place.end.y;
-
-    max_mg = max(max_mg, lx_mg);
-    max_mg = max(max_mg, ly_mg);
-    max_mg = max(max_mg, rx_mg);
-    max_mg = max(max_mg, ry_mg);
-
-    gmin.x = place.org.x - max_mg;
-    gmin.y = place.org.y - max_mg;
-    gmin.z = place.org.z;
-
-    gmax.x = place.end.x + max_mg;
-    gmax.y = place.end.y + max_mg;
-    gmax.z = place.end.z;
-
-    printf(" ==== %f %f %f %f %f %f\n", gmin.x, gmin.y, gmin.z, place.org.x,
-           place.org.y, place.org.z);
-
-    printf(" ==== %f %f %f %f %f %f\n", gmax.x, gmax.y, gmax.z, place.end.x,
-           place.end.y, place.end.z);
-
-    gwid.x = gmax.x - gmin.x;
-    gwid.y = gmax.y - gmin.y;
-    gwid.z = gmax.z - gmin.z;
-
-    printf("place.org = (%d, %d, %d) , place.end = (%d, %d, %d)\n",
-           (int)(place.org.x + 0.5), (int)(place.org.y + 0.5),
-           (int)(place.org.z + 0.5), (int)(place.end.x + 0.5),
-           (int)(place.end.y + 0.5), (int)(place.end.z + 0.5));
-
-    place.cnt.x = place.end.x - place.org.x;
-    place.cnt.y = place.end.y - place.org.y;
-    place.cnt.z = place.end.z - place.org.z;
-
-    place.center.x = 0.5 * (place.org.x + place.end.x);
-    place.center.y = 0.5 * (place.org.y + place.end.y);
-    place.center.z = 0.5 * (place.org.z + place.end.z);
-
-    place.area = place.cnt.x * place.cnt.y * place.cnt.z;
-}
-
-int read_nodes (char *input) {
-    FILE*fp=fopen(input,"r");
-    char*token=NULL;
-    char buf[BUF_SZ]// ,buf2[BUF_SZ] ;
-    int buf_size=BUF_SZ;
-    int i=0;
-
-    MODULE *curModule=NULL;
-    TERM *curTerminal=NULL;
-    FPOS max_cell,min_cell,max_term,min_term;
-
-    int idx=0;
-
-    total_term_area = 0 ;
-
-    max_cell.x = 0,max_cell.y = 0;
-    min_cell.x = 100000000,min_cell.y=100000000;
-
-    max_term.x = 0,max_term.y = 0;
-    min_term.x = 100000000,min_term.y=100000000;
-
-    avgCellSize.x = 0,avgCellSize.y = 0;
-    avgTerminalSize.x = 0,avgTerminalSize.y = 0;
-
-
-    do
-    {
-        fgets(buf,buf_size,fp);
-        token=strtok(buf," \t\n") ;
-    }
-    while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
-    token = strtok(NULL," \t\n");
-    token = strtok(NULL," \t\n");
-
-    moduleCNT = atoi(token);
-
-    do
-    {
-        fgets(buf,buf_size,fp);
-        token=strtok(buf," \t\n") ;
-    }
-    while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
-    token = strtok(NULL," \t\n");
-    token = strtok(NULL," \t\n");
-
-    terminalCNT = atoi(token);
-
-    moduleCNT -= terminalCNT;
-
-    moduleInstance=(struct MODULE*)mkl_malloc(sizeof(struct
-MODULE)*moduleCNT,64);
-    terminalInstance=(struct TERM*)mkl_malloc(sizeof(struct
-TERM)*terminalCNT,64);
-
-    modu_map_cnt = 100000;
-    term_map_cnt = 100000;
-
-    modu_map = (int*)mkl_malloc(sizeof(int)*modu_map_cnt, 64);
-    term_map = (int*)mkl_malloc(sizeof(int)*term_map_cnt, 64);
-
-    for(i=0;i<modu_map_cnt;i++)
-    {
-        modu_map[i] = -1 ;
-    }
-    for(i=0;i<term_map_cnt;i++)
-    {
-        term_map[i] = -1 ;
-    }
-
-
-    for (i=0; i<moduleCNT; i++) {
-        curModule = &moduleInstance[i];
-        curModule->idx = i;
-
-        do {
-            fgets (buf, buf_size, fp);
-            token = strtok(buf, " \t\n");
-        } while (!token || token[0]=='#' || !strcmp(token, "UCLA"));
-
-        strcpy (curModule->Name(), token);
-        idx = atoi(token+1);
-
-        if (idx > modu_map_cnt-1) {
-            modu_map_cnt = max ( idx+1,modu_map_cnt*2 );
-            modu_map = (int*)realloc(modu_map,sizeof(int)*modu_map_cnt);
-        }
-
-        modu_map [idx] = i ;
-
-        token=strtok(NULL," \t\n");
-        curModule->size.x = atoi(token) ;
-
-        token=strtok(NULL," \t\n");
-        curModule->size.y = atoi(token) ;
-
-        curModule->area = curModule->size.x * curModule->size.y ;
-
-        curModule->pof = NULL;
-        curModule->pin = NULL;
-
-        curModule->netCNTinObject=0;
-
-        curModule->pinCNTinObject=0;
-
-        if (max_cell.x < curModule->size.x) max_cell.x = curModule->size.x;
-        if (min_cell.x > curModule->size.x) min_cell.x = curModule->size.x;
-        if (max_cell.y < curModule->size.y) max_cell.y = curModule->size.y;
-        if (min_cell.y > curModule->size.y) min_cell.y = curModule->size.y;
-        avgCellSize.x += curModule->size.x;
-        avgCellSize.y += curModule->size.y;
-    }
-
-
-    for(i=0;i<terminalCNT;i++)
-    {
-        curTerminal = & terminalInstance[i];
-
-        curTerminal->idx = i ;
-        do
-        {
-            fgets(buf,buf_size,fp);
-            token=strtok(buf," \t\n") ;
-        }
-        while(!token || token[0]=='#' || !strcmp(token,"UCLA") );
-
-
-        strcpy(curTerminal->Name(),token);
-
-        idx = atoi(token+1);
-
-        if(idx > term_map_cnt - 1)
-        {
-            term_map_cnt = max ( idx+1,term_map_cnt*2 );
-            term_map = (int*)realloc(term_map,sizeof(int)*term_map_cnt);
-        }
-
-        term_map [idx] = i ;
-
-        token=strtok(NULL," \t\n");
-        curTerminal->size.x = atoi(token) ;
-
-        token=strtok(NULL," \t\n");
-        curTerminal->size.y = atoi(token) ;
-
-        curTerminal->area = curTerminal->size.x * curTerminal->size.y ;
-
-        curTerminal->pof = NULL ;
-        curTerminal->pin = NULL ;
-
-        curTerminal->netCNTinObject=0;
-        curTerminal->pinCNTinObject=0;
-
-        if(max_term.x < curTerminal->size.x)
-            max_term.x = curTerminal->size.x ;
-        if(min_term.x > curTerminal->size.x)
-            min_term.x = curTerminal->size.x ;
-
-        if(max_term.y < curTerminal->size.y)
-            max_term.y = curTerminal->size.y ;
-        if(min_term.y > curTerminal->size.y)
-            min_term.y = curTerminal->size.y ;
-
-        avgTerminalSize.x += curTerminal->size.x ;
-        avgTerminalSize.y += curTerminal->size.y ;
-
-        total_term_area += curTerminal->area ;
-    }
-
-
-    avgCellSize.x /= (prec)moduleCNT;
-    avgCellSize.y /= (prec)moduleCNT;
-    avgTerminalSize.x /= (prec)terminalCNT;
-    avgTerminalSize.y /= (prec)terminalCNT;
-
-    printf("INFO:  cell min (%.0f,%.0f) , max (%.0f,%.0f) avg (%.2f %.2f)\n",
-            min_cell.x,min_cell.y,max_cell.x,max_cell.y,avgCellSize.x,avgCellSize.y);
-    printf("curTerminal min (%.0f,%.0f) , max (%.0f,%.0f) avg (%.2f %.2f)\n",
-            min_term.x,min_term.y,max_term.x,max_term.y,avgTerminalSize.x,avgTerminalSize.y);
-    return 1;
-}
-*/
 
 int read_shapes_3D(char *input) {
   FILE *fp = fopen(input, "r");
@@ -1336,13 +908,9 @@ int read_nodes_3D(char *input) {
 
   moduleCNT -= terminalCNT;
   moduleInstance =
-      (struct MODULE *)mkl_malloc(sizeof(struct MODULE) * moduleCNT, 64);
+      (struct MODULE *)malloc(sizeof(struct MODULE) * moduleCNT);
   terminalInstance =
-      (struct TERM *)mkl_malloc(sizeof(struct TERM) * terminalCNT, 64);
-
-  // why this is required..
-  // terminal_size_max = zeroFPoint;
-  // module_size_max = zeroFPoint;
+      (struct TERM *)malloc(sizeof(struct TERM) * terminalCNT);
 
   // to find max size..
   prec maxSize = PREC_MIN;
@@ -1607,8 +1175,8 @@ int read_nets_3D(char *input) {
   token = strtok(NULL, " \t\n");
   pinCNT = atoi(token);
 
-  netInstance = (struct NET *)mkl_malloc(sizeof(struct NET) * netCNT, 64);
-  pinInstance = (struct PIN *)mkl_malloc(sizeof(struct PIN) * pinCNT, 64);
+  netInstance = (struct NET *)malloc(sizeof(struct NET) * netCNT);
+  pinInstance = (struct PIN *)malloc(sizeof(struct PIN) * pinCNT);
 
   int pid = 0;
   for(int i = 0; i < netCNT; i++) {
@@ -1633,8 +1201,8 @@ int read_nets_3D(char *input) {
     // lutong 05132016
     // if (strcmp(curNet->Name(), "CLK") && (strcmp(curNet->Name(), "GND"))){
 
-    curNet->pin = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * curNet->pinCNTinObject, 64);
+    curNet->pin = (struct PIN **)malloc(
+        sizeof(struct PIN *) * curNet->pinCNTinObject);
 
     if(max_net_deg < curNet->pinCNTinObject) {
       max_net_deg = curNet->pinCNTinObject;
@@ -1821,7 +1389,7 @@ int read_scl(char *input) {
   //    row_st = (struct ROW *)malloc(sizeof(struct ROW) * row_cnt);
   // call constructor
   //    row_st = new ROW[row_cnt];
-  row_st = (ROW *)mkl_malloc(sizeof(struct ROW) * row_cnt, 64);
+  row_st = (ROW *)malloc(sizeof(struct ROW) * row_cnt);
   fgets(buf, buf_size, fp);
 
   for(int i = 0; i < row_cnt; i++) {
@@ -1924,102 +1492,6 @@ int read_scl(char *input) {
   return 1;
 }
 
-void output_mGP2D_pl(char *output) {
-  FILE *fp = fopen(output, "w");
-  struct MODULE *curModule = NULL;
-  struct TERM *curTerminal = NULL;
-
-  fputs("UCLA pl 1.0 \n", fp);
-  fputs("# Created	:	Jan  6 2005\n", fp);
-  fputs(
-      "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp);
-  fputs("\n", fp);
-
-  for(int i = 0; i < moduleCNT; i++) {
-    curModule = &moduleInstance[i];
-    if(flg_3dic) {
-      fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
-              curModule->pmin.x, curModule->pmin.y, 0.0f);
-    }
-    else {
-      fprintf(fp, "%s\t%.6lf\t%.6lf\t: N\n", curModule->Name(), curModule->pmin.x,
-              curModule->pmin.y);
-    }
-  }
-
-  for(int i = 0; i < terminalCNT; i++) {
-    if(flg_3dic) {
-      curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
-              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y), 0);
-    }
-    else {
-      curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->Name(),
-              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
-    }
-  }
-  fclose(fp);
-}
-
-// write pl files
-void output_cGP2D_pl(char *output) {
-  int i = 0;
-  FILE *fp = fopen(output, "w");
-  MODULE *curModule = NULL;
-  TERM *curTerminal = NULL;
-
-  fputs("UCLA pl 1.0 \n", fp);
-  fputs("# Created	:	Jan  6 2005\n", fp);
-  fputs(
-      "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp);
-  fputs("\n", fp);
-
-  for(i = 0; i < moduleCNT; i++) {
-    curModule = &moduleInstance[i];
-
-    if(flg_3dic) {
-      if(curModule->flg == StdCell) {
-        fprintf(fp, "%s\t%.6lf\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
-                curModule->pmin.x, curModule->pmin.y, 0.0f);
-      }
-      else {
-        fprintf(fp, "%s\t%d\t%d\t%d\t: N /FIXED\n", curModule->Name(),
-                curModule->pmin_lg.x, curModule->pmin_lg.y, 0);
-      }
-    }
-    else {
-      if(curModule->flg == StdCell) {
-        fprintf(fp, "%s\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
-                curModule->pmin.x, curModule->pmin.y);
-      }
-      else {
-        fprintf(fp, "%s\t%d\t%d\t: N /FIXED\n", curModule->Name(),
-                curModule->pmin_lg.x, curModule->pmin_lg.y);
-      }
-    }
-  }
-
-  for(i = 0; i < terminalCNT; i++) {
-    if(flg_3dic) {
-      curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
-              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y), 0);
-    }
-    else {
-      curTerminal = &terminalInstance[i];
-      fprintf(fp, "%s %d\t%d\t: N /FIXED\n", curTerminal->Name(),
-              INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
-    }
-  }
-
-  fclose(fp);
-}
-
 void output_pl(char *output) {
   FILE *fp = fopen(output, "w");
   struct MODULE *curModule = NULL;
@@ -2092,22 +1564,22 @@ void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
     currentPinCount++;
     *pin = (PIN **)realloc(*pin, sizeof(struct PIN *) * currentPinCount);
     *pof = (FPOS *)realloc(*pof, sizeof(struct FPOS) * currentPinCount);
-    //*pin_tmp = (struct PIN**)mkl_malloc(sizeof(struct
+    //*pin_tmp = (struct PIN**)malloc(sizeof(struct
     // PIN*)*currentPinCount, 64);
-    //*pof_tmp = (struct FPOS*)mkl_malloc(sizeof(struct
+    //*pof_tmp = (struct FPOS*)malloc(sizeof(struct
     // FPOS)*currentPinCount, 64);
     // memcpy(*pin_tmp, *pin, currentPinCount*(sizeof(struct PIN*)));
     // memcpy(*pof_tmp, *pof, currentPinCount*(sizeof(struct FPOS)));
-    // mkl_free(*pin);
-    // mkl_free(*pof);
-    //*pin = (struct PIN**)mkl_malloc(sizeof(struct PIN*)*currentPinCount,
+    // free(*pin);
+    // free(*pof);
+    //*pin = (struct PIN**)malloc(sizeof(struct PIN*)*currentPinCount,
     // 64);
-    //*pof = (struct FPOS*)mkl_malloc(sizeof(struct FPOS)*currentPinCount,
+    //*pof = (struct FPOS*)malloc(sizeof(struct FPOS)*currentPinCount,
     // 64);
     // memcpy(*pin, *pin_tmp, currentPinCount*(sizeof(struct PIN*)));
     // memcpy(*pof, *pof_tmp, currentPinCount*(sizeof(struct FPOS)));
-    // mkl_free(*pin_tmp);
-    // mkl_free(*pof_tmp);
+    // free(*pin_tmp);
+    // free(*pof_tmp);
   }
   else {
     currentPinCount++;
@@ -2125,221 +1597,6 @@ void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
   (*pin)[currentPinCount - 1]->pinIDinModule = currentPinCount - 1;
   (*pin)[currentPinCount - 1]->gid = curPinIdx;
   (*pin)[currentPinCount - 1]->IO = curPinDirection;
-}
-
-void write_new_bench(void) {
-  /////////////////////////////////
-
-  int i = 0, j = 0, moduleID = 0, pinIDinModule = 0;
-
-  sprintf(sing_fn_aux, "%s.aux", gbch);
-  sprintf(sing_fn_nets, "%s.nets", gbch);
-  sprintf(sing_fn_nodes, "%s.nodes", gbch);
-  sprintf(sing_fn_pl, "%s.pl", gbch);
-  sprintf(sing_fn_wts, "%s.wts", gbch);
-  sprintf(sing_fn_scl, "%s.scl", gbch);
-
-  sprintf(gTMP_bch_dir, "%s/%s", dir_bnd, gbch);
-
-  // mkdir -p ../output/SB/experment0/tier/0
-  char mkdir_cmd[BUF_SZ];
-  sprintf(mkdir_cmd, "mkdir -p %s", gTMP_bch_dir);
-  system(mkdir_cmd);
-
-  sprintf(gTMP_bch_aux, "%s/%s.aux", gTMP_bch_dir, gbch);
-
-  sprintf(gTMP_bch_nets, "%s/%s.nets", gTMP_bch_dir, gbch);
-
-  sprintf(gTMP_bch_nodes, "%s/%s.nodes", gTMP_bch_dir, gbch);
-
-  sprintf(gTMP_bch_pl, "%s/%s.pl", gTMP_bch_dir, gbch);
-
-  sprintf(gTMP_bch_wts, "%s/%s.wts", gTMP_bch_dir, gbch);
-
-  sprintf(gTMP_bch_scl, "%s/%s.scl", gTMP_bch_dir, gbch);
-
-  printf("TMP BCH AUX %s NETS %s NODES %s PL %s WTS %s SCL %s\n", sing_fn_aux,
-         sing_fn_nets, sing_fn_nodes, sing_fn_pl, sing_fn_wts, sing_fn_scl);
-
-  PIN *pin = NULL;
-  NET *net = NULL;
-  MODULE *curModule = NULL;
-  TERM *curTerminal = NULL;
-
-  // write aux
-  FILE *fp_aux = fopen(gTMP_bch_aux, "w");
-  fprintf(fp_aux, "RowBasedPlacement :  %s  %s  %s  %s  %s\n", sing_fn_nodes,
-          sing_fn_nets, sing_fn_wts, sing_fn_pl, sing_fn_scl);
-
-  fclose(fp_aux);
-
-  // write wts
-  FILE *fp_wts = fopen(gTMP_bch_wts, "w");
-  fputs("UCLA wts 1.0\n", fp_wts);
-  fputs("# Created\t:\tDec 27 2004\n", fp_wts);
-  fputs(
-      "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_wts);
-
-  fclose(fp_wts);
-
-  // write nets
-  FILE *fp_nets = fopen(gTMP_bch_nets, "w");
-  fputs("UCLA nets 1.0 \n", fp_nets);
-  fputs("# Created	:	Jan  6 2005\n", fp_nets);
-  fputs(
-      "# User   	:	Gi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_nets);
-
-  fputs("\n", fp_nets);
-
-  fprintf(fp_nets, "NumNets : %d\n", netCNT);
-  fprintf(fp_nets, "NumPins : %d\n", pinCNT);
-
-  fputs("\n", fp_nets);
-
-  char io[BUF_SZ];
-  for(i = 0; i < netCNT; i++) {
-    net = &netInstance[i];
-
-    fprintf(fp_nets, "NetDegree : %d   %s\n", net->pinCNTinObject2, net->Name());
-    for(j = 0; j < net->pinCNTinObject2; j++) {
-      pin = net->pin[j];
-
-      moduleID = pin->moduleID;
-      pinIDinModule = pin->pinIDinModule;
-
-      if(pin->IO == 0)
-        strcpy(io, "I");
-      else if(pin->IO == 1)
-        strcpy(io, "O");
-      else  // B
-        strcpy(io, "B");
-
-      if(pin->term == 0) {
-        curModule = &moduleInstance[moduleID];
-
-        pinIDinModule = pin->pinIDinModule;
-
-        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curModule->Name(), io,
-                curModule->pof[pinIDinModule].x,
-                curModule->pof[pinIDinModule].y);
-      }
-      else {
-        moduleID = pin->moduleID;
-        curTerminal = &terminalInstance[moduleID];
-
-        fprintf(fp_nets, "\t%s\t%s : %.6lf\t%.6lf\n", curTerminal->Name(), io,
-                curTerminal->pof[pinIDinModule].x,
-                curTerminal->pof[pinIDinModule].y);
-      }
-    }
-  }
-
-  fclose(fp_nets);
-
-  // write nodes
-  FILE *fp_nodes = fopen(gTMP_bch_nodes, "w");
-  fputs("UCLA nodes 1.0\n", fp_nodes);
-  fputs("# Created\t:\tJan  6 2005\n", fp_nodes);
-  fputs(
-      "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_nodes);
-
-  fputs("\n", fp_nodes);
-
-  fprintf(fp_nodes, "NumNodes :  \t%d\n", moduleCNT + terminalCNT);
-  fprintf(fp_nodes, "NumTerminals :  \t%d\n", terminalCNT + gmov_mac_cnt);
-
-  for(i = 0; i < moduleCNT; i++) {
-    curModule = &moduleInstance[i];
-
-    if(curModule->flg == StdCell) {
-      fprintf(fp_nodes, "\t%s\t%d\t%d\n", curModule->Name(),
-              INT_CONVERT(curModule->size.x), INT_CONVERT(curModule->size.y));
-    }
-    else {
-      fprintf(fp_nodes, "\t%s\t%d\t%d\tterminal\n", curModule->Name(),
-              INT_CONVERT(curModule->size.x), INT_CONVERT(curModule->size.y));
-    }
-  }
-
-  for(i = 0; i < terminalCNT; i++) {
-    curTerminal = &terminalInstance[i];
-
-    fprintf(fp_nodes, "\t%s\t%d\t%d\tterminal\n", curTerminal->Name(),
-            INT_CONVERT(curTerminal->size.x), INT_CONVERT(curTerminal->size.y));
-  }
-
-  fclose(fp_nodes);
-
-  // write pl files
-  FILE *fp_pl = fopen(gTMP_bch_pl, "w");
-  fputs("UCLA pl 1.0\n", fp_pl);
-  fputs("# Created\t:\tJan  6 2005\n", fp_pl);
-  fputs(
-      "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_pl);
-
-  fputs("\n", fp_pl);
-
-  for(i = 0; i < moduleCNT; i++) {
-    curModule = &moduleInstance[i];
-
-    if(curModule->flg == StdCell) {
-      fprintf(fp_pl, "%s\t%.6lf\t%.6lf\t: N\n", curModule->Name(),
-              curModule->pmin.x, curModule->pmin.y);
-    }
-    else {
-      fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curModule->Name(),
-              curModule->pmin_lg.x, curModule->pmin_lg.y);
-    }
-  }
-
-  for(i = 0; i < terminalCNT; i++) {
-    curTerminal = &terminalInstance[i];
-
-    fprintf(fp_pl, "%s\t%d\t%d\t: N /FIXED\n", curTerminal->Name(),
-            INT_CONVERT(curTerminal->pmin.x), INT_CONVERT(curTerminal->pmin.y));
-  }
-
-  fclose(fp_pl);
-
-  // write scl files
-  FILE *fp_scl = fopen(gTMP_bch_scl, "w");
-  fputs("UCLA scl 1.0\n", fp_scl);
-  fputs("# Created\t:\tJan  6 2005\n", fp_scl);
-  fputs(
-      "# User   \t:\tGi-Joon Nam & Mehmet Yildiz at IBM Austin "
-      "Research({gnam, mcan}@us.ibm.com)\n",
-      fp_scl);
-
-  fputs("\n", fp_scl);
-  fprintf(fp_scl, "NumRows :  \t%d\n", row_cnt);
-  fputs("\n", fp_scl);
-
-  for(i = 0; i < row_cnt; i++) {
-    ROW* rwp = &row_st[i];
-
-    fprintf(fp_scl, "CoreRow Horizontal\n");
-    fprintf(fp_scl, "  Coordinate    :   %d\n", INT_CONVERT( rwp->pmin.y ));
-    fprintf(fp_scl, "  Height        :   12\n");
-    fprintf(fp_scl, "  Sitewidth     :    1\n");
-    fprintf(fp_scl, "  Sitespacing   :    1\n");
-    fprintf(fp_scl, "  Siteorient    :    1\n");
-    fprintf(fp_scl, "  Sitesymmetry  :    1\n");
-    fprintf(fp_scl, "  SubrowOrigin  :    %d\tNumSites  :  %d\n", 
-        INT_CONVERT( rwp->pmin.x ), INT_CONVERT( rwp->x_cnt ));
-    fprintf(fp_scl, "End\n");
-  }
-
-  fclose(fp_scl);
-
-  /////////////////////////////////
 }
 
 void runtimeError(string error_text) {
@@ -2436,34 +1693,6 @@ void delete_input_files_in(char *dir) {
   sprintf(cmd, "rm -rf %s/%s.pl", dir, gbch);
   system(cmd);
 }
-/*
-void copy_original_SB_files_to_Dir(char *dir) {
-  char cmd[BUF_SZ];
-  char SBorigDirFile[BUF_SZ];
-
-  sprintf(SBorigDirFile, "%s/SB_orig/%s/%s", currentDir, gbch, gbch);
-
-  sprintf(cmd, "mkdir -p %s", dir);
-  system(cmd);
-
-  sprintf(cmd, "cp -rf %s.aux %s/.", SBorigDirFile, dir);
-  system(cmd);
-  sprintf(cmd, "cp -rf %s.nodes %s/.", SBorigDirFile, dir);
-  system(cmd);
-  sprintf(cmd, "cp -rf %s.nets %s/.", SBorigDirFile, dir);
-  system(cmd);
-  sprintf(cmd, "cp -rf %s.pl %s/%s_orig.pl", SBorigDirFile, dir, gbch);
-  system(cmd);
-  sprintf(cmd, "cp -rf %s.scl %s/.", SBorigDirFile, dir);
-  system(cmd);
-  sprintf(cmd, "cp -rf %s.wts %s/.", SBorigDirFile, dir);
-  system(cmd);
-  sprintf(cmd, "cp -rf %s.shapes %s/.", SBorigDirFile, dir);
-  system(cmd);
-  sprintf(cmd, "cp -rf %s.route %s/.", SBorigDirFile, dir);
-  system(cmd);
-}
-*/
 
 void LinkConvertedBookshelf(char* newDir) {
   char cmd[BUF_SZ] = {0, };
@@ -3550,11 +2779,11 @@ void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt) {
   prec ylen = grow_pmax.y - grow_pmin.y;
   prec aspect_ratio = (prec)ylen / (prec)xlen;
 
-  printf("INFO:  ASPECT RATIO=%.6lf\n", aspect_ratio);
-  printf("INFO:  ROW = (MinX=%f, MinY=%f)\n", grow_pmin.x, grow_pmin.y);
-  printf("INFO:  ROW = (MaxX=%f, MaxY=%f)\n", grow_pmax.x, grow_pmax.y);
-  printf("INFO:  TERM: (%lf, %lf) - (%lf, %lf)\n", terminal_pmin.x,
-         terminal_pmin.y, terminal_pmax.x, terminal_pmax.y);
+  PrintInfoPrec("AspectRatio", aspect_ratio);
+  PrintInfoPrecPair("RowMinXY", grow_pmin.x, grow_pmin.y);
+  PrintInfoPrecPair("RowMaxXY", grow_pmax.x, grow_pmax.y);
+  PrintInfoPrecPair("TerminalMinXY", terminal_pmin.x, terminal_pmin.y);
+  PrintInfoPrecPair("TerminalMaxXY", terminal_pmax.x, terminal_pmax.y);
 
   *tier_row_cnt = row_cnt;  
 
@@ -3568,7 +2797,7 @@ void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt) {
 void output_gp_net_hpwl(char *fn) {
   int i = 0;
   FILE *fp = fopen(fn, "w");
-  struct FPOS net_hpwl = zeroFPoint;
+  struct FPOS net_hpwl;
   struct NET *net = NULL;
 
   for(i = 0; i < netCNT; i++) {
@@ -3584,7 +2813,7 @@ void output_gp_net_hpwl(char *fn) {
 void output_net_hpwl(char *fn) {
     int i = 0;
     FILE *fp = fopen(fn, "w");
-    struct FPOS net_hpwl = zeroFPoint;
+    struct FPOS net_hpwl;
     struct NET *net = NULL;
 
     for(i = 0; i < netCNT; i++) {

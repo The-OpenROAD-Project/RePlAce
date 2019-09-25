@@ -64,7 +64,6 @@
 #include <cstring>
 #include <cassert>
 
-
 #define PI 3.141592653589793238462L
 #define SQRT2 1.414213562373095048801L
 #define INV_SQRT2 0.707106781186547524401L
@@ -128,8 +127,6 @@ typedef double prec;
 #define LS_DEN
 #define DetailPlace
 #define FILLER_ADJ RandomAdj
-#define TIER_DEP /* 64.0 */ /* 600.0 */ 1
-#define TIER_Z0 0
 #define MSH_Z_RES /* 8 */ 1
 #define THETA_XY_3D_PLOT PI / 6.0
 #define Z_SCAL 1.00
@@ -170,63 +167,68 @@ struct POS;
 struct FPOS {
   prec x;
   prec y;
-//  prec z;
+  //  prec z;
 
   FPOS() {
-    SetZero();
+    x = y = 0; 
   };
 
-  FPOS(prec _x, prec _y) : x(_x), y(_y){};
+  FPOS(prec xloc, prec yloc) : x(xloc), y(yloc) {};
 
-  inline void Set(prec a) {
+  void Set(prec a) {
     x = y = a;
   }
-  inline void Set(FPOS a) {
+  void Set(FPOS a) {
     x = a.x;
     y = a.y;
   }
-  inline void Set(prec _x, prec _y) {
-    x = _x;
-    y = _y;
+
+  void Set(prec xloc, prec yloc) {
+    x = xloc;
+    y = yloc;
   }
 
-  inline void Set(POS a);
+  void Set(POS a);
 
-  inline void SetZero() {
-    x = y = 0.0f;
+  void SetZero() {
+    x = y = 0;
   }
-  inline void Add(FPOS a) {
+
+  prec GetX() { return x; };
+  prec GetY() { return y; }; 
+
+  void Add(FPOS a) {
     x += a.x;
     y += a.y;
   }
-  inline void SetAdd(FPOS a, FPOS b) {
+  void SetAdd(FPOS a, FPOS b) {
     x = a.x + b.x;
     y = a.y + b.y;
   }
-  inline void Min(FPOS a) {
+  void Min(FPOS a) {
     x = min(x, a.x);
     y = min(y, a.y);
   }
-  inline void SetMin(FPOS a, FPOS b) {
+  void SetMin(FPOS a, FPOS b) {
     x = min(a.x, b.x);
     y = min(a.y, b.y);
   }
-  inline void Max(FPOS a) {
+  void Max(FPOS a) {
     x = max(x, a.x);
     y = max(y, a.y);
   }
-  inline void SetMax(FPOS a, FPOS b) {
+  void SetMax(FPOS a, FPOS b) {
     x = max(a.x, b.x);
     y = max(a.y, b.y);
   }
 
-  inline prec GetProduct() {
+  prec GetProduct() {
     return x * y;
   }
-  inline void Dump() {
+  void Dump() {
     cout << "(" << x << " " << y << ")" << endl;
   }
-  inline void Dump(string a) {
+  void Dump(string a) {
     cout << a << ": (" << x << " " << y << ")" << endl;
   }
 };
@@ -637,23 +639,23 @@ struct NET {
   FPOS sum_num2;
   FPOS sum_denom1;
   FPOS sum_denom2;
-  PIN **pin;
-  PIN **pin2;
+  PIN **pin;  // will have modified pin info. see opt.cpp
+  PIN **pin2; // will store original pin info. used for bookshelf writing.
   FPOS terminalMin;
   FPOS terminalMax;
 
   prec hpwl_x;
   prec hpwl_y;
   prec hpwl;
-  int outPinIdx;  // determine outpin's index
-  int pinCNTinObject;
-  int pinCNTinObject2;
+  int outPinIdx;            // determine outpin's index
+  int pinCNTinObject;       // for pin
+  int pinCNTinObject2;      // for pin2
   int pinCNTinObject_tier;  // used for writing bookshelf
   int idx;
   int mod_idx;
-  prec timingWeight;  // mgwoo
-  prec stn_cof;       // lutong
-  prec wl_rsmt;       // lutong
+  prec timingWeight;
+  prec stn_cof;             // lutong
+  prec wl_rsmt;             // lutong
 
   const char* Name() { return netNameStor[idx].c_str(); }
 
@@ -751,7 +753,12 @@ struct TIER {
 
 enum { STDCELLonly, MIXED };
 
+
+extern int gVerbose;
+
 // for timing
+extern prec globalWns;
+extern prec globalTns;
 extern prec netCut;
 extern bool hasNetWeight;
 extern prec netWeight;
@@ -907,11 +914,6 @@ extern prec MaxExtraWSfor3D;
 extern prec rowHeight;
 extern prec SITE_SPA;
 extern prec layout_area;
-extern double tot_HPWL;
-extern prec tx_HPWL;
-extern prec ty_HPWL;
-extern prec tz_HPWL;
-extern prec tot_overlap;
 extern prec total_std_area;
 extern prec total_std_den;
 extern prec total_modu_area;
@@ -952,9 +954,7 @@ extern unsigned extPt2_1stOrder;
 extern unsigned extPt3_1stOrder;
 
 extern char gbch_dir[BUF_SZ];
-extern char gbch_aux[BUF_SZ];
 extern char gbch[BUF_SZ];
-extern char gGP_dir[BUF_SZ];
 extern char gGP_pl[BUF_SZ];
 extern char gIP_pl[BUF_SZ];
 extern char gGP_pl_file[BUF_SZ];
@@ -970,25 +970,6 @@ extern char gGR_dir[BUF_SZ];
 extern char gGR_log[BUF_SZ];
 extern char gGR_tmp[BUF_SZ];
 extern char gFinal_DP_pl[BUF_SZ];
-extern char gTMP_bch_dir[BUF_SZ];
-extern char gTMP_bch_aux[BUF_SZ];
-extern char gTMP_bch_nodes[BUF_SZ];
-extern char gTMP_bch_nets[BUF_SZ];
-extern char gTMP_bch_wts[BUF_SZ];
-extern char gTMP_bch_pl[BUF_SZ];
-extern char gTMP_bch_scl[BUF_SZ];
-extern char sing_fn_aux[BUF_SZ];
-extern char sing_fn_nets[BUF_SZ];
-extern char sing_fn_nodes[BUF_SZ];
-extern char sing_fn_pl[BUF_SZ];
-extern char sing_fn_wts[BUF_SZ];
-extern char sing_fn_scl[BUF_SZ];
-extern char fn_bch_IP[BUF_SZ];
-extern char fn_bch_GP[BUF_SZ];
-extern char fn_bch_GP2[BUF_SZ];
-extern char fn_bch_GP3[BUF_SZ];
-extern char fn_bch_mac_LG[BUF_SZ];
-extern char fn_bch_DP[BUF_SZ];
 extern char bench_aux[BUF_SZ];
 extern char dir_bnd[BUF_SZ];
 extern char global_router[1023];
@@ -1021,7 +1002,6 @@ extern prec gridLLx, gridLLy;
 extern prec tileWidth, tileHeight;
 extern prec blockagePorosity;
 
-extern RECT cur_rect;
 extern PIN *pinInstance;
 extern MODULE *moduleInstance;
 extern CELL *gcell_st;
@@ -1050,9 +1030,6 @@ extern FPOS term_pmax;
 extern FPOS term_pmin;
 
 extern FPOS filler_size;
-
-extern FPOS zeroFPoint;
-extern POS zeroPoint;
 
 extern POS msh;
 
@@ -1091,10 +1068,6 @@ extern int numThread;
 enum class InputMode { bookshelf, lefdef };
 extern InputMode inputMode;
 
-extern string denCMD;
-extern string bxMaxCMD;
-extern string byMaxCMD;
-extern string bzMaxCMD;
 extern string racntiCMD;    // lutong
 extern string maxinflCMD;   // lutong
 extern string inflcoefCMD;  // lutong
@@ -1116,11 +1089,11 @@ extern bool thermalAwarePlaceCMD;
 extern bool isOnlyGlobalPlace;
 extern bool isSkipIP;
 extern bool isTiming;
-extern bool isARbyUserCMD;
 extern bool stnCMD;  // lutong
 extern bool trialRunCMD;
 extern bool autoEvalRC_CMD;
 extern bool onlyLG_CMD;
+
 
 //////////////////////////////////////////////////////////////////////////
 // Defined in main.cpp ///////////////////////////////////////////////////
@@ -1159,13 +1132,15 @@ void printEPs(void);
 
 void printUsage(void);
 void initArgument(int, char **);
+void initGlobalVars();
+void initGlobalVarsAfterParse();
+
 void calcTSVweight(void);
 bool argument(int, char **);
 void printCMD(int, char **);
 bool criticalArgumentError(void);
 
 int pos_eqv(struct POS p1, struct POS p2);
-int HPWL_count(void);
 void overlap_count(int iter);
 void update_net_by_pin(void);
 

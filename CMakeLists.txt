@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # For Multithread
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 -O3 ${OpenMP_CXX_FLAGS}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -g -ggdb")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -49,7 +49,6 @@ set(ENV{TYPE_CALL} library)
 
 ## configure settings
 find_package(GoogleHash)
-find_package(MKL REQUIRED)
 find_package(TCL REQUIRED)
 
 find_package(ZLIB REQUIRED)
@@ -65,7 +64,7 @@ find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 
 # for multi threads
-# find_package(OpenMP REQUIRED)
+find_package(OpenMP REQUIRED)
 
 set (REPLACE_SRC 
   src/argument.cpp
@@ -94,6 +93,8 @@ set (REPLACE_SRC
   src/timingSta.cpp
   src/trial.cpp
   src/wlen.cpp
+  src/replace_external.cpp
+  src/replace_wrap.cpp
   )
 
 
@@ -103,7 +104,8 @@ set (REPLACE_HEADER
   src/charge.h
   src/fft.h
   src/gcell.h
-  src/global.h
+  src/replace_private.h
+  src/replace_external.h
   src/initPlacement.h
   src/lefdefIO.h
   src/macro.h
@@ -117,12 +119,15 @@ set (REPLACE_HEADER
   src/util.h
 )
 
+set (REPLACE_SWIG_FILES
+  src/replace.i
+)
+
 ############################################################
 # include directories 
 ############################################################
 include_directories(
   ${X11_INCLUDE_DIR}
-  ${MKL_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
 
   ${EIGEN_HOME}
@@ -153,23 +158,28 @@ include_directories(
   ${OPENSTA_HOME}/util
   ${OPENSTA_HOME}/verilog
 
-
-  )
+)
 
 ############################################################
 # Create a library 
 ############################################################
-add_library( replacelib STATIC
-  ${REPLACE_SRC}
-)
+# add_library( replacelib  SHARED
+#   ${REPLACE_SRC}
+# )
 
-set_target_properties( replacelib 
-  PROPERTIES OUTPUT_NAME "replace"
-)
+# set_target_properties( replacelib 
+#   PROPERTIES OUTPUT_NAME "replace"
+# )
 
 ############################################################
 # Create an executable
 ############################################################
+add_custom_command(OUTPUT ${REPLACE_HOME}/src/replace_wrap.cpp
+  COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${REPLACE_HOME}/src/replace_wrap.cpp ${REPLACE_HOME}/src/replace.i   
+  WORKING_DIRECTORY ${REPLACE_HOME}
+  DEPENDS ${REPLACE_SWIG_FILES}
+)
+
 add_executable( replace
   ${REPLACE_SRC}
 )
@@ -179,10 +189,10 @@ add_dependencies( replace flute )
 add_dependencies( replace def )
 add_dependencies( replace lef )
 
-add_dependencies( replacelib sta )
-add_dependencies( replacelib flute )
-add_dependencies( replacelib def )
-add_dependencies( replacelib lef )
+#add_dependencies( replacelib sta )
+#add_dependencies( replacelib flute )
+#add_dependencies( replacelib def )
+#add_dependencies( replacelib lef )
 
 target_link_libraries( replace
   PUBLIC
@@ -199,9 +209,10 @@ target_link_libraries( replace
 
   ${ZLIB_LIBRARIES}
   ${X11_LIBRARIES}
-  ${MKL_LIBRARIES}
   ${JPEG_LIBRARIES}
   ${TCL_LIB}
+
+  ${OpenMP_CXX_LIBRARIES}
   Threads::Threads
   -static-libstdc++ 
   )
@@ -212,6 +223,6 @@ target_link_libraries( replace
 
 install(FILES ${REPLACE_HEADER} DESTINATION include)
 install(TARGETS replace DESTINATION bin)
-install(TARGETS replacelib DESTINATION lib)
+# install(TARGETS replacelib DESTINATION lib)
 
 

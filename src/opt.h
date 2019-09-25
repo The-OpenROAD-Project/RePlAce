@@ -42,7 +42,7 @@
 #define __PL_OPT__
 
 #include <vector>
-#include "global.h"
+#include "replace_private.h"
 
 extern int FILLER_PLACE;
 extern int NUM_ITER_FILLER_PLACE;  // fast filler pre-place, need tuning

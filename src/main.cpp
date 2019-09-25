@@ -54,7 +54,7 @@
 #include "bin.h"
 #include "charge.h"
 #include "fft.h"
-#include "global.h"
+#include "replace_private.h"
 #include "initPlacement.h"
 #include "macro.h"
 #include "opt.h"
@@ -62,8 +62,13 @@
 #include "wlen.h"
 #include "timing.h"
 
+#include <tcl.h>
+
 #define compileDate __DATE__
 #define compileTime __TIME__
+
+prec globalWns;
+prec globalTns;
 
 prec netCut;
 bool hasNetWeight;
@@ -116,7 +121,7 @@ int gcell_cnt;
 int row_cnt;
 int place_st_cnt;
 
-int g_rrr;
+int gVerbose;
 
 int STAGE;
 int placementStdcellCNT;
@@ -208,11 +213,6 @@ prec rowHeight;
 prec SITE_SPA;
 
 prec layout_area;
-double tot_HPWL;
-prec tx_HPWL;
-prec ty_HPWL;
-prec tz_HPWL;
-prec tot_overlap;
 prec total_std_area;
 prec total_std_den;
 prec total_modu_area;
@@ -253,7 +253,6 @@ char defGpOutput[BUF_SZ];
 char gbch_dir[BUF_SZ];
 char gbch_aux[BUF_SZ];
 char gbch[BUF_SZ];
-char gGP_dir[BUF_SZ];
 char gGP_pl[BUF_SZ];
 char gIP_pl[BUF_SZ];
 char gGP_pl_file[BUF_SZ];
@@ -269,19 +268,6 @@ char gGR_dir[BUF_SZ];
 char gGR_log[BUF_SZ];
 char gGR_tmp[BUF_SZ];
 char gFinal_DP_pl[BUF_SZ];
-char gTMP_bch_dir[BUF_SZ];
-char gTMP_bch_aux[BUF_SZ];
-char gTMP_bch_nodes[BUF_SZ];
-char gTMP_bch_nets[BUF_SZ];
-char gTMP_bch_wts[BUF_SZ];
-char gTMP_bch_pl[BUF_SZ];
-char gTMP_bch_scl[BUF_SZ];
-char sing_fn_aux[BUF_SZ];
-char sing_fn_nets[BUF_SZ];
-char sing_fn_nodes[BUF_SZ];
-char sing_fn_pl[BUF_SZ];
-char sing_fn_wts[BUF_SZ];
-char sing_fn_scl[BUF_SZ];
 char bench_aux[BUF_SZ];
 char dir_bnd[BUF_SZ];
 char global_router[1023];
@@ -289,8 +275,6 @@ char output_dir[BUF_SZ];
 char currentDir[BUF_SZ];
 
 string sourceCodeDir;
-
-// RECT cur_rect;
 
 // opt.cpp -> main.cpp
 CELL *gcell_st;
@@ -303,13 +287,10 @@ PLACE place_backup;
 FPOS term_pmax;
 FPOS term_pmin;
 FPOS filler_size;
-FPOS zeroFPoint;
-POS zeroPoint;
 POS n1p;
 POS msh;
 FPOS gmin;
 FPOS gmax;
-FPOS gwid;
 TIER *tier_st;
 POS dim_bin;
 POS dim_bin_mGP2D;
@@ -344,11 +325,7 @@ InputMode inputMode;
 
 string benchName;
 
-string denCMD;
 string dimCMD;
-string bxMaxCMD;
-string byMaxCMD;
-string bzMaxCMD;
 string gTSVcofCMD;
 string ALPHAmGP_CMD;
 string ALPHAcGP_CMD;
@@ -397,14 +374,45 @@ bool lambda2CMD;
 bool dynamicStepCMD;
 bool isOnlyGlobalPlace;
 bool isTiming;
-bool isARbyUserCMD;
 bool thermalAwarePlaceCMD;
 bool trialRunCMD;
 bool autoEvalRC_CMD;
 bool onlyLG_CMD;
 ///////////////////////////////////////////////////////////
 
+extern "C" {
+extern int Replace_Init(Tcl_Interp *interp);
+}
+
+int 
+replaceTclAppInit(Tcl_Interp *interp) {
+  Tcl_Init(interp);
+  Replace_Init(interp);
+  
+  string command = "";
+
+  command = "";
+  command += "puts \"RePlAce Version: 1.0.0\"";
+  Tcl_Eval(interp, command.c_str());
+
+  command = "";
+  command += "if {$tcl_interactive} {\n";
+  command += "package require tclreadline\n";
+  command += "proc ::tclreadline::prompt1 {} {\n";
+  command += " return \"replace-[lindex [split [pwd] \"/\"] end] % \"\n";
+  command += "}\n";
+  command += "::tclreadline::Loop\n";
+  command += "}";
+  
+  // register tclreadline 
+  Tcl_Eval(interp, command.c_str());
+  
+  return TCL_OK;
+}
+
 int main(int argc, char *argv[]) {
+ 
+  Tcl_Main(1, argv, replaceTclAppInit);
 
   double tot_cpu = 0;
   double time_ip = 0;
@@ -607,35 +615,25 @@ int main(int argc, char *argv[]) {
   time_end(&tot_cpu);
   ///////////////////////////////////////////////////////////////////////
 
-  get_modu_hpwl();
+  UpdateNetMinMaxPin2();
+
   output_final_pl(gDP3_pl);
   if(inputMode == InputMode::lefdef) {
     WriteDef(defOutput);
   }
 
-  printf("\n\n");
-  printf(
-      "=== SUMMARY "
-      "=========================================================\n");
-  printf(" ### HPWL (x, y) of the design is %.2lf (%.2lf, %.2lf).\n\n",
-         tot_HPWL, tx_HPWL, ty_HPWL);
-
   printf(" ### Numbers of Iterations: \n");
   if(trialRunCMD)
     printf("     Trial:  %d (%.4lf sec/iter)\n", trial_iterCNT,
            time_tp / (prec)trial_iterCNT);
-  if(numLayer > 1)
-    printf("     mGP3D:  %d\n", mGP3D_iterCNT);
   if(mGP2D_iterCNT != 0)
     printf("     mGP2D:  %d (%.4lf sec/iter)\n", mGP2D_iterCNT,
-           time_mGP / ((prec)(mGP3D_iterCNT + mGP2D_iterCNT)));
-  if(numLayer > 1)
-    printf("     cGP3D:  %d\n", cGP3D_iterCNT);
+           time_mGP / ((prec)(mGP2D_iterCNT)));
   printf("     cGP2D:  %d (%.4lf sec/iter)\n", cGP2D_iterCNT,
          time_cGP / ((prec)(cGP3D_iterCNT + cGP2D_iterCNT)));
   printf("     ____________________________________\n");
-  printf("     TOTAL:  %d\n\n", trial_iterCNT + mGP3D_iterCNT + mGP2D_iterCNT +
-                                    cGP3D_iterCNT + cGP2D_iterCNT);
+  printf("     TOTAL:  %d\n\n", trial_iterCNT + mGP2D_iterCNT +
+                                    cGP2D_iterCNT);
 
   printf(
       " ### CPU_{IP, TP, mGP, LG, cGP, DP} is %.2lf, %.2lf, %.2lf, %.2lf, "
@@ -691,21 +689,7 @@ void init() {
 
   inv_RAND_MAX = (prec)1.0 / RAND_MAX;
 
-  target_cell_den = atof(denCMD.c_str());
-  target_cell_den_orig = atof(denCMD.c_str());  // lutong
-  // overflowMin     = overflowMin/atof(den);
-
-  zeroFPoint.SetZero();
-  zeroPoint.SetZero();
-
-  //    gfft_flg = DDCT;
-
-  //    sprintf(FastDP_cmd, "FastPlace3.0_DP");
-  //    sprintf(NTUplace3_cmd, "ntuplace3");
-  //    sprintf(NTUplace4h_cmd, "ntuplace4h");
   sprintf(global_router, "NCTUgr.ICCAD2012");
-  // sprintf (global_router, "NCTUgr2_fast");
-  // sprintf (global_router, "NCTUgr2");
 
   switch(detailPlacer) {
     case FastPlace:
@@ -727,8 +711,6 @@ void init() {
   }
 
   sprintf(str_dp3, ".%s.%s", bmFlagCMD.c_str(), "eplace");
-  g_rrr = 0;
-  tot_overlap = 0;
 
   if(strcmp(bmFlagCMD.c_str(), "mms") == 0) {
     INPUT_FLG = MMS;
@@ -747,7 +729,7 @@ void init() {
   }
 
   global_macro_area_scale = target_cell_den;
-  PrintInfoPrec("TargetDensity", target_cell_den);
+  PrintInfoPrec("TargetDensity", target_cell_den, 0);
 
   wcof_flg = /* 1 */ 2 /* 3 */;
 
@@ -844,7 +826,6 @@ void init() {
   sprintf(gmGP2D_pl, "%s/%s.eplace-mGP2D.pl", dir_bnd, gbch);
   sprintf(gGP3_pl, "%s/%s.eplace-cGP2D.pl", dir_bnd, gbch);
   sprintf(gGP_pl_file, "%s.eplace-gp.pl", gbch);
-  sprintf(gGP_dir, "%s", dir_bnd);
   sprintf(gLG_pl, "%s/%s%s.pl", dir_bnd, gbch, str_lg);
   sprintf(gDP_pl, "%s/%s%s.pl", dir_bnd, gbch, str_dp);
   sprintf(gDP2_pl, "%s/%s%s.pl", dir_bnd, gbch, str_dp2);
@@ -859,8 +840,6 @@ void init() {
 
   sprintf(bench_aux, "%s/%s.aux", gbch_dir, gbch);
   sprintf(gbch_aux, "%s.aux", gbch);
-
-  strcpy(gGP_dir, "./");
 
   strcpy(gDP_log, gbch);
   strcat(gDP_log, "_DP.log");
@@ -881,11 +860,9 @@ void initialPlacement_main() {
   STAGE = INITIAL_PLACE;
   initial_placement();
   UpdateNetAndGetHpwl();
-  printf("RESULT:\n");
-  printf("   HPWL(IP): %.4f (%.4f, %.4f)\n\n",
-         total_hpwl.x + total_hpwl.y , total_hpwl.x, total_hpwl.y);
+
+  PrintUnscaledHpwl("Initial Placement");
   place_backup = place;
-  fflush(stdout);
 }
 
 void tmGP3DglobalPlacement_main() {
@@ -944,10 +921,8 @@ void mGP2DglobalPlacement_main() {
   if(dynamicStepCMD) {
     reassign_trial_2ndOrder_lastEP(total_hpwl.x + total_hpwl.y);
   }
-  printf("RESULT:\n");
-  printf("   HPWL(mGP2D): %.4f (%.4f, %.4f)\n\n", total_hpwl.x + total_hpwl.y,
-         total_hpwl.x, total_hpwl.y);
-  fflush(stdout);
+  auto hpwl = GetUnscaledHpwl(); 
+  PrintInfoPrec("Nesterov: HPWL", hpwl.first + hpwl.second, 1);
 }
 
 void tcGP3DglobalPlacement_main() {
@@ -1001,10 +976,9 @@ void cGP2DglobalPlacement_main() {
 
   isFirst_gp_opt = false;
   UpdateNetAndGetHpwl();
-  printf("RESULT:\n");
-  printf("   HPWL(cGP2D): %.4f (%.4f, %.4f)\n\n", total_hpwl.x + total_hpwl.y,
-         total_hpwl.x, total_hpwl.y);
-  fflush(stdout);
+
+  auto hpwl = GetUnscaledHpwl(); 
+  PrintInfoPrec("Nesterov: HPWL", hpwl.first + hpwl.second, 1);
 }
 
 void macroLegalization_main() {
@@ -1079,13 +1053,13 @@ void WriteBookshelf() {
 }
 
 void free_trial_mallocs() {
-  mkl_free(moduleInstance);
-  mkl_free(terminalInstance);
-  mkl_free(netInstance);
-  mkl_free(pinInstance);
-  mkl_free(gcell_st);
+  free(moduleInstance);
+  free(terminalInstance);
+  free(netInstance);
+  free(pinInstance);
+  free(gcell_st);
   free(row_st);
-  mkl_free(tier_st);
+  free(tier_st);
   free(place_st);
 
 }

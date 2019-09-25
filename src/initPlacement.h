@@ -42,7 +42,7 @@
 #define __PL_IP__
 
 #include <Eigen/SparseCore>
-#include "global.h"
+#include "replace_private.h"
 
 using Eigen::VectorXf;
 typedef Eigen::SparseMatrix< prec, Eigen::RowMajor > SMatrix;

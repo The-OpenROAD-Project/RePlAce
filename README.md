@@ -28,7 +28,6 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 ## Install on a bare-metal machine
 
 ### Pre-requisite
-* Intel MKL packages [Link](https://software.intel.com/en-us/articles/free-ipsxe-tools-and-libraries) >= 2016.3.210
 * GCC compiler and libstdc++ static library >= 4.8.5
 * boost library >= 1.41
 * bison (for lef/def parsers) >= 3.0.4

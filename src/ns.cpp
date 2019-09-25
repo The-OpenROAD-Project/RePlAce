@@ -51,8 +51,7 @@
 #include "bookShelfIO.h"
 #include "bin.h"
 #include "charge.h"
-#include "global.h"
-#include "mkl.h"
+#include "replace_private.h"
 #include "ns.h"
 #include "opt.h"
 #include "plot.h"
@@ -90,14 +89,12 @@ void myNesterov::nesterov_opt() {
 
   InitializationCoefficients();
 
-  //    cout << it->ovfl << endl;
   if(DEN_ONLY_PRECON) {
     InitializationPrecondition_DEN_ONLY_PRECON();
   }
   else {
     InitializationPrecondition();
   }
-  //    cout << it->ovfl << endl;
 
   InitializationIter();
 
@@ -163,7 +160,7 @@ void myNesterov::nesterov_opt() {
     // for comparison
     //        TimingInst.ExecuteStaFirst(gbch, verilogCMD, libStor, sdcCMD);
   }
-  mkl_malloc_free();
+  malloc_free();
 }
 
 void myNesterov::InitializationCommonVar() {
@@ -201,38 +198,35 @@ void myNesterov::InitializationCommonVar() {
   sum_wgrad = 0;
   sum_pgrad = 0;
   sum_tgrad = 0;
-  //    u.SetZero();
-  //    v.SetZero();
-  //    half_densize.SetZero();
   wcof.SetZero();
   wpre.SetZero();
   charge_dpre.SetZero();
   temp_dpre.SetZero();
   pre.SetZero();
 
-  iter_st = (struct ITER *)mkl_malloc(sizeof(struct ITER) * (max_iter + 1), 64);
+  iter_st = (struct ITER *)malloc(sizeof(struct ITER) * (max_iter + 1));
 
-  x_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  x_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  y_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_dst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_wdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_pdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y_pdstl = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  y_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_dst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_wdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_pdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y_pdstl = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  z_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_dst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_wdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_pdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  z_pdstl = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  z_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_dst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_wdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_pdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  z_pdstl = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  x0_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  x0_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
-  y0_st = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_dst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_wdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_pdst = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
-  y0_pdstl = (struct FPOS *)mkl_malloc(sizeof(struct FPOS) * N, 64);
+  y0_st = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_dst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_wdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_pdst = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
+  y0_pdstl = (struct FPOS *)malloc(sizeof(struct FPOS) * N);
 
   memset(x_st, 0.0f, sizeof(prec) * N * 2);
   memset(y_st, 0.0f, sizeof(prec) * N * 2);
@@ -254,10 +248,10 @@ void myNesterov::InitializationCommonVar() {
   memset(y0_pdst, 0.0f, sizeof(prec) * N * 2);
   memset(y0_pdstl, 0.0f, sizeof(prec) * N * 2);
 
-  cellLambdaArr = (prec *)mkl_malloc(sizeof(prec) * N, 64);
-  pcofArr = (prec *)mkl_malloc(sizeof(prec) * 100, 64);
-  // alphaArrCD  =(prec*)mkl_malloc(sizeof(prec)*100, 64);
-  // deltaArrCD  =(prec*)mkl_malloc(sizeof(prec)*100, 64);
+  cellLambdaArr = (prec *)malloc(sizeof(prec) * N);
+  pcofArr = (prec *)malloc(sizeof(prec) * 100);
+  // alphaArrCD  =(prec*)malloc(sizeof(prec)*100);
+  // deltaArrCD  =(prec*)malloc(sizeof(prec)*100);
   // IK 05/08/17
   // if (isRoutability) MIN_PRE = 1E-15;
   // else                MIN_PRE = 1;
@@ -797,7 +791,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
             std::chrono::duration_cast< std::chrono::duration< double > >(
                 finish - start)
                 .count();
-        cout << "BuildSteiner: " << elapsed_seconds << endl;
+        PrintInfoRuntime("Timing: BuildSteiner", elapsed_seconds, 1);
 
         start = std::chrono::steady_clock::now();
         TimingInst.ExecuteStaLater();
@@ -807,7 +801,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
             std::chrono::duration_cast< std::chrono::duration< double > >(
                 finish - start)
                 .count();
-        cout << "ExecuteStaLater: " << elapsed_seconds << endl;
+        PrintInfoRuntime("Timing: EsecuteStaLater", elapsed_seconds, 1);
         
         for(int j=checkIter-2; j<=checkIter+2; j++) {
           timingCheck[j] = 1;
@@ -842,84 +836,55 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
   return -1;
 }
 
-void myNesterov::mkl_malloc_free() {
-  mkl_free(iter_st);
-  mkl_free(x_st);
-  mkl_free(y_st);
-  mkl_free(y_dst);
-  mkl_free(y_wdst);
-  mkl_free(y_pdst);
-  mkl_free(y_pdstl);
-  mkl_free(z_st);
-  mkl_free(z_dst);
-  mkl_free(z_wdst);
-  mkl_free(z_pdst);
-  mkl_free(z_pdstl);
-  mkl_free(x0_st);
-  mkl_free(y0_st);
-  mkl_free(y0_dst);
-  mkl_free(y0_wdst);
-  mkl_free(y0_pdst);
-  mkl_free(y0_pdstl);
-  mkl_free(cellLambdaArr);
-  mkl_free(pcofArr);
-  // mkl_free(alphaArrCD);
-  // mkl_free(deltaArrCD);
+void myNesterov::malloc_free() {
+  free(iter_st);
+  free(x_st);
+  free(y_st);
+  free(y_dst);
+  free(y_wdst);
+  free(y_pdst);
+  free(y_pdstl);
+  free(z_st);
+  free(z_dst);
+  free(z_wdst);
+  free(z_pdst);
+  free(z_pdstl);
+  free(x0_st);
+  free(y0_st);
+  free(y0_dst);
+  free(y0_wdst);
+  free(y0_pdst);
+  free(y0_pdstl);
+  free(cellLambdaArr);
+  free(pcofArr);
+  // free(alphaArrCD);
+  // free(deltaArrCD);
 }
 
 void myNesterov::SummarizeNesterovOpt(int last_index) {
   prec tot_hpwl_y;
   prec tot_hpwl_x;
 
-  if(STAGE == mGP3D) {
-    mGP3D_iterCNT = last_index + 1;
-    hpwl_mGP3D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY mGP3D\n");
-    printf("INFO:    #iterations = %d\n", mGP3D_iterCNT);
-    printf("INFO:        mGP3D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        mGP3D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        mGP3D      POTENTIAL %.4lf\n", it->potn);
-    mGP3D_tot_iter = last_index;
-    mGP3D_opt_phi_cof = opt_phi_cof;
-  }
-  else if(STAGE == mGP2D) {
+  if(STAGE == mGP2D) {
     mGP2D_iterCNT = last_index + 1;
     hpwl_mGP2D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY mGP2D\n");
-    printf("INFO:    #iterations = %d\n", mGP2D_iterCNT);
-    printf("INFO:        mGP2D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        mGP2D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        mGP2D      POTENTIAL %.4lf\n", it->potn);
+    PrintInfoInt("Nesterov: NumIters", cGP2D_iterCNT, 1);
+    PrintInfoPrec("Nesterov: ScaledHpwl", it->tot_hpwl, 1);
+    PrintInfoPrec("Nesterov: Overflow", it->ovfl, 1);
+    PrintInfoPrec("Nesterov: Potential", it->potn, 1);
     mGP2D_tot_iter = last_index;
     mGP2D_opt_phi_cof = opt_phi_cof;
-  }
-  else if(STAGE == cGP3D) {
-    cGP3D_iterCNT = last_index + 1;
-    hpwl_cGP3D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY cGP3D\n");
-    printf("INFO:    #iterations = %d\n", cGP3D_iterCNT);
-    printf("INFO:        cGP3D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        cGP3D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        cGP3D      POTENTIAL %.4lf\n", it->potn);
-    cGP3D_tot_iter = last_index;
-    cGP3D_opt_phi_cof = opt_phi_cof;
   }
   else if(STAGE == cGP2D) {
     cGP2D_iterCNT = last_index + 1;
     hpwl_cGP2D = it->tot_hpwl;
-    printf("\n");
-    printf("INFO:    SUMMARY cGP2D\n");
-    printf("INFO:    #iterations = %d\n", cGP2D_iterCNT);
-    printf("INFO:        cGP2D ITERATION HPWL %.4lf\n", it->tot_hpwl);
-    printf("INFO:        cGP2D ITERATION OVFL %.4lf\n", it->ovfl);
-    printf("INFO:        cGP2D      POTENTIAL %.4lf\n", it->potn);
+    PrintInfoInt("Nesterov: NumIters", cGP2D_iterCNT, 1);
+    PrintInfoPrec("Nesterov: ScaledHpwl", it->tot_hpwl, 1);
+    PrintInfoPrec("Nesterov: Overflow", it->ovfl, 1);
+    PrintInfoPrec("Nesterov: Potential", it->potn, 1);
+
     cGP2D_tot_iter = last_index;
     cGP2D_opt_phi_cof = opt_phi_cof;
-  }
-  else {
   }
 
   cell_update(x_st, N_org);
@@ -930,8 +895,8 @@ void myNesterov::SummarizeNesterovOpt(int last_index) {
   net_update(x_st);
   tot_hpwl_x = GetHpwl();
 
-  printf("INFO:    TOTAL HPWL (U_k, V_k) = %.6lf, %.6lf\n", tot_hpwl_x,
-         tot_hpwl_y);
+  PrintInfoPrec("Nesterov: xInstScaledHpwl", tot_hpwl_x, 1);
+  PrintInfoPrec("Nesterov: yInstScaledHpwl", tot_hpwl_y, 1);
 }
 
 void getCostFuncGradient3(struct FPOS *dst, struct FPOS *wdst,
@@ -1646,23 +1611,29 @@ void myNesterov::UpdateBeta(struct ITER *it) {
 }
 
 void myNesterov::PrintNesterovOptStatus(int iter) {
-  printf("\n");
-  printf("ITER: %d\n", iter);
-  printf("    HPWL=%.6f\n", it->tot_hpwl);
-  // if (stnCMD)     printf ("    STNWL=%f\n", it->tot_stnwl);
-  // printf ("    WEIGHTEDWL=%f\n", it->tot_wwl);
-  printf("    OVFL=%.6f\n", it->ovfl);
-  printf("    HPWL=(%.6f, %.6f)\n", it->hpwl.x, it->hpwl.y);
-  printf("    POTN=%.6E\n", it->potn);
-  printf("    PHIC=%.6E\n", opt_phi_cof);
-  // if (lambda2CMD) {
-  //    printf ("    LOCL=%.6E\n", opt_phi_cof_local);
-  //    printf ("    ALPH=%.6E\n", ALPHA);
-  //}
-  // if (dynamicStepCMD) printf ("    UPCF=%.6E\n", UPPER_PCOF);
-  printf("    GRAD=%.6E\n", it->grad);
-  // printf ("    Alph=%.6E\n", it->alpha00);
-  printf("    NuBT=%d\n", backtrack_cnt);
-  printf("    CPU =%.6f\n", it->cpu_cost);
+  if( gVerbose <= 1 ) {
+    if( iter % 10 == 0 ) {
+      cout << "[INFO] Nesterov: " << iter << " OverFlow: " << it->ovfl << " ScaledHpwl: " << it->tot_hpwl << endl;
+    } 
+  }
+  else if ( gVerbose >= 2 ) {
+    printf("\n");
+    printf("ITER: %d\n", iter);
+    printf("    HPWL=%.6f\n", it->tot_hpwl);
+    // if (stnCMD)     printf ("    STNWL=%f\n", it->tot_stnwl);
+    // printf ("    WEIGHTEDWL=%f\n", it->tot_wwl);
+    printf("    OVFL=%.6f\n", it->ovfl);
+    printf("    HPWL=(%.6f, %.6f)\n", it->hpwl.x, it->hpwl.y);
+    printf("    POTN=%.6E\n", it->potn);
+    printf("    PHIC=%.6E\n", opt_phi_cof);
+    // if (lambda2CMD) {
+    //    printf ("    LOCL=%.6E\n", opt_phi_cof_local);
+    //    printf ("    ALPH=%.6E\n", ALPHA);
+    //}
+    // if (dynamicStepCMD) printf ("    UPCF=%.6E\n", UPPER_PCOF);
+    printf("    GRAD=%.6E\n", it->grad);
+    printf("    NuBT=%d\n", backtrack_cnt);
+    printf("    CPU =%.6f\n", it->cpu_cost);
+  }
 }
 

@@ -3023,7 +3023,7 @@ void Replace::Circuit::DumpLefPin(lefiPin* pin) {
   fflush(stdout);
 }
 
-void Replace::Circuit::ParseLef(vector< string >& lefStor,
+int Replace::Circuit::ParseLef(vector< string >& lefStor,
                                 bool isVerbose = false) {
   //    char* outFile;
 
@@ -3212,13 +3212,15 @@ void Replace::Circuit::ParseLef(vector< string >& lefStor,
     status = lefwInit(fout);  // initialize the lef writer,
     // need to be called 1st
     if(status != LEFW_OK)
-      return;
+      return 1;
 
     fout = NULL;
     res = lefrRead(f, lefName.c_str(), (void*)userData);
 
-    if(res)
+    if(res) {
       CIRCUIT_FPRINTF(stderr, "Reader returns bad status.\n", lefName.c_str());
+      return res;
+    }
 
     (void)lefrPrintUnusedCallbacks(fout);
     (void)lefrReleaseNResetMemory();
@@ -3287,6 +3289,8 @@ void Replace::Circuit::ParseLef(vector< string >& lefStor,
 
   // Release allocated singleton data.
   //    lefrClear();
+
+  return res;
 }
 void Replace::Circuit::WriteLef(FILE* _fout) {
   fout = _fout;

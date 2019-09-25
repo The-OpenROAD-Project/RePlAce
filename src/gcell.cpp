@@ -46,7 +46,7 @@
 #include <unordered_map>
 #include <algorithm>
 
-#include "global.h"
+#include "replace_private.h"
 #include "bin.h"
 #include "charge.h"
 #include "plot.h"
@@ -60,8 +60,8 @@ TILE *tile_mat;
 
 void get_blockage() {
   struct TIER *tier = &tier_st[0];
-  struct POS b0 = zeroPoint;
-  struct POS b1 = zeroPoint;
+  struct POS b0;
+  struct POS b1;
   // struct FPOS interval = zeroFPoint;
   mypos interval;
   // struct TILE *bp = NULL;
@@ -311,12 +311,12 @@ void tile_init_temp() {
 
 void tile_init_cGP2D() {
   struct TIER *tier = NULL;
-  struct POS p = zeroPoint;
+  struct POS p;
   struct TILE *bp = NULL;
   struct TILE *bpx = NULL;
   struct TILE *bpy = NULL;
-  struct POS b0 = zeroPoint;
-  struct POS b1 = zeroPoint;
+  struct POS b0;
+  struct POS b1;
   prec max_x, min_x, max_y, min_y, area_share;
 
   int x, y;
@@ -351,7 +351,7 @@ void tile_init_cGP2D() {
   tier->tile_org.x = gridLLx;
   tier->tile_org.y = gridLLy;
   tile_mat =
-      (struct TILE *)mkl_malloc(sizeof(struct TILE) * tier->tot_tile_cnt, 64);
+      (struct TILE *)malloc(sizeof(struct TILE) * tier->tot_tile_cnt);
   tier->tile_mat = tile_mat;
   for(int i = 0; i < tier->tot_tile_cnt; i++) {
     new(&tier->tile_mat[i]) TILE();

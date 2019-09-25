@@ -41,7 +41,7 @@
 #ifndef __PL_WLEN__
 #define __PL_WLEN__
 
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 
 enum { NoneWpre, PcntWpre, WlenWpre };
@@ -89,7 +89,7 @@ void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad);
 inline void get_net_wlen_grad_wa(FPOS obj, NET *net, PIN *pin, FPOS *grad);
 
 inline void wlen_pre(int cell_idx, FPOS *wpre) {
-  *wpre = zeroFPoint;
+  wpre->x = wpre->y = 0;
 
 #ifdef NO_WLEN
   return;
@@ -99,8 +99,7 @@ inline void wlen_pre(int cell_idx, FPOS *wpre) {
 
   switch(WLEN_PRE) {
     case NoneWpre:
-
-      *wpre = zeroFPoint;
+      wpre->x = wpre->y = 0;
       break;
 
     case PcntWpre:
@@ -158,7 +157,7 @@ prec get_mac_hpwl(int idx);
 //////-MACRO LG-//////
 
 prec net_update_hpwl_mac(void);
-prec get_modu_hpwl();
+void UpdateNetMinMaxPin2();
 void update_pin2(void);
 
 enum { LSE, WA };

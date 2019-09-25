@@ -1,6 +1,6 @@
 #ifndef __REPLACE_ROUTE__
 #define __REPLACE_ROUTE__ 0
-#include "global.h"
+#include "replace_private.h"
 #include "lefdefIO.h"
 
 

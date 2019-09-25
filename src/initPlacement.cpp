@@ -45,8 +45,9 @@
 #include <string>
 #include <ctime>
 
-#include "global.h"
+#include "replace_private.h"
 #include "initPlacement.h"
+#include "wlen.h"
 #include "plot.h"
 
 #include <Eigen/Core>
@@ -65,15 +66,15 @@ void initial_placement() {
 
   double time_s = 0;
 
-  HPWL_count();
+  auto hpwl = GetUnscaledHpwl(); 
 
   if(isSkipIP) {
     return;
   }
 
-  printf("INFO:  The Initial HPWL is %.6lf\n", tot_HPWL);
+  printf("INFO:  The Initial HPWL is %.6lf\n", hpwl.first + hpwl.second);
 
-  if(tot_HPWL <= 0) {
+  if(hpwl.first + hpwl.second <= 0) {
     printf("ERROR: HPWL <= 0, skip initial QP\n");
     return;
   }
@@ -119,7 +120,6 @@ void initial_placement() {
     update_module(xcg_x, ycg_x);
     update_pin_by_module();
     update_net_by_pin();
-    HPWL_count();
 
     if(isPlot && i % 5 == 0) {
       SaveCellPlotAsJPEG(string("FIP - Iter: ") + to_string(i), false,
@@ -129,8 +129,11 @@ void initial_placement() {
     }
 
     time_end(&time_s);
+
+    hpwl = GetUnscaledHpwl();
+
     printf("INFO:  IP%3d,  CG Error %.6lf,  HPWL %.6lf,  CPUtime %.2lf\n", i,
-           max(x_err, y_err), tot_HPWL, time_s);
+           max(x_err, y_err), hpwl.first + hpwl.second, time_s);
     fflush(stdout);
 
     if(fabs(x_err) < target_tol && fabs(y_err) < target_tol && i > 4) {
@@ -158,7 +161,6 @@ void build_data_struct(bool initCoordi) {
       pin = term->pin[j];
       pin->tier = 0;
     }
-
   }
 
   for(int i = 0; i < moduleCNT; i++) {

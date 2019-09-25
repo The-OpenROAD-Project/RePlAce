@@ -83,7 +83,7 @@
 #include <defrReader.hpp>
 #include <defiAlias.hpp>
 
-#include "global.h"
+#include "replace_private.h"
 #define INIT_STR "!@#!@#"
 
 using std::cout;
@@ -135,6 +135,11 @@ class Circuit {
     ParseDef(defFilename, isVerbose);
   };
 
+  
+  // Parsing function
+  int ParseLef(vector< string >& lefStor, bool isVerbose);
+  int ParseDef(string filename, bool isVerbose);
+  
   void WriteLef(FILE* _fout);
   void WriteDef(FILE* _fout);
 
@@ -208,9 +213,6 @@ class Circuit {
   vector< HASH_MAP< string, int > > defComponentPinToNet;
 
  private:
-  // Parsing function
-  void ParseLef(vector< string >& lefStor, bool isVerbose);
-  void ParseDef(string filename, bool isVerbose);
 
   /////////////////////////////////////////////////////
   // LEF Writing

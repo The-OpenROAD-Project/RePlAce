@@ -40,7 +40,7 @@
 
 #include "plot.h"
 #include "bin.h"
-#include "global.h"
+#include "replace_private.h"
 #include "opt.h"
 
 #include "CImg.h"

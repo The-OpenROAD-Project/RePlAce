@@ -1,7 +1,7 @@
 #ifndef __REPLACE_TIMING__
 #define __REPLACE_TIMING__ 0
 
-#include "global.h"
+#include "replace_private.h"
 #include "lefdefIO.h"
 
 #include <fstream>

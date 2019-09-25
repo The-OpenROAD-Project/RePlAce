@@ -41,7 +41,7 @@
 #ifndef __GCELL__
 #define __GCELL__
 
-#include "global.h"
+#include "replace_private.h"
 
 class mypos {
  public:

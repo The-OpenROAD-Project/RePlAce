@@ -43,7 +43,7 @@
 
 #include <cstring>
 
-#include "global.h"
+#include "replace_private.h"
 #include "bin.h"
 
 void mkdirPlot();

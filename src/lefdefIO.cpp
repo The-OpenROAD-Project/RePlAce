@@ -46,11 +46,9 @@
 //
 ///////////////////////////////////////////////////////
 
-#include "global.h"
+#include "replace_private.h"
 #include "lefdefIO.h"
 #include "bookShelfIO.h"
-
-#include "mkl.h"
 
 #include "timing.h"
 #include "timingSta.h"
@@ -87,7 +85,11 @@ using Replace::Circuit;
 //
 
 // global variable.. to write output as DEF
-Replace::Circuit __ckt;
+namespace Replace {
+  Circuit __ckt;
+}
+
+using Replace::__ckt;
 
 // lef 2 def unit convert
 static prec l2d = 0.0f;
@@ -361,8 +363,7 @@ void SetParameter() {
   unitY = 1.0 * siteSizeY / 9.0f;
   unitX = unitY;
 
-  cout << "INFO:  SCALE DOWN UNIT: ( " << unitX << ", " << unitY << " )"
-       << endl;
+  PrintInfoPrec( "ScaleDownUnit", unitX );
 
   // offsetX & offsetY : Minimum coordinate of ROW's x/y
   if(IsPrecEqual(offsetX, PREC_MAX)) {
@@ -387,9 +388,7 @@ void SetParameter() {
               0 : siteSizeY - (rowMin % siteSizeY);
   }
 
-  cout << "INFO:  OFFSET COORDINATE: ( " << offsetX << ", " << offsetY << " )"
-       << endl
-       << endl;
+  PrintInfoPrecPair( "OffsetCoordi", offsetX, offsetY );
 }
 
 void SetVerilogTopModule() {
@@ -412,7 +411,6 @@ void ParseLefDef() {
   GenerateFullRow(__ckt);
 
   if(__ckt.defNetStor.size() > 0) {
-    cout << "INFO:  EXTRACT NET INFO FROM DEF ONLY" << endl;
     GenerateNetDefOnly(__ckt);
   }
   else {
@@ -421,7 +419,7 @@ void ParseLefDef() {
       exit(1);
   }
 
-  cout << "INFO:  SUCCESSFULLY LEF/DEF PARSED" << endl;
+  PrintProc("LEF/DEF Parsing Success!");
 
   // do weird things..
   FPOS tier_min, tier_max;
@@ -477,7 +475,6 @@ void WriteDef(const char* defOutput) {
   }
 
   __ckt.WriteDef(fp);
-  cout << "INFO:  SUCCESSFULLY WRITE DEF FILE INTO " << defOutput << endl;
 }
 
 ////////
@@ -708,7 +705,7 @@ void SetSizeForObsMacro(int macroIdx, MODULE* curModule, int orient) {
 // terminal_pmin & terminal_pmax must be updated...
 void GenerateModuleTerminal(Replace::Circuit& __ckt) {
   moduleInstance =
-      (MODULE*)mkl_malloc(sizeof(MODULE) * __ckt.defComponentStor.size(), 64);
+      (MODULE*)malloc(sizeof(MODULE) * __ckt.defComponentStor.size());
 
   // to fast traverse when building TerminalInstance
   vector< int > fixedComponent;
@@ -809,8 +806,8 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
   //    cout << moduleCNT << endl;
 
   // memory cutting
-  moduleInstance =
-      (MODULE*)mkl_realloc(moduleInstance, sizeof(MODULE) * moduleCNT);
+//  moduleInstance =
+//      (MODULE*)realloc(moduleInstance, sizeof(MODULE) * moduleCNT);
 
   //
   // Terminal Update
@@ -827,10 +824,9 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
 
   TERM* curTerm = NULL;
   terminalCNT = 0;
-  terminalInstance = (TERM*)mkl_malloc(
+  terminalInstance = (TERM*)malloc(
       sizeof(TERM) * (blockageIdxStor.size() + fixedComponent.size() +
-                      __ckt.defPinStor.size()),
-      64);
+                      __ckt.defPinStor.size()));
 
   // for fixed cells.
   for(auto& curIdx : fixedComponent) {
@@ -966,8 +962,8 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     curTerm->Dump();
     terminalCNT++;
   }
-  cout << "INFO:  #MODULE: " << moduleCNT << ", #TERMINAL: " << terminalCNT
-       << endl;
+  PrintInfoInt("NumModules", moduleCNT);
+  PrintInfoInt("NumTerminals", terminalCNT);
 }
 
 /////////////////////////////////////////////////////
@@ -1171,8 +1167,8 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
   // termCnt Updates 
   int prevCnt = terminalCNT;
   terminalCNT += dummyTermStor_.size();
-  terminalInstance = 
-    (TERM*) mkl_realloc( terminalInstance, sizeof(TERM) * terminalCNT);
+//  terminalInstance = 
+//    (TERM*) realloc( terminalInstance, sizeof(TERM) * terminalCNT);
  
   // copy into original instances 
   for(int i=prevCnt; i<terminalCNT; i++) {
@@ -1280,7 +1276,7 @@ void GenerateRow(Replace::Circuit& __ckt) {
   int i = 0;
 
   row_cnt = __ckt.defRowStor.size();
-  row_st = (ROW*)mkl_malloc(sizeof(ROW) * row_cnt, 64);
+  row_st = (ROW*)malloc(sizeof(ROW) * row_cnt);
 
   for(auto& row : __ckt.defRowStor) {
     auto sitePtr = __ckt.lefSiteMap.find(string(row.macro()));
@@ -1361,16 +1357,15 @@ void GenerateRow(Replace::Circuit& __ckt) {
     //        curRow->Dump(to_string(i));
     i++;
   }
-  cout << "INFO:  ROW SIZE: ( " << SITE_SPA << ", " << rowHeight << " ) "
-       << endl;
-  cout << "INFO:  #ROW: " << row_cnt << endl;
+  PrintInfoPrecPair( "RowSize", SITE_SPA, rowHeight );
+  PrintInfoInt( "NumRows", row_cnt );
 }
 
 // MS-Placement requires this!
 void GenerateFullRow(Replace::Circuit& __ckt) {
-  cout << "INFO:  NEW ROW IS CREATING... (Mixed-Size Mode) " << endl;
+  PrintProcBegin("Generate Un-fragmented Rows");
   if( row_st ) {
-    mkl_free(row_st);
+    free(row_st);
   }
   // Newly create the all ROW area for floorplan.
   // In here, I've used DESIGN FE_CORE_BOX_LL_X statements in
@@ -1388,8 +1383,8 @@ void GenerateFullRow(Replace::Circuit& __ckt) {
 
   DieRect coreArea = GetCoreFromRow();
 
-  cout << "INFO:  CORE AREA: (" << coreArea.llx << " " << coreArea.lly << ") - ("
-       << coreArea.urx << " " << coreArea.ury << ")" << endl;
+  PrintInfoPrecPair("CoreAreaLxLy", coreArea.llx, coreArea.lly );
+  PrintInfoPrecPair("CoreAreaUxUy", coreArea.urx, coreArea.ury );
 
   // this portion is somewhat HARD_CODING
   // it regards there only one SITE definition per each design!
@@ -1420,7 +1415,7 @@ void GenerateFullRow(Replace::Circuit& __ckt) {
   float rowSizeY = rowHeight = siteY;
 
   row_cnt = rowCntY;
-  row_st = (ROW*)mkl_malloc(sizeof(ROW) * row_cnt, 64);
+  row_st = (ROW*)malloc(sizeof(ROW) * row_cnt);
 
   /////////////////////////
   // HARD CODE PART!!!!!
@@ -1499,10 +1494,10 @@ void GenerateFullRow(Replace::Circuit& __ckt) {
     curRow->site_wid = curRow->site_spa = SITE_SPA = minRow->xStep() / unitX;
 //    curRow->Dump(to_string(i));
   }
-
-  cout << "INFO:  NEW ROW SIZE: ( " << SITE_SPA << ", " << rowHeight << " ) "
-       << endl;
-  cout << "INFO:  NEW #ROW: " << row_cnt << endl;
+  
+  PrintInfoPrecPair( "RowSize", SITE_SPA, rowHeight );
+  PrintInfoInt( "NumRows", row_cnt );
+  PrintProcEnd("Generate Un-fragmented Rows"); 
 }
 
 
@@ -1676,6 +1671,8 @@ FPOS GetOffset(Replace::Circuit& __ckt, string& instName, string& pinName,
 // defPinStor -> pinInstance
 //
 void GenerateNetDefOnly(Replace::Circuit& __ckt) {
+  PrintProcBegin("DEF Net Parsing");
+
   pinCNT = 0;
   netCNT = __ckt.defNetStor.size();
   for(auto& curNet : __ckt.defNetStor) {
@@ -1683,8 +1680,8 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
   }
 
   // memory reserve
-  netInstance = (NET*)mkl_malloc(sizeof(NET) * netCNT, 64);
-  pinInstance = (PIN*)mkl_malloc(sizeof(PIN) * pinCNT, 64);
+  netInstance = (NET*)malloc(sizeof(NET) * netCNT);
+  pinInstance = (PIN*)malloc(sizeof(PIN) * pinCNT);
   for(int i = 0; i < pinCNT; i++) {
     new(&pinInstance[i]) PIN;
   }
@@ -1756,7 +1753,7 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
 
     curNet->pinCNTinObject = net.numConnections();
     //        cout << "connection: " << net.numConnections() << endl;
-    curNet->pin = (PIN**)mkl_malloc(sizeof(PIN*) * net.numConnections(), 64);
+    curNet->pin = (PIN**)malloc(sizeof(PIN*) * net.numConnections());
 
     for(int i = 0; i < net.numConnections(); i++) {
       // net.pin(i) itself exists on termInst
@@ -1868,10 +1865,12 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
   netCNT = netIdx;
 
   // memory cutting (shrink)
-  netInstance = (NET*)mkl_realloc(netInstance, sizeof(NET) * netCNT);
-  pinInstance = (PIN*)mkl_realloc(pinInstance, sizeof(PIN) * pinCNT);
+//  netInstance = (NET*)realloc(netInstance, sizeof(NET) * netCNT);
+//  pinInstance = (PIN*)realloc(pinInstance, sizeof(PIN) * pinCNT);
 
-  cout << "INFO:  #NET: " << netCNT << ", #PIN: " << pinCNT << endl;
+  PrintInfoInt( "NumNets", netCNT ); 
+  PrintInfoInt( "NumPins", pinCNT );
+  PrintProcEnd("DEF Net Parsing");
 }
 
 //

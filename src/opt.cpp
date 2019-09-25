@@ -49,8 +49,7 @@
 #include "bin.h"
 #include "fft.h"
 #include "gcell.h"
-#include "global.h"
-#include "mkl.h"
+#include "replace_private.h"
 #include "ns.h"
 #include "opt.h"
 #include "plot.h"
@@ -118,14 +117,17 @@ int setup_before_opt_cGP2D(void) {
   bin_init_2D(cGP2D);
 
   // routability
-  routeInst.Init();
-  WriteBookshelfForGR();
-  char routeLoc[BUF_SZ] = {0, };
-  sprintf(routeLoc, "%s/router_base/%s.route", dir_bnd, gbch);
+  if( isRoutability ) {
+    routeInst.Init();
+    WriteBookshelfForGR();
 
-  if(isRoutability == true) {
-    read_routes_3D( routeLoc );
-    tile_init_cGP2D(); 
+    char routeLoc[BUF_SZ] = {0, };
+    sprintf(routeLoc, "%s/router_base/%s.route", dir_bnd, gbch);
+
+    if(isRoutability == true) {
+      read_routes_3D( routeLoc );
+      tile_init_cGP2D(); 
+    }
   }
 
   charge_fft_init(dim_bin_cGP2D, bin_stp_cGP2D, 0);
@@ -259,23 +261,30 @@ void whitespace_init(void) {
 
   total_WS_area = total_PL_area - total_termPL_area;
   total_std_den = total_std_area / (total_WS_area - total_macro_area);
-  printf("INFO:  Chip Area: %lf x %lf = %lf \n", place.cnt.x, place.cnt.y, place.area);
-  fflush(stdout);
-  printf("INFO:  Total_PL_Area = %lf, %lf of chip\n", total_PL_area,
-         total_PL_area / place.area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_TermPL_Area = %ld, %lf of PL\n", total_termPL_area,
-         1.0 * total_termPL_area / place.area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_WS_Area = %ld, %lf of PL\n", total_WS_area,
-         1.0 * total_WS_area / total_PL_area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_Macro_Area = %lf, %lf of WS\n", total_macro_area,
-         total_macro_area / total_WS_area * 100.0);
-  fflush(stdout);
-  printf("INFO:  Total_StdCell_Area = %lf, %lf of WS\n", total_std_area,
-         total_std_area / total_WS_area * 100.0);
-  fflush(stdout);
+//  printf("INFO:  Chip Area: %lf x %lf = %lf \n", place.cnt.x, place.cnt.y, place.area);
+//  fflush(stdout);
+
+  PrintInfoPrec("TotalPlaceArea", total_PL_area);
+  PrintInfoPrec("TotalFixedArea", total_termPL_area);
+  PrintInfoPrec("TotalWhiteSpaceArea", total_WS_area);
+  PrintInfoPrec("TotalPlaceMacrosArea", total_macro_area);
+  PrintInfoPrec("TotalPlaceStdCellsArea", total_std_area); 
+  PrintInfoPrec("Util(%)", (total_macro_area + total_std_area) / total_PL_area * 100);
+
+  if( (total_macro_area + total_std_area)/total_PL_area > 1.00f ) {
+    PrintError("Utilization Exceeds 100%. Please double-check your input DEF");
+  }
+
+//  printf("INFO:  Total_PL_Area = %lf, %lf of chip\n", total_PL_area,
+//         total_PL_area / place.area * 100.0);
+//  printf("INFO:  Total_TermPL_Area = %ld, %lf of PL\n", total_termPL_area,
+//         1.0 * total_termPL_area / place.area * 100.0);
+//  printf("INFO:  Total_WS_Area = %ld, %lf of PL\n", total_WS_area,
+//         1.0 * total_WS_area / total_PL_area * 100.0);
+//  printf("INFO:  Total_Macro_Area = %lf, %lf of WS\n", total_macro_area,
+//         total_macro_area / total_WS_area * 100.0);
+//  printf("INFO:  Total_StdCell_Area = %lf, %lf of WS\n", total_std_area,
+//         total_std_area / total_WS_area * 100.0);
 }
 
 void filler_adj(void) {
@@ -289,8 +298,8 @@ void filler_adj(void) {
 
 void rand_filler_adj(int idx) {
   int i = 0;
-  struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
+  struct FPOS pmin, pmax;
+  struct FPOS rnd;
   struct CELL *filler = NULL;
 
   for(i = idx; i < gcell_cnt; i++) {
@@ -310,8 +319,8 @@ void rand_filler_adj(int idx) {
 
 void filler_adj_mGP2D(void) {
   int z = 0, i = 0;
-  struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
+  struct FPOS pmin, pmax;
+  struct FPOS rnd;
   struct CELL *filler = NULL;
   struct TIER *tier = NULL;
 
@@ -337,8 +346,8 @@ void filler_adj_mGP2D(void) {
 
 void filler_adj_cGP2D(void) {
   int z = 0, i = 0;
-  struct FPOS pmin = zeroFPoint, pmax = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
+  struct FPOS pmin, pmax;
+  struct FPOS rnd;
   struct CELL *filler = NULL;
   struct TIER *tier = NULL;
 
@@ -369,8 +378,7 @@ void cell_filler_init() {
   struct CELL *filler = NULL;
   prec k_f2c = 1.0;
   struct CELL *gcell_st_tmp = NULL;
-  struct FPOS org = zeroFPoint, end = zeroFPoint, len = zeroFPoint,
-              rnd = zeroFPoint;
+  struct FPOS org, end, len, rnd;
 
   prec f_area = k_f2c * avg80p_cell_area;
 
@@ -400,30 +408,28 @@ void cell_filler_init() {
   filler_area = f_area;
   filler_size = f_size;
 
-  printf("INFO:  FillerCell's Area = %.6lf\n", filler_area);
-
   gfiller_cnt = (int)(total_filler_area / filler_area + 0.5);
-  cout << "gFillerCount: " << gfiller_cnt << endl;
-  cout << "filler_area: " << filler_area << endl;
-  cout << "total_filler_area: : " << total_filler_area << endl;
 
-  printf("INFO:  FillerCell's X = %.6lf , FillerCell's Y = %.6lf\n",
-           filler_size.x, filler_size.y);
-  fflush(stdout);
+  PrintInfoPrec("FillerInit: TotalFillerArea", total_filler_area);
+  PrintInfoInt("FillerInit: NumFillerCells", gfiller_cnt);
+  PrintInfoPrec("FillerInit: FillerCellArea", filler_area);
+  PrintInfoPrecPair("FillerInit: FillerCellSize", filler_size.x, filler_size.y);
+
   gcell_cnt = moduleCNT + gfiller_cnt;
 
   // igkang:  replace realloc to mkl
   gcell_st_tmp =
-      (struct CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+      (struct CELL *)malloc(sizeof(struct CELL) * gcell_cnt);
   memcpy(gcell_st_tmp, gcell_st, moduleCNT * (sizeof(struct CELL)));
-  mkl_free(gcell_st);
+  free(gcell_st);
 
-  gcell_st = (CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+  gcell_st = (CELL *)malloc(sizeof(struct CELL) * gcell_cnt);
   memcpy(gcell_st, gcell_st_tmp, gcell_cnt * (sizeof(struct CELL)));
-  mkl_free(gcell_st_tmp);
+  free(gcell_st_tmp);
 
-  printf("INFO:  #CELL = %d =  %d (#MODULE) + %d (#FILLER)\n", gcell_cnt,
-         moduleCNT, gfiller_cnt);
+  PrintInfoInt("FillerInit: NumCells", gcell_cnt);
+  PrintInfoInt("FillerInit: NumModules", moduleCNT);
+  PrintInfoInt("FillerInit: NumFillers", gfiller_cnt);
 
   for(i = moduleCNT; i < gcell_cnt; i++) {
     filler = &gcell_st[i];
@@ -469,9 +475,9 @@ void cell_init(void) {
   struct FPOS pof;
   struct PIN *pin = NULL;
   struct NET *net = NULL;
-  prec *cell_area_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
-  prec *cell_x_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
-  prec *cell_y_st = (prec *)mkl_malloc(sizeof(prec) * moduleCNT, 64);
+  prec *cell_area_st = (prec *)malloc(sizeof(prec) * moduleCNT);
+  prec *cell_x_st = (prec *)malloc(sizeof(prec) * moduleCNT);
+  prec *cell_y_st = (prec *)malloc(sizeof(prec) * moduleCNT);
 
   for(i = 0; i < moduleCNT; i++) {
     mdp = &moduleInstance[i];
@@ -494,9 +500,9 @@ void cell_init(void) {
     total_y += cell_y_st[i];
   }
 
-  mkl_free(cell_area_st);
-  mkl_free(cell_x_st);
-  mkl_free(cell_y_st);
+  free(cell_area_st);
+  free(cell_x_st);
+  free(cell_y_st);
 
   avg_cell_area = total_area / ((prec)(max_idx - min_idx));
   avg_cell_x = total_x / ((prec)(max_idx - min_idx));
@@ -506,17 +512,17 @@ void cell_init(void) {
   avg80p_cell_dim.x = avg_cell_x;
   avg80p_cell_dim.y = avg_cell_y;
 
-  printf("INFO:  Average 80pct Cell Area = %.4lf\n", avg80p_cell_area);
+  PrintInfoPrec("80pCellArea", avg80p_cell_area);
 
   gcell_cnt = moduleCNT;
-  gcell_st = (struct CELL *)mkl_malloc(sizeof(struct CELL) * gcell_cnt, 64);
+  gcell_st = (struct CELL *)malloc(sizeof(struct CELL) * gcell_cnt);
 
-  // pin2 copy loop 
+  // pin2 copy loop: pin2 is original pin info
   for(i = 0; i < netCNT; i++) {
     net = &netInstance[i];
     net->mod_idx = -1;
-    net->pin2 = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * net->pinCNTinObject, 64);
+    net->pin2 = (struct PIN **)malloc(
+        sizeof(struct PIN *) * net->pinCNTinObject);
     net->pinCNTinObject2 = net->pinCNTinObject;
     for(j = 0; j < net->pinCNTinObject2; j++) {
       net->pin2[j] = net->pin[j];
@@ -533,16 +539,22 @@ void cell_init(void) {
     cell->size = mdp->size;
     cell->half_size = mdp->half_size;
     cell->area = mdp->area;
-    cell->pof = (struct FPOS *)mkl_malloc(
-        sizeof(struct FPOS) * mdp->pinCNTinObject, 64);
-    cell->pin = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * mdp->pinCNTinObject, 64);
+    cell->pof = (struct FPOS *)malloc(
+        sizeof(struct FPOS) * mdp->pinCNTinObject);
+    cell->pin = (struct PIN **)malloc(
+        sizeof(struct PIN *) * mdp->pinCNTinObject);
     cell->pinCNTinObject = 0;
 
+    // 
+    // pin removal is executed 
+    // when there are two duplicated pins 
+    // (connected to a same net) in a single instance 
+    //
     for(j = 0; j < mdp->pinCNTinObject; j++) {
       pin = mdp->pin[j];
       pof = mdp->pof[j];
       net = &netInstance[pin->netID];
+
       if(net->mod_idx == i) {
         for(k = pin->pinIDinNet; k < net->pinCNTinObject - 1; k++) {
           net->pin[k] = net->pin[k + 1];
@@ -560,26 +572,26 @@ void cell_init(void) {
     }
 
     cell->netCNTinObject = cell->pinCNTinObject;
-    cell->pin_tmp = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * cell->pinCNTinObject, 64);
-    cell->pof_tmp = (struct FPOS *)mkl_malloc(
-        sizeof(struct FPOS) * cell->pinCNTinObject, 64);
+    cell->pin_tmp = (struct PIN **)malloc(
+        sizeof(struct PIN *) * cell->pinCNTinObject);
+    cell->pof_tmp = (struct FPOS *)malloc(
+        sizeof(struct FPOS) * cell->pinCNTinObject);
     memcpy(cell->pin_tmp, cell->pin,
            cell->pinCNTinObject * (sizeof(struct PIN *)));
     memcpy(cell->pof_tmp, cell->pof,
            cell->pinCNTinObject * (sizeof(struct FPOS)));
-    mkl_free(cell->pin);
-    mkl_free(cell->pof);
-    cell->pin = (struct PIN **)mkl_malloc(
-        sizeof(struct PIN *) * cell->pinCNTinObject, 64);
-    cell->pof = (struct FPOS *)mkl_malloc(
-        sizeof(struct FPOS) * cell->pinCNTinObject, 64);
+    free(cell->pin);
+    free(cell->pof);
+    cell->pin = (struct PIN **)malloc(
+        sizeof(struct PIN *) * cell->pinCNTinObject);
+    cell->pof = (struct FPOS *)malloc(
+        sizeof(struct FPOS) * cell->pinCNTinObject);
     memcpy(cell->pin, cell->pin_tmp,
            cell->pinCNTinObject * (sizeof(struct PIN *)));
     memcpy(cell->pof, cell->pof_tmp,
            cell->pinCNTinObject * (sizeof(struct FPOS)));
-    mkl_free(cell->pin_tmp);
-    mkl_free(cell->pof_tmp);
+    free(cell->pin_tmp);
+    free(cell->pof_tmp);
 
     cell->pmin = mdp->pmin;
     cell->pmax = mdp->pmax;
@@ -592,10 +604,10 @@ void cell_delete(void) {
 
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];
-    mkl_free(cell->pin);
-    mkl_free(cell->pof);
+    free(cell->pin);
+    free(cell->pof);
   }
-  mkl_free(gcell_st);
+  free(gcell_st);
 }
 
 void input_sol(struct FPOS *st, int N, char *fn) {
@@ -703,13 +715,13 @@ void cg_input(struct FPOS *x_st, int N, int input) {
   char fn_x_isol[BUF_SZ];
   char fn_wl_sol[BUF_SZ];
 
-  struct FPOS half_den_size = zeroFPoint;
-  struct FPOS center = zeroFPoint;
-  struct FPOS rnd = zeroFPoint;
-  struct FPOS v = zeroFPoint;
-  struct FPOS sqr_org = zeroFPoint;
-  struct FPOS sqr_cnt = zeroFPoint;
-  struct FPOS sqr_end = zeroFPoint;
+  struct FPOS half_den_size;
+  struct FPOS center;
+  struct FPOS rnd;
+  struct FPOS v;
+  struct FPOS sqr_org;
+  struct FPOS sqr_cnt;
+  struct FPOS sqr_end;
 
   switch(input) {
     case QWL_ISOL:
@@ -763,18 +775,18 @@ int area_sort(const void *a, const void *b) {
 
 void init_iter(struct ITER *it, int idx) {
   it->idx = idx;
-  it->wlen = zeroFPoint;
+  it->wlen.x = it->wlen.y = 0;
   it->tot_wlen = 0;
   it->grad = 0;
-  it->hpwl = zeroFPoint;
+  it->hpwl.x = it->hpwl.y = 0;
   it->tot_hpwl = 0;
   it->ovfl = 0;
-  it->wcof = zeroFPoint;
+  it->wcof.x = it->wcof.y = 0;
   it->pcof = 0;
   it->beta = 0;
   it->alpha00 = 0;
-  it->alpha_dim = zeroFPoint;
-  it->lc_dim = zeroFPoint;
+  it->alpha_dim.x = it->alpha_dim.y = 0;
+  it->lc_dim.x = it->lc_dim.y = 0;
   it->lc_w = 0;
   it->lc_p = 0;
   it->cpu_curr = 0;
@@ -806,12 +818,6 @@ void gp_opt(void) {
   }
 
   modu_copy();
-
-  if(STAGE == mGP2D)
-    output_mGP2D_pl(gmGP2D_pl);
-  else if(STAGE == cGP2D)
-    output_cGP2D_pl(gGP3_pl);
-
   fflush(stdout);
 }
 
@@ -1008,7 +1014,7 @@ void cell_init_2D(void) {
 
 void update_cell_den() {
   struct CELL *cell = NULL;
-  struct FPOS scal = zeroFPoint;
+  struct FPOS scal;
 
   for(int i = 0; i < gcell_cnt; i++) {
     cell = &gcell_st[i];
