@@ -89,7 +89,7 @@ replace_external::init_replace_db() {
   lefin lefReader(db, false);
   
   std::list<std::string> lefList(lef_stor.begin(), lef_stor.end());
-  lefReader.createTechAndLib("testlib", lef_stor[0].c_str());
+  lefReader.createTechAndLib("testlib", lefList);
 
   defin defReader(db);
 
