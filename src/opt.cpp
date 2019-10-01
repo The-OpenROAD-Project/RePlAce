@@ -55,6 +55,8 @@
 #include "plot.h"
 #include "wlen.h"
 
+using std::to_string;
+
 int FILLER_PLACE;
 int NUM_ITER_FILLER_PLACE;  // fast filler pre-place, need tuning
 prec opt_phi_cof;

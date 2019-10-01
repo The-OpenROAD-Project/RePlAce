@@ -101,11 +101,11 @@ typedef double prec;
 #define IS_PRECISION_EQUAL(a, b) (fabs((a)-(b)) <= PREC_EPSILON)
 
 #ifdef USE_GOOGLE_HASH
-#define HASH_MAP dense_hash_map
-#define HASH_SET dense_hash_set
+#define HASH_MAP google::dense_hash_map
+#define HASH_SET google::dense_hash_set
 #else
-#define HASH_MAP unordered_map
-#define HASH_SET unordered_set
+#define HASH_MAP std::unordered_map
+#define HASH_SET std::unordered_set
 #endif
 
 #define TSV_CAP 30.0  // fF
@@ -138,214 +138,85 @@ typedef double prec;
 ///////////////////////////////////////////////////////////////////////////
 
 
-using std::string;
-using std::cout;
-using std::endl;
-
-using std::vector;
-using std::pair;
-using std::tuple;
-using std::max;
-using std::min;
-
-using std::fixed;
-using std::scientific;
-using std::map;
-using std::to_string;
-
-using std::numeric_limits;
-using std::make_pair;
-
-#ifdef USE_GOOGLE_HASH
-using google::dense_hash_map;
-using google::dense_hash_set;
-#else
-using std::unordered_map;
-using std::unordered_set;
-#endif
-
 struct POS;
 
 struct FPOS {
   prec x;
   prec y;
-  //  prec z;
 
-  FPOS() {
-    x = y = 0; 
-  };
+  FPOS();
+  FPOS(prec xloc, prec yloc);
+  void Set(prec a);
+  void Set(FPOS a);
 
-  FPOS(prec xloc, prec yloc) : x(xloc), y(yloc) {};
-
-  void Set(prec a) {
-    x = y = a;
-  }
-  void Set(FPOS a) {
-    x = a.x;
-    y = a.y;
-  }
-
-  void Set(prec xloc, prec yloc) {
-    x = xloc;
-    y = yloc;
-  }
-
+  void Set(prec xloc, prec yloc);
   void Set(POS a);
+  void SetZero();
 
-  void SetZero() {
-    x = y = 0;
-  }
+  prec GetX();
+  prec GetY(); 
 
-  prec GetX() { return x; };
-  prec GetY() { return y; }; 
+  void Add(FPOS a);
+  void SetAdd(FPOS a, FPOS b);
 
-  void Add(FPOS a) {
-    x += a.x;
-    y += a.y;
-  }
-  void SetAdd(FPOS a, FPOS b) {
-    x = a.x + b.x;
-    y = a.y + b.y;
-  }
-  void Min(FPOS a) {
-    x = min(x, a.x);
-    y = min(y, a.y);
-  }
-  void SetMin(FPOS a, FPOS b) {
-    x = min(a.x, b.x);
-    y = min(a.y, b.y);
-  }
-  void Max(FPOS a) {
-    x = max(x, a.x);
-    y = max(y, a.y);
-  }
-  void SetMax(FPOS a, FPOS b) {
-    x = max(a.x, b.x);
-    y = max(a.y, b.y);
-  }
+  void Min(FPOS a);
+  void SetMin(FPOS a, FPOS b);
 
-  prec GetProduct() {
-    return x * y;
-  }
-  void Dump() {
-    cout << "(" << x << " " << y << ")" << endl;
-  }
-  void Dump(string a) {
-    cout << a << ": (" << x << " " << y << ")" << endl;
-  }
+  void Max(FPOS a);
+  void SetMax(FPOS a, FPOS b);
+
+  prec GetProduct();
+  void Dump();
+  void Dump(std::string a);
 };
 
 struct POS {
   int x;
   int y;
 
-  POS() {
-    SetZero();
-  };
+  POS();
+  POS(int xloc, int yloc);
 
-  POS(int _x, int _y) : x(_x), y(_y){};
+  void Set(int a);
+  void Set(POS a);
 
-  inline void Set(int a) {
-    x = y = a;
-  }
-  inline void Set(POS a) {
-    x = a.x;
-    y = a.y;
-  }
+  void Set(int xloc, int yloc);
 
-  inline void Set(int _x, int _y){
-    x = _x;
-    y = _y;
-  }
+  void Set(FPOS fp);
+  void SetZero();
+  void Add(POS a);
 
-  inline void Set(FPOS fp);
-
-  inline void SetZero() {
-    x = y = 0.0f;
-  }
-  inline void Add(POS a) {
-    x += a.x;
-    y += a.y;
-  }
-
-  inline void SetAdd(POS a, POS b) {
-    x = a.x + b.x;
-    y = a.y + b.y;
-  }
-  inline void Min(POS a) {
-    x = min(x, a.x);
-    y = min(y, a.y);
-  }
-  inline void SetMin(POS a, POS b) {
-    x = min(a.x, b.x);
-    y = min(a.y, b.y);
-  }
-  inline void Max(POS a) {
-    x = max(x, a.x);
-    y = max(y, a.y);
-  }
-  inline void SetMax(POS a, POS b) {
-    x = max(a.x, b.x);
-    y = max(a.y, b.y);
-  }
-  inline int GetProduct() {
-    return x * y ;
-  }
-  inline void SetXProjection(int a, int b) {
-    x = (x < a) ? a : (x > b) ? b : x;
-  }
-  inline void SetYProjection(int a, int b) {
-    y = (y < a) ? a : (y > b) ? b : y;
-  }
-  inline void SetProjection(POS a, POS b) {
-    SetXProjection(a.x, b.x);
-    SetYProjection(a.y, b.y);
-  }
-  inline void SetXYProjection(POS a, POS b) {
-    SetXProjection(a.x, b.x);
-    SetYProjection(a.y, b.y);
-  }
-  inline void Dump() {
-    cout << "(" << x << " " << y << ")" << endl;
-  }
-  inline void Dump(string a) {
-    cout << a << ": (" << x << " " << y << ")" << endl;
-  }
+  void SetAdd(POS a, POS b);
+  void Min(POS a);
+  void SetMin(POS a, POS b);
+  void Max(POS a); 
+  void SetMax(POS a, POS b);
+  int GetProduct();
+  void SetXProjection(int a, int b);
+  void SetYProjection(int a, int b);
+  void SetProjection(POS a, POS b);
+  void SetXYProjection(POS a, POS b);
+  void Dump(); 
+  void Dump(std::string a);
 };
-
-inline void FPOS::Set(POS p) {
-  x = p.x;
-  y = p.y;
-}
-
-inline void POS::Set(FPOS fp) {
-  x = INT_CONVERT(fp.x);
-  y = INT_CONVERT(fp.y);
-}
 
 
 // for saving pinName
-// If it's lied in the PIN structure, it'll enlarge the runtime
-extern vector< vector< string > > mPinName;
-extern vector< vector< string > > tPinName;
+// If it's lied in the PIN structure, 
+// it'll enlarge the runtime
+extern std::vector< std::vector< std::string > > mPinName;
+extern std::vector< std::vector< std::string > > tPinName;
 
-extern vector<string> moduleNameStor; 
-extern vector<string> terminalNameStor;
-extern vector<string> cellNameStor;
-extern vector<string> netNameStor;
+extern std::vector<std::string> moduleNameStor; 
+extern std::vector<std::string> terminalNameStor;
+extern std::vector<std::string> cellNameStor;
+extern std::vector<std::string> netNameStor;
 
 struct RECT {
   FPOS pmin;
   FPOS pmax;
-  RECT() {
-    pmin.SetZero();
-    pmax.SetZero();
-  };
-  void Dump() {
-    pmin.Dump("RECT: pmin");
-    pmax.Dump("RECT: pmax");
-    cout << endl;
-  }
+  RECT();
+  void Dump();
 };
 
 // Pin Instance
@@ -367,13 +238,7 @@ struct PIN {
   int Y_MIN;
   int X_MAX;
   int Y_MAX;
-  PIN() {
-    fp.SetZero();
-    e1.SetZero();
-    e2.SetZero();
-    flg1.SetZero();
-    flg2.SetZero();
-  }
+  PIN(); 
 };
 
 
@@ -398,44 +263,9 @@ struct MODULE {
   POS pmin_lg;
   POS pmax_lg;
 
-  const char* Name() { return moduleNameStor[idx].c_str(); }
-
-  MODULE()
-      : pof(0),
-        pin(0),
-        area(0.0f),
-        idx(0),
-        netCNTinObject(0),
-        pinCNTinObject(0),
-        flg(0),
-        tier(0),
-        mac_idx(0),
-        ovlp_flg(0) {
-    pmin.SetZero();
-    pmax.SetZero();
-    size.SetZero();
-    half_size.SetZero();
-    center.SetZero();
-    pmin_lg.SetZero();
-    pmax_lg.SetZero();
-  }
-  void Dump(string a) {
-    cout << a << endl;
-    cout << "tier: " << tier << endl;
-    cout << "mac_idx: " << mac_idx << endl;
-    cout << "ovlp_flg: " << ovlp_flg << endl;
-    pmin.Dump("pmin");
-    pmax.Dump("pmax");
-    size.Dump("size");
-    half_size.Dump("half_size");
-    center.Dump("center");
-    cout << "area: " << area << endl;
-    cout << "netCNTinObject: " << netCNTinObject << endl;
-    cout << "pinCNTinObject: " << pinCNTinObject << endl;
-    pmin_lg.Dump("pmin_lg");
-    pmax_lg.Dump("pmax_lg");
-    cout << endl;
-  }
+  const char* Name();
+  MODULE();
+  void Dump(std::string a);
 };
 
 
@@ -459,40 +289,10 @@ struct TERM {
            //    int tier;
   bool isTerminalNI;
   prec PL_area;
-  const char* Name() { return terminalNameStor[idx].c_str(); }
+  const char* Name();
 
-  TERM()
-      : area(0.0f),
-        pof(0),
-        pin(0),
-        idx(0),
-        netCNTinObject(0),
-        pinCNTinObject(0),
-        IO(0),
-        isTerminalNI(0),
-        PL_area(0.0f) {
-    pmin.SetZero();
-    pmax.SetZero();
-    size.SetZero();
-    center.SetZero();
-  }
-
-  void Dump() {
-    printf("terminal[%d]: name: %s \n", idx, Name());
-    fflush(stdout);
-    cout << "isTerminalNI: " << (isTerminalNI ? "YES" : "NO") << endl;
-    cout << "IO: " << ((IO == 0) ? "Input" : "Output") << endl;
-    //        cout << "tier: " << tier << endl;
-    pmin.Dump("pmin");
-    pmax.Dump("pmax");
-    cout << "area: " << area << endl;
-    size.Dump("size");
-    center.Dump("center");
-    cout << "netCNTinObject: " << netCNTinObject << endl;
-    cout << "pinCNTinObject: " << pinCNTinObject << endl;
-    cout << "PL_area: " << PL_area << endl;
-    cout << endl;
-  }
+  TERM();
+  void Dump();
 };
 
 struct CELL {
@@ -524,7 +324,7 @@ struct CELL {
   FPOS half_den_size_org_befo_bloating;
   FPOS *pof_tmp;
   PIN **pin_tmp;
-  const char* Name() { return cellNameStor[idx].c_str(); }
+  const char* Name();
 };
 
 class SHAPE {
@@ -532,7 +332,7 @@ class SHAPE {
   //    char *name;
   //    char *prefix;
 
-  string name, instName;
+  std::string name, instName;
 
   int idx;
   prec llx;
@@ -540,23 +340,10 @@ class SHAPE {
   prec width;
   prec height;
 
-  SHAPE(string _name, string _instName, int _idx, prec _llx, prec _lly,
-        prec _width, prec _height)
-      : name(_name),
-        instName(_instName),
-        idx(_idx),
-        llx(_llx),
-        lly(_lly),
-        width(_width),
-        height(_height){};
-
-  void Dump() {
-    printf(
-        "shape[%d]: name: %s, instName: %s, llx: %lf, lly: %lf, width: %lf, "
-        "height: %lf\n",
-        idx, name.c_str(), instName.c_str(), llx, lly, width, height);
-    fflush(stdout);
-  }
+  SHAPE(std::string _name, std::string _instName, 
+      int _idx, prec _llx, prec _lly,
+      prec _width, prec _height);
+  void Dump();
 };
 
 class UFPin {
@@ -566,18 +353,8 @@ class UFPin {
   int rank;
   int modu;
 
-  UFPin() {
-  }
-
-  UFPin(int moduleID) {
-    // id = 0;
-    parent = moduleID;
-    rank = 0;
-    modu = moduleID;
-  }
-
-  ~UFPin() {
-  }
+  UFPin();
+  UFPin(int moduleID);
 };
 
 class TwoPinNets {
@@ -589,20 +366,10 @@ class TwoPinNets {
   int i;
   int j;
 
-  TwoPinNets() {
-  }
+  TwoPinNets();
+  TwoPinNets(int start_modu, int end_modu, 
+      prec rect_dist, int i, int j);
 
-  TwoPinNets(int start_modu, int end_modu, prec rect_dist, int i, int j) {
-    selected = false;
-    this->start_modu = start_modu;
-    this->end_modu = end_modu;
-    this->rect_dist = rect_dist;
-    this->i = i;
-    this->j = j;
-  }
-
-  ~TwoPinNets() {
-  }
 };
 
 
@@ -612,26 +379,17 @@ class ROUTRACK {
   struct FPOS to;
   int layer;  // 1:M_Layer1, 2:M_Layer2, ..., etc.
   int netIdx;
-  ROUTRACK() : layer(INT_MAX), netIdx(INT_MAX) { from.SetZero(); to.SetZero(); };
-  ROUTRACK(struct FPOS _from, struct FPOS _to, int _layer, int _netIdx) {
-    from.Set(_from);
-    to.Set(_to);
-    layer = _layer;
-    netIdx = _netIdx;
-  };
-  void Dump() {
-    from.Dump("from"); 
-    to.Dump("to"); 
-    cout << "layer: " << layer << endl;
-    cout << "netIdx: " << netIdx << endl << endl;
-  }
+  ROUTRACK();
+  ROUTRACK(struct FPOS _from, struct FPOS _to, 
+      int _layer, int _netIdx);
+  void Dump();
 };
 
 struct NET {
   public:
   std::map< int, UFPin > mUFPin;
-  vector< TwoPinNets > two_pin_nets;
-  vector< ROUTRACK > routing_tracks;
+  std::vector< TwoPinNets > two_pin_nets;
+  std::vector< ROUTRACK > routing_tracks;
 
   prec min_x;
   prec min_y;
@@ -659,23 +417,8 @@ struct NET {
   prec stn_cof;             // lutong
   prec wl_rsmt;             // lutong
 
-  const char* Name() { return netNameStor[idx].c_str(); }
-
-  NET() : min_x(PREC_MAX), min_y(PREC_MAX), 
-  max_x(PREC_MIN), max_y(PREC_MIN),
-  pin(0), pin2(0), hpwl_x(PREC_MIN), hpwl_y(PREC_MIN),  
-  outPinIdx(INT_MAX), pinCNTinObject(INT_MAX), pinCNTinObject2(INT_MAX),
-  pinCNTinObject_tier(INT_MAX), idx(INT_MAX), mod_idx(INT_MAX), 
-  timingWeight(0.0f), 
-  stn_cof(0.0f),
-  wl_rsmt(0.0f) { 
-    sum_num1.SetZero();
-    sum_num2.SetZero();
-    sum_denom1.SetZero();
-    sum_denom2.SetZero();
-    terminalMin.SetZero();
-    terminalMax.SetZero();
-  };
+  const char* Name();
+  NET();
 };
 
 int UFFind(NET *net, int moduleID);
@@ -690,15 +433,7 @@ struct PLACE {
   FPOS stp;
   FPOS cnt;
   prec area;
-  void Dump(string a) {
-    cout << a << endl;
-    org.Dump("origin");
-    end.Dump("end");
-    center.Dump("center");
-    stp.Dump("stp");
-    cnt.Dump("cnt");
-    cout << endl;
-  }
+  void Dump(std::string a);
 };
 
 // for multi-rows
@@ -776,18 +511,18 @@ extern prec resPerMicron;
 
 extern bool isClockGiven;
 extern prec timingClock;
-extern string clockPinName;
+extern std::string clockPinName;
 
 extern bool isInitSeed;
-extern string plotColorFile;
+extern std::string plotColorFile;
 
 extern int timingUpdateIter;
 extern int pinCNT;
 extern int moduleCNT;
 extern int gcell_cnt;
 
-extern string globalRouterPosition;
-extern string globalRouterSetPosition;
+extern std::string globalRouterPosition;
+extern std::string globalRouterSetPosition;
 extern prec globalRouterCapRatio;
 
 enum { FillerCell, StdCell, Macro };
@@ -799,8 +534,8 @@ extern int totalShapeCount;
 extern int g_rrr;
 extern int STAGE;
 
-extern vector< SHAPE > shapeStor;
-extern HASH_MAP< string, vector< int > > shapeMap;
+extern std::vector< SHAPE > shapeStor;
+extern HASH_MAP< std::string, std::vector< int > > shapeMap;
 
 // STAGE's possible inner variables
 enum {
@@ -817,8 +552,8 @@ enum {
 // these variable is required to have detailPlacer settings
 extern int detailPlacer;
 enum { NoneDp, FastPlace, NTUplace3, NTUplace4h };
-extern string detailPlacerLocation;
-extern string detailPlacerFlag;
+extern std::string detailPlacerLocation;
+extern std::string detailPlacerFlag;
 
 extern bool isOnlyLGinDP;
 extern bool isSkipPlacement;
@@ -978,7 +713,7 @@ extern char global_router[1023];
 extern char output_dir[BUF_SZ];
 extern char currentDir[BUF_SZ];
 
-extern string sourceCodeDir;
+extern std::string sourceCodeDir;
 
 extern bool isRoutabilityInit;
 extern bool isTrial;
@@ -986,20 +721,20 @@ extern bool isFirst_gp_opt;
 extern bool DEN_ONLY_PRECON;
 extern int orderHPWL;
 
-extern vector< std::pair< int, prec > > inflationList;
-extern vector< std::pair< prec, prec > > trial_HPWLs;
-extern vector< prec > trial_POTNs;
-extern vector< std::pair< prec, prec > > hpwlEPs_1stOrder;
-extern vector< std::pair< prec, prec > > hpwlEPs_2ndOrder;
-extern vector< prec > potnEPs;
-extern std::map< string, vector< int > > routeBlockageNodes;
+extern std::vector< std::pair< int, prec > > inflationList;
+extern std::vector< std::pair< prec, prec > > trial_HPWLs;
+extern std::vector< prec > trial_POTNs;
+extern std::vector< std::pair< prec, prec > > hpwlEPs_1stOrder;
+extern std::vector< std::pair< prec, prec > > hpwlEPs_2ndOrder;
+extern std::vector< prec > potnEPs;
+extern std::map< std::string, std::vector< int > > routeBlockageNodes;
 extern int nXgrids, nYgrids, nMetLayers;
-extern vector< int > verticalCapacity;
-extern vector< int > horizontalCapacity;
-extern vector< prec > minWireWidth;
-extern vector< prec > minWireSpacing;
-extern vector< prec > viaSpacing;
-extern vector< tuple< int, int, int, int, int, int, int > > edgeCapAdj;
+extern std::vector< int > verticalCapacity;
+extern std::vector< int > horizontalCapacity;
+extern std::vector< prec > minWireWidth;
+extern std::vector< prec > minWireSpacing;
+extern std::vector< prec > viaSpacing;
+extern std::vector< std::tuple< int, int, int, int, int, int, int > > edgeCapAdj;
 extern prec gridLLx, gridLLy;
 extern prec tileWidth, tileHeight;
 extern prec blockagePorosity;
@@ -1010,7 +745,7 @@ extern CELL *gcell_st;
 extern TERM *terminalInstance;
 
 extern NET *netInstance;
-extern HASH_MAP< string, int > netNameMap;
+extern HASH_MAP< std::string, int > netNameMap;
 
 // structure for *.scl
 extern ROW *row_st;
@@ -1051,29 +786,29 @@ extern FPOS grow_pmax;
 ///////////////////////////////////////////////////////////////////////////
 /*  ARGUMENTS: main.cpp                                                  */
 ///////////////////////////////////////////////////////////////////////////
-extern string bmFlagCMD;
-extern string auxCMD;
-extern string defName;
-extern string verilogName;
-extern string sdcName;
-extern vector< string > lefStor;
-extern string outputCMD;
-extern string experimentCMD;
-extern vector< string > libStor;
-extern string verilogTopModule;
+extern std::string bmFlagCMD;
+extern std::string auxCMD;
+extern std::string defName;
+extern std::string verilogName;
+extern std::string sdcName;
+extern std::vector< std::string > lefStor;
+extern std::string outputCMD;
+extern std::string experimentCMD;
+extern std::vector< std::string > libStor;
+extern std::string verilogTopModule;
 extern int defMacroCnt;
 extern int numInitPlaceIter;
 
-extern string benchName;
+extern std::string benchName;
 
 extern int numThread;
 enum class InputMode { bookshelf, lefdef };
 extern InputMode inputMode;
 
-extern string racntiCMD;    // lutong
-extern string maxinflCMD;   // lutong
-extern string inflcoefCMD;  // lutong
-extern string filleriterCMD;
+extern std::string racntiCMD;    // lutong
+extern std::string maxinflCMD;   // lutong
+extern std::string inflcoefCMD;  // lutong
+extern std::string filleriterCMD;
 extern prec refDeltaWL;
 extern int conges_eval_methodCMD;  // grouter | prob
 
@@ -1177,7 +912,7 @@ void pre_mac_tier(void);
 
 inline prec getStepSizefromEPs(prec hpwl, prec hpwlEP, prec hpwlSTD,
                                prec basePCOF, prec baseRange) {
-  return min(basePCOF + baseRange, basePCOF +
+  return std::min(basePCOF + baseRange, basePCOF +
                                        baseRange * ((prec)fabs(hpwl - hpwlSTD) /
                                                     (prec)fabs(hpwlEP - hpwlSTD)));
 }

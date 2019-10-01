@@ -111,7 +111,7 @@ replace_external::init_replace_db() {
   dbSet<dbInst>::iterator iitr;
   for( iitr = insts.begin(); iitr != insts.end(); ++iitr ) {
     dbInst* curInst = *iitr;
-    cout << curInst->getName() << endl;
+//    cout << curInst->getName() << endl;
   }
 
   return true; 

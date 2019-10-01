@@ -52,6 +52,9 @@
 #include "plot.h"
 #include "wlen.h"
 
+using std::min;
+using std::max;
+
 /*
 prec get_potn(struct FPOS *st, int N) {
     prec sum_cell_phi = 0;

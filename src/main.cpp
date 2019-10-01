@@ -184,7 +184,7 @@ vector< pair< prec, prec > > hpwlEPs_2ndOrder;
 vector< prec > potnEPs;
 
 // .route
-map< string, vector< int > > routeBlockageNodes;
+std::map< string, vector< int > > routeBlockageNodes;
 int nXgrids, nYgrids, nMetLayers;
 vector< int > verticalCapacity;
 vector< int > horizontalCapacity;

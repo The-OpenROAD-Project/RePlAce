@@ -52,6 +52,10 @@
 
 #include "lefdefIO.h"
 
+using std::min;
+using std::max;
+using std::make_pair;
+
 int wcof_flg;
 int MAX_EXP;
 int NEG_MAX_EXP;

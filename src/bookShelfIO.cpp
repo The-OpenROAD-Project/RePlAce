@@ -57,6 +57,12 @@
 #include <string>
 #include <vector>
 
+using std::cout;
+using std::endl;
+using std::min;
+using std::max;
+using std::to_string;
+
 // this is shared with lefdefIO.cpp
 FPOS grow_pmin, grow_pmax;
 FPOS terminal_pmin, terminal_pmax;

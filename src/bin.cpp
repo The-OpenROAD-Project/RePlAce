@@ -55,6 +55,11 @@
 #include "wlen.h"
 
 using std::to_string;
+using std::cout;
+using std::endl;
+using std::max;
+using std::min;
+using std::numeric_limits;
 
 int tot_bin_cnt;
 int bin_cnt;

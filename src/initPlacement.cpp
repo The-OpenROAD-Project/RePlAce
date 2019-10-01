@@ -55,6 +55,12 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <unsupported/Eigen/IterativeSolvers>
 
+using std::vector;
+using std::string;
+using std::to_string;
+using std::max;
+using std::min;
+
 void initial_placement() {
   using namespace Eigen;
   printf("PROC:  Conjugate Gradient (CG) method to obtain the IP\n");
