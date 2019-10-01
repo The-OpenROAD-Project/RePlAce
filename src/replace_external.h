@@ -42,6 +42,7 @@ public:
   void set_pcof_max(double pcof_max);
   
   bool init_replace();
+  bool init_replace_db();
 
   size_t get_instance_list_size();
   std::string get_master_name(size_t idx);

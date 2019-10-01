@@ -11,5 +11,3 @@
 %include <std_pair.i>
 
 %include "replace_external.h"
-%template(vstr)         std::vector<std::string>;
-

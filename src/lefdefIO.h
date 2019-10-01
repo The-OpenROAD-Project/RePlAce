@@ -150,12 +150,12 @@ class Circuit {
   string lefDivider;
   string lefBusBitChar;
 
-  lefiUnits lefUnit;
+  LefDefParser::lefiUnits lefUnit;
   double lefManufacturingGrid;
-  vector< lefiMacro > lefMacroStor;
-  vector< lefiLayer > lefLayerStor;
-  vector< lefiVia > lefViaStor;
-  vector< lefiSite > lefSiteStor;
+  vector< LefDefParser::lefiMacro > lefMacroStor;
+  vector< LefDefParser::lefiLayer > lefLayerStor;
+  vector< LefDefParser::lefiVia > lefViaStor;
+  vector< LefDefParser::lefiSite > lefSiteStor;
 
   // Macro, via, Layer's unique name -> index of lefXXXStor.
   HASH_MAP< string, int > lefMacroMap;
@@ -168,10 +168,10 @@ class Circuit {
   // -> lefiPin, lefiObstruction
   //
   // below index is same with lefMacroStor
-  vector< vector< lefiPin > > lefPinStor;  // macroIdx -> pinIdx -> pinObj
+  vector< vector< LefDefParser::lefiPin > > lefPinStor;  // macroIdx -> pinIdx -> pinObj
   vector< HASH_MAP< string, int > >
       lefPinMapStor;  // macroIdx -> pinName -> pinIdx
-  vector< vector< lefiObstruction > >
+  vector< vector< LefDefParser::lefiObstruction > >
       lefObsStor;  // macroIdx -> obsIdx -> obsObj
 
   /////////////////////////////////////////////////////
@@ -229,8 +229,8 @@ class Circuit {
   void DumpLefSite();
   void DumpLefMacro();
 
-  void DumpLefPin(lefiPin* pin);
-  void DumpLefObs(lefiObstruction* obs);
+  void DumpLefPin(LefDefParser::lefiPin* pin);
+  void DumpLefObs(LefDefParser::lefiObstruction* obs);
 
   void DumpLefVia();
   void DumpLefDone();

@@ -1,3 +1,8 @@
+
+#include "db.h"
+#include "lefin.h"
+#include "defin.h"
+
 #include "replace_external.h"
 #include "wlen.h"
 #include "initPlacement.h"
@@ -71,6 +76,45 @@ replace_external::init_replace() {
   build_data_struct();
   update_instance_list();
   return true;
+}
+
+bool 
+replace_external::init_replace_db() {
+  using namespace ads;
+//  dbDatabase * db = dbDatabase::open( "chip.db", dbCreate );
+
+//  Logger::initLogger(_interp);
+
+  dbDatabase * db = dbDatabase::create();
+  lefin lefReader(db, false);
+  
+  std::list<std::string> lefList(lef_stor.begin(), lef_stor.end());
+  lefReader.createTechAndLib("testlib", lef_stor[0].c_str());
+
+  defin defReader(db);
+
+  std::vector<dbLib *> search_libs;
+  dbSet<dbLib> libs = db->getLibs();
+  dbSet<dbLib>::iterator itr;
+  for( itr = libs.begin(); itr != libs.end(); ++itr ) {
+    search_libs.push_back(*itr);
+  }
+
+  dbChip* chip = defReader.createChip( search_libs,  def_stor[0].c_str() );
+  if( chip == NULL ) { 
+    cout << "Failed to read def file: " << def_stor[0] << endl;
+    exit(1);
+  }
+
+  dbBlock* block = chip->getBlock(); 
+  dbSet<dbInst> insts = block->getInsts();
+  dbSet<dbInst>::iterator iitr;
+  for( iitr = insts.begin(); iitr != insts.end(); ++iitr ) {
+    dbInst* curInst = *iitr;
+    cout << curInst->getName() << endl;
+  }
+
+  return true; 
 }
 
 void

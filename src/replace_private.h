@@ -64,6 +64,8 @@
 #include <cstring>
 #include <cassert>
 
+#include <tcl.h>
+
 #define PI 3.141592653589793238462L
 #define SQRT2 1.414213562373095048801L
 #define INV_SQRT2 0.707106781186547524401L
@@ -1094,6 +1096,7 @@ extern bool trialRunCMD;
 extern bool autoEvalRC_CMD;
 extern bool onlyLG_CMD;
 
+extern Tcl_Interp* _interp;
 
 //////////////////////////////////////////////////////////////////////////
 // Defined in main.cpp ///////////////////////////////////////////////////

@@ -36,6 +36,9 @@ set(CIMG_HOME
 set(EIGEN_HOME
   ${PROJECT_SOURCE_DIR}/module/eigen-git-mirror 
 )
+set(OPENDB_HOME
+  ${PROJECT_SOURCE_DIR}/module/Athena-OpenROAD
+)
 
 add_subdirectory(${DEFLIB_HOME})
 add_subdirectory(${LEFLIB_HOME})
@@ -158,18 +161,21 @@ include_directories(
   ${OPENSTA_HOME}/util
   ${OPENSTA_HOME}/verilog
 
+  ${OPENDB_HOME}/zrouter/src/include
+  ${OPENDB_HOME}/zrouter/src/lefin
+  ${OPENDB_HOME}/zrouter/src/defin
 )
 
 ############################################################
 # Create a library 
 ############################################################
-# add_library( replacelib  SHARED
-#   ${REPLACE_SRC}
-# )
+add_library( replacelib  SHARED
+  ${REPLACE_SRC}
+)
 
-# set_target_properties( replacelib 
-#   PROPERTIES OUTPUT_NAME "replace"
-# )
+set_target_properties( replacelib 
+  PROPERTIES OUTPUT_NAME "replace"
+)
 
 ############################################################
 # Create an executable
@@ -189,10 +195,10 @@ add_dependencies( replace flute )
 add_dependencies( replace def )
 add_dependencies( replace lef )
 
-#add_dependencies( replacelib sta )
-#add_dependencies( replacelib flute )
-#add_dependencies( replacelib def )
-#add_dependencies( replacelib lef )
+add_dependencies( replacelib sta )
+add_dependencies( replacelib flute )
+add_dependencies( replacelib def )
+add_dependencies( replacelib lef )
 
 target_link_libraries( replace
   PUBLIC
@@ -215,6 +221,26 @@ target_link_libraries( replace
   ${OpenMP_CXX_LIBRARIES}
   Threads::Threads
   -static-libstdc++ 
+
+  ${OPENDB_HOME}/zrouter/src/lefin/liblefin.a
+  ${OPENDB_HOME}/zrouter/src/main/libmain.a
+  ${OPENDB_HOME}/zrouter/src/db/WireConn/libdb_conn.a
+  ${OPENDB_HOME}/zrouter/src/db/db_tcl/libdb_tcl.a
+  ${OPENDB_HOME}/zrouter/src/db/libdb.a
+  ${OPENDB_HOME}/zrouter/src/ModuleTemplate/libTEMPLATE.a
+  ${OPENDB_HOME}/zrouter/src/ModuleTemplate/TMP_tcl/libTMP_tcl.a
+  ${OPENDB_HOME}/zrouter/src/defout/libdefout.a
+  ${OPENDB_HOME}/zrouter/src/sylib/libsylib.a
+  ${OPENDB_HOME}/zrouter/src/tm/libtm.a
+  ${OPENDB_HOME}/zrouter/src/lefout/liblefout.a
+  ${OPENDB_HOME}/zrouter/src/sver/libsver.a
+  ${OPENDB_HOME}/zrouter/src/zutil/libzutil.a
+  ${OPENDB_HOME}/zrouter/src/oa/liboa.a
+  ${OPENDB_HOME}/zrouter/src/sdcrypt/libsdcrypt.a
+  ${OPENDB_HOME}/zrouter/src/cdslef56/lef/liblef.a
+  ${OPENDB_HOME}/zrouter/src/defin/libdefin.a
+  ${OPENDB_HOME}/zrouter/src/zlib/libzlib.a
+
   )
 
 ############################################################
@@ -223,6 +249,6 @@ target_link_libraries( replace
 
 install(FILES ${REPLACE_HEADER} DESTINATION include)
 install(TARGETS replace DESTINATION bin)
-# install(TARGETS replacelib DESTINATION lib)
+install(TARGETS replacelib DESTINATION lib)
 
 

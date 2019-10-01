@@ -380,14 +380,58 @@ bool autoEvalRC_CMD;
 bool onlyLG_CMD;
 ///////////////////////////////////////////////////////////
 
+Tcl_Interp* _interp;
+
 extern "C" {
 extern int Replace_Init(Tcl_Interp *interp);
+extern int Zrouter_Init(Tcl_Interp *interp);
 }
+
 
 int 
 replaceTclAppInit(Tcl_Interp *interp) {
-  Tcl_Init(interp);
-  Replace_Init(interp);
+
+  _interp = interp;
+
+
+  if (Tcl_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+
+
+#ifdef TCL_TEST
+#ifdef TCL_XT_TEST
+  if (Tclxttest_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+#endif
+  if (Tcltest_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+  Tcl_StaticPackage(interp, "Tcltest", Tcltest_Init,
+      (Tcl_PackageInitProc *) NULL);
+  if (TclObjTest_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+#ifdef TCL_THREADS
+  if (TclThread_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+#endif
+  if (Procbodytest_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+  Tcl_StaticPackage(interp, "procbodytest", Procbodytest_Init,
+      Procbodytest_SafeInit);
+#endif /* TCL_TEST */
+
+  if( Zrouter_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+
+  if( Replace_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR; 
+  }
   
   string command = "";
 
