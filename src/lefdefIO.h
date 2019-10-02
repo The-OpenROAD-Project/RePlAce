@@ -348,6 +348,7 @@ void SetUnitY(float _unitY);
 void SetOffsetX(float _offsetX);
 void SetOffsetY(float _offsetY);
 void SetUnitY(double _unitY);
+void SetDefDbu(double _l2d);
 
 prec GetUnitX();
 prec GetUnitY();

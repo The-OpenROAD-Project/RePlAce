@@ -270,6 +270,10 @@ void SetOffsetY(float _offsetY) {
   offsetY = _offsetY;
 }
 
+void SetDefDbu(double _l2d) {
+  l2d = _l2d;
+}
+
 prec GetUnitX() { return unitX; }
 prec GetUnitY() { return unitY; }
 prec GetOffsetX() { return offsetX; }

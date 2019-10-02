@@ -6,6 +6,7 @@
 #include "replace_external.h"
 #include "wlen.h"
 #include "initPlacement.h"
+#include "dbLefDefIO.h"
 
 
 replace_external::
@@ -102,17 +103,13 @@ replace_external::init_replace_db() {
 
   dbChip* chip = defReader.createChip( search_libs,  def_stor[0].c_str() );
   if( chip == NULL ) { 
-    cout << "Failed to read def file: " << def_stor[0] << endl;
+    cout << "Failed to read def file: " 
+      << def_stor[0] << endl;
     exit(1);
   }
 
-  dbBlock* block = chip->getBlock(); 
-  dbSet<dbInst> insts = block->getInsts();
-  dbSet<dbInst>::iterator iitr;
-  for( iitr = insts.begin(); iitr != insts.end(); ++iitr ) {
-    dbInst* curInst = *iitr;
-//    cout << curInst->getName() << endl;
-  }
+  FillReplaceStructures(db);
+
 
   return true; 
 }

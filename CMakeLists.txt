@@ -99,6 +99,7 @@ set (REPLACE_SRC
   src/replace_external.cpp
   src/replace_wrap.cpp
   src/replace_private.cpp
+  src/dbLefDefIO.cpp
   )
 
 
@@ -121,6 +122,7 @@ set (REPLACE_HEADER
   src/timingSta.h
   src/wlen.h
   src/util.h
+  src/dbLefDefIO.h
 )
 
 set (REPLACE_SWIG_FILES
