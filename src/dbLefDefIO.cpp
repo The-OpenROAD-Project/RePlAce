@@ -2,6 +2,7 @@
 #include "replace_private.h"
 #include "lefdefIO.h"
 #include "bookShelfIO.h"
+#include "defout.h"
 #include <iostream>
 
 using ads::dbDatabase;
@@ -21,6 +22,7 @@ using ads::dbRegion;
 using ads::dbSigType;
 
 using ads::adsRect;
+using ads::defout;
 
 using ads::error;
 using ads::notice;
@@ -538,4 +540,22 @@ DieRect GetCoreFromDb(dbSet<ads::dbRow> &rows, bool isScaleDown) {
     DieRect( GetScaleDownPoint(minX), GetScaleDownPoint(minY),
             GetScaleDownPoint(maxX), GetScaleDownPoint(maxY))
     : DieRect(minX, minY, maxX, maxY); 
+}
+
+void WriteDefDb(dbDatabase* db, const char* defName) {
+  dbChip* chip = db->getChip();
+  dbBlock* block = chip->getBlock();
+
+  for(int i=0; i<moduleCNT; i++)  {
+    MODULE* curModule = &moduleInstance[i];
+    
+    dbInst* curInst = block->findInst( curModule->Name() );  
+    curInst->setLocation( 
+        GetScaleUpPointX(curModule->pmin.x), 
+        GetScaleUpPointY(curModule->pmin.y));
+    curInst->setPlacementStatus(dbPlacementStatus::PLACED);
+  }
+
+  defout writer;
+  writer.writeBlock( block, defName );
 }

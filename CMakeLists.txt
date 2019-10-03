@@ -167,6 +167,7 @@ include_directories(
   ${OPENDB_HOME}/zrouter/src/include
   ${OPENDB_HOME}/zrouter/src/lefin
   ${OPENDB_HOME}/zrouter/src/defin
+  ${OPENDB_HOME}/zrouter/src/defout
 )
 
 ############################################################

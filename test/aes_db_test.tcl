@@ -11,12 +11,13 @@ replace_external rep
 
 # Import LEF/DEF files
 rep import_lef ${lib_dir}/NangateOpenCellLibrary.lef
-rep import_def ${design_dir}/${design}.def
+rep import_def ${design_dir}/${design}_60.def
 rep set_output ./output/
 
 rep set_verbose_level 0
-rep set_plot_enable
-rep set_density 0.6
+
+# rep set_plot_enable
+rep set_density 0.7
 
 # Initialize RePlAce
 rep init_replace_db
@@ -35,6 +36,6 @@ rep place_cell_nesterov_place
 #rep print_instances
 
 # Export DEF file
-rep export_def ./gcd_nonTD.def
+rep export_def ./aes_cipher_top_placed_60.def
 puts "Final HPWL: [rep get_hpwl]"
 

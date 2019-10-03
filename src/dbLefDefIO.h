@@ -16,4 +16,6 @@ void GenerateDummyCellDb(ads::dbSet<ads::dbRow> &rows);
 DieRect GetDieFromDb(ads::dbBox &bBox, bool isScaleDown = false);
 DieRect GetCoreFromDb(ads::dbSet<ads::dbRow> &rows, bool isScaleDown = false);
 
+void WriteDefDb(ads::dbDatabase* db, const char* defName);
+
 #endif

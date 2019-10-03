@@ -36,7 +36,13 @@ replace_external::import_lib(const char* lib){
 
 void 
 replace_external::export_def(const char* def){
-  WriteDef(def);
+  if( use_db ) {
+    ads::dbDatabase* db = ads::dbDatabase::getDatabase( db_id ); 
+    WriteDefDb(db, def);
+  }
+  else {
+    WriteDef(def);
+  }
 }
 
 void
