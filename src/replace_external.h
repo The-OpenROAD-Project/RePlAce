@@ -47,7 +47,14 @@ public:
   bool init_replace();
   bool init_replace_db();
 
+  // for test purpose
   size_t get_instance_list_size();
+  size_t get_module_size();
+  size_t get_terminal_size();
+  size_t get_net_size();
+  size_t get_pin_size();
+  size_t get_row_size();
+
   std::string get_master_name(size_t idx);
   std::string get_instance_name(size_t idx);
   float get_x(size_t idx); 

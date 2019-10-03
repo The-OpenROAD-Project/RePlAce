@@ -210,9 +210,36 @@ replace_external::import_verilog(const char* verilog) {
   verilog_stor.push_back(verilog);
 }
 
+
+
 size_t
 replace_external::get_instance_list_size() {
   return instance_list.size();
+}
+
+size_t
+replace_external::get_module_size() {
+  return moduleCNT;
+}
+
+size_t
+replace_external::get_terminal_size() {
+  return terminalCNT;
+}
+
+size_t
+replace_external::get_net_size() {
+  return netCNT;
+}
+
+size_t
+replace_external::get_pin_size() {
+  return pinCNT;
+}
+
+size_t
+replace_external::get_row_size() {
+  return row_cnt;
 }
 
 // examples for checking component names

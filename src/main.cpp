@@ -449,7 +449,7 @@ replaceTclAppInit(Tcl_Interp *interp) {
 //  command += "}";
   
   // register tclreadline 
-  Tcl_Eval(interp, command.c_str());
+//  Tcl_Eval(interp, command.c_str());
   
   return TCL_OK;
 }
