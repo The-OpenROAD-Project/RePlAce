@@ -439,14 +439,14 @@ replaceTclAppInit(Tcl_Interp *interp) {
   command += "puts \"RePlAce Version: 1.0.0\"";
   Tcl_Eval(interp, command.c_str());
 
-  command = "";
-  command += "if {$tcl_interactive} {\n";
-  command += "package require tclreadline\n";
-  command += "proc ::tclreadline::prompt1 {} {\n";
-  command += " return \"replace-[lindex [split [pwd] \"/\"] end] % \"\n";
-  command += "}\n";
-  command += "::tclreadline::Loop\n";
-  command += "}";
+//  command = "";
+//  command += "if {$tcl_interactive} {\n";
+//  command += "package require tclreadline\n";
+//  command += "proc ::tclreadline::prompt1 {} {\n";
+//  command += " return \"replace-[lindex [split [pwd] \"/\"] end] % \"\n";
+//  command += "}\n";
+//  command += "::tclreadline::Loop\n";
+//  command += "}";
   
   // register tclreadline 
   Tcl_Eval(interp, command.c_str());

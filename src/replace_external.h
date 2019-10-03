@@ -22,9 +22,11 @@ public:
   ~replace_external();
   void import_lef(const char* lef);
   void import_def(const char* def);
+  void import_db(const char* db);
   void set_output(const char* output);
 
   void export_def(const char* def);
+  void export_db(const char* db);
 
   void set_timing_driven(bool is_true);
   void import_sdc(const char* sdc);

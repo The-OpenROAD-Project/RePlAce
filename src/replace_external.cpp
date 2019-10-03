@@ -12,7 +12,7 @@
 replace_external::
 replace_external() : 
   timing_driven_mode(false), ckt(&Replace::__ckt), 
-  unit_r(0.0f), unit_c(0.0f), use_db(true) {
+  unit_r(0.0f), unit_c(0.0f), use_db(true), db_id(INT_MAX) {
   initGlobalVars();
 };
 
@@ -21,17 +21,71 @@ replace_external::
 
 void 
 replace_external::import_lef(const char* lef){ 
-  lef_stor.push_back(lef);
+  ads::dbDatabase * db = NULL;
+  if( db_id == INT_MAX ) {
+    db = ads::dbDatabase::create();
+    db_id = db->getId();
+  }
+  else {
+    db = ads::dbDatabase::getDatabase(db_id);
+  }
+  ads::lefin lefReader(db, false);
+  lefReader.createTechAndLib("testlib", lef);
 }
 
 void 
 replace_external::import_def(const char* def){
-  def_stor.push_back(def);
+  ads::dbDatabase * db = NULL;
+  if( db_id == INT_MAX ) {
+    db = ads::dbDatabase::create();
+    db_id = db->getId();
+  }
+  else {
+    db = ads::dbDatabase::getDatabase(db_id);
+  }
+  ads::defin defReader(db);
+
+  std::vector<ads::dbLib *> search_libs;
+  ads::dbSet<ads::dbLib> libs = db->getLibs();
+  ads::dbSet<ads::dbLib>::iterator itr;
+  for( itr = libs.begin(); itr != libs.end(); ++itr ) {
+    search_libs.push_back(*itr);
+  }
+  ads::dbChip* chip = defReader.createChip( search_libs,  def );
 }
 
 void 
 replace_external::import_lib(const char* lib){
   lib_stor.push_back(lib);
+}
+
+void
+replace_external::import_db(const char* dbLoc) {
+//  ads::dbDatabase* db = NULL;
+  ads::dbDatabase* db = ads::dbDatabase::create();
+
+  FILE* fp = fopen(dbLoc, "rb");
+  if( fp == NULL ) {
+    cout << "ERROR: Can't open " <<  dbLoc << endl;
+    exit(1);
+  }
+  db->ads::dbDatabase::read(fp);
+  fclose(fp);
+  db_id = db->getId(); 
+}
+
+void
+replace_external::export_db(const char* dbLoc) {
+  ads::dbDatabase* db = ads::dbDatabase::getDatabase( db_id );  
+  
+  FILE* fp = fopen(dbLoc, "wb");
+  if( fp == NULL ) {
+    cout << "ERROR: Can't open " <<  dbLoc << endl;
+    exit(1);
+  }
+
+  db->ads::dbDatabase::write(fp);
+  fclose(fp);
 }
 
 void 
@@ -92,12 +146,20 @@ replace_external::init_replace_db() {
 //  dbDatabase * db = dbDatabase::open( "chip.db", dbCreate );
 
 //  Logger::initLogger(_interp);
+  ads::dbDatabase * db = NULL;
+  if( db_id == INT_MAX ) {
+    db = ads::dbDatabase::create();
+    db_id = db->getId();
+  }
+  else {
+    db = dbDatabase::getDatabase(db_id);
+  }
 
+  /*
   dbDatabase * db = dbDatabase::create();
   db_id = db->getId();
   lefin lefReader(db, false);
   
-  std::list<std::string> lefList(lef_stor.begin(), lef_stor.end());
   lefReader.createTechAndLib("testlib", lefList);
 
   defin defReader(db);
@@ -114,7 +176,8 @@ replace_external::init_replace_db() {
     cout << "Failed to read def file: " 
       << def_stor[0] << endl;
     exit(1);
-  }
+  }*/
+
   
 //  lefStor = lef_stor;
 //  defName = def_stor[0];
