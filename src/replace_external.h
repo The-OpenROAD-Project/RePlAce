@@ -36,6 +36,7 @@ public:
   void set_verbose_level(int verbose);
   void set_density(double density);
   void set_bin_grid_count(size_t grid_count);
+  void set_plot_enable();
   
   void set_lambda(double lambda);
   void set_pcof_min(double pcof_min);
@@ -78,6 +79,8 @@ private:
   bool timing_driven_mode;
   double unit_r;
   double unit_c;
+  int db_id;
+  bool use_db;
 };
 
 #endif

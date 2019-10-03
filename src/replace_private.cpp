@@ -361,6 +361,31 @@ NET::NET() : min_x(PREC_MAX), min_y(PREC_MAX),
     terminalMax.SetZero();
   }
 
+ROW::ROW() : site_wid(0),
+  site_spa(0),
+  ori(""),
+  isXSymmetry(false),
+  isYSymmetry(false),
+  isR90Symmetry(false),
+  x_cnt(0) {
+    pmin.SetZero();
+    pmax.SetZero();
+    size.SetZero();
+  }
+
+void ROW::Dump(std::string a) {
+    cout << a << endl;
+    cout << "site_wid: " << site_wid << endl;
+    cout << "site_spa: " << site_spa << endl;
+    cout << "ori: " << ori << endl;
+    cout << "x_cnt: " << x_cnt << endl;
+    pmin.Dump("pmin");
+    pmax.Dump("pmax");
+    size.Dump("size");
+    cout << endl;
+  }
+
+
 void PLACE::Dump(std::string a) {
     cout << a << endl;
     org.Dump("origin");

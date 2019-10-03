@@ -11,7 +11,7 @@ replace_external rep
 
 # Import LEF/DEF files
 rep import_lef ${lib_dir}/contest.lef
-rep import_def ${design_dir}/${design}.def
+rep import_def ${design_dir}/${design}_mixed_row.def
 rep set_output ./output/
 
 rep set_bin_grid_count 64

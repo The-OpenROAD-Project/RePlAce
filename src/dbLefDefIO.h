@@ -10,9 +10,10 @@ void FillReplaceModule(ads::dbSet<ads::dbInst> &insts);
 void FillReplaceTerm(ads::dbSet<ads::dbInst> &insts, ads::dbSet<ads::dbBTerm> &bterms);
 void FillReplaceRow(ads::dbSet<ads::dbRow> &rows);
 void FillReplaceNet(ads::dbSet<ads::dbNet> &nets);
+void GenerateDummyCellDb(ads::dbSet<ads::dbRow> &rows);
 
 
-DieRect GetDieFromDb(ads::dbBox &bBox, bool isScaleDown = true);
-DieRect GetCoreFromDb(ads::dbSet<ads::dbRow> &rows);
+DieRect GetDieFromDb(ads::dbBox &bBox, bool isScaleDown = false);
+DieRect GetCoreFromDb(ads::dbSet<ads::dbRow> &rows, bool isScaleDown = false);
 
 #endif

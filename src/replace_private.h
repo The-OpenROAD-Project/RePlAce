@@ -425,6 +425,26 @@ int UFFind(NET *net, int moduleID);
 void UFUnion(NET *net, int idx, int idy);
 
 // for *.scl files
+struct ROW {
+  prec site_wid;  // SiteWidth
+  prec site_spa;  // SiteSpacing
+
+  std::string ori;
+  //    string sym;
+  bool isXSymmetry;
+  bool isYSymmetry;
+  bool isR90Symmetry;
+
+  int x_cnt;  // NumSites
+  FPOS pmin;
+  FPOS pmax;
+  FPOS size;
+
+  ROW();
+  void Dump(std::string a);
+};
+
+// for *.scl files
 // ROW -> PLACE structure
 struct PLACE {
   FPOS org;

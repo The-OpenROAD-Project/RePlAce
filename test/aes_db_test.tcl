@@ -15,6 +15,8 @@ rep import_def ${design_dir}/${design}.def
 rep set_output ./output/
 
 rep set_verbose_level 0
+rep set_plot_enable
+rep set_density 0.6
 
 # Initialize RePlAce
 rep init_replace_db

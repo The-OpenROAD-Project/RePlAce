@@ -11,7 +11,8 @@
 
 replace_external::
 replace_external() : 
-  timing_driven_mode(false), ckt(&Replace::__ckt), unit_r(0.0f), unit_c(0.0f) {
+  timing_driven_mode(false), ckt(&Replace::__ckt), 
+  unit_r(0.0f), unit_c(0.0f), use_db(true) {
   initGlobalVars();
 };
 
@@ -87,6 +88,7 @@ replace_external::init_replace_db() {
 //  Logger::initLogger(_interp);
 
   dbDatabase * db = dbDatabase::create();
+  db_id = db->getId();
   lefin lefReader(db, false);
   
   std::list<std::string> lefList(lef_stor.begin(), lef_stor.end());
@@ -107,10 +109,20 @@ replace_external::init_replace_db() {
       << def_stor[0] << endl;
     exit(1);
   }
+  
+//  lefStor = lef_stor;
+//  defName = def_stor[0];
+  outputCMD = output_loc;
+
+  initGlobalVarsAfterParse();
+  init();
 
   FillReplaceStructures(db);
-
-
+  
+  net_update_init();
+  init_tier();
+  build_data_struct();
+  update_instance_list();
   return true; 
 }
 
@@ -258,19 +270,49 @@ replace_external::set_net_weight_scale(double net_weight_scale) {
   netWeightScale = net_weight_scale;
 }
 
+void
+replace_external::set_plot_enable() {
+  isPlot = true;
+}
+
 
 void 
 replace_external::update_instance_list() {
   if( instance_list.size() == 0 ) {
-    for(int i=0; i<moduleCNT; i++) {
-      MODULE* module = &moduleInstance[i];
-      instance_info tmp;
-      tmp.name = module->Name();
-      auto cmPtr = ckt->defComponentMap.find(tmp.name);
-      tmp.master = ckt->defComponentStor[cmPtr->second].name();
-      tmp.x = module->pmin.x;
-      tmp.y = module->pmin.y;
-      instance_list.push_back(tmp);
+    if( use_db ) {
+      using namespace ads;
+      dbDatabase* db = dbDatabase::getDatabase( db_id ); 
+
+      dbChip* chip = db->getChip();
+      dbBlock* block = chip->getBlock();
+
+      for(int i=0; i<moduleCNT; i++) {
+        MODULE* module = &moduleInstance[i];
+        instance_info tmp;
+        tmp.name = module->Name();
+        
+        dbInst* curInst = block->findInst( module->Name() );
+        dbMaster* curMaster = curInst->getMaster();
+        tmp.master = curMaster->getConstName();
+
+        tmp.x = module->pmin.x;
+        tmp.y = module->pmin.y;
+        instance_list.push_back(tmp);
+      }
+    }
+    else {
+      for(int i=0; i<moduleCNT; i++) {
+        MODULE* module = &moduleInstance[i];
+        instance_info tmp;
+        tmp.name = module->Name();
+
+        auto cmPtr = ckt->defComponentMap.find(tmp.name);
+        tmp.master = ckt->defComponentStor[cmPtr->second].name();
+
+        tmp.x = module->pmin.x;
+        tmp.y = module->pmin.y;
+        instance_list.push_back(tmp);
+      }
     }
   }
   else {
