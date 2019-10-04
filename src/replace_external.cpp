@@ -12,7 +12,8 @@
 replace_external::
 replace_external() : 
   timing_driven_mode(false), ckt(&Replace::__ckt), 
-  unit_r(0.0f), unit_c(0.0f), use_db(true), db_id(INT_MAX) {
+  unit_r(0.0f), unit_c(0.0f), 
+  use_db(true), db_id(INT_MAX), output_loc("") {
   initGlobalVars();
 };
 
@@ -106,6 +107,7 @@ replace_external::set_output(const char* output) {
 
 bool 
 replace_external::init_replace() {
+/*
   if( lef_stor.size() == 0 ) {
     std::cout << "ERROR: Specify at least one LEF file!" << std::endl;
     exit(1);
@@ -138,6 +140,7 @@ replace_external::init_replace() {
   build_data_struct();
   update_instance_list();
   return true;
+*/
 }
 
 bool 
@@ -181,7 +184,7 @@ replace_external::init_replace_db() {
   
 //  lefStor = lef_stor;
 //  defName = def_stor[0];
-  outputCMD = output_loc;
+  outputCMD = (output_loc == "")? "./output" : output_loc;
 
   initGlobalVarsAfterParse();
   init();

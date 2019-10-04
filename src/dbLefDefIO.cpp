@@ -557,5 +557,6 @@ void WriteDefDb(dbDatabase* db, const char* defName) {
   }
 
   defout writer;
+  writer.setVersion( defout::DEF_5_6 );
   writer.writeBlock( block, defName );
 }

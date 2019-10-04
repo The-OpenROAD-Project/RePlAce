@@ -79,8 +79,6 @@ private:
 
   Replace::Circuit* ckt;
 
-  std::vector<std::string> lef_stor;
-  std::vector<std::string> def_stor;
   std::vector<std::string> verilog_stor;
   std::vector<std::string> lib_stor;
   std::string sdc_file;
