@@ -20,6 +20,126 @@ replace_external() :
 replace_external::
 ~replace_external() {};
 
+void
+replace_external::help() {
+  cout << endl;
+  cout <<"RePlAce Commands" << endl;
+  cout <<"import_lef [file_name]" << endl;
+  cout <<"  file_name      Input LEF file location" << endl;
+  cout << endl;
+  cout <<"import_def [file_name]" << endl;
+  cout <<"  file_name      Input DEF file location" << endl;
+  cout << endl;
+  cout <<"import_db [file_name]" << endl;
+  cout <<"  file_name      Input DB file location" << endl;
+  cout << endl;
+
+  cout <<"export_def [file_name]" << endl;
+  cout <<"  file_name      Output DEF file location" << endl;
+  cout << endl;
+  cout <<"export_db  [file_name]" << endl;
+  cout <<"  file_name      Output DB file location" << endl;
+  cout << endl;
+  
+  cout <<"set_output [file_location]" << endl;
+  cout <<"  file_location  Output folder location" << endl;
+  cout << endl;
+  
+  cout <<"set_verbose_level [level]" << endl;
+  cout <<"  level          Set verbose level. [1-3, int]" << endl;
+  cout << endl;
+  cout <<"set_density [density]" << endl;
+  cout <<"  density        Set density. [0-1, float]" << endl;
+  cout << endl;
+  cout <<"set_bin_grid_count [num]" << endl;
+  cout <<"  num            Set bin_grid_count. [64,128,256,512,..., int]" << endl;
+  cout << endl;
+  cout <<"set_plot_enable [mode]" << endl;
+  cout <<"  mode           Set plot modes. [true/false]" << endl;
+  cout << endl;
+  cout <<"set_lambda [lambda]" << endl;
+  cout <<"  lambda         Set lambda for RePlAce tunning." << endl;
+  cout <<"                 [8e-5~10e5, float]" << endl;
+  cout << endl;
+  cout <<"set_pcof_min [pcof_min]" << endl;
+  cout <<"  pcof_min       Set pcof_min for RePlAce tunning." << endl;
+  cout <<"                 [0.95-1.05, float]" << endl;
+  cout << endl;
+  cout <<"set_pcof_max [pcof_max]" << endl;
+  cout <<"  pcof_max       Set pcof_max for RePlAce tunning." << endl;
+  cout <<"                 [1.00-1.20, float]" << endl;
+  cout << endl;
+  
+  cout <<"place_cell_init_place" << endl;
+  cout <<"                 Execute BiCGSTAB engine for initial place." << endl;
+  cout << endl;
+  cout <<"place_cell_nesterov_place" << endl;
+  cout <<"                 Execute Nesterov engine for global place." << endl;
+  cout << endl;
+  cout <<"init_replace_db" << endl;
+  cout <<"                 Initialize RePlAces' structure." << endl;
+  cout << endl;
+  
+//  cout <<"======Circuit Info======" << endl;
+//  cout <<"get_instance_list_size" << endl;
+//  cout <<"get_module_size " << endl;
+//  cout <<"get_terminal_size " << endl;
+//  cout <<"get_net_size " << endl;
+//  cout <<"get_pin_size " << endl;
+//  cout <<"get_row_size " << endl;
+//  cout <<"get_master_name " << endl;
+//  cout <<"get_instance_name " << endl;
+//  cout <<"get_x " << endl;
+//  cout <<"get_y " << endl;
+//  cout <<"get_hpwl " << endl;
+//  cout <<"print_instances " << endl;
+//  cout << endl;
+  
+//  cout <<"save_jpeg " << endl;
+
+  cout <<"======Timing-Driven Related Cmds======" << endl;
+  cout <<"set_timing_driven [mode]" << endl;
+  cout <<"  mode           Set Timing-driven modes. [true/false]" << endl;
+  cout << endl;
+  cout <<"import_sdc [file_name]" << endl;
+  cout <<"  file_name      Input SDC file location" << endl;
+  cout << endl;
+  cout <<"import_verilog [file_name]" << endl;
+  cout <<"  file_name      Input Verilog file location" << endl;
+  cout << endl;
+  cout <<"import_lib [file_name]" << endl;
+  cout <<"  file_name      Input Liberty file location" << endl;
+  cout << endl;
+
+  cout <<"set_unit_res [resistor]" << endl;
+  cout <<"  resistor       Resistance per Micron. (unit:Ohm)" << endl;
+  cout <<"                 Used for internal RC extraction" << endl;
+  cout << endl;
+  cout <<"set_unit_cap [capacitance]" << endl;
+  cout <<"  capacitance    Resistance per Micron. (unit:Ohm)" << endl;
+  cout <<"                 Used for internal RC extraction" << endl;
+  cout << endl;
+  cout <<"set_net_weight_min [weight_min]" << endl;
+  cout <<"  weight_min     Set net_weight_min for TD-RePlAce tunning" << endl;
+  cout <<"                 [1.0-1.8, float]" << endl;
+  cout << endl;
+  cout <<"set_net_weight_max [weight_max]" << endl;
+  cout <<"  weight_max     Set net_weight_max for TD-RePlAce tunning" << endl;
+  cout <<"                 [weight_min-1.8, float]" << endl;
+  cout << endl;
+  cout <<"set_net_weight_scale [weight_scale]" << endl;
+  cout <<"  weight_scale   Set net_weight_scale for TD-RePlAce tunning" << endl;
+  cout <<"                 [200-, float]" << endl;
+  cout << endl;
+  cout <<"get_wns" << endl;
+  cout <<"                 Return WNS from OpenSTA [float]" << endl;
+  cout << endl;
+  cout <<"get_tns" << endl;
+  cout <<"                 Return TNS from OpenSTA [float]" << endl;
+  cout << endl;
+  
+}
+
 void 
 replace_external::import_lef(const char* lef){ 
   ads::dbDatabase * db = NULL;
@@ -310,6 +430,10 @@ replace_external::place_cell_nesterov_place() {
     cGP2DglobalPlacement_main();
   }
   update_instance_list();
+  if( isPlot ) {
+    SaveCellPlotAsJPEG("Global Placement Result", false,
+        string(dir_bnd) + string("/globalPlace"));
+  }
   return true;
 }
 
@@ -370,8 +494,8 @@ replace_external::set_net_weight_scale(double net_weight_scale) {
 }
 
 void
-replace_external::set_plot_enable() {
-  isPlot = true;
+replace_external::set_plot_enable(bool plot) {
+  isPlot = plot;
 }
 
 

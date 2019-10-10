@@ -37,7 +37,7 @@ set(EIGEN_HOME
   ${PROJECT_SOURCE_DIR}/module/eigen-git-mirror 
 )
 set(OPENDB_HOME
-  ${PROJECT_SOURCE_DIR}/module/OpenDB-libs
+  ${PROJECT_SOURCE_DIR}/module/OpenDB
 )
 
 add_subdirectory(${DEFLIB_HOME})
@@ -239,11 +239,11 @@ target_link_libraries( replace
   ${OPENDB_HOME}/zrouter/src/lefout/liblefout.a
   ${OPENDB_HOME}/zrouter/src/sver/libsver.a
   ${OPENDB_HOME}/zrouter/src/zutil/libzutil.a
-  ${OPENDB_HOME}/zrouter/src/oa/liboa.a
-  ${OPENDB_HOME}/zrouter/src/sdcrypt/libsdcrypt.a
   ${OPENDB_HOME}/zrouter/src/cdslef56/lef/liblef.a
   ${OPENDB_HOME}/zrouter/src/defin/libdefin.a
   ${OPENDB_HOME}/zrouter/src/zlib/libzlib.a
+  ${OPENDB_HOME}/zrouter/src/SHAPES/PDN_tcl/libPDN_tcl.a
+  ${OPENDB_HOME}/zrouter/src/SHAPES/libSHAPES.a
 
   )
 

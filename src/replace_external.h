@@ -4,6 +4,7 @@
 // No hope to isolate right now...
 #include "replace_private.h"
 #include "lefdefIO.h"
+#include "plot.h"
 
 
 // SWIG refuse to be inside replace_external...
@@ -20,6 +21,9 @@ public:
 
   replace_external();
   ~replace_external();
+
+  void help();
+
   void import_lef(const char* lef);
   void import_def(const char* def);
   void import_db(const char* db);
@@ -38,7 +42,7 @@ public:
   void set_verbose_level(int verbose);
   void set_density(double density);
   void set_bin_grid_count(size_t grid_count);
-  void set_plot_enable();
+  void set_plot_enable(bool plot);
   
   void set_lambda(double lambda);
   void set_pcof_min(double pcof_min);
