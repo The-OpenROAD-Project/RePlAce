@@ -5,7 +5,9 @@
 
 replace_external::
 replace_external() : 
-  timing_driven_mode(false), ckt(&Replace::__ckt), unit_r(0.0f), unit_c(0.0f) {
+  timing_driven_mode(false), ckt(&Replace::__ckt), 
+  unit_r(0.0f), unit_c(0.0f),
+  output_loc("") {
   initGlobalVars();
 };
 
@@ -50,7 +52,7 @@ replace_external::init_replace() {
 
   lefStor = lef_stor;
   defName = def_stor[0];
-  outputCMD = output_loc;
+  outputCMD = (output_loc == "")? "./output" : output_loc;
 
   if( timing_driven_mode == true ) {
     capPerMicron = unit_c;
