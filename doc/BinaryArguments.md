@@ -1,65 +1,75 @@
-# Usage
+# Usage with TCL Interpreter
 
-## Lef/Def/Verilog (Commercial Format)
-    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> [-verilog <*.v>] -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
+RePlAce has internal TCL Interpreter. The following line will create replace_external objects.
 
-* __-bmflag__ : Specify which Benchmark is used
-* __-lef__ : \*.lef Location (Multiple lef files supported. __Technology LEF must be ahead of other LEFs.__)
-* __-def__ : \*.def Location (Required due to FloorPlan information)
-* __-verilog__ : \*.v Location (Optional)
-* __-output__ : Specify the Location of Output Results
-* __-dpflag__ : Specify which Detailed Placer is Used
-* __-dploc__ : Specify the Location of Detailed Placer
-* __-fast__ : Fast and quick placement for IO-pin placement. Please do NOT use this command in general purposes (It'll not spread all cells enough)
-* __-t__ : Specify the number of threads. Default = 1. __Multi-threads mode is not fully developed yet__
+    replace_external rep
+    
+After having a rep object, a user can type any TCL commands after one spacing from the object name(e.g. rep).
+
+    rep [tcl_command]
 
 
-## Timing-Driven mode for Lef/Def/Verilog (Commercial Format)
-    $ ./RePlAce -bmflag <mms/ispd/sb/ibm/etc> -lef tech.lef -lef macro.lef ...  -def <*.def> -verilog <*.v> -lib lib1.lib -lib lib2.lib ... -sdc <*.sdc> -timing -capPerMicron 0.23e-15 -resPerMicron 70.0 -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation> [Options]
+## File I/O Commands
+* __import_lef__ [file_name] : \*.lef location (Multiple lef files supported. __Technology LEF must be ahead of other LEFs.__)
+* __import_def__ [file_name] : \*.def location (Required due to FloorPlan information)
+* __export_def__ [file_name] : Output DEF location
+* __set_output__ [directory_location] : Specify the location of output results. Default: ./output
+   
+## Flow Control
+* __init_replace__ : Initialize RePlAce's structure based on LEF and DEF.
+* __place_cell_init_place__ : Execute BiCGSTAB engine for initial place.
+* __place_cell_nesterov_place__ : Execute Nesterov engine for global placement.
 
-__Timing-Driven__ mode must have same arguments as non-timing mode, but the __differences__ are:
-* __-timing__ : Specify the Timing-Driven Placement Mode
-* __-verilog__ : \*.v Location (__Required__ for OpenSTA)
-* __-sdc__ : Specify the Synopsys Design Constraint (SDC) file. (Required for OpenSTA)
-* __-lib__ : \*.lib Location (Multiple lib files supported. Required for OpenSTA)
-* __-capPerMicron__ : Capacitance per Micron. Unit: Farad. (Used for Internal RC Extraction)
-* __-resPerMicron__ : Resisance per Micron. Unit: Ohm. (Used for Internal RC Extraction)
 
-## Legalization mode 
-    $ ./RePlAce -bmflag etc -onlyDP -onlyLG -lef tech.lef -lef macro.lef ...  -def <*.def> -output <outputLocation> -dpflag <NTU3/NTU4> -dploc <dpLocation>
+## Timing-driven Mode
+* __set_timing_driven__ [true/false] : Enable timing-driven modes
+* __import_lib__ [file_name] : \*.lib location (Multiple lib files supported. Required for OpenSTA)
+* __import_sdc__ [file_name] : \*.sdc location (Required for OpenSTA). SDC: Synopsys Design Constraint (SDC)
+* __import_verilog__ [file_name] : \*.v location (Required for OpenSTA)
+* __set_unit_res__ [resistor] : Resisance per micron. Unit: Ohm. (Used for Internal RC Extraction)
+* __set_unit_cap__ [capacitance] : Capacitance per micron. Unit: Farad. (Used for Internal RC Extraction)
 
-Note that verilog is not supported in this mode.
+## RePlAce tunning parameters
+__Note that the following tunning parameters must be defined before executing init_replace commands__
+* __set_density__ [density] : Set target density. [0-1, float]. Default: 1.00
+* __set_bin_grid_count__ [num] : Set bin_grid_count. [64,128,256,512,..., int]. Default: Defined by internal algorithm.
+* __set_lambda__ [lambda] : Set lambda for RePlAce tunning. [float]. Default : 8e-5~10e5
+* __set_pcof_min__ [pcof_min] : Set pcof_min(µ_k Lower Bound) for RePlAce tunning. [0.95-1.05, float]. Default: 0.95
+* __set_pcof_max__ [pcof_max] : Set pcof_max(µ_k Upper Bound) for RePlAce tunning. [1.00-1.20, float]. Default: 1.05
+* __set_step_scale__ [step_scale] : Set step_scale(∆HPWL_REF) for RePlAce tunning. Default: 346000
+* __set_target_overflow__ [overflow] : Set 
 
-__Legalization-Only__ mode must have the same arguments as original mode, but the __differences__ are:
+__Timing-driven related tuning parameters__
+* __set_net_weight_min__ [weight_min] :
+* __set_net_weight_max__ [weight_max] :
+* __set_net_weight_scale__ [weight_scale] : 
 
-* __-onlyDP__ : Only Detailed Placement Mode
-* __-onlyLG__ : Call Detailed Placement in Legalization Mode
+## Other options
+* __set_plot_enable__ [mode] : Set plot modes; This mode will plot layout every 10 iterations (Cell, bin, and arrow plots) [true/false]. Default: False
+* __set_seed_init_enable__ [true/false] : Start global place with the given placed locations. Default: False
+* __set_fast_mode_enable__ [true/false] : Fast and quick placement for IO-pin placement. Please do __NOT__ use this command in general purposes (It'll not spread all cells enough). Default: False
+* __set_verbose_level__ [level] : Specify the verbose level. [1-3, int]. Default: 1
 
-## Other Options
-### Flow Control
-* __-timing__ : Enable Timing-Driven Placement Mode 
-* __-skipIP__ : Skip Initial Placement Mode 
-* __-onlyGP__ : Only Global Placement Mode
-* __-onlyDP__ : Only Detailed Placement Mode
-* __-onlyLG__ : Call Detailed Placement in Legalization Mode
+## Query results
+* __get_hpwl__ : Returns HPWL results on Micron. [float]
+* __get_wns__ : Returns WNS from OpenSTA. (Only available when timing-driven mode is enabled) [float]
+* __get_tns__ : Returns TNS from OpenSTA. (Only available when timing-driven mode is enabled) [float]
+* __print_instances__ : Print out all of instances' information. (Not recommended for huge design)
+* __get_instance_list_size__ : Returns total number of instances in RePlAce. [size_t]
+* __get_x__ [index] : Returns x coordinates of specified instances' index. [float]
+* __get_y__ [index] : Returns y coordinates of specified instances' index. [float]
+* __get_master_name__ [index] : Returns master name of specified instances' index. [string]
+* __get_instance_name__ [index] : Returns instance name of specified instances' index. [string]
 
-### Nesterov Control
-* __-den__ : Target Density, Floating Number, Default = 1 [0.00,1.00]
-* __-bin__ : #bins (in power of 2) for x, y, z Directions, Unsigned Integer[3], Default = 32 32 32
-* __-overflow__ : Overflow Termination Condition, Floating Number, Default = 0.1 [0.00, 1.00]
-* __-initCoef__ : Initial lambda coefficients, Float Number, Default = 0.00008
-* __-pcofmin__ : µ_k Lower Bound, Float Number, Default = 0.95
-* __-pcofmax__ : µ_k Upper Bound, Float Number, Default = 1.05
+## Example TCL scripts
+* Non Timing-Driven RePlAce: 
+* Timing-Driven RePlAce: 
+
+FYI, All of the TCL commands are defined in the [replace_external.h]() header files.
+
+
+### Routability-driven parameters (unused now)
 * __-rancti__ : Max # Global Router Calls and Cell Inflation. No Restore of Cell Size, Keep Increasing, Unsigned Integer, Default = 10
 * __-maxinfl__ : Max Cell Inflation for Each Cell Inflation Per Global Router Call. Floating Number, Default = 2.5
 * __-inflcoef__ : γ_super, Floating Number, Default = 2.33
 * __-filleriter__ : # Filler Only Placement Iterations, Floating Number, Default = 20
-* __-stepScale__ : ∆HPWL_REF, Floating Number, Default=346000
-* __-initSeed__ : Start Nesterov iteration with the given placed locations, Default = False
-
-
-### Plot
-* __-plot__ : Plot Layout Every 10 Iterations (Cell, Bin, Arrow Plots)
-
-### Router
-* __-routability__ : Enable Routability flow 
