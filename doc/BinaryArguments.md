@@ -4,7 +4,7 @@ RePlAce has internal TCL Interpreter. The following line will create replace_ext
 
     replace_external rep
     
-After having a rep object, a user can type any TCL commands after one spacing from the object name(e.g. rep).
+After having a replace_external object, a user can type any TCL commands after one spacing from the object name(e.g. rep).
 
     rep [tcl_command]
 
@@ -30,19 +30,19 @@ After having a rep object, a user can type any TCL commands after one spacing fr
 * __set_unit_cap__ [capacitance] : Capacitance per micron. Unit: Farad. (Used for Internal RC Extraction)
 
 ## RePlAce tunning parameters
-__Note that the following tunning parameters must be defined before executing init_replace commands__
+__Note that the following tunning parameters must be defined before executing init_replace command__
 * __set_density__ [density] : Set target density. [0-1, float]. Default: 1.00
 * __set_bin_grid_count__ [num] : Set bin_grid_count. [64,128,256,512,..., int]. Default: Defined by internal algorithm.
 * __set_lambda__ [lambda] : Set lambda for RePlAce tunning. [float]. Default : 8e-5~10e5
-* __set_pcof_min__ [pcof_min] : Set pcof_min(µ_k Lower Bound) for RePlAce tunning. [0.95-1.05, float]. Default: 0.95
-* __set_pcof_max__ [pcof_max] : Set pcof_max(µ_k Upper Bound) for RePlAce tunning. [1.00-1.20, float]. Default: 1.05
-* __set_step_scale__ [step_scale] : Set step_scale(∆HPWL_REF) for RePlAce tunning. Default: 346000
-* __set_target_overflow__ [overflow] : Set 
+* __set_pcof_min__ [pcof_min] : Set pcof_min(µ_k Lower Bound). [0.95-1.05, float]. Default: 0.95
+* __set_pcof_max__ [pcof_max] : Set pcof_max(µ_k Upper Bound). [1.00-1.20, float]. Default: 1.05
+* __set_step_scale__ [step_scale] : Set step_scale(∆HPWL_REF). Default: 346000
+* __set_target_overflow__ [overflow] : Set target overflow termination condition. [0.01-1.00, float]. Default: 0.1
 
 __Timing-driven related tuning parameters__
-* __set_net_weight_min__ [weight_min] :
-* __set_net_weight_max__ [weight_max] :
-* __set_net_weight_scale__ [weight_scale] : 
+* __set_net_weight_min__ [weight_min] : Set net_weight_min. [1.0-1.8, float]
+* __set_net_weight_max__ [weight_max] : Set net_weight_max. [weight_min-1.8, float]
+* __set_net_weight_scale__ [weight_scale] : Set net_weight_scale. [200-, float]
 
 ## Other options
 * __set_plot_enable__ [mode] : Set plot modes; This mode will plot layout every 10 iterations (Cell, bin, and arrow plots) [true/false]. Default: False
@@ -51,6 +51,7 @@ __Timing-driven related tuning parameters__
 * __set_verbose_level__ [level] : Specify the verbose level. [1-3, int]. Default: 1
 
 ## Query results
+__Note that the following commands will work after init_replace command__
 * __get_hpwl__ : Returns HPWL results on Micron. [float]
 * __get_wns__ : Returns WNS from OpenSTA. (Only available when timing-driven mode is enabled) [float]
 * __get_tns__ : Returns TNS from OpenSTA. (Only available when timing-driven mode is enabled) [float]
@@ -65,11 +66,4 @@ __Timing-driven related tuning parameters__
 * Non Timing-Driven RePlAce: 
 * Timing-Driven RePlAce: 
 
-FYI, All of the TCL commands are defined in the [replace_external.h]() header files.
-
-
-### Routability-driven parameters (unused now)
-* __-rancti__ : Max # Global Router Calls and Cell Inflation. No Restore of Cell Size, Keep Increasing, Unsigned Integer, Default = 10
-* __-maxinfl__ : Max Cell Inflation for Each Cell Inflation Per Global Router Call. Floating Number, Default = 2.5
-* __-inflcoef__ : γ_super, Floating Number, Default = 2.33
-* __-filleriter__ : # Filler Only Placement Iterations, Floating Number, Default = 20
+FYI, All of the TCL commands are defined in the [replace_external.h](src/replace_external.h) header files.
