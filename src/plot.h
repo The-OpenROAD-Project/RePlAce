@@ -48,17 +48,17 @@
 
 void mkdirPlot();
 
-string intoFourDigit(int idx);
+std::string intoFourDigit(int idx);
 void idx2str4digits(int idx, char *str);
 void GCellPinCoordiUpdate();
 
 // X11 drawing function
 // below function is added by mgwoo.
-void SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition);
-void SaveBinPlotAsJPEG(string imgName, string imgPosition);
-void SaveArrowPlotAsJPEG(string imgName, string imgPosition);
-void SavePlot(string imgName = "", bool isGCell = false);
-void ShowPlot(string circuitName = "");
+void SaveCellPlotAsJPEG(std::string imgName, bool isGCell, std::string imgPosition);
+void SaveBinPlotAsJPEG(std::string imgName, std::string imgPosition);
+void SaveArrowPlotAsJPEG(std::string imgName, std::string imgPosition);
+void SavePlot(std::string imgName = "", bool isGCell = false);
+void ShowPlot(std::string circuitName = "");
 
 enum { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE };
 
@@ -99,12 +99,12 @@ class PlotEnv {
   bool hasCellColor;
   // color information for each cells.
   // Needed for cell coloring
-  vector<PlotColor> colors;
+  std::vector<PlotColor> colors;
 
   // constructor
   PlotEnv();
   void Init();
-  void InitCellColors(string colorFile);
+  void InitCellColors(std::string colorFile);
   int GetTotalImageWidth();
   int GetTotalImageHeight();
   int GetX(FPOS &coord);

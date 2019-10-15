@@ -163,8 +163,8 @@ void update_pin2(void);
 enum { LSE, WA };
 
 
-pair<double, double> GetUnscaledHpwl();
-void PrintUnscaledHpwl(string mode);
+std::pair<double, double> GetUnscaledHpwl();
+void PrintUnscaledHpwl(std::string mode);
 
 
 #define WLEN_MODEL WA /* LSE */ /* NTU */

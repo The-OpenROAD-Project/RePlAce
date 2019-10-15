@@ -231,7 +231,7 @@ struct PinInfo {
       SetEscapedStr(netStr);
     }
 
-    return netStr + ":" + to_string(pNum);
+    return netStr + ":" + std::to_string(pNum);
   }
 
   bool isTerminal() {

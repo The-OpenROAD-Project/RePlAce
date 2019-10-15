@@ -52,6 +52,10 @@
 #include "bookShelfIO.h"
 #include "bin.h"
 
+using std::min;
+using std::max;
+
+
 void trial_main() {
   trial_HPWLs.clear();
   trial_POTNs.clear();

@@ -87,14 +87,14 @@ struct BIN {
   prec den;
   prec den2;
   prec no_mac_den;
-  void dump(string a) {
-    cout << a << endl;
+  void dump(std::string a) {
+    std::cout << a << std::endl;
     e.Dump("e");
     p.Dump("p");
     pmin.Dump("pmin");
     pmax.Dump("pmax");
     center.Dump("center");
-    cout << endl;
+    std::cout << std::endl;
   }
 };
 

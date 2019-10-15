@@ -59,6 +59,9 @@
 // global variable due to weird structure
 RouteInstance routeInst;
 using std::ifstream;
+using std::min;
+using std::max;
+using std::to_string;
 
 void RouteInstance::Init(){
 #ifdef USE_GOOGLE_HASH

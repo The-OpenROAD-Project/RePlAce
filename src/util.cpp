@@ -54,25 +54,12 @@
 #include "opt.h"
 #include "util.h"
 
-//int prec_eqv(prec x, prec y) {
-//  return get_abs(x - y) < Epsilon;
-//}
 
-//int prec_le(prec x, prec y) {
-//  return prec_lt(x, y) | prec_eqv(x, y);
-//}
-
-//int prec_ge(prec x, prec y) {
-//  return prec_gt(x, y) | prec_eqv(x, y);
-//}
-
-//int prec_lt(prec x, prec y) {
-//  return x - y < -1.0 * Epsilon;
-//}
-
-//int prec_gt(prec x, prec y) {
-//  return x - y > 1.0 * Epsilon;
-//}
+using std::string;
+using std::min;
+using std::max;
+using std::cout;
+using std::endl;
 
 prec get_abs(prec a) {
   return a < 0.0 ? -1.0 * a : a;

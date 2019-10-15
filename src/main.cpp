@@ -184,7 +184,7 @@ vector< pair< prec, prec > > hpwlEPs_2ndOrder;
 vector< prec > potnEPs;
 
 // .route
-map< string, vector< int > > routeBlockageNodes;
+std::map< string, vector< int > > routeBlockageNodes;
 int nXgrids, nYgrids, nMetLayers;
 vector< int > verticalCapacity;
 vector< int > horizontalCapacity;
@@ -378,16 +378,28 @@ bool thermalAwarePlaceCMD;
 bool trialRunCMD;
 bool autoEvalRC_CMD;
 bool onlyLG_CMD;
+bool isFastMode;
 ///////////////////////////////////////////////////////////
+
+Tcl_Interp* _interp;
 
 extern "C" {
 extern int Replace_Init(Tcl_Interp *interp);
 }
 
+
 int 
 replaceTclAppInit(Tcl_Interp *interp) {
-  Tcl_Init(interp);
-  Replace_Init(interp);
+
+  _interp = interp;
+
+  if (Tcl_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR;
+  }
+
+  if( Replace_Init(interp) == TCL_ERROR) {
+    return TCL_ERROR; 
+  }
   
   string command = "";
 
@@ -395,17 +407,17 @@ replaceTclAppInit(Tcl_Interp *interp) {
   command += "puts \"RePlAce Version: 1.0.0\"";
   Tcl_Eval(interp, command.c_str());
 
-  command = "";
-  command += "if {$tcl_interactive} {\n";
-  command += "package require tclreadline\n";
-  command += "proc ::tclreadline::prompt1 {} {\n";
-  command += " return \"replace-[lindex [split [pwd] \"/\"] end] % \"\n";
-  command += "}\n";
-  command += "::tclreadline::Loop\n";
-  command += "}";
+//  command = "";
+//  command += "if {$tcl_interactive} {\n";
+//  command += "package require tclreadline\n";
+//  command += "proc ::tclreadline::prompt1 {} {\n";
+//  command += " return \"replace-[lindex [split [pwd] \"/\"] end] % \"\n";
+//  command += "}\n";
+//  command += "::tclreadline::Loop\n";
+//  command += "}";
   
   // register tclreadline 
-  Tcl_Eval(interp, command.c_str());
+//  Tcl_Eval(interp, command.c_str());
   
   return TCL_OK;
 }

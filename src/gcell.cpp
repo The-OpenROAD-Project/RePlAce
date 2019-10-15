@@ -56,6 +56,14 @@
 #include "macro.h"
 #include "gcell.h"
 
+
+using std::cout;
+using std::endl;
+using std::max;
+using std::min;
+using std::string;
+
+
 TILE *tile_mat;
 
 void get_blockage() {

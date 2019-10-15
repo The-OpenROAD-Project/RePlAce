@@ -4,20 +4,15 @@
 #include <iostream>
 #include "replace_private.h"
 
-//int prec_eqv(prec x, prec y);
-//int prec_le(prec x, prec y);
-//int prec_ge(prec x, prec y);
-//int prec_lt(prec x, prec y);
-//int prec_gt(prec x, prec y);
+
 unsigned prec2unsigned(prec a);
 void itoa(int n, char k[]);
-
 
 void time_start(double *time_cost);
 void time_end(double *time_cost);
 void time_calc(double last_time, double *curr_time, double *time_cost);
 
-string getexepath();
+std::string getexepath();
 
 FPOS fp_mul(struct FPOS a, struct FPOS b);
 inline FPOS fp_add(struct FPOS a, struct FPOS b) {
@@ -61,21 +56,21 @@ bool ReplaceStringInPlace(std::string &subject,
                                  const std::string &replace);
 void SetEscapedStr(std::string &inp);
 char *GetEscapedStr(const char *name, bool isEscape = true);
-string GetRealPath(string path );
+std::string GetRealPath(std::string path );
 
 
 // Print functions
-void PrintProc(string input, int verbose = 0);
-void PrintProcBegin(string input, int verbose = 0);
-void PrintProcEnd(string input, int verbose = 0);
-void PrintError(string input, int verbose = 0); 
-void PrintInfoInt(string input, int val, int verbose = 0);
-void PrintInfoPrec(string input, prec val, int verbose = 0);
-void PrintInfoPrecSignificant(string input, prec val, int verbose = 0);
-void PrintInfoPrecPair(string input, prec val1, prec val2, int verbose = 0);
-void PrintInfoString(string input, int verbose = 0);
-void PrintInfoString(string input, string val, int verbose = 0);
-void PrintInfoRuntime(string input, double runtime, int verbose = 0);
+void PrintProc(std::string input, int verbose = 0);
+void PrintProcBegin(std::string input, int verbose = 0);
+void PrintProcEnd(std::string input, int verbose = 0);
+void PrintError(std::string input, int verbose = 0); 
+void PrintInfoInt(std::string input, int val, int verbose = 0);
+void PrintInfoPrec(std::string input, prec val, int verbose = 0);
+void PrintInfoPrecSignificant(std::string input, prec val, int verbose = 0);
+void PrintInfoPrecPair(std::string input, prec val1, prec val2, int verbose = 0);
+void PrintInfoString(std::string input, int verbose = 0);
+void PrintInfoString(std::string input, std::string val, int verbose = 0);
+void PrintInfoRuntime(std::string input, double runtime, int verbose = 0);
 
 
 

@@ -1,13 +1,15 @@
 #include "replace_external.h"
 #include "wlen.h"
 #include "initPlacement.h"
+#include "plot.h"
 
 
 replace_external::
 replace_external() : 
-  timing_driven_mode(false), ckt(&Replace::__ckt), 
-  unit_r(0.0f), unit_c(0.0f),
-  output_loc("") {
+  ckt(&Replace::__ckt), 
+  output_loc(""),
+  timing_driven_mode(false), 
+  unit_r(0.0f), unit_c(0.0f) {
   initGlobalVars();
 };
 
@@ -24,10 +26,6 @@ replace_external::import_def(const char* def){
   def_stor.push_back(def);
 }
 
-void 
-replace_external::import_lib(const char* lib){
-  lib_stor.push_back(lib);
-}
 
 void 
 replace_external::export_def(const char* def){
@@ -37,6 +35,108 @@ replace_external::export_def(const char* def){
 void
 replace_external::set_output(const char* output) {
   output_loc = output;
+}
+
+
+void
+replace_external::set_timing_driven(bool is_true) {
+  timing_driven_mode = is_true;
+}
+
+void 
+replace_external::import_sdc(const char* sdc) {
+  sdc_file = sdc;
+}
+
+void
+replace_external::import_verilog(const char* verilog) {
+  verilog_stor.push_back(verilog);
+}
+
+void 
+replace_external::import_lib(const char* lib){
+  lib_stor.push_back(lib);
+}
+
+void
+replace_external::set_unit_res(double r) {
+  unit_r = r;
+}
+
+void 
+replace_external::set_unit_cap(double c) {
+  unit_c = c;
+}
+
+void
+replace_external::set_plot_enable(bool plot_mode) {
+  isPlot = plot_mode;
+}
+
+void
+replace_external::set_verbose_level(int verbose) {
+  gVerbose = verbose;
+}
+
+void
+replace_external::set_fast_mode_enable(bool fast_mode) {
+  isFastMode = fast_mode;
+}
+
+void
+replace_external::set_seed_init_enable(bool seed_init) {
+  isInitSeed = seed_init;
+}
+
+void
+replace_external::set_density(double density) {
+  target_cell_den = target_cell_den_orig = density;
+}
+
+void
+replace_external::set_bin_grid_count(size_t grid_count) {
+  dim_bin.x = dim_bin.y = grid_count;
+  isBinSet = true;
+}
+
+void
+replace_external::set_lambda(double lambda) {
+  INIT_LAMBDA_COF_GP = lambda; 
+}
+
+void
+replace_external::set_pcof_min(double pcof_min) {
+  LOWER_PCOF = pcof_min;
+}
+
+void
+replace_external::set_pcof_max(double pcof_max) {
+  UPPER_PCOF = pcof_max;
+}
+
+void
+replace_external::set_step_scale(double step_scale) {
+  refDeltaWL = step_scale;
+}
+
+void
+replace_external::set_target_overflow(double overflow) {
+  overflowMin = overflow;
+}
+
+void
+replace_external::set_net_weight_min(double net_weight_min) {
+  netWeightBase = net_weight_min;
+}
+
+void
+replace_external::set_net_weight_max(double net_weight_max) {
+  netWeightBound = net_weight_max;
+}
+
+void
+replace_external::set_net_weight_scale(double net_weight_scale) {
+  netWeightScale = net_weight_scale;
 }
 
 bool 
@@ -64,8 +164,8 @@ replace_external::init_replace() {
   }
 
   initGlobalVarsAfterParse();
-
   init();
+
   ParseInput();
 
   net_update_init();
@@ -73,74 +173,6 @@ replace_external::init_replace() {
   build_data_struct();
   update_instance_list();
   return true;
-}
-
-void
-replace_external::set_timing_driven(bool is_true) {
-  timing_driven_mode = is_true;
-}
-
-void 
-replace_external::import_sdc(const char* sdc) {
-  sdc_file = sdc;
-}
-
-void
-replace_external::import_verilog(const char* verilog) {
-  verilog_stor.push_back(verilog);
-}
-
-size_t
-replace_external::get_instance_list_size() {
-  return instance_list.size();
-}
-
-// examples for checking component names
-std::string
-replace_external::get_master_name(size_t idx) {
-  return instance_list[idx].master;
-}
-
-// examples for checking component names
-std::string
-replace_external::get_instance_name(size_t idx) {
-  return instance_list[idx].name;
-}
-
-void
-replace_external::print_instances() {
-  std::cout << "Total Instance: " << instance_list.size() << endl; 
-  for(auto& cur_inst : instance_list ) {
-    std::cout << cur_inst.name << " (" << cur_inst.master << ") x:";
-    std::cout << cur_inst.x << " y:" << cur_inst.y << std::endl;
-  }
-}
-
-
-float
-replace_external::get_x(size_t idx) {
-  return instance_list[idx].x;
-}
-
-float
-replace_external::get_y(size_t idx) {
-  return instance_list[idx].y;
-}
-
-float
-replace_external::get_hpwl() {
-  auto res = GetUnscaledHpwl();
-  return res.first + res.second;
-}
-
-float
-replace_external::get_wns() {
-  return globalWns;
-}
-
-float
-replace_external::get_tns() {
-  return globalTns;
 }
 
 bool 
@@ -160,64 +192,67 @@ replace_external::place_cell_nesterov_place() {
     cGP2DglobalPlacement_main();
   }
   update_instance_list();
+  if( isPlot ) {
+    SaveCellPlotAsJPEG("Global Placement Result", false,
+        string(dir_bnd) + string("/globalPlace"));
+  }
   return true;
 }
 
-void
-replace_external::set_verbose_level(int verbose) {
-  gVerbose = verbose;
+
+size_t
+replace_external::get_instance_list_size() {
+  return instance_list.size();
+}
+
+// examples for checking component names
+std::string
+replace_external::get_master_name(size_t idx) {
+  return instance_list[idx].master;
+}
+
+// examples for checking component names
+std::string
+replace_external::get_instance_name(size_t idx) {
+  return instance_list[idx].name;
+}
+
+float
+replace_external::get_x(size_t idx) {
+  return instance_list[idx].x;
+}
+
+float
+replace_external::get_y(size_t idx) {
+  return instance_list[idx].y;
 }
 
 void
-replace_external::set_unit_res(double r) {
-  unit_r = r;
+replace_external::print_instances() {
+  std::cout << "Total Instance: " << instance_list.size() << endl; 
+  for(auto& cur_inst : instance_list ) {
+    std::cout << cur_inst.name << " (" << cur_inst.master << ") x:";
+    std::cout << cur_inst.x << " y:" << cur_inst.y << std::endl;
+  }
 }
 
-void 
-replace_external::set_unit_cap(double c) {
-  unit_c = c;
+
+float
+replace_external::get_hpwl() {
+  auto res = GetUnscaledHpwl();
+  return res.first + res.second;
 }
 
-void
-replace_external::set_lambda(double lambda) {
-  INIT_LAMBDA_COF_GP = lambda; 
+float
+replace_external::get_wns() {
+  return globalWns;
 }
 
-void
-replace_external::set_pcof_min(double pcof_min) {
-  LOWER_PCOF = pcof_min;
+float
+replace_external::get_tns() {
+  return globalTns;
 }
 
-void
-replace_external::set_pcof_max(double pcof_max) {
-  UPPER_PCOF = pcof_max;
-}
-
-void
-replace_external::set_bin_grid_count(size_t grid_count) {
-  dim_bin.x = dim_bin.y = grid_count;
-  isBinSet = true;
-}
-
-void
-replace_external::set_density(double density) {
-  target_cell_den = target_cell_den_orig = density;
-}
-
-void
-replace_external::set_net_weight_min(double net_weight_min) {
-  netWeightBase = net_weight_min;
-}
-
-void
-replace_external::set_net_weight_max(double net_weight_max) {
-  netWeightBound = net_weight_max;
-}
-
-void
-replace_external::set_net_weight_scale(double net_weight_scale) {
-  netWeightScale = net_weight_scale;
-}
 
 
 void 
@@ -243,6 +278,7 @@ replace_external::update_instance_list() {
   }
 }
 
+// TODO
 bool
 replace_external::save_jpeg(const char* jpeg) {
   return true;

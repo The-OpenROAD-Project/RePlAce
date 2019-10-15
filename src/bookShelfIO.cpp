@@ -57,6 +57,12 @@
 #include <string>
 #include <vector>
 
+using std::cout;
+using std::endl;
+using std::min;
+using std::max;
+using std::to_string;
+
 // this is shared with lefdefIO.cpp
 FPOS grow_pmin, grow_pmax;
 FPOS terminal_pmin, terminal_pmax;
@@ -2782,8 +2788,8 @@ void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt) {
   PrintInfoPrec("AspectRatio", aspect_ratio);
   PrintInfoPrecPair("RowMinXY", grow_pmin.x, grow_pmin.y);
   PrintInfoPrecPair("RowMaxXY", grow_pmax.x, grow_pmax.y);
-  PrintInfoPrecPair("TerminalMinXY", terminal_pmin.x, terminal_pmin.y);
-  PrintInfoPrecPair("TerminalMaxXY", terminal_pmax.x, terminal_pmax.y);
+//  PrintInfoPrecPair("TerminalMinXY", terminal_pmin.x, terminal_pmin.y);
+//  PrintInfoPrecPair("TerminalMaxXY", terminal_pmax.x, terminal_pmax.y);
 
   *tier_row_cnt = row_cnt;  
 

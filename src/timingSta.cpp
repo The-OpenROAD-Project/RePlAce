@@ -8,6 +8,8 @@
 
 #include <tcl.h>
 
+using std::to_string;
+
 TIMING_NAMESPACE_OPEN
 
 inline string Timing::GetPinName(PIN* curPin, bool isEscape) {

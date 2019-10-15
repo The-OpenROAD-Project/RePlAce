@@ -51,8 +51,6 @@
 #include "routeOpt.h"
 
 
-static bool isFastMode = false;
-
 void initGlobalVars() {
   bmFlagCMD = "etc";       // string
   target_cell_den = PREC_MAX;

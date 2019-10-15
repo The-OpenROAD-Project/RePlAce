@@ -61,47 +61,6 @@ struct NODES {
   NODES() : index(0), isTerminal(false), isTerminalNI(false){};
 };
 
-// for *.scl files
-struct ROW {
-  prec site_wid;  // SiteWidth
-  prec site_spa;  // SiteSpacing
-
-  string ori;
-  //    string sym;
-  bool isXSymmetry;
-  bool isYSymmetry;
-  bool isR90Symmetry;
-
-  int x_cnt;  // NumSites
-  FPOS pmin;
-  FPOS pmax;
-  FPOS size;
-
-  ROW()
-      : site_wid(0),
-        site_spa(0),
-        ori(""),
-        isXSymmetry(false),
-        isYSymmetry(false),
-        isR90Symmetry(false),
-        x_cnt(0) {
-    pmin.SetZero();
-    pmax.SetZero();
-    size.SetZero();
-  }
-
-  void Dump(string a) {
-    cout << a << endl;
-    cout << "site_wid: " << site_wid << endl;
-    cout << "site_spa: " << site_spa << endl;
-    cout << "ori: " << ori << endl;
-    cout << "x_cnt: " << x_cnt << endl;
-    pmin.Dump("pmin");
-    pmax.Dump("pmax");
-    size.Dump("size");
-    cout << endl;
-  }
-};
 
 class BookshelfNameMap {
   public:
