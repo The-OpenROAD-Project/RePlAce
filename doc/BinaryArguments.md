@@ -66,4 +66,4 @@ __Note that the following commands will work after init_replace command__
 * Non Timing-Driven RePlAce: 
 * Timing-Driven RePlAce: 
 
-FYI, All of the TCL commands are defined in the [replace_external.h](src/replace_external.h) header files.
+FYI, All of the TCL commands are defined in the [replace_external.h](../src/replace_external.h) header files.
