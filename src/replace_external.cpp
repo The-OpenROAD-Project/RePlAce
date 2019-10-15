@@ -16,6 +16,162 @@ replace_external() :
 replace_external::
 ~replace_external() {};
 
+void
+replace_external::help() {
+  cout << endl;
+  cout << "==== File I/O Commands ====" << endl;
+  cout << "import_lef [file_name]" << endl;
+  cout << "    *.lef location " << endl;
+  cout << "    (Multiple lef files supported. " << endl;
+  cout << "    Technology LEF must be ahead of other LEFs.) " << endl;
+  cout << endl; 
+  cout << "import_def [file_name]" << endl;
+  cout << "    *.def location " << endl;
+  cout << "    (Required due to FloorPlan information)" << endl;
+  cout << endl; 
+  cout << "export_def [file_name]" << endl;
+  cout << "    Output DEF location" << endl;
+  cout << endl; 
+  cout << "set_output [directory_location]" << endl;
+  cout << "    Specify the location of output results. " << endl;
+  cout << "    Default: ./output " << endl;
+     
+  cout << endl;
+  cout << "==== Flow Control ==== " << endl;
+  cout << "init_replace" << endl;
+  cout << "    Initialize RePlAce's structure based on LEF and DEF." << endl;
+  cout << endl; 
+  cout << "place_cell_init_place" << endl;
+  cout << "    Execute BiCGSTAB engine for initial place." << endl;
+  cout << endl; 
+  cout << "place_cell_nesterov_place" << endl;
+  cout << "    Execute Nesterov engine for global placement. " << endl;
+  cout << endl; 
+  cout << "==== Timing-driven Mode ====" << endl;
+  cout << "set_timing_driven [true/false]" << endl;
+  cout << "  Enable timing-driven modes" << endl;
+  cout << endl; 
+  cout << "import_lib [file_name]" << endl;
+  cout << "    *.lib location " << endl;
+  cout << "    (Multiple lib files supported. Required for OpenSTA)" << endl;
+  cout << endl; 
+  cout << "import_sdc [file_name]" << endl;
+  cout << "    *.sdc location (Required for OpenSTA). " << endl;
+  cout << "    SDC: Synopsys Design Constraint (SDC)" << endl;
+  cout << endl; 
+  cout << "import_verilog [file_name]" << endl;
+  cout << "    *.v location (Required for OpenSTA)" << endl;
+  cout << endl; 
+  cout << "set_unit_res [resistor]" << endl;
+  cout << "    Resisance per micron. Unit: Ohm. " << endl;
+  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << endl; 
+  
+  cout << "set_unit_cap [capacitance]" << endl;
+  cout << "    Capacitance per micron. Unit: Farad. " << endl;
+  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << endl; 
+  
+  cout << "==== RePlAce tunning parameters ====" << endl;
+  cout << "** Note that the following tunning parameters " << endl;
+  cout << "   must be defined before executing init_replace command" << endl;
+  cout << endl; 
+  cout << "set_density [density]" << endl;
+  cout << "    Set target density. [0-1, float]. Default: 1.00" << endl;
+  cout << endl; 
+  cout << "set_bin_grid_count [num]" << endl;
+  cout << "    Set bin_grid_count. [64,128,256,512,..., int]. " << endl;
+  cout << "    Default: Defined by internal algorithm." << endl;
+  cout << endl; 
+  cout << "set_lambda [lambda]" << endl;
+  cout << "    Set lambda for RePlAce tunning. [float]." << endl;
+  cout << "    Default : 8e-5~10e5" << endl;
+  cout << endl; 
+  cout << "set_pcof_min [pcof_min]" << endl;
+  cout << "    Set pcof_min(µ_k Lower Bound). [0.95-1.05, float]." << endl;
+  cout << "    Default: 0.95" << endl;
+  cout << endl; 
+  cout << "set_pcof_max [pcof_max]" << endl;
+  cout << "    Set pcof_max(µ_k Upper Bound). [1.00-1.20, float]." << endl;
+  cout << "    Default: 1.05" << endl;
+  cout << endl; 
+  cout << "set_step_scale [step_scale]" << endl;
+  cout << "    Set step_scale(∆HPWL_REF). Default: 346000" << endl;
+  cout << endl; 
+  cout << "set_target_overflow [overflow]" << endl;
+  cout << "    Set target overflow termination condition." << endl;
+  cout << "    [0.01-1.00, float]. Default: 0.1" << endl;
+  cout << endl; 
+  
+  cout << "==== Timing-driven related tuning parameters ==== " << endl;
+  cout << "set_net_weight_min [weight_min]" << endl;
+  cout << "    Set net_weight_min. [1.0-1.8, float]" << endl;
+  cout << endl; 
+  cout << "set_net_weight_max [weight_max]" << endl;
+  cout << "    Set net_weight_max. [weight_min-1.8, float]" << endl;
+  cout << endl; 
+  cout << "set_net_weight_scale [weight_scale]" << endl;
+  cout << "    Set net_weight_scale. [200-, float]" << endl;
+  cout << endl; 
+  
+  cout << "==== Other options ==== " << endl;
+  cout << "set_plot_enable [mode]" << endl;
+  cout << "    Set plot modes; " << endl;
+  cout << "    This mode will plot layout every 10 iterations" << endl;
+  cout << "    (Cell, bin, and arrow plots) [true/false]." << endl;
+  cout << "    Default: False" << endl;
+  cout << endl; 
+  cout << "set_seed_init_enable [true/false]" << endl;
+  cout << "    Start global place with the given placed locations." << endl;
+  cout << "    Default: False" << endl;
+  cout << endl; 
+  cout << "set_fast_mode_enable [true/false]" << endl;
+  cout << "    Fast and quick placement for IO-pin placement." << endl;
+  cout << "    Please do NOT use this command in general purposes" << endl;
+  cout << "    (It'll not spread all cells enough). Default: False" << endl;
+  cout << endl; 
+  cout << "set_verbose_level [level]" << endl;
+  cout << "    Specify the verbose level. [1-3, int]. Default: 1" << endl;
+  cout << endl; 
+  
+  cout << "==== Query results ==== " << endl;
+  cout << "** Note that the following commands will work " << endl;
+  cout << "   after init_replace command" << endl;
+  cout << endl; 
+  cout << "get_hpwl" << endl;
+  cout << "    Returns HPWL results on Micron. [float]" << endl;
+  cout << endl; 
+  cout << "get_wns" << endl;
+  cout << "    Returns WNS from OpenSTA." << endl;
+  cout << "    (Only available when timing-driven mode is enabled) [float] " << endl;
+  cout << endl; 
+  cout << "get_tns" << endl;
+  cout << "    Returns TNS from OpenSTA." << endl;
+  cout << "    (Only available when timing-driven mode is enabled) [float]" << endl;
+  cout << endl; 
+  
+  cout << "print_instances" << endl;
+  cout << "    Print out all of instances' information. " << endl;
+  cout << "    (Not recommended for huge design)" << endl;
+  cout << endl; 
+  cout << "get_instance_list_size" << endl;
+  cout << "    Returns total number of instances in RePlAce. [size_t]" << endl;
+  cout << endl; 
+  cout << "get_x [index]" << endl;
+  cout << "    Returns x coordinates of specified instances' index. [float]" << endl;
+  cout << endl; 
+  cout << "get_y [index]" << endl;
+  cout << "    Returns y coordinates of specified instances' index. [float]" << endl;
+  cout << endl; 
+  cout << "get_master_name [index]" << endl;
+  cout << "    Returns master name of specified instances' index. [string]" << endl;
+  cout << endl; 
+  cout << "get_instance_name [index]" << endl;
+  cout << "    Returns instance name of specified instances' index. [string]" << endl;
+  cout << endl; 
+
+}
+
 void 
 replace_external::import_lef(const char* lef){ 
   lef_stor.push_back(lef);

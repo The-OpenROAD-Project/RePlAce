@@ -20,6 +20,9 @@ public:
 
   replace_external();
   ~replace_external();
+  
+  void help();
+
   void import_lef(const char* lef);
   void import_def(const char* def);
   void export_def(const char* def);
