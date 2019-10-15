@@ -33,6 +33,6 @@ rep place_cell_nesterov_place
 #rep print_instances
 
 # Export DEF file
-rep export_def ./gcd_nonTD.def
+rep export_def ./${design}_nan45_nontd.def
 puts "Final HPWL: [rep get_hpwl]"
 

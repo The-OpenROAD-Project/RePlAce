@@ -45,7 +45,7 @@ rep place_cell_nesterov_place
 # rep print_instances 
 
 # Export DEF file
-rep export_def ./gcd_TD.def
+rep export_def ./${design}_nan45_td.def
 puts "nesterovPlace HPWL: [rep get_hpwl]"
 puts "final WNS: [rep get_wns]"
 puts "final TNS: [rep get_tns]"
