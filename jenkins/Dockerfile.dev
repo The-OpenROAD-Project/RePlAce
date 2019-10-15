@@ -1,13 +1,19 @@
 FROM openroad/centos6-tcl8.6 AS builder
 
-# install 
-RUN yum -y install centos-release-scl 
+# install gcc 6
+RUN yum -y install centos-release-scl && \
+    yum -y install devtoolset-6 devtoolset-6-libatomic-devel
+ENV CC=/opt/rh/devtoolset-6/root/usr/bin/gcc \
+    CPP=/opt/rh/devtoolset-6/root/usr/bin/cpp \
+    CXX=/opt/rh/devtoolset-6/root/usr/bin/g++ \
+    PATH=/opt/rh/devtoolset-6/root/usr/bin:$PATH \
+    LD_LIBRARY_PATH=/opt/rh/devtoolset-6/root/usr/lib64:/opt/rh/devtoolset-6/root/usr/lib:/opt/rh/devtoolset-6/root/usr/lib64/dyninst:/opt/rh/devtoolset-6/root/usr/lib/dyninst:/opt/rh/devtoolset-6/root/usr/lib64:/opt/rh/devtoolset-6/root/usr/lib:$LD_LIBRARY_PATH
 
 # install dependencies
-RUN yum install -y gcc gcc-c++ wget libstdc++-devel libstdc++-static libX11-devel \
+RUN yum install -y wget libstdc++-devel libstdc++-static libX11-devel \
     boost-devel zlib-devel tcl-devel tk-devel swig flex \
-    libtool-ltdl gmp-devel mpfr-devel libmpc-devel bison byacc ctags \
-    ImageMagick ImageMagick-devel git glibc-static zlib-static libjpeg-turbo-static bc
+    gmp-devel mpfr-devel libmpc-devel bison \
+    ImageMagick ImageMagick-devel git glibc-static zlib-static libjpeg-turbo-static 
 
 # Updating new bison 3+
 RUN yum remove -y bison
