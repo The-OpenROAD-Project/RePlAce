@@ -1,7 +1,10 @@
 *.log
+*.log*
 *.swo
 *.swd
 *.swp
+*.cmd
+*.cmd*
 */**/*.o
 
 bench_**
@@ -9,6 +12,7 @@ output/*
 logdir/*
 evaluation/*
 test/output/*
+test/*.def
 
 !*.gitignore
 
