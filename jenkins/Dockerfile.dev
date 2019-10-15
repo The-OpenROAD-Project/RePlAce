@@ -28,3 +28,10 @@ RUN wget https://ftp.gnu.org/gnu/bison/bison-3.0.1.tar.gz && \
 RUN wget https://cmake.org/files/v3.9/cmake-3.9.0-Linux-x86_64.sh && \
     chmod +x cmake-3.9.0-Linux-x86_64.sh  && \
     ./cmake-3.9.0-Linux-x86_64.sh --skip-license --prefix=/usr/local
+
+# Installing python3.5 for regression tests
+RUN yum install rh-python35 -y
+RUN echo 'pip install --upgrade pip' | scl enable rh-python35 bash
+ENV PATH=/opt/rh/rh-python35/root/usr/bin:$PATH \
+    LD_LIBRARY_PATH=/opt/rh/rh-python35/root/usr/lib64:$LD_LIBRARY_PATH \
+    MANPATH=/opt/rh/rh-python35/root/usr/share/man:$MANPATH
