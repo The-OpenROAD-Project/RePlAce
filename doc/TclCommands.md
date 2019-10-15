@@ -63,7 +63,7 @@ __Note that the following commands will work after init_replace command__
 * __get_instance_name__ [index] : Returns instance name of specified instances' index. [string]
 
 ## Example TCL scripts
-* Non Timing-Driven RePlAce: 
-* Timing-Driven RePlAce: 
+* Non Timing-Driven RePlAce: [gcd_nontd_test.tcl](../test/gcd_nontd_test.tcl), [wb_nontd_test.tcl](../test/wb_nontd_test.tcl)
+* Timing-Driven RePlAce: [gcd_td_test.tcl](../test/gcd_td_test.tcl), [wb_td_test.tcl](../test/wb_td_test.tcl)
 
 FYI, All of the TCL commands are defined in the [replace_external.h](../src/replace_external.h) header files.
