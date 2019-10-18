@@ -193,6 +193,11 @@ replace_external::set_output(const char* output) {
   output_loc = output;
 }
 
+void
+replace_external::set_output_experiment_name(const char* output) {
+  experimentCMD = output;
+}
+
 
 void
 replace_external::set_timing_driven(bool is_true) {
@@ -242,6 +247,12 @@ replace_external::set_fast_mode_enable(bool fast_mode) {
 void
 replace_external::set_seed_init_enable(bool seed_init) {
   isInitSeed = seed_init;
+}
+
+
+void
+replace_external::set_plot_color_file(std::string color_file) {
+  plotColorFile = color_file;
 }
 
 void
@@ -326,7 +337,7 @@ replace_external::init_replace() {
 
   net_update_init();
   init_tier();
-  build_data_struct();
+  build_data_struct(!isInitSeed);
   update_instance_list();
   return true;
 }

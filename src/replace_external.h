@@ -27,6 +27,7 @@ public:
   void import_def(const char* def);
   void export_def(const char* def);
   void set_output(const char* output);
+  void set_output_experiment_name(const char* output);
 
   void set_timing_driven(bool is_true);
   void import_sdc(const char* sdc);
@@ -39,6 +40,7 @@ public:
   void set_verbose_level(int verbose);
   void set_fast_mode_enable(bool fast_mode);
   void set_seed_init_enable(bool seed_init);
+  void set_plot_color_file(std::string color_file);
   
   void set_density(double density);
   void set_bin_grid_count(size_t grid_count);
