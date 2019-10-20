@@ -1040,16 +1040,15 @@ void bin_update7_cGP2D() {
     cout << "bin final loop: " << time << endl;
   }
 
-  //    cout << "sum_ovf_area: " << sum_ovf_area << endl;
+  // cout << "sum_ovf_area: " << sum_ovf_area << endl;
 
   tier->sum_ovf = sum_ovf_area / tier->modu_area;
   gsum_ovf_area += sum_ovf_area;
-  //    cout << "gsum_ovf_area: " << gsum_ovf_area << endl;
-  //    cout << "total_modu_area: " << total_modu_area << endl;
+  // cout << "gsum_ovf_area: " << gsum_ovf_area << endl;
+  // cout << "total_modu_area: " << total_modu_area << endl;
 
   gsum_ovfl = gsum_ovf_area / total_modu_area;
-  //    cout << "gsumovfl: " << gsum_ovfl << endl;
-  //    exit(1);
+  // cout << "gsumovfl: " << gsum_ovfl << endl;
 }
 
 void get_term_den(prec *den) {

@@ -80,19 +80,24 @@ void myNesterov::nesterov_opt() {
 
   // if (stnCMD == true)     FLUTE_init();
 
+  // x_st and y_st are exactly same, 
+  // but why do we need to re-do this??
+  // pre-calculates for WL forces
   net_update(y_st);
 
+  // pre-calculates Density forces.
   bin_update();
 
-  // if (stnCMD == true)     buildRSMT_FLUTE(y_st);
-
+  // fill in y_wdst, y_pdst , and y_pdstl if needed
   InitializationCostFunctionGradient(&sum_wgrad, &sum_pgrad);
 
   InitializationCoefficients();
 
+  // density only preconditioner. not recommended.
   if(DEN_ONLY_PRECON) {
     InitializationPrecondition_DEN_ONLY_PRECON();
   }
+  // normal preconditioner.
   else {
     InitializationPrecondition();
   }
@@ -261,16 +266,26 @@ void myNesterov::InitializationCommonVar() {
 
 void myNesterov::InitializationCellStatus() {
   // OPT_INPUT == QWL_ISOL
+  //
+  // update x_st based on half_den_size in gcell instances
+  // See opt.cpp:cell_init_2D for initializing gcell's half_den_size
   cg_input(x_st, N, OPT_INPUT);
+
+  // 
+  // calculate net-based WA values
+  //
   net_update(x_st);
 
+  // init y_st, y0_st, x0_st as x_st
   for(int i = 0; i < N; i++) {
     y_st[i] = y0_st[i] = x0_st[i] = x_st[i];
   }
 
+  // no need
   if(STAGE == mGP3D || STAGE == cGP3D)
     ShiftPL_SA(y_st, N);
 
+  // no need
   if(numLayer == 1) {
     if(placementMacroCNT == 0) {
       if(STAGE == cGP2D)
@@ -341,7 +356,8 @@ void myNesterov::InitializationCoefficients() {
         LOWER_PCOF = 0.90;   // 0.70, 0.60
       }
 
-      opt_phi_cof = mGP2D_opt_phi_cof / pow(UPPER_PCOF, (prec)cGP2D_buf_iter);
+      opt_phi_cof = mGP2D_opt_phi_cof / 
+        pow(UPPER_PCOF, (prec)cGP2D_buf_iter);
     }
     else {
       opt_phi_cof = sum_wgrad / sum_pgrad * INIT_LAMBDA_COF_GP;
@@ -609,9 +625,9 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
           v.x = u.x + cof * (u.x - x_st[j].x);
           v.y = u.y + cof * (u.y - x_st[j].y);
 
-          x0_st[j] = valid_coor00(u, half_densize);
+          x0_st[j] = GetCoordiLayoutInside(u, half_densize);
           // auto temp = y0_st[j];
-          y0_st[j] = valid_coor00(v, half_densize);
+          y0_st[j] = GetCoordiLayoutInside(v, half_densize);
           // if (temp.x == y0_st[j].x && temp.y == y0_st[j].y) ++cnt;
         }
       }
@@ -730,7 +746,7 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
         if(bloatCNT < bloating_max_count) {
           last_ra_iter = i;
           cell_update(x_st, N_org);
-          modu_copy();
+          UpdateModuleCoordiFromGcell();
           congEstimation(x_st);
           // if (inflation_cnt == 0) calcCong_print_detail();
           if(inflation_cnt % 2 == 0) {
@@ -1265,8 +1281,8 @@ void myNesterov::z_init() {
     zx = y_st[j].x + z_ref_alpha * y_dst[j].x;
     zy = y_st[j].y + z_ref_alpha * y_dst[j].y;
 
-    z_st[j].x = valid_coor2(zx, half_densize.x, 0);
-    z_st[j].y = valid_coor2(zy, half_densize.y, 1);
+    z_st[j].x = GetCoordiLayoutInsideAxis(zx, half_densize.x, 0);
+    z_st[j].y = GetCoordiLayoutInsideAxis(zy, half_densize.y, 1);
   }
 //  exit(1);
 }
@@ -1439,6 +1455,10 @@ void get_lc3_filler(struct FPOS *y_st, struct FPOS *y_dst, struct FPOS *z_st,
   iter->alpha00 = alpha;
 }
 
+// fill in
+// y_wdst and y_pdst
+// y_wdst : wirelength-gradient value
+// y_pdst : density-gradient value
 void myNesterov::InitializationCostFunctionGradient(prec *sum_wgrad0,
                                                     prec *sum_pgrad0) {
   prec tmp_sum_wgrad = 0;
@@ -1451,36 +1471,7 @@ void myNesterov::InitializationCostFunctionGradient(prec *sum_wgrad0,
   for(int i = 0; i < N; i++) {
     cell = &gcell_st[i];
     wlen_grad(i, &wgrad);
-    // if (STAGE==mGP3D) {
-    //    if (constraintDrivenCMD == false)
-    //        potn_grad (i, &pgrad);
-    //    else if (constraintDrivenCMD == true) {
-    //        if (lambda2CMD == false)
-    //            potn_grad_local (i, &pgrad, &cellLambdaArr[i]);
-    //        else if (lambda2CMD == true) {
-    //            potn_grad (i, &pgrad);
-    //            potn_grad_local (i, &pgradl, &cellLambdaArr[i]);
-    //        }
-    //    }
-    //}
-    // else if (STAGE==cGP3D) {
-    //    if (cell->flg==Macro) {
-    //        wgrad = zeroFPoint;
-    //        pgrad = zeroFPoint;
-    //        pgradl= zeroFPoint;
-    //    } else {
-    //        if (constraintDrivenCMD == false)
-    //            potn_grad (i, &pgrad);
-    //        else if (constraintDrivenCMD == true) {
-    //            if (lambda2CMD == false)
-    //                potn_grad_local (i, &pgrad, &cellLambdaArr[i]);
-    //            else if (lambda2CMD == true) {
-    //                potn_grad (i, &pgrad);
-    //                potn_grad_local (i, &pgradl, &cellLambdaArr[i]);
-    //            }
-    //        }
-    //    }
-    //}
+    
     if(STAGE == cGP2D) {
       if(cell->flg == Macro) {
         wgrad.SetZero();
@@ -1575,7 +1566,7 @@ void myNesterov::ShiftPL_SA_sub(struct FPOS *y_st, int N) {
     v.x = center.x + d.x;
     v.y = center.y + d.y;
 
-    center = valid_coor00(v, half_densize);
+    center = GetCoordiLayoutInside(v, half_densize);
 
     y_st[i] = center;
   }

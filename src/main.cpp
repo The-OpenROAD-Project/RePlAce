@@ -724,39 +724,34 @@ void init() {
 
   sprintf(str_dp3, ".%s.%s", bmFlagCMD.c_str(), "eplace");
 
-  if(strcmp(bmFlagCMD.c_str(), "mms") == 0) {
-    INPUT_FLG = MMS;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "ispd") == 0) {
-    INPUT_FLG = ISPD;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "sb") == 0) {
-    INPUT_FLG = SB;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "etc") == 0) {
-    INPUT_FLG = ETC;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "ibm") == 0) {
-    INPUT_FLG = IBM;
-  }
+  INPUT_FLG = ETC;
 
   global_macro_area_scale = target_cell_den;
   PrintInfoPrec("TargetDensity", target_cell_den, 0);
 
   wcof_flg = /* 1 */ 2 /* 3 */;
 
+  // see ePlace-MS 
+  // 8 * binSize.
+  //
+  // see: wlen.cpp: wcof_init function also
+  //
   switch(WLEN_MODEL) {
     case LSE:
+      // 10 !!!
       wcof00.x = wcof00.y = 0.1;
       break;
 
     case WA:
       if(INPUT_FLG == ISPD05 || INPUT_FLG == ISPD06 || INPUT_FLG == ISPD ||
          INPUT_FLG == MMS || INPUT_FLG == SB || INPUT_FLG == ETC) {
-        wcof00_org.x = wcof00_org.y = 0.125;
+
+        // 8 !!!
+        wcof00.x = wcof00.y = 0.125;
       }
       else if(INPUT_FLG == IBM) {
-        wcof00_org.x = wcof00_org.y = 0.50;
+        // 2 !!!
+        wcof00.x = wcof00.y = 0.50;
       }
       break;
   }
@@ -940,7 +935,7 @@ void mGP2DglobalPlacement_main() {
 void tcGP3DglobalPlacement_main() {
   STAGE = cGP3D;
   // ALPHA = initialALPHA;
-  cell_copy();  // cell_macro_copy ();
+  UpdateGcellCoordiFromModule();  // cell_macro_copy ();
   gp_opt();
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
@@ -952,7 +947,7 @@ void tcGP3DglobalPlacement_main() {
 void cGP3DglobalPlacement_main() {
   STAGE = cGP3D;
   // ALPHA = initialALPHA;
-  cell_copy();  // cell_macro_copy ();
+  UpdateGcellCoordiFromModule();  // cell_macro_copy ();
   gp_opt();
   isFirst_gp_opt = false;
   UpdateNetAndGetHpwl();

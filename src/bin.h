@@ -113,46 +113,51 @@ void bin_delete(void);
 
 void get_bin_grad(BIN **bin, int max_x, int max_y);
 
-// int wthin(prec a, prec min_a, prec max_a);
-// prec get_int_line(prec min_x1, prec max_x1, prec min_x2, prec max_x2);
-// FPOS get_int_rgn(FPOS min1, FPOS max1, FPOS min2, FPOS max2);
-
 void legal_bin_idx(POS *p);
 POS get_bin_pt_from_point(FPOS p);
 
 // calculating the da variable.
 // using current da & half_size.
 //
-inline prec valid_coor2(prec da, prec half_size, int lab) {
-  prec min_a = da - half_size;
-  prec max_a = da + half_size;
+//
+inline prec 
+GetCoordiLayoutInsideAxis(prec center_coordi, prec half_size, int lab) {
+  prec min_a = center_coordi - half_size;
+  prec max_a = center_coordi + half_size;
+
+  prec valid_center_coordi = center_coordi;
 
   // according to X
   if(lab == 0) {
     if(min_a < place.org.x)
-      da += place.org.x - min_a;
+      center_coordi += place.org.x - min_a;
     if(max_a > place.end.x)
-      da -= max_a - place.end.x;
+      center_coordi -= max_a - place.end.x;
   }
   // accroding to Y
   else if(lab == 1) {
     if(min_a < place.org.y)
-      da += place.org.y - min_a;
+      center_coordi += place.org.y - min_a;
     if(max_a > place.end.y)
-      da -= max_a - place.end.y;
+      center_coordi -= max_a - place.end.y;
   }
-  return da;
+  return center_coordi;
 }
 
-inline FPOS valid_coor00(FPOS v, FPOS half_size) {
+// given center_coordi and half_size, 
+// 
+// return a valid center_coordi, 
+// within place.org <= center_coordi <= place.end.
+//
+// half_size is considered.
+//
+inline FPOS 
+GetCoordiLayoutInside(FPOS center_coordi, FPOS half_size) {
   FPOS v1;
-  v1.x = valid_coor2(v.x, half_size.x, 0);
-  v1.y = valid_coor2(v.y, half_size.y, 1);
+  v1.x = GetCoordiLayoutInsideAxis(center_coordi.x, half_size.x, 0);
+  v1.y = GetCoordiLayoutInsideAxis(center_coordi.y, half_size.y, 1);
   return v1;
 }
-
-prec valid_coor(prec a, int xy);
-prec valid_coor3(prec da, prec sz, int lab);
 
 int is_IO_block(TERM *term);
 

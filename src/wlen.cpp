@@ -127,6 +127,10 @@ FPOS get_wlen_cof1(prec ovf) {
   return cof;
 }
 
+// 
+// Described in ePlace-MS paper !!!!
+//
+//
 FPOS get_wlen_cof2(prec ovf) {
   FPOS cof;
   prec tmp = 0.0;
@@ -145,43 +149,26 @@ FPOS get_wlen_cof2(prec ovf) {
   return cof;
 }
 
-void wlen_init(void) {
-  int i = 0 /* ,cnt=exp_st_cnt */;
+void wlen_init() {
+//  int i = 0 /* ,cnt=exp_st_cnt */;
   /* prec interval = exp_interval ; */
-  exp_st = (EXP_ST *)malloc(sizeof(EXP_ST) * exp_st_cnt);
-  for(i = 0; i < exp_st_cnt; i++) {
-    exp_st[i].x = (prec)i * exp_interval - MAX_EXP;
-    exp_st[i].val = exp(exp_st[i].x);
-    if(i > 0) {
-      exp_st[i - 1].y_h = (exp_st[i].val - exp_st[i - 1].val) / exp_interval;
-    }
-  }
+//  exp_st = (EXP_ST *)malloc(sizeof(EXP_ST) * exp_st_cnt);
+//  for(i = 0; i < exp_st_cnt; i++) {
+//    exp_st[i].x = (prec)i * exp_interval - MAX_EXP;
+//    exp_st[i].val = exp(exp_st[i].x);
+//    if(i > 0) {
+//      exp_st[i - 1].y_h = (exp_st[i].val - exp_st[i - 1].val) / exp_interval;
+//    }
+//  }
 
   gp_wlen_weight.x = gp_wlen_weight.y = 1.0;
-
-  dp_wlen_weight.x = 1.0;
-  dp_wlen_weight.y = 1.0;
+  dp_wlen_weight.x = dp_wlen_weight.y = 1.0;
 }
 
-void wlen_init_mGP2D(void) {
-  gp_wlen_weight.x = 1.0;
-  gp_wlen_weight.y = 1.0;
-
-  dp_wlen_weight.x = 1.0;
-  dp_wlen_weight.y = 1.0;
-}
-
-void wlen_init_cGP2D(void) {
-  gp_wlen_weight.x = 1.0;
-  gp_wlen_weight.y = 1.0;
-
-  dp_wlen_weight.x = 1.0;
-  dp_wlen_weight.y = 1.0;
-}
-
+// 
 void wcof_init(FPOS bstp) {
-  wcof00 = wcof00_org;
-
+  // 0.5*(~) = binSize;
+  //
   base_wcof.x = wcof00.x / (0.5 * (bstp.x + bstp.y));
   base_wcof.y = wcof00.y / (0.5 * (bstp.x + bstp.y));
 
@@ -825,6 +812,8 @@ prec net_update_hpwl_mac(void) {
   return hpwl;
 }
 
+// WA
+//
 void net_update_wa(FPOS *st) {
   int i = 0;
 
@@ -850,7 +839,9 @@ void net_update_wa(FPOS *st) {
   if(timeon) {
     time_end(&time);
     cout << "parallelTime : " << time << endl;
-  };
+  }
+//  wlen_cof.Dump("current_wlen_cof"); 
+//  cout << "NEG_MAX_EXP: " << NEG_MAX_EXP << endl;
 
 #pragma omp parallel default(none) shared( \
     netInstance, moduleInstance, st, netCNT, NEG_MAX_EXP, wlen_cof) private(i)
@@ -921,6 +912,15 @@ void net_update_wa(FPOS *st) {
       // net->sum_denom2 (MIN)
       // pin->flg2 (MIN)
       //
+      //
+      // Note that NEG_MAX_EXP is -300
+      // The meaning NEG_MAX_EXP is. not to have weird out of range values 
+      // in floating vars.
+      //
+      // we know that wlen_cof is 1/ gamma.
+      // See main.cpp wcof00 and wlen.cpp: wcof_init. 
+      //
+      
       for(int j = 0; j < net->pinCNTinObject; j++) {
         PIN *pin = net->pin[j];
         FPOS fp = pin->fp;
@@ -928,6 +928,7 @@ void net_update_wa(FPOS *st) {
         prec exp_min_x = (min_x - fp.x) * wlen_cof.x;
         prec exp_max_y = (fp.y - max_y) * wlen_cof.y;
         prec exp_min_y = (min_y - fp.y) * wlen_cof.y;
+
 
         if(exp_max_x > NEG_MAX_EXP) {
           pin->e1.x = get_exp(exp_max_x);

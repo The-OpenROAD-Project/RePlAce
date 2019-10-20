@@ -164,11 +164,9 @@ int post_mGP2D_delete(void);
 void post_opt(void);
 
 void cell_init(void);
-void calc_average_module_width();
 
 void cell_filler_init();
 
-void update_cell_den();
 void whitespace_init(void);
 
 void cell_update(struct FPOS *st, int n);
@@ -176,8 +174,8 @@ void cell_delete(void);
 
 void input_sol(struct FPOS *st, int N, char *fn);
 
-void modu_copy(void);
-void cell_copy(void);
+void UpdateModuleCoordiFromGcell(void);
+void UpdateGcellCoordiFromModule(void);
 
 prec get_dis(struct FPOS *a, struct FPOS *b, int N);
 struct FPOS get_dis2(struct FPOS *a, struct FPOS *b, int N, prec num);
@@ -243,11 +241,7 @@ void init_iter(struct ITER *it, int idx);
 void cell_macro_copy(void);
 void gp_opt(void);
 
-void filler_adj(void);
-void filler_adj_mGP2D(void);
-void filler_adj_cGP2D(void);
-void smart_filler_adj(void);
-void rand_filler_adj(int idx);
+void FillerCellRandPlace(int idx);
 void sa_pl_shift(struct FPOS *x_st, int N);
 
 void tier_delete_mGP2D(void);

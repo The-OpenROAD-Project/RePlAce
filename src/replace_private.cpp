@@ -280,6 +280,17 @@ void TERM::Dump() {
 const char* CELL::Name() { 
   return cellNameStor[idx].c_str(); 
 }
+
+void CELL::Dump() {
+  printf("gcell[%d]:name: %s\n", idx, Name());
+  fflush(stdout);
+  pmin.Dump("pmin");
+  pmax.Dump("pmax");
+  den_pmin.Dump("den_pmin");
+  den_pmax.Dump("den_pmax");
+  cout << "grad: x: " << x_grad << " y: " << y_grad << endl;
+  cout << "den_scal: " << den_scal << endl << endl;
+}
   
 SHAPE::SHAPE(std::string _name, std::string _instName, int _idx, prec _llx, prec _lly,
         prec _width, prec _height)

@@ -68,7 +68,6 @@
 
 #define PI 3.141592653589793238462L
 #define SQRT2 1.414213562373095048801L
-#define INV_SQRT2 0.707106781186547524401L
 
 // for PREC_MODE variable => required for different codes.
 #define IS_FLOAT 0
@@ -128,7 +127,6 @@ typedef double prec;
 #define MIN_LEN 25.0 /* 10.0 */ /* 5.0 */ /* 1.0 */
 #define LS_DEN
 #define DetailPlace
-#define FILLER_ADJ RandomAdj
 #define MSH_Z_RES /* 8 */ 1
 #define THETA_XY_3D_PLOT PI / 6.0
 #define Z_SCAL 1.00
@@ -325,6 +323,7 @@ struct CELL {
   FPOS *pof_tmp;
   PIN **pin_tmp;
   const char* Name();
+  void Dump();
 };
 
 class SHAPE {
