@@ -7,7 +7,6 @@
 replace_external::
 replace_external() : 
   ckt(&Replace::__ckt), 
-  output_loc(""),
   timing_driven_mode(false), 
   unit_r(0.0f), unit_c(0.0f) {
   initGlobalVars();
@@ -334,6 +333,11 @@ replace_external::init_replace() {
   init();
 
   ParseInput();
+ 
+  // update custom net-weights 
+  if( hasCustomNetWeight ) {
+    initCustomNetWeight(net_weight_file); 
+  }
 
   net_update_init();
   init_tier();
@@ -475,7 +479,7 @@ replace_external::save_jpeg(const char* jpeg) {
 }
 
 void
-replace_external::import_custom_net_weight(const char* net_weight_file) {
+replace_external::import_custom_net_weight(const char* input_file) {
   hasCustomNetWeight = true;
-  initCustomNetWeight(net_weight_file); 
+  net_weight_file = input_file;
 }

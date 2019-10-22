@@ -93,6 +93,7 @@ private:
   std::vector<std::string> def_stor;
   std::vector<std::string> verilog_stor;
   std::vector<std::string> lib_stor;
+  std::string net_weight_file;
   std::string sdc_file;
   std::string output_loc;
   bool timing_driven_mode;

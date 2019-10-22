@@ -479,6 +479,7 @@ void wlen_grad_wa(int cell_idx, FPOS *grad) {
 // customWeight update functions:
 void initCustomNetWeight(string netWeightFile) {
 
+  PrintProcBegin("CustomNetWeightInit");
   // save netName / weight pair
   std::unordered_map<string,prec> tempMap;
   
@@ -495,7 +496,7 @@ void initCustomNetWeight(string netWeightFile) {
         stringstream ss(value);
         if (line == "") continue;
         tempMap[field] = atof(value.c_str());
-        //cout <<"Net " <<field <<" has weight " <<tempMap[field] <<endl;
+//        cout <<"Net " <<field <<" has weight " <<tempMap[field] <<endl;
       }
     }
     fin.close();
@@ -506,14 +507,18 @@ void initCustomNetWeight(string netWeightFile) {
   }
 
   // fill in net->customWeight
+  int customWeightCnt = 0;
   for (int i = 0; i < netCNT; i++) {
     if (tempMap.find(string(netInstance[i].Name())) != tempMap.end()) {
       netInstance[i].customWeight = tempMap[string(netInstance[i].Name())];
-      cout << netInstance[i].Name()
-        <<" weight " <<netInstance[i].customWeight 
-        <<" assigned" <<endl;
+      customWeightCnt ++;
+      //cout << netInstance[i].Name()
+      // <<" weight " <<netInstance[i].customWeight 
+      // <<" assigned" <<endl;
     }
   }
+  PrintInfoInt("CustomNetWeightCount", customWeightCnt);
+  PrintProcBegin("CustomNetWeightEnd");
 }
 
 void get_net_wlen_grad2_lse(NET *net, PIN *pin, FPOS *grad2) {
