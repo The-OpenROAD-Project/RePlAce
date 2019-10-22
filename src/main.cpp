@@ -205,7 +205,6 @@ prec BETAcGP;
 prec BETA;
 prec dampParam;
 prec stn_weight;  // lutong
-prec global_ovfl;
 prec maxALPHA;
 prec ExtraWSfor3D;
 prec MaxExtraWSfor3D;

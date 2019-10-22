@@ -663,7 +663,6 @@ extern prec BETAcGP;
 extern prec BETA;
 
 extern prec dampParam;
-extern prec global_ovfl;  ////////////
 extern prec maxALPHA;
 extern prec ExtraWSfor3D;
 extern prec MaxExtraWSfor3D;

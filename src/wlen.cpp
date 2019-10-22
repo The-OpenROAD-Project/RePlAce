@@ -146,6 +146,8 @@ FPOS get_wlen_cof2(prec ovf) {
     tmp = 1.0 / pow(10.0, (ovf - 0.1) * 20 / 9.0 - 1.0);
     cof.x = cof.y = tmp;
   }
+//  cout << "ovfl: " << ovf << endl;
+//  cof.Dump("current_wlen_cof:");
   return cof;
 }
 
@@ -173,6 +175,7 @@ void wcof_init(FPOS bstp) {
   base_wcof.y = wcof00.y / (0.5 * (bstp.x + bstp.y));
 
   wlen_cof = fp_scal(0.1, base_wcof);
+//  wlen_cof = base_wcof;
   wlen_cof_inv = fp_inv(wlen_cof);
 }
 

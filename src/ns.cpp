@@ -498,7 +498,6 @@ void myNesterov::InitializationIter() {
   it->hpwl = total_hpwl;
   it->potn = gsum_phi;
   it->ovfl = gsum_ovfl;
-  global_ovfl = gsum_ovfl;
   it->grad = get_norm(y_dst, N, 2.0);
 }
 
