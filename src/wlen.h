@@ -87,6 +87,9 @@ inline void wlen_grad_wa(int cell_idx, FPOS *grad);
 void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad);
 inline void get_net_wlen_grad_wa(FPOS obj, NET *net, PIN *pin, FPOS *grad);
 
+
+void initCustomNetWeight(std::string netWeightFile);
+
 inline void wlen_pre(int cell_idx, FPOS *wpre) {
   wpre->x = wpre->y = 0;
 

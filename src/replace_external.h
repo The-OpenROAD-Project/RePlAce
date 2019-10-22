@@ -75,9 +75,11 @@ public:
   size_t get_pin_size();
   size_t get_row_size();
 
-  float get_nesterov_overflow();
-  int get_nesterov_iter_count();
-  float get_nesterov_potential();
+//  float get_nesterov_overflow();
+//  int get_nesterov_iter_count();
+//  float get_nesterov_potential();
+  
+  void import_custom_net_weight(const char* net_weight);
 
   bool save_jpeg(const char* jpeg);
 

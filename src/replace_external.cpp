@@ -420,7 +420,30 @@ replace_external::get_tns() {
   return globalTns;
 }
 
+size_t
+replace_external::get_module_size() {
+  return moduleCNT;
+}
 
+size_t
+replace_external::get_terminal_size() {
+  return terminalCNT;
+}
+
+size_t
+replace_external::get_net_size() {
+  return netCNT;
+}
+
+size_t
+replace_external::get_pin_size() {
+  return pinCNT;
+}
+
+size_t
+replace_external::get_row_size() {
+  return row_cnt;
+}
 
 void 
 replace_external::update_instance_list() {
@@ -449,4 +472,10 @@ replace_external::update_instance_list() {
 bool
 replace_external::save_jpeg(const char* jpeg) {
   return true;
+}
+
+void
+replace_external::import_custom_net_weight(const char* net_weight_file) {
+  hasCustomNetWeight = true;
+  initCustomNetWeight(net_weight_file); 
 }

@@ -413,7 +413,7 @@ struct NET {
   int idx;
   int mod_idx;
   prec timingWeight;
-  prec stn_cof;             // lutong
+  prec customWeight;
   prec wl_rsmt;             // lutong
 
   const char* Name();
@@ -516,7 +516,8 @@ extern int gVerbose;
 extern prec globalWns;
 extern prec globalTns;
 extern prec netCut;
-extern bool hasNetWeight;
+extern bool hasUnitNetWeight;
+extern bool hasCustomNetWeight;
 extern prec netWeight;
 extern prec netWeightMin;
 extern prec netWeightMax;

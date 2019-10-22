@@ -44,6 +44,9 @@
 #include <cstring>
 #include <iomanip>
 #include <omp.h>
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
 
 #include "replace_private.h"
 #include "macro.h"
@@ -55,6 +58,8 @@
 using std::min;
 using std::max;
 using std::make_pair;
+using std::fstream;
+using std::stringstream;
 
 int wcof_flg;
 int MAX_EXP;
@@ -446,24 +451,64 @@ void wlen_grad_wa(int cell_idx, FPOS *grad) {
 
     get_net_wlen_grad_wa(pin->fp, net, pin, &net_grad);
 
-    float curWeight = netInstance[pin->netID].timingWeight;
+    float curTimingWeight = netInstance[pin->netID].timingWeight;
     // Timing Control Parts
-    if(isTiming && curWeight > 0) {
-      curWeight = netWeightBase + min(max(0.0f, netWeightBound - netWeightBase),
-                                      curWeight / netWeightScale);
-      // cout << "calNetWeight: " << curWeight << endl;
-      if(hasNetWeight) {
+    if(isTiming && curTimingWeight > 0) {
+      curTimingWeight = netWeightBase + min(max(0.0f, netWeightBound - netWeightBase),
+                                      curTimingWeight / netWeightScale);
+      // cout << "calNetWeight: " << curTimingWeight << endl;
+      if(hasUnitNetWeight) {
         net_grad.x *= netWeight;
         net_grad.y *= netWeight;
       }
+      else if( hasCustomNetWeight ) {
+        net_grad.x *= net->customWeight;
+        net_grad.y *= net->customWeight;
+      }
       else {
-        net_grad.x *= curWeight;
-        net_grad.y *= curWeight;
+        net_grad.x *= curTimingWeight;
+        net_grad.y *= curTimingWeight;
       }
     }
 
     grad->x += net_grad.x;
     grad->y += net_grad.y;
+  }
+}
+
+// customWeight update functions:
+void initCustomNetWeight(string netWeightFile) {
+
+  // save netName / weight pair
+  std::unordered_map<string,prec> tempMap;
+  
+  fstream fin(netWeightFile.c_str());
+  string line;
+  if (fin.is_open()){
+    while (fin.good()){
+      getline(fin, line);
+      if (line.empty() || line[0] != '#'){
+        char delimiter=' ';
+        int pos = line.find(delimiter);
+        string field = line.substr(0, pos);
+        string value = line.substr(pos + 1);
+        stringstream ss(value);
+        if (line == "") continue;
+        tempMap[field] = atof(value.c_str());
+        //cout <<"Net " <<field <<" has weight " <<tempMap[field] <<endl;
+      }
+    }
+    fin.close();
+  }
+
+  // fill in net->customWeight
+  for (int i = 0; i < netCNT; i++) {
+    if (tempMap.find(string(netInstance[i].Name())) != tempMap.end()) {
+      netInstance[i].customWeight = tempMap[string(netInstance[i].Name())];
+      cout << netInstance[i].Name()
+        <<" weight " <<netInstance[i].customWeight 
+        <<" assigned" <<endl;
+    }
   }
 }
 
