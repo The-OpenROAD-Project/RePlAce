@@ -177,7 +177,6 @@ vector< pair< int, prec > > inflationList;
 bool isTrial = false;
 bool isFirst_gp_opt = true;
 bool DEN_ONLY_PRECON;
-bool isCustomNetWeight;
 
 int orderHPWL;
 vector< pair< prec, prec > > trial_HPWLs;

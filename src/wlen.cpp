@@ -500,6 +500,10 @@ void initCustomNetWeight(string netWeightFile) {
     }
     fin.close();
   }
+  else {
+    cout << "ERROR: Cannot open " << netWeightFile << endl;
+    exit(1);
+  }
 
   // fill in net->customWeight
   for (int i = 0; i < netCNT; i++) {

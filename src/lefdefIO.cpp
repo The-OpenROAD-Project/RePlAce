@@ -770,7 +770,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
 
     if(fabs(curModule->size.y - rowHeight) > PREC_EPSILON) {
       defMacroCnt++;
-      cout << "MACRO: " << curComp->id() << " " << curModule->size.y << endl;
+//      cout << "MACRO: " << curComp->id() << " " << curModule->size.y << endl;
     }
 
     // set half_size
@@ -962,6 +962,7 @@ void GenerateModuleTerminal(Replace::Circuit& __ckt) {
     curTerm->Dump();
     terminalCNT++;
   }
+  PrintInfoInt("MacroCount", defMacroCnt);
   PrintInfoInt("NumModules", moduleCNT);
   PrintInfoInt("NumTerminals", terminalCNT);
 }
