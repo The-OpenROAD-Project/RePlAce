@@ -59,6 +59,47 @@ using namespace std;
 using Replace::NetInfo;
 using Replace::Circuit;
 
+
+Replace::Circuit::Circuit() : lefManufacturingGrid(DBL_MIN) {
+#ifdef USE_GOOGLE_HASH
+  lefMacroMap.set_empty_key(INIT_STR);
+  lefViaMap.set_empty_key(INIT_STR);
+  lefLayerMap.set_empty_key(INIT_STR);
+  lefSiteMap.set_empty_key(INIT_STR);
+
+  defComponentMap.set_empty_key(INIT_STR);
+  defPinMap.set_empty_key(INIT_STR);
+  defRowY2OrientMap.set_empty_key(INT_MAX);
+#endif
+};
+  
+Replace::Circuit::Circuit(vector< string >& lefStor, string defFilename, bool isVerbose)
+      : lefManufacturingGrid(DBL_MIN) {
+#ifdef USE_GOOGLE_HASH
+    lefMacroMap.set_empty_key(INIT_STR);
+    lefViaMap.set_empty_key(INIT_STR);
+    lefLayerMap.set_empty_key(INIT_STR);
+    lefSiteMap.set_empty_key(INIT_STR);
+
+    defComponentMap.set_empty_key(INIT_STR);
+    defPinMap.set_empty_key(INIT_STR);
+    defRowY2OrientMap.set_empty_key(INT_MAX);
+#endif
+
+    Init(lefStor, defFilename, isVerbose);
+  }
+
+void Replace::Circuit::Init(vector< string >& lefStor, string defFilename,
+    bool isVerbose) {
+  PrintProcBegin("LefParsing");
+  ParseLef(lefStor, isVerbose);
+  PrintProcEnd("LefParsing");
+  PrintProcBegin("DefParsing");
+  ParseDef(defFilename, isVerbose);
+  PrintProcEnd("DefParsing");
+}
+
+
 //
 // The below global variable is updated.
 //
@@ -70,6 +111,7 @@ using Replace::Circuit;
 // row_st // row_cnt
 //
 // shapeMap // (Fixed cell can have rectilinear polygon)
+
 //
 // numNonRectangularNodes // required bookshelf writing - *.shape aware
 // totalShapeCount // required bookshelf writing - *.shape aware
@@ -400,7 +442,7 @@ void ParseLefDef() {
   //
   // Replace::Circuit __ckt(lefStor, defName, "");
   //
-  __ckt.Init(lefStor, defName, isVerbose);
+  __ckt.Init(lefStor, defName, ( gVerbose >= 1 ));
 
   SetParameter();
 
@@ -1716,6 +1758,11 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
     if(net.hasUse() &&
        (strcmp(net.use(), "CLOCK") == 0 || strcmp(net.use(), "POWER") == 0 ||
         strcmp(net.use(), "GROUND") == 0 || strcmp(net.use(), "RESET") == 0)) {
+      continue;
+    }
+
+    // skip for empty net definition.
+    if( net.numConnections() == 0 ) {
       continue;
     }
    
