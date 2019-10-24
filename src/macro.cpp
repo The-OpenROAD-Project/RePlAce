@@ -855,11 +855,6 @@ void sa_post(void) {
     mac->pmax.y = (prec)mac->pmax_lg.y;
 
     mac->tier = z;
-
-    for(j = 0; j < mac->pinCNTinObject; j++) {
-      pin = mac->pin[j];
-      pin->tier = z;
-    }
   }
 
   total_modu_area -= total_macro_area * target_cell_den;

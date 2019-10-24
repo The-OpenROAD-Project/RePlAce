@@ -231,7 +231,6 @@ struct PIN {
   int gid;   // current Pin's idx
   int IO;    // I -> 0; O -> 1
   int term;  // term -> 1, move -> 0
-  int tier;
   int X_MIN;
   int Y_MIN;
   int X_MAX;

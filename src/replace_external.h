@@ -36,11 +36,13 @@ public:
   void set_unit_res(double unit_r);
   void set_unit_cap(double unit_c);
 
+
   void set_plot_enable(bool plot_mode);
   void set_verbose_level(int verbose);
   void set_fast_mode_enable(bool fast_mode);
   void set_seed_init_enable(bool seed_init);
   void set_plot_color_file(std::string color_file);
+  void set_write_bookshelf_enable(bool write_mode);
   
   void set_density(double density);
   void set_bin_grid_count(size_t grid_count);
@@ -75,6 +77,7 @@ public:
   size_t get_pin_size();
   size_t get_row_size();
 
+
 //  float get_nesterov_overflow();
 //  int get_nesterov_iter_count();
 //  float get_nesterov_potential();
@@ -97,6 +100,7 @@ private:
   std::string sdc_file;
   std::string output_loc;
   bool timing_driven_mode;
+  bool write_bookshelf_mode;
   double unit_r;
   double unit_c;
 };

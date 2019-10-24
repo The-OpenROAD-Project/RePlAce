@@ -222,11 +222,6 @@ void tier_assign(int mode) {
 
     tier->modu_st[tier->modu_cnt++] = modu;
     tier->modu_area += moduleArea;
-
-    for(int k = 0; k < modu->pinCNTinObject; k++) {
-      PIN *pin = modu->pin[k];
-      pin->tier = currTier;
-    }
   }
 
 

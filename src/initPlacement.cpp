@@ -160,15 +160,6 @@ void build_data_struct(bool initCoordi) {
   prec max_x = 0;
   prec max_y = 0;
 
-  for(int i = 0; i < terminalCNT; i++) {
-    term = &terminalInstance[i];
-
-    for(int j = 0; j < term->pinCNTinObject; j++) {
-      pin = term->pin[j];
-      pin->tier = 0;
-    }
-  }
-
   for(int i = 0; i < moduleCNT; i++) {
     mdp = &moduleInstance[i];
 

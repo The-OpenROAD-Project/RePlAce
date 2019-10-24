@@ -2,12 +2,14 @@
 #include "wlen.h"
 #include "initPlacement.h"
 #include "plot.h"
+#include "routeOpt.h"
 
 
 replace_external::
 replace_external() : 
   ckt(&Replace::__ckt), 
   timing_driven_mode(false), 
+  write_bookshelf_mode(false),
   unit_r(0.0f), unit_c(0.0f) {
   initGlobalVars();
 };
@@ -255,6 +257,11 @@ replace_external::set_plot_color_file(std::string color_file) {
 }
 
 void
+replace_external::set_write_bookshelf_enable(bool write_mode) {
+  write_bookshelf_mode = true;
+}
+
+void
 replace_external::set_density(double density) {
   target_cell_den = target_cell_den_orig = density;
 }
@@ -343,6 +350,11 @@ replace_external::init_replace() {
   init_tier();
   build_data_struct(!isInitSeed);
   update_instance_list();
+  if( write_bookshelf_mode ) {
+    setup_before_opt();
+    routeInst.Init();
+    WriteBookshelf();  
+  }
   return true;
 }
 

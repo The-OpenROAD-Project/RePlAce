@@ -2333,11 +2333,7 @@ void WriteNet(char *dir_tier, int curLayer, int pin_cnt, int net_cnt,
           }
         }
       }
-      else if(pin->tier != curLayer) {
-        fprintf(fp_nets, "\tfakePin%d\t%s : %.6lf\t%.6lf\n", pin->gid, io, 0.0,
-                0.0);
-      }
-      else if(pin->tier == curLayer) {
+      else {
         if(pin->term == 0) {
           MODULE *modu = &moduleInstance[moduleID];
           bsNetInfoStor.push_back(
@@ -2505,16 +2501,9 @@ void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing,
 
   for(int i = 0; i < pinCNT; i++) {
     pin = &pinInstance[i];
-    if(pin->term) {
-    }
-    else if(pin->tier != z) {
-      pin_term_cnt++;
-    }
-    else if(pin->tier == z) {
-      if(netChk[pin->netID] == -1) {
-        netChk[pin->netID] = 1;
-        net_cnt++;
-      }
+    if(!pin->term && netChk[pin->netID] == -1) {
+      netChk[pin->netID] = 1;
+      net_cnt++;
     }
   }
 

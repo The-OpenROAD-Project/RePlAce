@@ -1005,7 +1005,7 @@ void macroLegalization_main() {
 }
 
 void WriteBookshelfForGR() {
-  printf("INFO:  WRITE BOOKSHELF...");
+  PrintProcBegin("Write Bookshelf");
   // temporary update net->pin2 to write bookshelf
   update_pin2();
 
@@ -1027,8 +1027,7 @@ void WriteBookshelfForGR() {
         // *.shape support
 //        (detailPlacer == NTUplace3 || shapeMap.size() == 0) ? false : true);
         true, true, true);
-  printf("PROC:  END WRITE BOOKSHELF\n\n");
-  fflush(stdout);
+  PrintProcEnd("Write Bookshelf");
 }
 
 void WriteBookshelf() {
