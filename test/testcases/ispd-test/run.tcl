@@ -2,7 +2,7 @@
 # Examples for Non Timing-driven RePlAce with TCL usage
 #
 
-set design ispd 
+set design ispd18_test1.input 
 
 replace_external rep
 
@@ -29,5 +29,5 @@ rep place_cell_nesterov_place
 #rep print_instances
 
 # Export DEF file
-rep export_def ./${design}_nan45_nontd.def
+rep export_def ./${design}_nontd.def
 puts "Final HPWL: [rep get_hpwl]"
