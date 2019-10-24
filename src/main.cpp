@@ -1022,8 +1022,6 @@ void WriteBookshelfForGR() {
         targetDir, 
         // tier number
         0, 
-        // writing modes
-        (placementMacroCNT == 0) ? STDCELLonly : MIXED,
         // *.shape support
 //        (detailPlacer == NTUplace3 || shapeMap.size() == 0) ? false : true);
         true, true, true);
@@ -1049,8 +1047,6 @@ void WriteBookshelf() {
         targetDir,
         // tier number
         i, 
-        // writing modes
-        (placementMacroCNT == 0) ? STDCELLonly : MIXED,
         // *.shape support
         (detailPlacer == NTUplace3) ? false : true,
         false);

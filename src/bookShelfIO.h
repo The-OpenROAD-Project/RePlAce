@@ -118,7 +118,7 @@ void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt);
 
 void write_3d_bench(void);  // useless
 
-void WriteBookshelfWithTier(char* targetDir, int z, int lab, bool isShapeDrawing = true, 
+void WriteBookshelfWithTier(char* targetDir, int z, bool isShapeDrawing = true, 
     bool isNameConvert = false, bool isMetal1Removed = false);
 void ReadPlBookshelf(const char *fileName);
 

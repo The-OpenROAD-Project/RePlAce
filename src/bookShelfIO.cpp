@@ -2103,7 +2103,7 @@ void WriteRoute(char *dir_tier, bool isNameConvert, RouteInstance& routeInst,
 }
 
 // *.nodes writing
-void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
+void WriteNodes(char *dir_tier, int curLayer, int pin_term_cnt,
                 bool isShapeDrawing, bool isNameConvert) {
   char fn_nodes[BUF_SZ] = {
       0,
@@ -2121,29 +2121,23 @@ void WriteNodes(char *dir_tier, int curLayer, int lab, int pin_term_cnt,
 
   TIER *tier = &tier_st[curLayer];
 
-  int term_cnt = (lab) ? tier->mac_cnt + terminalCNT + pin_term_cnt
-                       : terminalCNT + pin_term_cnt;
+  int term_cnt = terminalCNT + pin_term_cnt;
 
   term_cnt = (!isShapeDrawing)
                  ? term_cnt + totalShapeCount - numNonRectangularNodes
                  : term_cnt;
 
-  //    if(lab)
-  //        term_cnt = tier->mac_cnt + terminalCNT + pin_term_cnt;
-  //    else
-  //        term_cnt = terminalCNT + pin_term_cnt;
-
-  int node_cnt = tier->modu_cnt + term_cnt;
+  int node_cnt = moduleCNT + term_cnt;
 
   fprintf(fp_nodes, "NumNodes      :  %d\n", node_cnt);
   fprintf(fp_nodes, "NumTerminals  :  %d\n\n", term_cnt);
 
-  for(int i = 0; i < tier->modu_cnt; i++) {
-    MODULE *modu = tier->modu_st[i];
+  for(int i = 0; i < moduleCNT; i++) {
+    MODULE* curModule = &moduleInstance[i];
     fprintf(fp_nodes, "%*s %*d %*d\n", 15, 
-        (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
-        14, GetScaleUpSize ( modu->size.x ),
-        14, GetScaleUpSize ( modu->size.y ));
+        (isNameConvert)? _bsMap.GetBsModuleName( curModule->Name() ) : curModule->Name(), 
+        14, GetScaleUpSize ( curModule->size.x ),
+        14, GetScaleUpSize ( curModule->size.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {
@@ -2473,7 +2467,7 @@ void WriteScl(char *dir_tier, int curLayer) {
 
 // write bookshelf's output
 // z : current tier's index
-void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing, 
+void WriteBookshelfWithTier(char* dir_tier, int z, bool isShapeDrawing, 
     bool isNameConvert, bool isMetal1Removed) {
   PIN *pin = NULL;
   NET *net = NULL;
@@ -2537,7 +2531,7 @@ void WriteBookshelfWithTier(char* dir_tier, int z, int lab, bool isShapeDrawing,
   WriteNet(dir_tier, z, pin_cnt, net_cnt, netChk, isShapeDrawing, isNameConvert);
 
   WriteScl(dir_tier, z);
-  WriteNodes(dir_tier, z, lab, pin_term_cnt, isShapeDrawing, isNameConvert);
+  WriteNodes(dir_tier, z, pin_term_cnt, isShapeDrawing, isNameConvert);
   WritePl(dir_tier, z, isShapeDrawing, isNameConvert );
 
   WriteRoute( dir_tier, isNameConvert, routeInst, isMetal1Removed);
