@@ -204,41 +204,6 @@ void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
     curTerminal->pmax.y = curTerminal->center.y + 0.5 * curTerminal->size.y;
   }
 
-  /*
-   for(int i=0; i<terminalCNT; i++) {
-       if(terminalInstance[i].isTerminalNI) {
-           continue;
-       }
-
-       if(shapeMap.find( terminalInstance[i].name ) != shapeMap.end() ) {
-           continue;
-       }
-
-       TERM* curTerminalA = &terminalInstance[i];
-
-       for(int j=i+1; j<terminalCNT; j++) {
-           if( terminalInstance[j].isTerminalNI) {
-               continue;
-           }
-
-           if(shapeMap.find( terminalInstance[j].name ) != shapeMap.end() ) {
-               continue;
-           }
-
-           TERM* curTerminalB = &terminalInstance[j];
-
-           prec commonArea = pGetCommonAreaXY( curTerminalA->pmin,
-                  curTerminalA->pmax, curTerminalB->pmin,
-                  curTerminalB->pmax );
-           if(commonArea > 0) {
-               cout << "Warning!! " << curTerminalA->Name() << " , " <<
-                        curTerminalB->Name() << " : " << commonArea << endl;
-           }
-       }
-   }
-   cout << "end" << endl;
-   */
-
   // mgwoo
   //
   assert(tot_row_cnt == row_cnt);
@@ -2119,8 +2084,6 @@ void WriteNodes(char *dir_tier, int curLayer, int pin_term_cnt,
       fp_nodes);
   fputs("\n", fp_nodes);
 
-  TIER *tier = &tier_st[curLayer];
-
   int term_cnt = terminalCNT + pin_term_cnt;
 
   term_cnt = (!isShapeDrawing)
@@ -2375,14 +2338,12 @@ void WritePl(char *dir_tier, int curLayer, bool isShapeDrawing,
 
   fputs("\n", fp_pl);
 
-  TIER *tier = &tier_st[curLayer];
-
-  for(int i = 0; i < tier->modu_cnt; i++) {
-    MODULE *modu = tier->modu_st[i];
+  for(int i = 0; i < moduleCNT; i++) {
+    MODULE *curModule = &moduleInstance[i];
     fprintf(fp_pl, "%s\t%.6lf\t%.6lf : N\n", 
-        (isNameConvert)? _bsMap.GetBsModuleName( modu->Name() ) : modu->Name(), 
-        GetScaleUpPointFloatX( modu->pmin.x ), 
-        GetScaleUpPointFloatY( modu->pmin.y ));
+        (isNameConvert)? _bsMap.GetBsModuleName( curModule->Name() ) : curModule->Name(), 
+        GetScaleUpPointFloatX( curModule->pmin.x ), 
+        GetScaleUpPointFloatY( curModule->pmin.y ));
   }
 
   for(int i = 0; i < terminalCNT; i++) {

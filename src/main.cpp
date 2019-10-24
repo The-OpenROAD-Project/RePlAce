@@ -1041,16 +1041,14 @@ void WriteBookshelf() {
   sprintf( cmd, "mkdir -p %s", targetDir);
   system(cmd);
 
-  for(int i = 0; i < numLayer; i++) {
     // call Write Bookshelf function by its tier
     WriteBookshelfWithTier(
         targetDir,
         // tier number
-        i, 
+        0, 
         // *.shape support
         (detailPlacer == NTUplace3) ? false : true,
         false);
-  }
   printf("PROC:  END WRITE BOOKSHELF\n\n");
   fflush(stdout);
 }
