@@ -44,6 +44,9 @@
 #include <cstring>
 #include <iomanip>
 #include <omp.h>
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
 
 #include "replace_private.h"
 #include "macro.h"
@@ -55,6 +58,8 @@
 using std::min;
 using std::max;
 using std::make_pair;
+using std::fstream;
+using std::stringstream;
 
 int wcof_flg;
 int MAX_EXP;
@@ -127,6 +132,10 @@ FPOS get_wlen_cof1(prec ovf) {
   return cof;
 }
 
+// 
+// Described in ePlace-MS paper !!!!
+//
+//
 FPOS get_wlen_cof2(prec ovf) {
   FPOS cof;
   prec tmp = 0.0;
@@ -142,50 +151,36 @@ FPOS get_wlen_cof2(prec ovf) {
     tmp = 1.0 / pow(10.0, (ovf - 0.1) * 20 / 9.0 - 1.0);
     cof.x = cof.y = tmp;
   }
+//  cout << "ovfl: " << ovf << endl;
+//  cof.Dump("current_wlen_cof:");
   return cof;
 }
 
-void wlen_init(void) {
-  int i = 0 /* ,cnt=exp_st_cnt */;
+void wlen_init() {
+//  int i = 0 /* ,cnt=exp_st_cnt */;
   /* prec interval = exp_interval ; */
-  exp_st = (EXP_ST *)malloc(sizeof(EXP_ST) * exp_st_cnt);
-  for(i = 0; i < exp_st_cnt; i++) {
-    exp_st[i].x = (prec)i * exp_interval - MAX_EXP;
-    exp_st[i].val = exp(exp_st[i].x);
-    if(i > 0) {
-      exp_st[i - 1].y_h = (exp_st[i].val - exp_st[i - 1].val) / exp_interval;
-    }
-  }
+//  exp_st = (EXP_ST *)malloc(sizeof(EXP_ST) * exp_st_cnt);
+//  for(i = 0; i < exp_st_cnt; i++) {
+//    exp_st[i].x = (prec)i * exp_interval - MAX_EXP;
+//    exp_st[i].val = exp(exp_st[i].x);
+//    if(i > 0) {
+//      exp_st[i - 1].y_h = (exp_st[i].val - exp_st[i - 1].val) / exp_interval;
+//    }
+//  }
 
   gp_wlen_weight.x = gp_wlen_weight.y = 1.0;
-
-  dp_wlen_weight.x = 1.0;
-  dp_wlen_weight.y = 1.0;
+  dp_wlen_weight.x = dp_wlen_weight.y = 1.0;
 }
 
-void wlen_init_mGP2D(void) {
-  gp_wlen_weight.x = 1.0;
-  gp_wlen_weight.y = 1.0;
-
-  dp_wlen_weight.x = 1.0;
-  dp_wlen_weight.y = 1.0;
-}
-
-void wlen_init_cGP2D(void) {
-  gp_wlen_weight.x = 1.0;
-  gp_wlen_weight.y = 1.0;
-
-  dp_wlen_weight.x = 1.0;
-  dp_wlen_weight.y = 1.0;
-}
-
+// 
 void wcof_init(FPOS bstp) {
-  wcof00 = wcof00_org;
-
+  // 0.5*(~) = binSize;
+  //
   base_wcof.x = wcof00.x / (0.5 * (bstp.x + bstp.y));
   base_wcof.y = wcof00.y / (0.5 * (bstp.x + bstp.y));
 
   wlen_cof = fp_scal(0.1, base_wcof);
+//  wlen_cof = base_wcof;
   wlen_cof_inv = fp_inv(wlen_cof);
 }
 
@@ -456,25 +451,74 @@ void wlen_grad_wa(int cell_idx, FPOS *grad) {
 
     get_net_wlen_grad_wa(pin->fp, net, pin, &net_grad);
 
-    float curWeight = netInstance[pin->netID].timingWeight;
+    float curTimingWeight = netInstance[pin->netID].timingWeight;
     // Timing Control Parts
-    if(isTiming && curWeight > 0) {
-      curWeight = netWeightBase + min(max(0.0f, netWeightBound - netWeightBase),
-                                      curWeight / netWeightScale);
-      // cout << "calNetWeight: " << curWeight << endl;
-      if(hasNetWeight) {
+    if(isTiming && curTimingWeight > 0) {
+      curTimingWeight = netWeightBase + min(max(0.0f, netWeightBound - netWeightBase),
+                                      curTimingWeight / netWeightScale);
+      // cout << "calNetWeight: " << curTimingWeight << endl;
+      if(hasUnitNetWeight) {
         net_grad.x *= netWeight;
         net_grad.y *= netWeight;
       }
+      else if( hasCustomNetWeight ) {
+        net_grad.x *= net->customWeight;
+        net_grad.y *= net->customWeight;
+      }
       else {
-        net_grad.x *= curWeight;
-        net_grad.y *= curWeight;
+        net_grad.x *= curTimingWeight;
+        net_grad.y *= curTimingWeight;
       }
     }
 
     grad->x += net_grad.x;
     grad->y += net_grad.y;
   }
+}
+
+// customWeight update functions:
+void initCustomNetWeight(string netWeightFile) {
+
+  PrintProcBegin("CustomNetWeightInit");
+  // save netName / weight pair
+  std::unordered_map<string,prec> tempMap;
+  
+  fstream fin(netWeightFile.c_str());
+  string line;
+  if (fin.is_open()){
+    while (fin.good()){
+      getline(fin, line);
+      if (line.empty() || line[0] != '#'){
+        char delimiter=' ';
+        int pos = line.find(delimiter);
+        string field = line.substr(0, pos);
+        string value = line.substr(pos + 1);
+        stringstream ss(value);
+        if (line == "") continue;
+        tempMap[field] = atof(value.c_str());
+//        cout <<"Net " <<field <<" has weight " <<tempMap[field] <<endl;
+      }
+    }
+    fin.close();
+  }
+  else {
+    cout << "ERROR: Cannot open " << netWeightFile << endl;
+    exit(1);
+  }
+
+  // fill in net->customWeight
+  int customWeightCnt = 0;
+  for (int i = 0; i < netCNT; i++) {
+    if (tempMap.find(string(netInstance[i].Name())) != tempMap.end()) {
+      netInstance[i].customWeight = tempMap[string(netInstance[i].Name())];
+      customWeightCnt ++;
+      //cout << netInstance[i].Name()
+      // <<" weight " <<netInstance[i].customWeight 
+      // <<" assigned" <<endl;
+    }
+  }
+  PrintInfoInt("CustomNetWeightCount", customWeightCnt);
+  PrintProcBegin("CustomNetWeightEnd");
 }
 
 void get_net_wlen_grad2_lse(NET *net, PIN *pin, FPOS *grad2) {
@@ -825,6 +869,8 @@ prec net_update_hpwl_mac(void) {
   return hpwl;
 }
 
+// WA
+//
 void net_update_wa(FPOS *st) {
   int i = 0;
 
@@ -850,7 +896,9 @@ void net_update_wa(FPOS *st) {
   if(timeon) {
     time_end(&time);
     cout << "parallelTime : " << time << endl;
-  };
+  }
+//  wlen_cof.Dump("current_wlen_cof"); 
+//  cout << "NEG_MAX_EXP: " << NEG_MAX_EXP << endl;
 
 #pragma omp parallel default(none) shared( \
     netInstance, moduleInstance, st, netCNT, NEG_MAX_EXP, wlen_cof) private(i)
@@ -921,6 +969,15 @@ void net_update_wa(FPOS *st) {
       // net->sum_denom2 (MIN)
       // pin->flg2 (MIN)
       //
+      //
+      // Note that NEG_MAX_EXP is -300
+      // The meaning NEG_MAX_EXP is. not to have weird out of range values 
+      // in floating vars.
+      //
+      // we know that wlen_cof is 1/ gamma.
+      // See main.cpp wcof00 and wlen.cpp: wcof_init. 
+      //
+      
       for(int j = 0; j < net->pinCNTinObject; j++) {
         PIN *pin = net->pin[j];
         FPOS fp = pin->fp;
@@ -928,6 +985,7 @@ void net_update_wa(FPOS *st) {
         prec exp_min_x = (min_x - fp.x) * wlen_cof.x;
         prec exp_max_y = (fp.y - max_y) * wlen_cof.y;
         prec exp_min_y = (min_y - fp.y) * wlen_cof.y;
+
 
         if(exp_max_x > NEG_MAX_EXP) {
           pin->e1.x = get_exp(exp_max_x);

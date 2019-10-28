@@ -96,45 +96,15 @@ REPLACE_NAMESPACE_OPEN
 
 class Circuit {
  public:
-  Circuit() : lefManufacturingGrid(DBL_MIN) {
-#ifdef USE_GOOGLE_HASH
-    lefMacroMap.set_empty_key(INIT_STR);
-    lefViaMap.set_empty_key(INIT_STR);
-    lefLayerMap.set_empty_key(INIT_STR);
-    lefSiteMap.set_empty_key(INIT_STR);
-
-    defComponentMap.set_empty_key(INIT_STR);
-    defPinMap.set_empty_key(INIT_STR);
-    defRowY2OrientMap.set_empty_key(INT_MAX);
-#endif
-  }
+  Circuit();
 
   //
   // LEF/DEF is essential,
   // but verilog is optional
   //
-  Circuit(vector< string >& lefStor, string defFilename, bool isVerbose = false)
-      : lefManufacturingGrid(DBL_MIN) {
-#ifdef USE_GOOGLE_HASH
-    lefMacroMap.set_empty_key(INIT_STR);
-    lefViaMap.set_empty_key(INIT_STR);
-    lefLayerMap.set_empty_key(INIT_STR);
-    lefSiteMap.set_empty_key(INIT_STR);
-
-    defComponentMap.set_empty_key(INIT_STR);
-    defPinMap.set_empty_key(INIT_STR);
-    defRowY2OrientMap.set_empty_key(INT_MAX);
-#endif
-
-    Init(lefStor, defFilename, isVerbose);
-  }
-
+  Circuit(vector< string >& lefStor, string defFilename, bool isVerbose = false); 
   void Init(vector< string >& lefStor, string defFilename,
-            bool isVerbose = false) {
-    ParseLef(lefStor, isVerbose);
-    ParseDef(defFilename, isVerbose);
-  };
-
+            bool isVerbose = false);
   
   // Parsing function
   int ParseLef(vector< string >& lefStor, bool isVerbose);

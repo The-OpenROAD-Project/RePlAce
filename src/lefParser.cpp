@@ -3024,7 +3024,7 @@ void Replace::Circuit::DumpLefPin(lefiPin* pin) {
 }
 
 int Replace::Circuit::ParseLef(vector< string >& lefStor,
-                                bool isVerbose = false) {
+                                bool isVerbose)  {
   //    char* outFile;
 
   FILE* f;

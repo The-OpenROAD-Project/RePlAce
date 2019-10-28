@@ -7,13 +7,17 @@
 #include "wlen.h"
 #include "initPlacement.h"
 #include "dbLefDefIO.h"
+#include "plot.h"
+#include "routeOpt.h"
 
 
 replace_external::
 replace_external() : 
-  timing_driven_mode(false), ckt(&Replace::__ckt), 
-  unit_r(0.0f), unit_c(0.0f), 
-  use_db(true), db_id(INT_MAX), output_loc("") {
+  ckt(&Replace::__ckt), 
+  timing_driven_mode(false), 
+  write_bookshelf_mode(false),
+  unit_r(0.0f), unit_c(0.0f),
+  use_db(true), db_id(INT_MAX) {
   initGlobalVars();
 };
 
@@ -23,121 +27,163 @@ replace_external::
 void
 replace_external::help() {
   cout << endl;
-  cout <<"RePlAce Commands" << endl;
-  cout <<"import_lef [file_name]" << endl;
-  cout <<"  file_name      Input LEF file location" << endl;
-  cout << endl;
-  cout <<"import_def [file_name]" << endl;
-  cout <<"  file_name      Input DEF file location" << endl;
-  cout << endl;
+  cout << "==== File I/O Commands ====" << endl;
+  cout << "import_lef [file_name]" << endl;
+  cout << "    *.lef location " << endl;
+  cout << "    (Multiple lef files supported. " << endl;
+  cout << "    Technology LEF must be ahead of other LEFs.) " << endl;
+  cout << endl; 
+  cout << "import_def [file_name]" << endl;
+  cout << "    *.def location " << endl;
+  cout << "    (Required due to FloorPlan information)" << endl;
+  cout << endl; 
   cout <<"import_db [file_name]" << endl;
-  cout <<"  file_name      Input DB file location" << endl;
+  cout <<"     Input DB file location" << endl;
   cout << endl;
+  cout << "export_def [file_name]" << endl;
+  cout << "    Output DEF location" << endl;
+  cout << endl; 
+  cout <<"export_db [file_name]" << endl;
+  cout <<"     Onput DB file location" << endl;
+  cout << endl;
+  cout << "set_output [directory_location]" << endl;
+  cout << "    Specify the location of output results. " << endl;
+  cout << "    Default: ./output " << endl;
+     
+  cout << endl;
+  cout << "==== Flow Control ==== " << endl;
+  cout << "init_replace" << endl;
+  cout << "    Initialize RePlAce's structure based on LEF and DEF." << endl;
+  cout << endl; 
+  cout << "place_cell_init_place" << endl;
+  cout << "    Execute BiCGSTAB engine for initial place." << endl;
+  cout << endl; 
+  cout << "place_cell_nesterov_place" << endl;
+  cout << "    Execute Nesterov engine for global placement. " << endl;
+  cout << endl; 
+  cout << "==== Timing-driven Mode ====" << endl;
+  cout << "set_timing_driven [true/false]" << endl;
+  cout << "  Enable timing-driven modes" << endl;
+  cout << endl; 
+  cout << "import_lib [file_name]" << endl;
+  cout << "    *.lib location " << endl;
+  cout << "    (Multiple lib files supported. Required for OpenSTA)" << endl;
+  cout << endl; 
+  cout << "import_sdc [file_name]" << endl;
+  cout << "    *.sdc location (Required for OpenSTA). " << endl;
+  cout << "    SDC: Synopsys Design Constraint (SDC)" << endl;
+  cout << endl; 
+  cout << "import_verilog [file_name]" << endl;
+  cout << "    *.v location (Required for OpenSTA)" << endl;
+  cout << endl; 
+  cout << "set_unit_res [resistor]" << endl;
+  cout << "    Resisance per micron. Unit: Ohm. " << endl;
+  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << endl; 
+  
+  cout << "set_unit_cap [capacitance]" << endl;
+  cout << "    Capacitance per micron. Unit: Farad. " << endl;
+  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << endl; 
+  
+  cout << "==== RePlAce tunning parameters ====" << endl;
+  cout << "** Note that the following tunning parameters " << endl;
+  cout << "   must be defined before executing init_replace command" << endl;
+  cout << endl; 
+  cout << "set_density [density]" << endl;
+  cout << "    Set target density. [0-1, float]. Default: 1.00" << endl;
+  cout << endl; 
+  cout << "set_bin_grid_count [num]" << endl;
+  cout << "    Set bin_grid_count. [64,128,256,512,..., int]. " << endl;
+  cout << "    Default: Defined by internal algorithm." << endl;
+  cout << endl; 
+  cout << "set_lambda [lambda]" << endl;
+  cout << "    Set lambda for RePlAce tunning. [float]." << endl;
+  cout << "    Default : 8e-5~10e5" << endl;
+  cout << endl; 
+  cout << "set_pcof_min [pcof_min]" << endl;
+  cout << "    Set pcof_min(µ_k Lower Bound). [0.95-1.05, float]." << endl;
+  cout << "    Default: 0.95" << endl;
+  cout << endl; 
+  cout << "set_pcof_max [pcof_max]" << endl;
+  cout << "    Set pcof_max(µ_k Upper Bound). [1.00-1.20, float]." << endl;
+  cout << "    Default: 1.05" << endl;
+  cout << endl; 
+  cout << "set_step_scale [step_scale]" << endl;
+  cout << "    Set step_scale(∆HPWL_REF). Default: 346000" << endl;
+  cout << endl; 
+  cout << "set_target_overflow [overflow]" << endl;
+  cout << "    Set target overflow termination condition." << endl;
+  cout << "    [0.01-1.00, float]. Default: 0.1" << endl;
+  cout << endl; 
+  
+  cout << "==== Timing-driven related tuning parameters ==== " << endl;
+  cout << "set_net_weight_min [weight_min]" << endl;
+  cout << "    Set net_weight_min. [1.0-1.8, float]" << endl;
+  cout << endl; 
+  cout << "set_net_weight_max [weight_max]" << endl;
+  cout << "    Set net_weight_max. [weight_min-1.8, float]" << endl;
+  cout << endl; 
+  cout << "set_net_weight_scale [weight_scale]" << endl;
+  cout << "    Set net_weight_scale. [200-, float]" << endl;
+  cout << endl; 
+  
+  cout << "==== Other options ==== " << endl;
+  cout << "set_plot_enable [mode]" << endl;
+  cout << "    Set plot modes; " << endl;
+  cout << "    This mode will plot layout every 10 iterations" << endl;
+  cout << "    (Cell, bin, and arrow plots) [true/false]." << endl;
+  cout << "    Default: False" << endl;
+  cout << endl; 
+  cout << "set_seed_init_enable [true/false]" << endl;
+  cout << "    Start global place with the given placed locations." << endl;
+  cout << "    Default: False" << endl;
+  cout << endl; 
+  cout << "set_fast_mode_enable [true/false]" << endl;
+  cout << "    Fast and quick placement for IO-pin placement." << endl;
+  cout << "    Please do NOT use this command in general purposes" << endl;
+  cout << "    (It'll not spread all cells enough). Default: False" << endl;
+  cout << endl; 
+  cout << "set_verbose_level [level]" << endl;
+  cout << "    Specify the verbose level. [1-3, int]. Default: 1" << endl;
+  cout << endl; 
+  
+  cout << "==== Query results ==== " << endl;
+  cout << "** Note that the following commands will work " << endl;
+  cout << "   after init_replace command" << endl;
+  cout << endl; 
+  cout << "get_hpwl" << endl;
+  cout << "    Returns HPWL results on Micron. [float]" << endl;
+  cout << endl; 
+  cout << "get_wns" << endl;
+  cout << "    Returns WNS from OpenSTA." << endl;
+  cout << "    (Only available when timing-driven mode is enabled) [float] " << endl;
+  cout << endl; 
+  cout << "get_tns" << endl;
+  cout << "    Returns TNS from OpenSTA." << endl;
+  cout << "    (Only available when timing-driven mode is enabled) [float]" << endl;
+  cout << endl; 
+  
+  cout << "print_instances" << endl;
+  cout << "    Print out all of instances' information. " << endl;
+  cout << "    (Not recommended for huge design)" << endl;
+  cout << endl; 
+  cout << "get_instance_list_size" << endl;
+  cout << "    Returns total number of instances in RePlAce. [size_t]" << endl;
+  cout << endl; 
+  cout << "get_x [index]" << endl;
+  cout << "    Returns x coordinates of specified instances' index. [float]" << endl;
+  cout << endl; 
+  cout << "get_y [index]" << endl;
+  cout << "    Returns y coordinates of specified instances' index. [float]" << endl;
+  cout << endl; 
+  cout << "get_master_name [index]" << endl;
+  cout << "    Returns master name of specified instances' index. [string]" << endl;
+  cout << endl; 
+  cout << "get_instance_name [index]" << endl;
+  cout << "    Returns instance name of specified instances' index. [string]" << endl;
+  cout << endl; 
 
-  cout <<"export_def [file_name]" << endl;
-  cout <<"  file_name      Output DEF file location" << endl;
-  cout << endl;
-  cout <<"export_db  [file_name]" << endl;
-  cout <<"  file_name      Output DB file location" << endl;
-  cout << endl;
-  
-  cout <<"set_output [file_location]" << endl;
-  cout <<"  file_location  Output folder location" << endl;
-  cout << endl;
-  
-  cout <<"set_verbose_level [level]" << endl;
-  cout <<"  level          Set verbose level. [1-3, int]" << endl;
-  cout << endl;
-  cout <<"set_density [density]" << endl;
-  cout <<"  density        Set density. [0-1, float]" << endl;
-  cout << endl;
-  cout <<"set_bin_grid_count [num]" << endl;
-  cout <<"  num            Set bin_grid_count. [64,128,256,512,..., int]" << endl;
-  cout << endl;
-  cout <<"set_plot_enable [mode]" << endl;
-  cout <<"  mode           Set plot modes. [true/false]" << endl;
-  cout << endl;
-  cout <<"set_lambda [lambda]" << endl;
-  cout <<"  lambda         Set lambda for RePlAce tunning." << endl;
-  cout <<"                 [8e-5~10e5, float]" << endl;
-  cout << endl;
-  cout <<"set_pcof_min [pcof_min]" << endl;
-  cout <<"  pcof_min       Set pcof_min for RePlAce tunning." << endl;
-  cout <<"                 [0.95-1.05, float]" << endl;
-  cout << endl;
-  cout <<"set_pcof_max [pcof_max]" << endl;
-  cout <<"  pcof_max       Set pcof_max for RePlAce tunning." << endl;
-  cout <<"                 [1.00-1.20, float]" << endl;
-  cout << endl;
-  
-  cout <<"place_cell_init_place" << endl;
-  cout <<"                 Execute BiCGSTAB engine for initial place." << endl;
-  cout << endl;
-  cout <<"place_cell_nesterov_place" << endl;
-  cout <<"                 Execute Nesterov engine for global place." << endl;
-  cout << endl;
-  cout <<"init_replace_db" << endl;
-  cout <<"                 Initialize RePlAces' structure." << endl;
-  cout << endl;
-  
-//  cout <<"======Circuit Info======" << endl;
-//  cout <<"get_instance_list_size" << endl;
-//  cout <<"get_module_size " << endl;
-//  cout <<"get_terminal_size " << endl;
-//  cout <<"get_net_size " << endl;
-//  cout <<"get_pin_size " << endl;
-//  cout <<"get_row_size " << endl;
-//  cout <<"get_master_name " << endl;
-//  cout <<"get_instance_name " << endl;
-//  cout <<"get_x " << endl;
-//  cout <<"get_y " << endl;
-//  cout <<"get_hpwl " << endl;
-//  cout <<"print_instances " << endl;
-//  cout << endl;
-  
-//  cout <<"save_jpeg " << endl;
-
-  cout <<"======Timing-Driven Related Cmds======" << endl;
-  cout <<"set_timing_driven [mode]" << endl;
-  cout <<"  mode           Set Timing-driven modes. [true/false]" << endl;
-  cout << endl;
-  cout <<"import_sdc [file_name]" << endl;
-  cout <<"  file_name      Input SDC file location" << endl;
-  cout << endl;
-  cout <<"import_verilog [file_name]" << endl;
-  cout <<"  file_name      Input Verilog file location" << endl;
-  cout << endl;
-  cout <<"import_lib [file_name]" << endl;
-  cout <<"  file_name      Input Liberty file location" << endl;
-  cout << endl;
-
-  cout <<"set_unit_res [resistor]" << endl;
-  cout <<"  resistor       Resistance per Micron. (unit:Ohm)" << endl;
-  cout <<"                 Used for internal RC extraction" << endl;
-  cout << endl;
-  cout <<"set_unit_cap [capacitance]" << endl;
-  cout <<"  capacitance    Resistance per Micron. (unit:Ohm)" << endl;
-  cout <<"                 Used for internal RC extraction" << endl;
-  cout << endl;
-  cout <<"set_net_weight_min [weight_min]" << endl;
-  cout <<"  weight_min     Set net_weight_min for TD-RePlAce tunning" << endl;
-  cout <<"                 [1.0-1.8, float]" << endl;
-  cout << endl;
-  cout <<"set_net_weight_max [weight_max]" << endl;
-  cout <<"  weight_max     Set net_weight_max for TD-RePlAce tunning" << endl;
-  cout <<"                 [weight_min-1.8, float]" << endl;
-  cout << endl;
-  cout <<"set_net_weight_scale [weight_scale]" << endl;
-  cout <<"  weight_scale   Set net_weight_scale for TD-RePlAce tunning" << endl;
-  cout <<"                 [200-, float]" << endl;
-  cout << endl;
-  cout <<"get_wns" << endl;
-  cout <<"                 Return WNS from OpenSTA [float]" << endl;
-  cout << endl;
-  cout <<"get_tns" << endl;
-  cout <<"                 Return TNS from OpenSTA [float]" << endl;
-  cout << endl;
-  
 }
 
 void 
@@ -175,10 +221,6 @@ replace_external::import_def(const char* def){
   ads::dbChip* chip = defReader.createChip( search_libs,  def );
 }
 
-void 
-replace_external::import_lib(const char* lib){
-  lib_stor.push_back(lib);
-}
 
 void
 replace_external::import_db(const char* dbLoc) {
@@ -225,6 +267,124 @@ replace_external::set_output(const char* output) {
   output_loc = output;
 }
 
+void
+replace_external::set_output_experiment_name(const char* output) {
+  experimentCMD = output;
+}
+
+
+void
+replace_external::set_timing_driven(bool is_true) {
+  timing_driven_mode = is_true;
+}
+
+void 
+replace_external::import_sdc(const char* sdc) {
+  sdc_file = sdc;
+}
+
+void
+replace_external::import_verilog(const char* verilog) {
+  verilog_stor.push_back(verilog);
+}
+
+void 
+replace_external::import_lib(const char* lib){
+  lib_stor.push_back(lib);
+}
+
+void
+replace_external::set_unit_res(double r) {
+  unit_r = r;
+}
+
+void 
+replace_external::set_unit_cap(double c) {
+  unit_c = c;
+}
+
+void
+replace_external::set_plot_enable(bool plot_mode) {
+  isPlot = plot_mode;
+}
+
+void
+replace_external::set_verbose_level(int verbose) {
+  gVerbose = verbose;
+}
+
+void
+replace_external::set_fast_mode_enable(bool fast_mode) {
+  isFastMode = fast_mode;
+}
+
+void
+replace_external::set_seed_init_enable(bool seed_init) {
+  isInitSeed = seed_init;
+}
+
+
+void
+replace_external::set_plot_color_file(std::string color_file) {
+  plotColorFile = color_file;
+}
+
+void
+replace_external::set_write_bookshelf_enable(bool write_mode) {
+  write_bookshelf_mode = true;
+}
+
+void
+replace_external::set_density(double density) {
+  target_cell_den = target_cell_den_orig = density;
+}
+
+void
+replace_external::set_bin_grid_count(size_t grid_count) {
+  dim_bin.x = dim_bin.y = grid_count;
+  isBinSet = true;
+}
+
+void
+replace_external::set_lambda(double lambda) {
+  INIT_LAMBDA_COF_GP = lambda; 
+}
+
+void
+replace_external::set_pcof_min(double pcof_min) {
+  LOWER_PCOF = pcof_min;
+}
+
+void
+replace_external::set_pcof_max(double pcof_max) {
+  UPPER_PCOF = pcof_max;
+}
+
+void
+replace_external::set_step_scale(double step_scale) {
+  refDeltaWL = step_scale;
+}
+
+void
+replace_external::set_target_overflow(double overflow) {
+  overflowMin = overflow;
+}
+
+void
+replace_external::set_net_weight_min(double net_weight_min) {
+  netWeightBase = net_weight_min;
+}
+
+void
+replace_external::set_net_weight_max(double net_weight_max) {
+  netWeightBound = net_weight_max;
+}
+
+void
+replace_external::set_net_weight_scale(double net_weight_scale) {
+  netWeightScale = net_weight_scale;
+}
+
 bool 
 replace_external::init_replace() {
 /*
@@ -239,7 +399,7 @@ replace_external::init_replace() {
 
   lefStor = lef_stor;
   defName = def_stor[0];
-  outputCMD = output_loc;
+  outputCMD = (output_loc == "")? "./output" : output_loc;
 
   if( timing_driven_mode == true ) {
     capPerMicron = unit_c;
@@ -251,14 +411,24 @@ replace_external::init_replace() {
   }
 
   initGlobalVarsAfterParse();
-
   init();
+
   ParseInput();
+ 
+  // update custom net-weights 
+  if( hasCustomNetWeight ) {
+    initCustomNetWeight(net_weight_file); 
+  }
 
   net_update_init();
   init_tier();
-  build_data_struct();
+  build_data_struct(!isInitSeed);
   update_instance_list();
+  if( write_bookshelf_mode ) {
+    setup_before_opt();
+    routeInst.Init();
+    WriteBookshelf();  
+  }
   return true;
 */
 }
@@ -318,20 +488,30 @@ replace_external::init_replace_db() {
   return true; 
 }
 
-void
-replace_external::set_timing_driven(bool is_true) {
-  timing_driven_mode = is_true;
+bool 
+replace_external::place_cell_init_place() {
+  initialPlacement_main();
+  update_instance_list();
+  return true;
 }
 
-void 
-replace_external::import_sdc(const char* sdc) {
-  sdc_file = sdc;
+bool
+replace_external::place_cell_nesterov_place() {
+  setup_before_opt();
+  if( placementMacroCNT > 0 ) {
+    mGP2DglobalPlacement_main();
+  }
+  else {
+    cGP2DglobalPlacement_main();
+  }
+  update_instance_list();
+  if( isPlot ) {
+    SaveCellPlotAsJPEG("Global Placement Result", false,
+        string(dir_bnd) + string("/globalPlace"));
+  }
+  return true;
 }
 
-void
-replace_external::import_verilog(const char* verilog) {
-  verilog_stor.push_back(verilog);
-}
 
 
 
@@ -377,16 +557,6 @@ replace_external::get_instance_name(size_t idx) {
   return instance_list[idx].name;
 }
 
-void
-replace_external::print_instances() {
-  std::cout << "Total Instance: " << instance_list.size() << endl; 
-  for(auto& cur_inst : instance_list ) {
-    std::cout << cur_inst.name << " (" << cur_inst.master << ") x:";
-    std::cout << cur_inst.x << " y:" << cur_inst.y << std::endl;
-  }
-}
-
-
 float
 replace_external::get_x(size_t idx) {
   return instance_list[idx].x;
@@ -396,6 +566,16 @@ float
 replace_external::get_y(size_t idx) {
   return instance_list[idx].y;
 }
+
+void
+replace_external::print_instances() {
+  std::cout << "Total Instance: " << instance_list.size() << endl; 
+  for(auto& cur_inst : instance_list ) {
+    std::cout << cur_inst.name << " (" << cur_inst.master << ") x:";
+    std::cout << cur_inst.x << " y:" << cur_inst.y << std::endl;
+  }
+}
+
 
 float
 replace_external::get_hpwl() {
@@ -413,91 +593,30 @@ replace_external::get_tns() {
   return globalTns;
 }
 
-bool 
-replace_external::place_cell_init_place() {
-  initialPlacement_main();
-  update_instance_list();
-  return true;
+size_t
+replace_external::get_module_size() {
+  return moduleCNT;
 }
 
-bool
-replace_external::place_cell_nesterov_place() {
-  setup_before_opt();
-  if( placementMacroCNT > 0 ) {
-    mGP2DglobalPlacement_main();
-  }
-  else {
-    cGP2DglobalPlacement_main();
-  }
-  update_instance_list();
-  if( isPlot ) {
-    SaveCellPlotAsJPEG("Global Placement Result", false,
-        string(dir_bnd) + string("/globalPlace"));
-  }
-  return true;
+size_t
+replace_external::get_terminal_size() {
+  return terminalCNT;
 }
 
-void
-replace_external::set_verbose_level(int verbose) {
-  gVerbose = verbose;
+size_t
+replace_external::get_net_size() {
+  return netCNT;
 }
 
-void
-replace_external::set_unit_res(double r) {
-  unit_r = r;
+size_t
+replace_external::get_pin_size() {
+  return pinCNT;
 }
 
-void 
-replace_external::set_unit_cap(double c) {
-  unit_c = c;
+size_t
+replace_external::get_row_size() {
+  return row_cnt;
 }
-
-void
-replace_external::set_lambda(double lambda) {
-  INIT_LAMBDA_COF_GP = lambda; 
-}
-
-void
-replace_external::set_pcof_min(double pcof_min) {
-  LOWER_PCOF = pcof_min;
-}
-
-void
-replace_external::set_pcof_max(double pcof_max) {
-  UPPER_PCOF = pcof_max;
-}
-
-void
-replace_external::set_bin_grid_count(size_t grid_count) {
-  dim_bin.x = dim_bin.y = grid_count;
-  isBinSet = true;
-}
-
-void
-replace_external::set_density(double density) {
-  target_cell_den = target_cell_den_orig = density;
-}
-
-void
-replace_external::set_net_weight_min(double net_weight_min) {
-  netWeightBase = net_weight_min;
-}
-
-void
-replace_external::set_net_weight_max(double net_weight_max) {
-  netWeightBound = net_weight_max;
-}
-
-void
-replace_external::set_net_weight_scale(double net_weight_scale) {
-  netWeightScale = net_weight_scale;
-}
-
-void
-replace_external::set_plot_enable(bool plot) {
-  isPlot = plot;
-}
-
 
 void 
 replace_external::update_instance_list() {
@@ -547,7 +666,14 @@ replace_external::update_instance_list() {
   }
 }
 
+// TODO
 bool
 replace_external::save_jpeg(const char* jpeg) {
   return true;
+}
+
+void
+replace_external::import_custom_net_weight(const char* input_file) {
+  hasCustomNetWeight = true;
+  net_weight_file = input_file;
 }

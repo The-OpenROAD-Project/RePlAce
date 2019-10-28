@@ -56,7 +56,6 @@ extern prec TSV_WEIGHT;
 extern int MAX_EXP;
 extern int NEG_MAX_EXP;
 extern FPOS wcof00;
-extern FPOS wcof00_org;
 extern FPOS total_hpwl;
 extern FPOS total_stnwl;  // lutong
 extern FPOS total_wlen;
@@ -87,6 +86,9 @@ void wlen_grad_lse(int cell_idx, FPOS *grad);
 inline void wlen_grad_wa(int cell_idx, FPOS *grad);
 void get_net_wlen_grad_lse(NET *net, PIN *pin, FPOS *grad);
 inline void get_net_wlen_grad_wa(FPOS obj, NET *net, PIN *pin, FPOS *grad);
+
+
+void initCustomNetWeight(std::string netWeightFile);
 
 inline void wlen_pre(int cell_idx, FPOS *wpre) {
   wpre->x = wpre->y = 0;

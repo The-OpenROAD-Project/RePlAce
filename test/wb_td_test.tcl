@@ -32,7 +32,7 @@ rep init_replace
 rep place_cell_nesterov_place
 
 # Export DEF file
-rep export_def ./output_wb_nontd.def
+rep export_def ./${design}_a2a_td.def
 
 puts "nesterovPlace HPWL: [rep get_hpwl]"
 puts "final WNS: [rep get_wns]"

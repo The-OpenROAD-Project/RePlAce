@@ -71,7 +71,8 @@ prec globalWns;
 prec globalTns;
 
 prec netCut;
-bool hasNetWeight;
+bool hasUnitNetWeight;
+bool hasCustomNetWeight;
 prec netWeight;
 prec netWeightMin;
 prec netWeightMax;
@@ -176,6 +177,7 @@ vector< pair< int, prec > > inflationList;
 bool isTrial = false;
 bool isFirst_gp_opt = true;
 bool DEN_ONLY_PRECON;
+
 int orderHPWL;
 vector< pair< prec, prec > > trial_HPWLs;
 vector< prec > trial_POTNs;
@@ -205,7 +207,6 @@ prec BETAcGP;
 prec BETA;
 prec dampParam;
 prec stn_weight;  // lutong
-prec global_ovfl;
 prec maxALPHA;
 prec ExtraWSfor3D;
 prec MaxExtraWSfor3D;
@@ -378,6 +379,7 @@ bool thermalAwarePlaceCMD;
 bool trialRunCMD;
 bool autoEvalRC_CMD;
 bool onlyLG_CMD;
+bool isFastMode;
 ///////////////////////////////////////////////////////////
 
 Tcl_Interp* _interp;
@@ -392,7 +394,6 @@ int
 replaceTclAppInit(Tcl_Interp *interp) {
 
   _interp = interp;
-
 
   if (Tcl_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
@@ -756,39 +757,34 @@ void init() {
 
   sprintf(str_dp3, ".%s.%s", bmFlagCMD.c_str(), "eplace");
 
-  if(strcmp(bmFlagCMD.c_str(), "mms") == 0) {
-    INPUT_FLG = MMS;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "ispd") == 0) {
-    INPUT_FLG = ISPD;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "sb") == 0) {
-    INPUT_FLG = SB;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "etc") == 0) {
-    INPUT_FLG = ETC;
-  }
-  else if(strcmp(bmFlagCMD.c_str(), "ibm") == 0) {
-    INPUT_FLG = IBM;
-  }
+  INPUT_FLG = ETC;
 
   global_macro_area_scale = target_cell_den;
   PrintInfoPrec("TargetDensity", target_cell_den, 0);
 
   wcof_flg = /* 1 */ 2 /* 3 */;
 
+  // see ePlace-MS 
+  // 8 * binSize.
+  //
+  // see: wlen.cpp: wcof_init function also
+  //
   switch(WLEN_MODEL) {
     case LSE:
+      // 10 !!!
       wcof00.x = wcof00.y = 0.1;
       break;
 
     case WA:
       if(INPUT_FLG == ISPD05 || INPUT_FLG == ISPD06 || INPUT_FLG == ISPD ||
          INPUT_FLG == MMS || INPUT_FLG == SB || INPUT_FLG == ETC) {
-        wcof00_org.x = wcof00_org.y = 0.125;
+
+        // 8 !!!
+        wcof00.x = wcof00.y = 0.125;
       }
       else if(INPUT_FLG == IBM) {
-        wcof00_org.x = wcof00_org.y = 0.50;
+        // 2 !!!
+        wcof00.x = wcof00.y = 0.50;
       }
       break;
   }
@@ -972,7 +968,7 @@ void mGP2DglobalPlacement_main() {
 void tcGP3DglobalPlacement_main() {
   STAGE = cGP3D;
   // ALPHA = initialALPHA;
-  cell_copy();  // cell_macro_copy ();
+  UpdateGcellCoordiFromModule();  // cell_macro_copy ();
   gp_opt();
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
@@ -984,7 +980,7 @@ void tcGP3DglobalPlacement_main() {
 void cGP3DglobalPlacement_main() {
   STAGE = cGP3D;
   // ALPHA = initialALPHA;
-  cell_copy();  // cell_macro_copy ();
+  UpdateGcellCoordiFromModule();  // cell_macro_copy ();
   gp_opt();
   isFirst_gp_opt = false;
   UpdateNetAndGetHpwl();
@@ -1041,7 +1037,7 @@ void macroLegalization_main() {
 }
 
 void WriteBookshelfForGR() {
-  printf("INFO:  WRITE BOOKSHELF...");
+  PrintProcBegin("Write Bookshelf");
   // temporary update net->pin2 to write bookshelf
   update_pin2();
 
@@ -1058,13 +1054,10 @@ void WriteBookshelfForGR() {
         targetDir, 
         // tier number
         0, 
-        // writing modes
-        (placementMacroCNT == 0) ? STDCELLonly : MIXED,
         // *.shape support
 //        (detailPlacer == NTUplace3 || shapeMap.size() == 0) ? false : true);
         true, true, true);
-  printf("PROC:  END WRITE BOOKSHELF\n\n");
-  fflush(stdout);
+  PrintProcEnd("Write Bookshelf");
 }
 
 void WriteBookshelf() {
@@ -1080,18 +1073,14 @@ void WriteBookshelf() {
   sprintf( cmd, "mkdir -p %s", targetDir);
   system(cmd);
 
-  for(int i = 0; i < numLayer; i++) {
     // call Write Bookshelf function by its tier
     WriteBookshelfWithTier(
         targetDir,
         // tier number
-        i, 
-        // writing modes
-        (placementMacroCNT == 0) ? STDCELLonly : MIXED,
+        0, 
         // *.shape support
         (detailPlacer == NTUplace3) ? false : true,
         false);
-  }
   printf("PROC:  END WRITE BOOKSHELF\n\n");
   fflush(stdout);
 }

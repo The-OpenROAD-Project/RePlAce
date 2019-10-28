@@ -97,6 +97,7 @@ set (REPLACE_SRC
   src/trial.cpp
   src/wlen.cpp
   src/replace_external.cpp
+  src/replace_private.cpp
   src/replace_wrap.cpp
   src/replace_private.cpp
   src/dbLefDefIO.cpp

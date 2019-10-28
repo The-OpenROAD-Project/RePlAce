@@ -73,6 +73,9 @@ prec MIN_PRE;
 
 FPOS avg80p_cell_dim;
 
+// should be removed!!! 3D code!!!
+//
+//
 void setup_before_opt(void) {
   //    mkdirPlot();
   whitespace_init();
@@ -87,7 +90,6 @@ void setup_before_opt(void) {
 
   cell_init();
   cell_filler_init();  // So that we can get total_filler_area.
-  calc_average_module_width();
 
   total_cell_area = total_modu_area + total_filler_area;
 
@@ -97,7 +99,7 @@ void setup_before_opt(void) {
   //    bin_init();
 
   charge_fft_init(msh, bin_stp, 1);
-  update_cell_den();
+//  update_cell_den();
   wcof_init(bin_stp);
 }
 
@@ -107,13 +109,14 @@ int setup_before_opt_mGP2D(void) {
 
   charge_fft_init(dim_bin_mGP2D, bin_stp_mGP2D, 0);
   wcof_init(bin_stp_mGP2D);
-  wlen_init_mGP2D();
+  wlen_init();
   cell_init_2D();
-  cell_copy();
+  UpdateGcellCoordiFromModule();
   net_update_init();
   return 1;
 }
 
+// only this!!!
 int setup_before_opt_cGP2D(void) {
   tier_init_2D(cGP2D);
   bin_init_2D(cGP2D);
@@ -134,9 +137,9 @@ int setup_before_opt_cGP2D(void) {
 
   charge_fft_init(dim_bin_cGP2D, bin_stp_cGP2D, 0);
   wcof_init(bin_stp_cGP2D);
-  wlen_init_cGP2D();
+  wlen_init();
   cell_init_2D();
-  cell_copy();
+  UpdateGcellCoordiFromModule();
   net_update_init();
   return 1;
 }
@@ -153,7 +156,7 @@ void post_opt(void) {
   bin_delete();
   charge_fft_delete(1);
   // if (thermalAwarePlaceCMD == true) thermal_fft_delete (1);
-  modu_copy();
+  UpdateModuleCoordiFromGcell();
   cell_delete();
 }
 
@@ -289,89 +292,39 @@ void whitespace_init(void) {
 //         total_std_area / total_WS_area * 100.0);
 }
 
-void filler_adj(void) {
-  if(STAGE == mGP2D)
-    filler_adj_mGP2D();
-  else if(STAGE == cGP3D)
-    rand_filler_adj(moduleCNT);
-  else if(STAGE == cGP2D)
-    filler_adj_cGP2D();
-}
-
-void rand_filler_adj(int idx) {
-  int i = 0;
+void FillerCellRandPlace() {
   struct FPOS pmin, pmax;
   struct FPOS rnd;
-  struct CELL *filler = NULL;
+  struct TIER *tier = &tier_st[0];
 
-  for(i = idx; i < gcell_cnt; i++) {
-    filler = &gcell_st[i];
-    pmin = fp_add(place.org, fp_scal(0.5, filler->size));
-    pmax = fp_subt(place.end, fp_scal(0.5, filler->size));
+  // filler_cell ranges
+  for(int i = tier->modu_cnt; i < tier->cell_cnt; i++) {
+    struct CELL* filler = tier->cell_st[i];
 
+    pmin = fp_add(tier->pmin, fp_scal(0.5, filler->size));
+    pmax = fp_subt(tier->pmax, fp_scal(0.5, filler->size));
+
+    // rnd will give rand() vals.
     rnd = fp_rand();
+    
+    // 
+    // pmin : possible minimum center point ranges inside layout.
+    // pmax : possible maximum center point ranges inside layout.
+    //
+    // inv_RAND_MAX * rnd will give FPOS pairs, 
+    // ranged on 0~1 float numbers.
+    //
+    // pmax - pmin : possible center point ranges' length.
+    // 
+
+    // Filler cells are randomly placed..!
 
     filler->center =
-        fp_add(fp_mul(fp_scal(inv_RAND_MAX, rnd), fp_subt(pmax, pmin)), pmin);
-
+      fp_add(fp_mul(fp_scal(inv_RAND_MAX, rnd), fp_subt(pmax, pmin)), pmin);
+    
+    // updates pmin and pmax based on center
     filler->pmin = fp_subt(filler->center, fp_scal(0.5, filler->size));
     filler->pmax = fp_add(filler->center, fp_scal(0.5, filler->size));
-  }
-}
-
-void filler_adj_mGP2D(void) {
-  int z = 0, i = 0;
-  struct FPOS pmin, pmax;
-  struct FPOS rnd;
-  struct CELL *filler = NULL;
-  struct TIER *tier = NULL;
-
-  for(z = 0; z < numLayer; z++) {
-    tier = &tier_st[z];
-
-    for(i = tier->modu_cnt; i < tier->cell_cnt; i++) {
-      filler = tier->cell_st[i];
-
-      pmin = fp_add(tier->pmin, fp_scal(0.5, filler->size));
-      pmax = fp_subt(tier->pmax, fp_scal(0.5, filler->size));
-
-      rnd = fp_rand();
-
-      filler->center =
-          fp_add(fp_mul(fp_scal(inv_RAND_MAX, rnd), fp_subt(pmax, pmin)), pmin);
-
-      filler->pmin = fp_subt(filler->center, fp_scal(0.5, filler->size));
-      filler->pmax = fp_add(filler->center, fp_scal(0.5, filler->size));
-    }
-  }
-}
-
-void filler_adj_cGP2D(void) {
-  int z = 0, i = 0;
-  struct FPOS pmin, pmax;
-  struct FPOS rnd;
-  struct CELL *filler = NULL;
-  struct TIER *tier = NULL;
-
-  for(z = 0; z < numLayer; z++) {
-    tier = &tier_st[z];
-
-    for(i = tier->modu_cnt; i < tier->cell_cnt; i++) {
-      filler = tier->cell_st[i];
-
-      pmin = fp_add(tier->pmin, fp_scal(0.5, filler->size));
-      pmax = fp_subt(tier->pmax, fp_scal(0.5, filler->size));
-
-      rnd = fp_rand();
-
-      filler->center =
-          fp_add(fp_mul(fp_scal(inv_RAND_MAX, rnd), fp_subt(pmax, pmin)), pmin);
-
-      filler->pmin = fp_subt(filler->center, fp_scal(0.5, filler->size));
-      filler->pmax = fp_add(filler->center, fp_scal(0.5, filler->size));
-    }
-
-    /* min_idx = max_idx; */
   }
 }
 
@@ -635,7 +588,7 @@ void input_sol(struct FPOS *st, int N, char *fn) {
   fclose(fp);
 }
 
-void modu_copy(void) {
+void UpdateModuleCoordiFromGcell(void) {
   int i = 0;
   struct CELL *cell = NULL;
   struct MODULE *mdp = NULL;
@@ -656,7 +609,7 @@ void modu_copy(void) {
   return;
 }
 
-void cell_copy(void) {
+void UpdateGcellCoordiFromModule(void) {
   struct CELL *cell = NULL;
   struct MODULE *module = NULL;
 
@@ -713,6 +666,8 @@ prec get_phi_cof(prec x) {
   return cof;
 }
 
+// cg input ?
+//
 void cg_input(struct FPOS *x_st, int N, int input) {
   char fn_x_isol[BUF_SZ];
   char fn_wl_sol[BUF_SZ];
@@ -726,13 +681,17 @@ void cg_input(struct FPOS *x_st, int N, int input) {
   struct FPOS sqr_end;
 
   switch(input) {
+    // 
+    // ???
+    //
     case QWL_ISOL:
       for(int i = 0; i < N; i++) {
         center = gcell_st[i].center;
-        // printf("%.16f %.16f\n",center.x, center.y);
+        // gcell's half_den_size is initialized at cell_init_2D function!
         half_den_size = gcell_st[i].half_den_size;
-        // printf("%.16f %.16f\n",half_den_size.x, half_den_size.y);
-        x_st[i] = valid_coor00(center, half_den_size);
+
+        // 
+        x_st[i] = GetCoordiLayoutInside(center, half_den_size);
       }
       break;
 
@@ -752,7 +711,7 @@ void cg_input(struct FPOS *x_st, int N, int input) {
         half_den_size = gcell_st[i].half_den_size;
         rnd = fp_rand();
         v = fp_add(fp_mul(fp_scal(inv_RAND_MAX, rnd), sqr_cnt), sqr_org);
-        x_st[i] = valid_coor00(v, half_den_size);
+        x_st[i] = GetCoordiLayoutInside(v, half_den_size);
       }
       break;
 
@@ -763,7 +722,7 @@ void cg_input(struct FPOS *x_st, int N, int input) {
       for(int i = 0; i < N; i++) {
         half_den_size = gcell_st[i].half_den_size;
         v = fp_add(fp_mul(fp_scal(inv_RAND_MAX, rnd), sqr_cnt), sqr_org);
-        x_st[i] = valid_coor00(v, half_den_size);
+        x_st[i] = GetCoordiLayoutInside(v, half_den_size);
       }
       break;
   }
@@ -798,9 +757,8 @@ void init_iter(struct ITER *it, int idx) {
 void gp_opt(void) {
   myNesterov ns_opt;
 
-#ifdef FILLER_ADJ
-  filler_adj();
-#endif
+  // fillerCell random placement
+  FillerCellRandPlace();
 
 //  if( isRoutability ) {
 //    routeInst.Init();
@@ -810,16 +768,15 @@ void gp_opt(void) {
   printf("PROC:  Start NESTEROV's Optimization\n");
   if(constraintDrivenCMD == false) {
     printf("PROC:    Global Lagrangian Multiplier is Applied\n");
-    ns_opt.nesterov_opt();
   }
   else if(constraintDrivenCMD == true) {
     printf(
         "PROC:    Both Global and Local Lagrangian Multipliers are "
         "Applied\n");
-    ns_opt.nesterov_opt();
   }
-
-  modu_copy();
+    
+  ns_opt.nesterov_opt();
+  UpdateModuleCoordiFromGcell();
   fflush(stdout);
 }
 
@@ -945,93 +902,38 @@ void cell_macro_copy(void) {
   return;
 }
 
+
+// update gcell's half_den_size
+// 
+// tier-> bin_stp : binSize.
+// tier-> half_bin_stp : binSize / 2
+//
 void cell_init_2D(void) {
-  int z = 0, i = 0;
   struct CELL *cell = NULL;
-  struct TIER *tier = NULL;
+  struct TIER *tier = &tier_st[0];
   struct FPOS scal;
 
-  if((INPUT_FLG == MMS &&
-      (target_cell_den == 1.00f || target_cell_den == 0.80f ||
-       target_cell_den == 1.00 || target_cell_den == 0.80))) {
-    for(z = 0; z < numLayer; z++) {
-      tier = &tier_st[z];
+  cout << "cell Init 2D:" << endl;
+  tier->bin_stp.Dump("tier->bin_stp");
+  tier->half_bin_stp.Dump("tier->half_bin_stp");
 
-      for(i = 0; i < tier->cell_cnt; i++) {
-        cell = tier->cell_st[i];
+  // normal cases
+  // SQRT2 = smoothing parameter for density_size calculation
+  for(int i = 0; i < tier->cell_cnt; i++) {
+    cell = tier->cell_st[i];
 
-        // LW 05/05/17
-        if(cell->size.x < tier->bin_stp.x) {
-          scal.x = cell->size.x / tier->bin_stp.x;
-          cell->half_den_size.x = tier->half_bin_stp.x;
-        }
-        else {
-          scal.x = 1.0;
-          cell->half_den_size.x = cell->half_size.x;
-        }
-
-        if(cell->size.y < tier->bin_stp.y) {
-          scal.y = cell->size.y / tier->bin_stp.y;
-          cell->half_den_size.y = tier->half_bin_stp.y;
-        }
-        else {
-          scal.y = 1.0;
-          cell->half_den_size.y = cell->half_size.y;
-        }
-
-        cell->den_scal = scal.x * scal.y;
-      }
-    }
-  }
-  else {
-    for(z = 0; z < numLayer; z++) {
-      tier = &tier_st[z];
-
-      for(i = 0; i < tier->cell_cnt; i++) {
-        cell = tier->cell_st[i];
-
-        if(cell->size.x < tier->bin_stp.x * SQRT2) {
-          scal.x = cell->size.x / (tier->bin_stp.x * SQRT2);
-          cell->half_den_size.x = tier->half_bin_stp.x * SQRT2;
-        }
-        else {
-          scal.x = 1.0;
-          cell->half_den_size.x = cell->half_size.x;
-        }
-
-        if(cell->size.y < tier->bin_stp.y * SQRT2) {
-          scal.y = cell->size.y / (tier->bin_stp.y * SQRT2);
-          cell->half_den_size.y = tier->half_bin_stp.y * SQRT2;
-        }
-        else {
-          scal.y = 1.0;
-          cell->half_den_size.y = cell->half_size.y;
-        }
-
-        cell->den_scal = scal.x * scal.y;
-      }
-    }
-  }
-}
-
-void update_cell_den() {
-  struct CELL *cell = NULL;
-  struct FPOS scal;
-
-  for(int i = 0; i < gcell_cnt; i++) {
-    cell = &gcell_st[i];
-    if(cell->size.x < bin_stp.x) {
-      scal.x = cell->size.x / bin_stp.x;
-      cell->half_den_size.x = half_bin_stp.x;
+    if(cell->size.x < tier->bin_stp.x * SQRT2) {
+      scal.x = cell->size.x / (tier->bin_stp.x * SQRT2);
+      cell->half_den_size.x = tier->half_bin_stp.x * SQRT2;
     }
     else {
       scal.x = 1.0;
       cell->half_den_size.x = cell->half_size.x;
     }
 
-    if(cell->size.y < bin_stp.y) {
-      scal.y = cell->size.y / bin_stp.y;
-      cell->half_den_size.y = half_bin_stp.y;
+    if(cell->size.y < tier->bin_stp.y * SQRT2) {
+      scal.y = cell->size.y / (tier->bin_stp.y * SQRT2);
+      cell->half_den_size.y = tier->half_bin_stp.y * SQRT2;
     }
     else {
       scal.y = 1.0;
@@ -1042,18 +944,35 @@ void update_cell_den() {
   }
 }
 
-void calc_average_module_width() {
-  prec tot_mod_wid = 0;
-  prec avg_mod_wid = 0;
-
-  for(int i = 0; i < moduleCNT; i++) {
-    tot_mod_wid += moduleInstance[i].size.x;
-  }
-  avg_mod_wid = tot_mod_wid / (prec)moduleCNT;
-
-  printf("INFO:  Average Module Width = %.6lf, Row Height = %f\n", avg_mod_wid,
-         rowHeight);
-}
+// why there is NO SQRT2?
+// should be removed to avoid confusing. 
+// void update_cell_den() {
+//   struct CELL *cell = NULL;
+//   struct FPOS scal;
+// 
+//   for(int i = 0; i < gcell_cnt; i++) {
+//     cell = &gcell_st[i];
+//     if(cell->size.x < bin_stp.x) {
+//       scal.x = cell->size.x / bin_stp.x;
+//       cell->half_den_size.x = half_bin_stp.x;
+//     }
+//     else {
+//       scal.x = 1.0;
+//       cell->half_den_size.x = cell->half_size.x;
+//     }
+// 
+//     if(cell->size.y < bin_stp.y) {
+//       scal.y = cell->size.y / bin_stp.y;
+//       cell->half_den_size.y = half_bin_stp.y;
+//     }
+//     else {
+//       scal.y = 1.0;
+//       cell->half_den_size.y = cell->half_size.y;
+//     }
+// 
+//     cell->den_scal = scal.x * scal.y;
+//   }
+// }
 
 //
 // update msh, msh_yz, d_msh

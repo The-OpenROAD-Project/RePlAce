@@ -68,7 +68,6 @@
 
 #define PI 3.141592653589793238462L
 #define SQRT2 1.414213562373095048801L
-#define INV_SQRT2 0.707106781186547524401L
 
 // for PREC_MODE variable => required for different codes.
 #define IS_FLOAT 0
@@ -128,7 +127,6 @@ typedef double prec;
 #define MIN_LEN 25.0 /* 10.0 */ /* 5.0 */ /* 1.0 */
 #define LS_DEN
 #define DetailPlace
-#define FILLER_ADJ RandomAdj
 #define MSH_Z_RES /* 8 */ 1
 #define THETA_XY_3D_PLOT PI / 6.0
 #define Z_SCAL 1.00
@@ -233,7 +231,6 @@ struct PIN {
   int gid;   // current Pin's idx
   int IO;    // I -> 0; O -> 1
   int term;  // term -> 1, move -> 0
-  int tier;
   int X_MIN;
   int Y_MIN;
   int X_MAX;
@@ -325,6 +322,7 @@ struct CELL {
   FPOS *pof_tmp;
   PIN **pin_tmp;
   const char* Name();
+  void Dump();
 };
 
 class SHAPE {
@@ -414,7 +412,7 @@ struct NET {
   int idx;
   int mod_idx;
   prec timingWeight;
-  prec stn_cof;             // lutong
+  prec customWeight;
   prec wl_rsmt;             // lutong
 
   const char* Name();
@@ -517,7 +515,8 @@ extern int gVerbose;
 extern prec globalWns;
 extern prec globalTns;
 extern prec netCut;
-extern bool hasNetWeight;
+extern bool hasUnitNetWeight;
+extern bool hasCustomNetWeight;
 extern prec netWeight;
 extern prec netWeightMin;
 extern prec netWeightMax;
@@ -664,7 +663,6 @@ extern prec BETAcGP;
 extern prec BETA;
 
 extern prec dampParam;
-extern prec global_ovfl;  ////////////
 extern prec maxALPHA;
 extern prec ExtraWSfor3D;
 extern prec MaxExtraWSfor3D;
@@ -850,6 +848,7 @@ extern bool stnCMD;  // lutong
 extern bool trialRunCMD;
 extern bool autoEvalRC_CMD;
 extern bool onlyLG_CMD;
+extern bool isFastMode;
 
 extern Tcl_Interp* _interp;
 

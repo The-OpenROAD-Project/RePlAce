@@ -4798,7 +4798,7 @@ void Replace::Circuit::DumpDefComponentPinToNet() {
 //
 /////////////////////////////////////////////////////////////////////
 
-int Replace::Circuit::ParseDef(string fileName, bool isVerbose = false) {
+int Replace::Circuit::ParseDef(string fileName, bool isVerbose) {
   //    int num = 99;
   char* inFile[6];
   FILE* f;

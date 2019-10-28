@@ -2,10 +2,11 @@
 RePlAce: Advancing Solution Quality and Routability Validation in Global Placement
 ## Features
 - Analytic and nonlinear placement algorithm. Solves electrostatic force equations using Nesterov's method. ([link](https://cseweb.ucsd.edu/~jlu/papers/eplace-todaes14/paper.pdf))
-- Fully supports commercial formats. (LEF/DEF format)
+- Fully supports commercial formats. (LEF/DEF 5.8)
 - Verified and worked well with various commercial technologies. (7/14/16/28/45/55/65nm)
 - Supports timing-driven placement mode based on commercial timer (OpenSTA).
 - Fast image drawing engine is ported (CImg).
+- __RePlAce has TCL interpreter now!__
 
 | <img src="/doc/image/adaptec2.inf.gif" width=350px> | <img src="/doc/image/coyote_TSMC16.gif" width=400px> | 
 |:--:|:--:|
@@ -31,12 +32,12 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 * GCC compiler and libstdc++ static library >= 4.8.5
 * boost library >= 1.41
 * bison (for lef/def parsers) >= 3.0.4
-* tcl (for OpenSTA) >= 8.4
+* tcl >= 8.4
 * X11 library (for CImg library to visualize) >= 1.6.5
 * Recommended OS: Centos6, Centos7 or Ubuntu 16.04
 
 ### Clone repo and submodules 
-    $ git clone --recursive https://github.com/abk-openroad/RePlAce.git
+    $ git clone --recursive https://github.com/The-OpenROAD-Project/RePlAce.git
     $ cd ~/RePlAce
     $ ./prerequisite/install_centos7.sh   // for centos 7
     $ ./prerequisite/install_ubuntu16.sh  // for ubuntu 16
@@ -44,26 +45,24 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
     $ cd build
     $ cmake ..                            // you may specify -DCMAKE_INSTALL_PREFIX to avoid installing in /usr/local/*
     $ make 
-    $ make install
+    $ make install                        // if you want to install
 
    
 ### Check your installation
     To make sure your installation is correct and the current tool version is stable enough, 
     run a Hello World application:
 
-    $ cd ./test
-    $ ./run.sh
+    $ cd RePlAce/test
+    $ replace < gcd_nontd_test.tcl
+    $ replace < gcd_td_test.tcl
  
 ### How To Execute
-    // download lefdef benchmarks
-    $ cd ~/RePlAce/bench/ispd18
-    $ ./download_ispd18.sh
+    // Tcl Interpreter Mode
+    // The following command will create a TCL interpreter session.
+    $ replace
     
-    // Generate a result from ISPD18 - ispd18.test1.input
-    // Check doc/ScriptUsage.md in detail
-    $ cd ~/RePlAce/src
-    $ ./execute_lefdef.py 0 
-    
+    // The following command will send all TCL commands to RePlAce's TCL interpreter
+    $ replace < run_replace.tcl
 
 ### Verified/supported Technologies
 * TSMC 65
@@ -74,10 +73,8 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 * GF 14
 * ASAP 7
 
-
 ### Manual
-* [How To Execute Python Scripts?](doc/ScriptUsage.md)
-* [RePlAce's arguments](doc/BinaryArguments.md)
+* [RePlAce's TCL Commands List](doc/TclCommands.md)
 * [How To Report Memory Bugs?](doc/ReportMemoryBug.md)
     
 ### License
@@ -98,6 +95,7 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 - Many subsequent improvements were made by Mingyu Woo leading up to the initial release.
 - Paper reference: C.-K. Cheng, A. B. Kahng, I. Kang and L. Wang, "RePlAce: Advancing Solution Quality and Routability Validation in Global Placement", to appear in IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, 2018.  (Digital Object Identifier: 10.1109/TCAD.2018.2859220)
 - Timing-Driven mode has been implemented by Mingyu Woo.
+- Tcl-Interpreter has been ported by Mingyu Woo.
 
 ### Limitations
 * Mixed-sized RePlAce with (LEF/DEF/Verilog) interface does not generate legalized placement.

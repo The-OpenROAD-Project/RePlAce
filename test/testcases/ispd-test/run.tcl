@@ -2,17 +2,13 @@
 # Examples for Non Timing-driven RePlAce with TCL usage
 #
 
-set design gcd
-set lib_dir ./library/nangate45/
-set design_dir ./design/nangate45/${design}
-
+set design ispd18_test1.input 
 
 replace_external rep
 
 # Import LEF/DEF files
-rep import_lef ${lib_dir}/NangateOpenCellLibrary.lef
-rep import_def ${design_dir}/${design}.def
-rep set_output ./output/
+rep import_lef ispd18_test1.input.lef
+rep import_def ispd18_test1.input.def
 
 rep set_verbose_level 0
 
@@ -33,6 +29,5 @@ rep place_cell_nesterov_place
 #rep print_instances
 
 # Export DEF file
-rep export_def ./${design}_nan45_nontd.def
+rep export_def ./${design}_nontd.def
 puts "Final HPWL: [rep get_hpwl]"
-
