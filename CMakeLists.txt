@@ -38,9 +38,6 @@ set(EIGEN_HOME
 )
 
 if(USE_OPENDB_TOP_LEVEL)
-  set(OPENDB_HOME
-    ${PROJECT_SOURCE_DIR}/../OpenDB
-  )
 else()
   set(OPENDB_HOME
     ${PROJECT_SOURCE_DIR}/module/OpenDB
