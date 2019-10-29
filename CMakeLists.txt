@@ -36,9 +36,16 @@ set(CIMG_HOME
 set(EIGEN_HOME
   ${PROJECT_SOURCE_DIR}/module/eigen-git-mirror 
 )
-set(OPENDB_HOME
-  ${PROJECT_SOURCE_DIR}/module/OpenDB
-)
+
+if(USE_OPENDB_TOP_LEVEL)
+  set(OPENDB_HOME
+    ${PROJECT_SOURCE_DIR}/../OpenDB
+  )
+else()
+  set(OPENDB_HOME
+    ${PROJECT_SOURCE_DIR}/module/OpenDB
+  )
+endif()
 
 add_subdirectory(${DEFLIB_HOME})
 add_subdirectory(${LEFLIB_HOME})
