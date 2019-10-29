@@ -5,6 +5,7 @@
 #include "replace_private.h"
 #include "lefdefIO.h"
 #include "plot.h"
+#include "db.h"
 
 
 // SWIG refuse to be inside replace_external...
@@ -29,6 +30,10 @@ public:
   
   void export_def(const char* def);
   void export_db(const char* db);
+
+  void set_db_id(int db_id);
+  void set_db(odb::dbDatabase* db);
+
   void set_output(const char* output);
   void set_output_experiment_name(const char* output);
 

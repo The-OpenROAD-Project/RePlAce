@@ -6,13 +6,11 @@ set design aes_cipher_top
 set lib_dir ./library/nangate45/
 set design_dir ./design/nangate45/${design}
 
-
 replace_external rep
 
 # Import LEF/DEF files
 rep import_lef ${lib_dir}/NangateOpenCellLibrary.lef
 rep import_def ${design_dir}/${design}_60.def
-rep set_output ./output/
 
 rep set_verbose_level 0
 

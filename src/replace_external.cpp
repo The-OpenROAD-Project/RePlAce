@@ -263,6 +263,16 @@ replace_external::export_def(const char* def){
 }
 
 void
+replace_external::set_db_id(int input_db_id) {
+  db_id = input_db_id;
+}
+
+void
+replace_external::set_db(odb::dbDatabase* db) {
+  db_id = db->getId();
+}
+
+void
 replace_external::set_output(const char* output) {
   output_loc = output;
 }
