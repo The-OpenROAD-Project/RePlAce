@@ -83,13 +83,6 @@ public:
   float get_wns();
   float get_tns(); 
 
-  size_t get_module_size();
-  size_t get_terminal_size();
-  size_t get_net_size();
-  size_t get_pin_size();
-  size_t get_row_size();
-
-
 //  float get_nesterov_overflow();
 //  int get_nesterov_iter_count();
 //  float get_nesterov_potential();

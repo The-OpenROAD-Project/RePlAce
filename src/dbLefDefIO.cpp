@@ -5,27 +5,27 @@
 #include "defout.h"
 #include <iostream>
 
-using ads::dbDatabase;
-using ads::dbTech;
-using ads::dbChip;
-using ads::dbBlock;
-using ads::dbSet;
-using ads::dbInst;
-using ads::dbPlacementStatus;
-using ads::dbITerm;
-using ads::dbBTerm;
-using ads::dbIoType;
-using ads::dbRow;
-using ads::dbNet;
-using ads::dbBox;
-using ads::dbRegion;
-using ads::dbSigType;
+using odb::dbDatabase;
+using odb::dbTech;
+using odb::dbChip;
+using odb::dbBlock;
+using odb::dbSet;
+using odb::dbInst;
+using odb::dbPlacementStatus;
+using odb::dbITerm;
+using odb::dbBTerm;
+using odb::dbIoType;
+using odb::dbRow;
+using odb::dbNet;
+using odb::dbBox;
+using odb::dbRegion;
+using odb::dbSigType;
 
-using ads::adsRect;
-using ads::defout;
+using odb::adsRect;
+using odb::defout;
 
-using ads::error;
-using ads::notice;
+using odb::error;
+using odb::notice;
 
 
 using std::string;
@@ -520,7 +520,7 @@ DieRect GetDieFromDb(dbBox* bBox, bool isScaleDown) {
       bBox->xMax(), bBox->yMax());
 }
 
-DieRect GetCoreFromDb(dbSet<ads::dbRow> &rows, bool isScaleDown) {
+DieRect GetCoreFromDb(dbSet<odb::dbRow> &rows, bool isScaleDown) {
   float minX = FLT_MAX, minY = FLT_MAX;
   float maxX = FLT_MIN, maxY = FLT_MIN;
 

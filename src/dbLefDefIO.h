@@ -4,18 +4,18 @@
 #include "db.h"
 #include "lefdefIO.h"
 
-void FillReplaceStructures(ads::dbDatabase* db);
-void FillReplaceParameter(ads::dbDatabase* db);
-void FillReplaceModule(ads::dbSet<ads::dbInst> &insts);
-void FillReplaceTerm(ads::dbSet<ads::dbInst> &insts, ads::dbSet<ads::dbBTerm> &bterms);
-void FillReplaceRow(ads::dbSet<ads::dbRow> &rows);
-void FillReplaceNet(ads::dbSet<ads::dbNet> &nets);
-void GenerateDummyCellDb(ads::dbSet<ads::dbRow> &rows);
+void FillReplaceStructures(odb::dbDatabase* db);
+void FillReplaceParameter(odb::dbDatabase* db);
+void FillReplaceModule(odb::dbSet<odb::dbInst> &insts);
+void FillReplaceTerm(odb::dbSet<odb::dbInst> &insts, odb::dbSet<odb::dbBTerm> &bterms);
+void FillReplaceRow(odb::dbSet<odb::dbRow> &rows);
+void FillReplaceNet(odb::dbSet<odb::dbNet> &nets);
+void GenerateDummyCellDb(odb::dbSet<odb::dbRow> &rows);
 
 
-DieRect GetDieFromDb(ads::dbBox &bBox, bool isScaleDown = false);
-DieRect GetCoreFromDb(ads::dbSet<ads::dbRow> &rows, bool isScaleDown = false);
+DieRect GetDieFromDb(odb::dbBox &bBox, bool isScaleDown = false);
+DieRect GetCoreFromDb(odb::dbSet<odb::dbRow> &rows, bool isScaleDown = false);
 
-void WriteDefDb(ads::dbDatabase* db, const char* defName);
+void WriteDefDb(odb::dbDatabase* db, const char* defName);
 
 #endif

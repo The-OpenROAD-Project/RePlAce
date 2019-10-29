@@ -426,10 +426,6 @@ replaceTclAppInit(Tcl_Interp *interp) {
       Procbodytest_SafeInit);
 #endif /* TCL_TEST */
 
-  if( Zrouter_Init(interp) == TCL_ERROR) {
-    return TCL_ERROR;
-  }
-
   if( Replace_Init(interp) == TCL_ERROR) {
     return TCL_ERROR; 
   }

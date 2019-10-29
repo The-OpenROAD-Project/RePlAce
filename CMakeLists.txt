@@ -44,6 +44,7 @@ add_subdirectory(${DEFLIB_HOME})
 add_subdirectory(${LEFLIB_HOME})
 add_subdirectory(${FLUTE_HOME})
 add_subdirectory(${OPENSTA_HOME})
+add_subdirectory(${OPENDB_HOME})
 
 set(ENV{TYPE_CALL} library)
 
@@ -165,10 +166,7 @@ include_directories(
   ${OPENSTA_HOME}/util
   ${OPENSTA_HOME}/verilog
 
-  ${OPENDB_HOME}/zrouter/src/include
-  ${OPENDB_HOME}/zrouter/src/lefin
-  ${OPENDB_HOME}/zrouter/src/defin
-  ${OPENDB_HOME}/zrouter/src/defout
+  ${OPENDB_HOME}/include/opendb
 )
 
 ############################################################
@@ -199,11 +197,13 @@ add_dependencies( replace sta )
 add_dependencies( replace flute )
 add_dependencies( replace def )
 add_dependencies( replace lef )
+add_dependencies( replace opendb )
 
 add_dependencies( replacelib sta )
 add_dependencies( replacelib flute )
 add_dependencies( replacelib def )
 add_dependencies( replacelib lef )
+add_dependencies( replacelib opendb )
 
 target_link_libraries( replace
   PUBLIC
@@ -227,25 +227,7 @@ target_link_libraries( replace
   Threads::Threads
   -static-libstdc++ 
 
-  ${OPENDB_HOME}/zrouter/src/lefin/liblefin.a
-  ${OPENDB_HOME}/zrouter/src/main/libzroutemain.a
-  ${OPENDB_HOME}/zrouter/src/db/WireConn/libdb_conn.a
-  ${OPENDB_HOME}/zrouter/src/db/db_tcl/libdb_tcl.a
-  ${OPENDB_HOME}/zrouter/src/db/libdb.a
-  ${OPENDB_HOME}/zrouter/src/ModuleTemplate/libTEMPLATE.a
-  ${OPENDB_HOME}/zrouter/src/ModuleTemplate/TMP_tcl/libTMP_tcl.a
-  ${OPENDB_HOME}/zrouter/src/defout/libdefout.a
-  ${OPENDB_HOME}/zrouter/src/sylib/libsylib.a
-  ${OPENDB_HOME}/zrouter/src/tm/libtm.a
-  ${OPENDB_HOME}/zrouter/src/lefout/liblefout.a
-  ${OPENDB_HOME}/zrouter/src/sver/libsver.a
-  ${OPENDB_HOME}/zrouter/src/zutil/libzutil.a
-  ${OPENDB_HOME}/zrouter/src/cdslef56/lef/liblef.a
-  ${OPENDB_HOME}/zrouter/src/defin/libdefin.a
-  ${OPENDB_HOME}/zrouter/src/zlib/libzlib.a
-  ${OPENDB_HOME}/zrouter/src/SHAPES/PDN_tcl/libPDN_tcl.a
-  ${OPENDB_HOME}/zrouter/src/SHAPES/libSHAPES.a
-
+  opendb
   )
 
 ############################################################

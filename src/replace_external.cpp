@@ -188,58 +188,58 @@ replace_external::help() {
 
 void 
 replace_external::import_lef(const char* lef){ 
-  ads::dbDatabase * db = NULL;
+  odb::dbDatabase * db = NULL;
   if( db_id == INT_MAX ) {
-    db = ads::dbDatabase::create();
+    db = odb::dbDatabase::create();
     db_id = db->getId();
   }
   else {
-    db = ads::dbDatabase::getDatabase(db_id);
+    db = odb::dbDatabase::getDatabase(db_id);
   }
-  ads::lefin lefReader(db, false);
+  odb::lefin lefReader(db, false);
   lefReader.createTechAndLib("testlib", lef);
 }
 
 void 
 replace_external::import_def(const char* def){
-  ads::dbDatabase * db = NULL;
+  odb::dbDatabase * db = NULL;
   if( db_id == INT_MAX ) {
-    db = ads::dbDatabase::create();
+    db = odb::dbDatabase::create();
     db_id = db->getId();
   }
   else {
-    db = ads::dbDatabase::getDatabase(db_id);
+    db = odb::dbDatabase::getDatabase(db_id);
   }
-  ads::defin defReader(db);
+  odb::defin defReader(db);
 
-  std::vector<ads::dbLib *> search_libs;
-  ads::dbSet<ads::dbLib> libs = db->getLibs();
-  ads::dbSet<ads::dbLib>::iterator itr;
+  std::vector<odb::dbLib *> search_libs;
+  odb::dbSet<odb::dbLib> libs = db->getLibs();
+  odb::dbSet<odb::dbLib>::iterator itr;
   for( itr = libs.begin(); itr != libs.end(); ++itr ) {
     search_libs.push_back(*itr);
   }
-  ads::dbChip* chip = defReader.createChip( search_libs,  def );
+  odb::dbChip* chip = defReader.createChip( search_libs,  def );
 }
 
 
 void
 replace_external::import_db(const char* dbLoc) {
-//  ads::dbDatabase* db = NULL;
-  ads::dbDatabase* db = ads::dbDatabase::create();
+//  odb::dbDatabase* db = NULL;
+  odb::dbDatabase* db = odb::dbDatabase::create();
 
   FILE* fp = fopen(dbLoc, "rb");
   if( fp == NULL ) {
     cout << "ERROR: Can't open " <<  dbLoc << endl;
     exit(1);
   }
-  db->ads::dbDatabase::read(fp);
+  db->odb::dbDatabase::read(fp);
   fclose(fp);
   db_id = db->getId(); 
 }
 
 void
 replace_external::export_db(const char* dbLoc) {
-  ads::dbDatabase* db = ads::dbDatabase::getDatabase( db_id );  
+  odb::dbDatabase* db = odb::dbDatabase::getDatabase( db_id );  
   
   FILE* fp = fopen(dbLoc, "wb");
   if( fp == NULL ) {
@@ -247,14 +247,14 @@ replace_external::export_db(const char* dbLoc) {
     exit(1);
   }
 
-  db->ads::dbDatabase::write(fp);
+  db->odb::dbDatabase::write(fp);
   fclose(fp);
 }
 
 void 
 replace_external::export_def(const char* def){
   if( use_db ) {
-    ads::dbDatabase* db = ads::dbDatabase::getDatabase( db_id ); 
+    odb::dbDatabase* db = odb::dbDatabase::getDatabase( db_id ); 
     WriteDefDb(db, def);
   }
   else {
@@ -435,13 +435,13 @@ replace_external::init_replace() {
 
 bool 
 replace_external::init_replace_db() {
-  using namespace ads;
+  using namespace odb;
 //  dbDatabase * db = dbDatabase::open( "chip.db", dbCreate );
 
 //  Logger::initLogger(_interp);
-  ads::dbDatabase * db = NULL;
+  odb::dbDatabase * db = NULL;
   if( db_id == INT_MAX ) {
-    db = ads::dbDatabase::create();
+    db = odb::dbDatabase::create();
     db_id = db->getId();
   }
   else {
@@ -593,36 +593,12 @@ replace_external::get_tns() {
   return globalTns;
 }
 
-size_t
-replace_external::get_module_size() {
-  return moduleCNT;
-}
-
-size_t
-replace_external::get_terminal_size() {
-  return terminalCNT;
-}
-
-size_t
-replace_external::get_net_size() {
-  return netCNT;
-}
-
-size_t
-replace_external::get_pin_size() {
-  return pinCNT;
-}
-
-size_t
-replace_external::get_row_size() {
-  return row_cnt;
-}
 
 void 
 replace_external::update_instance_list() {
   if( instance_list.size() == 0 ) {
     if( use_db ) {
-      using namespace ads;
+      using namespace odb;
       dbDatabase* db = dbDatabase::getDatabase( db_id ); 
 
       dbChip* chip = db->getChip();
