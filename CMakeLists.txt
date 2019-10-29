@@ -37,6 +37,9 @@ set(EIGEN_HOME
   ${PROJECT_SOURCE_DIR}/module/eigen-git-mirror 
 )
 
+set(BUILD_PYTHON OFF)
+set(BUILD_TCL OFF)
+
 if(USE_OPENDB_TOP_LEVEL)
   set(OPENDB_HOME
     ${PROJECT_SOURCE_DIR}/../OpenDB
