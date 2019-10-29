@@ -38,6 +38,9 @@ set(EIGEN_HOME
 )
 
 if(USE_OPENDB_TOP_LEVEL)
+  set(OPENDB_HOME
+    ${PROJECT_SOURCE_DIR}/../OpenDB
+  )
 else()
   set(OPENDB_HOME
     ${PROJECT_SOURCE_DIR}/module/OpenDB
@@ -48,11 +51,9 @@ add_subdirectory(${DEFLIB_HOME})
 add_subdirectory(${LEFLIB_HOME})
 add_subdirectory(${FLUTE_HOME})
 add_subdirectory(${OPENSTA_HOME})
-add_subdirectory(${OPENDB_HOME})
+add_subdirectory(${OPENDB_HOME} ${CMAKE_CURRENT_BINARY_DIR}/module/OpenDB)
 
 set(ENV{TYPE_CALL} library)
-
-
 
 
 ## configure settings
