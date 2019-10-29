@@ -139,43 +139,6 @@ set (REPLACE_SWIG_FILES
   src/replace.i
 )
 
-############################################################
-# include directories 
-############################################################
-include_directories(
-  ${X11_INCLUDE_DIR}
-  ${Boost_INCLUDE_DIR}
-
-  ${EIGEN_HOME}
-  ${CIMG_HOME}
-
-  ${DEFLIB_HOME}/def
-  ${DEFLIB_HOME}/defzlib
-  ${DEFLIB_HOME}/cdef
-  ${DEFLIB_HOME}/cdefzlib
-
-  ${LEFLIB_HOME}/lef
-  ${LEFLIB_HOME}/lefzlib
-  ${LEFLIB_HOME}/clef
-  ${LEFLIB_HOME}/clefzlib
-
-  ${FLUTE_HOME}/src
- 
-  ${OPENSTA_HOME}/app
-  ${OPENSTA_HOME}/dcalc
-  ${OPENSTA_HOME}/graph
-  ${OPENSTA_HOME}/liberty
-  ${OPENSTA_HOME}/network
-  ${OPENSTA_HOME}/parasitics
-  ${OPENSTA_HOME}/sdc
-  ${OPENSTA_HOME}/sdf
-  ${OPENSTA_HOME}/search
-  ${OPENSTA_HOME}/tcl
-  ${OPENSTA_HOME}/util
-  ${OPENSTA_HOME}/verilog
-
-  ${OPENDB_HOME}/include/opendb
-)
 
 ############################################################
 # Create a library 
@@ -212,6 +175,81 @@ add_dependencies( replacelib flute )
 add_dependencies( replacelib def )
 add_dependencies( replacelib lef )
 add_dependencies( replacelib opendb )
+
+############################################################
+# include directories 
+############################################################
+target_include_directories( replace 
+  PUBLIC
+  ${X11_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIR}
+
+  ${EIGEN_HOME}
+  ${CIMG_HOME}
+
+  ${DEFLIB_HOME}/def
+  ${DEFLIB_HOME}/defzlib
+  ${DEFLIB_HOME}/cdef
+  ${DEFLIB_HOME}/cdefzlib
+
+  ${LEFLIB_HOME}/lef
+  ${LEFLIB_HOME}/lefzlib
+  ${LEFLIB_HOME}/clef
+  ${LEFLIB_HOME}/clefzlib
+
+  ${FLUTE_HOME}/src
+ 
+  ${OPENSTA_HOME}/app
+  ${OPENSTA_HOME}/dcalc
+  ${OPENSTA_HOME}/graph
+  ${OPENSTA_HOME}/liberty
+  ${OPENSTA_HOME}/network
+  ${OPENSTA_HOME}/parasitics
+  ${OPENSTA_HOME}/sdc
+  ${OPENSTA_HOME}/sdf
+  ${OPENSTA_HOME}/search
+  ${OPENSTA_HOME}/tcl
+  ${OPENSTA_HOME}/util
+  ${OPENSTA_HOME}/verilog
+
+  ${OPENDB_HOME}/include/opendb
+)
+
+target_include_directories( replacelib 
+  PUBLIC
+  ${X11_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIR}
+
+  ${EIGEN_HOME}
+  ${CIMG_HOME}
+
+  ${DEFLIB_HOME}/def
+  ${DEFLIB_HOME}/defzlib
+  ${DEFLIB_HOME}/cdef
+  ${DEFLIB_HOME}/cdefzlib
+
+  ${LEFLIB_HOME}/lef
+  ${LEFLIB_HOME}/lefzlib
+  ${LEFLIB_HOME}/clef
+  ${LEFLIB_HOME}/clefzlib
+
+  ${FLUTE_HOME}/src
+ 
+  ${OPENSTA_HOME}/app
+  ${OPENSTA_HOME}/dcalc
+  ${OPENSTA_HOME}/graph
+  ${OPENSTA_HOME}/liberty
+  ${OPENSTA_HOME}/network
+  ${OPENSTA_HOME}/parasitics
+  ${OPENSTA_HOME}/sdc
+  ${OPENSTA_HOME}/sdf
+  ${OPENSTA_HOME}/search
+  ${OPENSTA_HOME}/tcl
+  ${OPENSTA_HOME}/util
+  ${OPENSTA_HOME}/verilog
+
+  ${OPENDB_HOME}/include/opendb
+)
 
 target_link_libraries( replace
   PUBLIC
