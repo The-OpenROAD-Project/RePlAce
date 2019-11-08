@@ -453,22 +453,21 @@ void wlen_grad_wa(int cell_idx, FPOS *grad) {
 
     float curTimingWeight = netInstance[pin->netID].timingWeight;
     // Timing Control Parts
-    if(isTiming && curTimingWeight > 0) {
-      curTimingWeight = netWeightBase + min(max(0.0f, netWeightBound - netWeightBase),
-                                      curTimingWeight / netWeightScale);
-      // cout << "calNetWeight: " << curTimingWeight << endl;
-      if(hasUnitNetWeight) {
-        net_grad.x *= netWeight;
-        net_grad.y *= netWeight;
-      }
-      else if( hasCustomNetWeight ) {
-        net_grad.x *= net->customWeight;
-        net_grad.y *= net->customWeight;
-      }
-      else {
-        net_grad.x *= curTimingWeight;
-        net_grad.y *= curTimingWeight;
-      }
+    // curTimingWeight = netWeightBase + min(max(0.0f, netWeightBound - netWeightBase),
+    // curTimingWeight / netWeightScale);
+    //
+    // cout << "calNetWeight: " << curTimingWeight << endl;
+    if(hasUnitNetWeight) {
+      net_grad.x *= netWeight;
+      net_grad.y *= netWeight;
+    }
+    else if( hasCustomNetWeight ) {
+      net_grad.x *= net->customWeight;
+      net_grad.y *= net->customWeight;
+    }
+    else if(isTiming && netWeightApply && curTimingWeight > 0) {
+      net_grad.x *= curTimingWeight;
+      net_grad.y *= curTimingWeight;
     }
 
     grad->x += net_grad.x;

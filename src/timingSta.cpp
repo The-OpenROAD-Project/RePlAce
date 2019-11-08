@@ -12,6 +12,14 @@ using std::to_string;
 
 TIMING_NAMESPACE_OPEN
 
+static const char *
+escapeDividers(const char *token,
+             const sta::Network *network);
+
+static float 
+GetMaxResistor(sta::Sta* sta, sta::Net* net);
+
+
 inline string Timing::GetPinName(PIN* curPin, bool isEscape) {
   // itself is PINS in def.
   if(curPin->term && _terms[curPin->moduleID].isTerminalNI) {
@@ -50,35 +58,6 @@ inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
                              : curPin.GetPinName((void*)_terms, _tPinName, isEscape);
 }
 
-float GetMaxResistor(sta::Sta* sta, Pin* pin) {
-  float retRes = 0.0f;
-
-  const MinMax* cnst_min_max = MinMaxAll::max()->asMinMax();
-  ParasiticAnalysisPt* ap =
-      sta->corners()->findCorner(0)->findParasiticAnalysisPt(cnst_min_max);
-
-  Parasitics* parasitics = sta->parasitics();
-
-  Parasitic* parasitic = parasitics->findParasiticNetwork(pin, ap);
-  ParasiticNode* paraNode = parasitics->findNode(parasitic, pin);
-
-  if(!paraNode) {
-    return 0.0f;
-  }
-  // Resistor Traverse
-  ParasiticDeviceIterator* paraDevIter = parasitics->deviceIterator(paraNode);
-
-  while(paraDevIter->hasNext()) {
-    ParasiticDevice* paraDev = paraDevIter->next();
-    if(!parasitics->isResistor(paraDev)) {
-      continue;
-    }
-
-    float newRes = parasitics->value(paraDev, ap);
-    retRes = (retRes < newRes) ? newRes : retRes;
-  }
-  return retRes;
-}
 
 void TimingPathPrint(sta::Sta* sta, sta::PathEnd* end) {
   cout << "===========================================================" << endl;
@@ -142,8 +121,8 @@ void TimingPathPrint(sta::Sta* sta, sta::PathEnd* end) {
         // if( dir->isInput() ) {
         //   continue;
         // }
-        cout << sta->network()->name(curPin) << " "
-             << GetMaxResistor(sta, curPin) << endl;
+//        cout << sta->network()->name(curPin) << " "
+//             << GetMaxResistor(sta, curPin) << endl;
       }
     }
 
@@ -476,32 +455,28 @@ void Timing::FillSpefForSta() {
     }
   }
 
-  bool isEscape = true;
-  for(int i=0; i<_netCnt; i++) {
-    char* tmpStr = GetEscapedStr(netInstance[i].Name(), isEscape);
-    sta::Net* net = sta::spef_reader->findNet(tmpStr);
-    if( !net ) {
-      isEscape = false;
-      break;
-    }
-  }
-//  isEscape = false;
-
+  // test purpose
+//  for(int i = 0; i < _netCnt; i++) {
+//    NET* curNet = &_nets[i];
+//    cout << "prev: " << curNet->Name() << " -> ";
+//    cout << escapeDividers( curNet->Name(), _sta->network());
+//    cout << " " << escapeBrackets( curNet->Name(), _sta->network()) << endl;
+//  }
+    
+  bool isEscape = false;
   for(int i = 0; i < _netCnt; i++) {
     NET* curNet = &_nets[i];
-    // char* netName = new char[strlen(curNet->name)+1];
-    // strcpy(netName, curNet->name);
-
-    char* tmpStr = GetEscapedStr(curNet->Name(), isEscape);
-//    cout << "find: " << tmpStr << endl;
-    sta::Net* net = sta::spef_reader->findNet(tmpStr);
+    sta::Net* net = sta::spef_reader->findNet(const_cast<char*>(curNet->Name()));
     if( !net ) {
-      cout << "ERROR  : Net " << tmpStr << " is not found in Verilog" << endl;
+      net = sta::spef_reader->findNet( 
+          const_cast<char*>(escapeDividers( curNet->Name(), _sta->network())));
+    }
+
+    if( !net ){
+      cout << "ERROR  : Net " << curNet->Name() << " is not found in Verilog" << endl;
       cout << "Verilog is mismatched with DEF files" << endl;
       exit(1);
     }
-    // cout << "SPEF: " << tmpStr << endl;
-    free(tmpStr);
 
     SpefTriple* netCap = new SpefTriple(lumpedCapStor[i] / CAP_SCALE);
     sta::spef_reader->dspfBegin(net, netCap);
@@ -593,10 +568,29 @@ void Timing::UpdateTimingSta() {
   _sta->updateTiming(true);
 }
 
+
+static float getNetSlack(sta::Sta* sta_, sta::Net* net) {
+  sta::Network* network = sta_->network();
+
+  float netSlack = MinMax::min()->initValue();
+  NetPinIterator *pin_iter = network->pinIterator(net);
+  while (pin_iter->hasNext()) {
+    Pin *pin = pin_iter->next();
+    if (network->isLoad(pin)) {
+      float pinSlack = sta_->pinSlack(pin, MinMax::max());
+      if (pinSlack < netSlack ) {
+        netSlack = pinSlack;
+      }
+    }
+  }
+  return netSlack ;
+}
+
 void Timing::UpdateNetWeightSta() {
   // report_checks -path_delay min_max
   Corner* corner = _sta->corners()->findCorner(0);
 
+  /*
   PathEndSeq* ends =
       _sta->findPathEnds(NULL, NULL, NULL,          // from, thru, to
                         false,                      // unconstrained
@@ -607,14 +601,93 @@ void Timing::UpdateNetWeightSta() {
                          true, true,         // setup, hold
                          true, true,         // recovery, removal
                          true, true);        // clk gating setup, hold
-
   if(ends->empty()) {
     cout << "ERROR: There is no valid timing path. " << endl;
     cout << "       Please double check your SDC and Design" << endl;
     cout << "       or, try to use non Timing-Driven mode" << endl;
     exit(1);
   }
+*/
+  
+  // To enable scaling 
+  // boundary values
+  netWeightMin = FLT_MAX;
+  netWeightMax = FLT_MIN;
+ 
+  // extract WNS 
+  Slack wns; 
+  Vertex* worstVertex = NULL;
+  
+  const MinMax* cnst_min_max = MinMax::max();
+  _sta->worstSlack(cnst_min_max, wns, worstVertex);
 
+  cout << "WNS: " << wns << endl;
+//  if( wns > 0 ) {
+//    for(int i=0; i<_netCnt; i++) {
+//      netInstance[i].timingWeight = 0.0f;
+//    } 
+//  }
+//  else {
+
+  float minRes = FLT_MAX;
+  float maxRes = FLT_MIN;
+
+  // for normalize
+  for(int i=0; i<_netCnt; i++) {
+    NET* curNet = &_nets[i];
+    sta::Net* curStaNet = _sta->network()->findNet(curNet->Name());
+    if( !curStaNet ) {
+      cout << "cannot find: " << curNet->Name() << endl;
+      cout << "Verilog and DEF are mismatched. Please check your input" << endl;
+      exit(1);
+    }
+    float netRes = GetMaxResistor(_sta, curStaNet);
+    minRes = (minRes > netRes)? netRes : minRes;
+    maxRes = (maxRes < netRes)? netRes : maxRes;
+  }
+    
+
+  // for all nets
+  for(int i=0; i<_netCnt; i++) {
+    NET* curNet = &_nets[i];
+    sta::Net* curStaNet = _sta->network()->findNet(curNet->Name());
+    if( !curStaNet ) {
+      cout << "cannot find: " << curNet->Name() << endl;
+      cout << "Verilog and DEF are mismatched. Please check your input" << endl;
+      exit(1);
+    }
+
+    float netSlack = getNetSlack( _sta, curStaNet );
+    netSlack = (fabs(netSlack - MinMax::min()->initValue()) <= FLT_EPSILON) ? 
+      0 : netSlack;
+
+    float criticality = (wns>0)? 0 : max(0.0f, netSlack / wns);
+
+//    cout << "diff: " << fabs(netSlack - MinMax::min()->initValue()) << endl;
+    cout << curNet->Name() << " netSlack: " << netSlack << " crit: " << criticality;
+
+    // get normalized resistor
+    float netRes = GetMaxResistor(_sta, curStaNet);
+    float normRes = (netRes - minRes)/(maxRes - minRes);
+
+    int netDegree = max(2, netInstance[i].pinCNTinObject);
+    float netWeight = 1 + normRes * (1 + criticality) / (netDegree - 1);
+    netWeight = (netWeight >= 1.9)? 1.9 : netWeight;
+    netWeight = (netSlack < 0)? 1.8 : 1;
+
+    cout << " normRes: " << normRes << " deg: " << netDegree << " nw: " << netWeight << endl;
+
+    // update timingWeight 
+    netInstance[i].timingWeight = netWeight;
+
+    // update netWeightMin / netWeightMax    
+    netWeightMin = (netWeightMin < netWeight) ? netWeightMin : netWeight;
+    netWeightMax = (netWeightMax > netWeight) ? netWeightMax : netWeight;
+  }
+
+  return;
+
+/*
   PathEndSeq::Iterator tmpIter(ends), pathEndIter(ends);
   int resultCnt = 0;
   while(tmpIter.hasNext()) {
@@ -626,32 +699,8 @@ void Timing::UpdateNetWeightSta() {
   int limintCnt = resultCnt;
 
   PrintInfoInt("Timing: NumPaths", resultCnt, 1);
-
-  //    _sta->setReportPathOptions(report_path_full, true, true, true, true,
-  //    true, 2);
-  //    _sta->reportPathEnds(ends) ;
-
   PathEnd* end = pathEndIter.next();
 
-  // vectex iterator and index check
-  /*
-  int i=1;
-  VertexIterator vIter(_sta->graph());
-  while(vIter.hasNext()) {
-      Vertex * vertex = vIter.next();
-      Pin* pin = vertex->pin();
-      if( i != _sta->network()->vertexIndex(pin)) {
-          cout << vertex->name(_sta->network()) << " " << i << " "
-              << _sta->network()->vertexIndex(pin) << endl;
-      }
-      i++;
-  }*/
-
-  const MinMax* cnst_min_max = MinMax::max();
-
-  // boundary value
-  netWeightMin = FLT_MAX;
-  netWeightMax = FLT_MIN;
 
   HASH_SET<sta::Net*> netSet;
 #ifdef USE_GOOGLE_HASH
@@ -738,7 +787,8 @@ void Timing::UpdateNetWeightSta() {
           Pin* curPin = connPinIter->next();
           // cout << sta->network()->name(curPin) << " "
           //   << GetMaxResistor(sta, curPin) << endl;
-          float curRes = GetMaxResistor(_sta, curPin);
+//          float curRes = GetMaxResistor(_sta, curPin);
+          float curRes = GetMaxResistor(_sta, NULL);
           highRes = (highRes < curRes) ? curRes : highRes;
           pinCnt ++;
         }
@@ -771,6 +821,7 @@ void Timing::UpdateNetWeightSta() {
     }
     end = pathEndIter.next();
   }
+  */
 }
 
 // static void ExecuteCommand( const char* inp ){
@@ -790,5 +841,41 @@ void Timing::UpdateNetWeightSta() {
 //   }
 //   return result;
 // }
+
+static float 
+GetMaxResistor(sta::Sta* sta, sta::Net* net) {
+  float retRes = 0.0f;
+
+  const MinMax* cnst_min_max = MinMaxAll::max()->asMinMax();
+  ParasiticAnalysisPt* ap =
+      sta->corners()->findCorner(0)->findParasiticAnalysisPt(cnst_min_max);
+
+  // find parasitic object from Net
+  Parasitics* parasitics = sta->parasitics();
+  Parasitic* parasitic = parasitics->findParasiticNetwork(net, ap);
+
+  // Resistor Traverse from Net
+  ParasiticDeviceIterator* paraDevIter = parasitics->deviceIterator(parasitic);
+
+  while(paraDevIter->hasNext()) {
+    ParasiticDevice* paraDev = paraDevIter->next();
+    if(!parasitics->isResistor(paraDev)) {
+      continue;
+    }
+
+    float newRes = parasitics->value(paraDev, ap);
+    retRes = (retRes < newRes) ? newRes : retRes;
+  }
+  return retRes;
+}
+
+static const char *
+escapeDividers(const char *token,
+             const sta::Network *network)
+{
+  return sta::escapeChars(token, network->pathDivider(), '\0',
+               network->pathEscape());
+}
+
 
 TIMING_NAMESPACE_CLOSE

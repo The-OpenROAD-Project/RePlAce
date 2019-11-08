@@ -298,6 +298,11 @@ replace_external::set_target_overflow(double overflow) {
 }
 
 void
+replace_external::set_net_weight_apply(bool mode){
+  netWeightApply = mode;
+}
+
+void
 replace_external::set_net_weight_min(double net_weight_min) {
   netWeightBase = net_weight_min;
 }

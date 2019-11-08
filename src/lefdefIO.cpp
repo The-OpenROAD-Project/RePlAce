@@ -1206,6 +1206,7 @@ void GenerateDummyCell(Replace::Circuit& __ckt) {
       }
     }
   }
+  PrintInfoInt("Inserted Dummy Terms", dummyTermStor_.size());
 
   // termCnt Updates 
   int prevCnt = terminalCNT;
@@ -1790,9 +1791,9 @@ void GenerateNetDefOnly(Replace::Circuit& __ckt) {
     netNameStor.push_back( netName );
     
     // But, netNameMap can have escaped strings
-    ReplaceStringInPlace(netName, "\\[", "[");
-    ReplaceStringInPlace(netName, "\\]", "]");
-    ReplaceStringInPlace(netName, "\\/", "/");
+//    ReplaceStringInPlace(netName, "\\[", "[");
+//    ReplaceStringInPlace(netName, "\\]", "]");
+//    ReplaceStringInPlace(netName, "\\/", "/");
 
     //        cout << "copied net Name: " << curNet->name << endl;
     netNameMap[netName] = netIdx;

@@ -52,6 +52,7 @@ public:
   void set_step_scale(double step_scale);
   void set_target_overflow(double overflow);
   
+  void set_net_weight_apply(bool mode);
   void set_net_weight_min(double net_weight_min);
   void set_net_weight_max(double net_weight_max);
   void set_net_weight_scale(double net_weight_scale);

@@ -80,6 +80,7 @@ prec netWeightMax;
 prec netWeightBase;
 prec netWeightBound;
 prec netWeightScale;
+bool netWeightApply;
 
 prec capPerMicron;
 prec resPerMicron;
