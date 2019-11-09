@@ -73,9 +73,6 @@
 #undef YY_INPUT
 #endif
 
-#include "SpefReaderPvt.hh"
-using namespace sta;
-
 // to import Swig
 extern "C" {
 extern int Sta_Init(Tcl_Interp *interp);

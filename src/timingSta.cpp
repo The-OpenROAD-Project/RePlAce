@@ -8,17 +8,17 @@
 
 #include <tcl.h>
 
+using namespace sta;
+using std::string;
 using std::to_string;
 
-TIMING_NAMESPACE_OPEN
-
-static const char *
-escapeDividers(const char *token,
-             const sta::Network *network);
-
+//static const char *
+//escapeDividers(const char *token,
+//             const sta::Network *network);
 static float 
 GetMaxResistor(sta::Sta* sta, sta::Net* net);
 
+namespace Timing { 
 
 inline string Timing::GetPinName(PIN* curPin, bool isEscape) {
   // itself is PINS in def.
@@ -38,13 +38,13 @@ inline string Timing::GetPinName(PIN* curPin, bool isEscape) {
   // bookshelf cases, it must be empty
   if(_mPinName.size() == 0 && _tPinName.size() == 0) {
     string pinPrefix = (curPin->IO == 0) ? "I" : "O";
-    return name + ":" + pinPrefix + to_string(curPin->pinIDinModule);
+    return name + "/" + pinPrefix + to_string(curPin->pinIDinModule);
   }
   // other LEF/DEF/VERILOG cases.
   else {
     return (curPin->term == 0)
-               ? name + ":" + _mPinName[curPin->moduleID][curPin->pinIDinModule]
-               : name + ":" +
+               ? name + "/" + _mPinName[curPin->moduleID][curPin->pinIDinModule]
+               : name + "/" +
                      _tPinName[curPin->moduleID][curPin->pinIDinModule];
   }
 }
@@ -54,8 +54,9 @@ inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
     return curPin.GetStnPinName(isEscape);
   }
 
-  return (curPin.isModule()) ? curPin.GetPinName((void*)_modules, _mPinName, isEscape)
-                             : curPin.GetPinName((void*)_terms, _tPinName, isEscape);
+  return (curPin.isModule()) ? 
+    curPin.GetPinName((void*)_modules, _mPinName, isEscape)
+    : curPin.GetPinName((void*)_terms, _tPinName, isEscape);
 }
 
 
@@ -116,7 +117,7 @@ void TimingPathPrint(sta::Sta* sta, sta::PathEnd* end) {
           sta->network()->connectedPinIterator(pinNet);
 
       while(connPinIter->hasNext()) {
-        Pin* curPin = connPinIter->next();
+        // Pin* curPin = connPinIter->next();
         // PortDirection* dir = sta->network()->direction(curPin);
         // if( dir->isInput() ) {
         //   continue;
@@ -248,35 +249,15 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
     exit(1);
   }
 
-  // network = _sta->networkReader();
-  // Instance* top_inst = network->topInstance();
-  // cout << top_inst << endl;
-  // NetSeq* nets = new NetSeq;
-  // PatternMatch pattern(string("*").c_str());
-  // cout << &pattern << endl;
-  // network->findNetsHierMatching(top_inst, &pattern, nets);
-  //
-  // NetSeq::Iterator netIter(nets);
-  // while(netIter.hasNext()) {
-  //     Net* net = netIter.next();
-  //     string netName = network->pathName(net);
-  //     cout << netName << endl;
-  // }
-
-  // exit(1);
-
   // read_parasitics
   //    cout << spefFileName << endl;
-  /*
-  bool parasitics =
-      _sta->readParasitics("/home/mgwoo/RePlACE-TD/output/etc/simple/experiment7/simple.spef",
-              _sta->currentInstance(),
-              MinMaxAll::max(), false, true, 0.0,
-              reduce_parasitics_to_pi_elmore, false, true, true);
+  //  bool parasitics =
+  //      _sta->readParasitics("simple.spef",
+  //              _sta->currentInstance(),
+  //              MinMaxAll::max(), false, true, 0.0,
+  //              reduce_parasitics_to_pi_elmore, false, true, true);
 
-              */
-  // from search/Sta.cc:readParasitics
-  FillSpefForSta();
+  MakeParasiticsForSta(); 
 
   if(isClockGiven) {
     GenerateClockSta();
@@ -311,8 +292,6 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
   // _sta->clear();
   // _sta = NULL;
   // delete _sta;
-
-  // exit(0);
 }
 
 void Timing::ExecuteStaLater() {
@@ -323,16 +302,14 @@ void Timing::ExecuteStaLater() {
   // _sta->network()->clear();
 
   auto start = std::chrono::steady_clock::now();
-  // do something
-  FillSpefForSta();
-
+  MakeParasiticsForSta(); 
   auto finish = std::chrono::steady_clock::now();
   double elapsed_seconds =
       std::chrono::duration_cast< std::chrono::duration< double > >(finish -
                                                                     start)
           .count();
 
-  PrintInfoRuntime("Timing: FillSpefForSta", elapsed_seconds, 1);
+  PrintInfoRuntime("Timing: FillParasitcsForSta", elapsed_seconds, 1);
 
   _sta->setIncrementalDelayTolerance(1e-6);
 
@@ -376,59 +353,17 @@ char* GetNewStr(const char* inp) {
   return ret;
 }
 
-void Timing::FillSpefForSta() {
-  const Corner* corner = _sta->corners()->findCorner(0);
-  const MinMax* cnst_min_max;
-  ParasiticAnalysisPt* ap;
-
-  // assume always MinMaxAll::max()
-  _sta->corners()->makeParasiticAnalysisPtsMinMax();
-  cnst_min_max = MinMaxAll::max()->asMinMax();
-  ap = corner->findParasiticAnalysisPt(cnst_min_max);
-
-  // cout << ap->index() << endl;
-
-  const OperatingConditions* op_cond =
-      _sta->sdc()->operatingConditions(cnst_min_max);
-
-  SpefReader* reader = new SpefReader(
-      "", NULL, _sta->currentInstance(), ap, false, false, false, 0.0,
-      ReduceParasiticsTo::pi_elmore, false, op_cond, corner, cnst_min_max,
-      true, _sta->report(), _sta->network(), _sta->parasitics());
-  sta::spef_reader = reader;
-
-  // spef parsing manually
-  // by default
-  sta::spef_reader->setDivider('/');
-  sta::spef_reader->setDelimiter(':');
-  sta::spef_reader->setBusBrackets('[', ']');
-
-  char* timeStr = new char[3];
-  char* resStr = new char[5];
-  char* inductStr = new char[3];
-  char* capStr = new char[3];
-
-  strcpy(timeStr, "PS");
-  strcpy(capStr, "PF");
-  strcpy(resStr, "OHM");
-  strcpy(inductStr, "UH");
-
-  sta::spef_reader->setTimeScale(1, timeStr);
-  sta::spef_reader->setCapScale(1, capStr);
-  sta::spef_reader->setResScale(1, resStr);
-  sta::spef_reader->setInductScale(1, inductStr);
+// 
+// Fill OpenSTA's parasitic models to have Cap / Res from FLUTE.
+//
+void Timing::MakeParasiticsForSta() {
+  sta::Network* network = _sta->network();
+  sta::Parasitics* parasitics = _sta->parasitics();
 
   HASH_MAP< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
   // map from pin name -> cap
   HASH_MAP< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
 
-  PinInfo tmpPin;
-  tmpPin.SetImpossible();
-
-#ifdef USE_GOOGLE_HASH
-  pin_cap_written.set_empty_key(tmpPin);
-  lumped_cap_at_pin.set_empty_key(tmpPin);
-#endif
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
@@ -446,7 +381,7 @@ void Timing::FillSpefForSta() {
       PIN* curPin = _nets[i].pin[j];
       if(curPin->term && _terms[curPin->moduleID].isTerminalNI &&
          curPin->IO == 1) {
-        // it was must be read from SDC file,
+        // This must be read from SDC file,
         // but in ICCAD contest, only outPin have PIN_CAP
         // as 4e-15
         lumpedCapStor[i] += TIMING_PIN_CAP;
@@ -455,94 +390,96 @@ void Timing::FillSpefForSta() {
     }
   }
 
-  // test purpose
-//  for(int i = 0; i < _netCnt; i++) {
-//    NET* curNet = &_nets[i];
-//    cout << "prev: " << curNet->Name() << " -> ";
-//    cout << escapeDividers( curNet->Name(), _sta->network());
-//    cout << " " << escapeBrackets( curNet->Name(), _sta->network()) << endl;
-//  }
-    
-  bool isEscape = false;
-  for(int i = 0; i < _netCnt; i++) {
-    NET* curNet = &_nets[i];
-    sta::Net* net = sta::spef_reader->findNet(const_cast<char*>(curNet->Name()));
-    if( !net ) {
-      net = sta::spef_reader->findNet( 
-          const_cast<char*>(escapeDividers( curNet->Name(), _sta->network())));
-    }
+  
+  // get maximum pin counts in current sta network structure:
+  int newPinIdx = network->pinCount()+1;
 
-    if( !net ){
-      cout << "ERROR  : Net " << curNet->Name() << " is not found in Verilog" << endl;
-      cout << "Verilog is mismatched with DEF files" << endl;
+  const sta::Corner* corner = _sta->corners()->findCorner(0);
+  _sta->corners()->makeParasiticAnalysisPtsMinMax();
+
+  const sta::MinMax* min_max = MinMax::max();
+  const sta::ParasiticAnalysisPt *ap = corner->findParasiticAnalysisPt(min_max); 
+  
+//  cout << "corner: " << corner << endl;
+//  cout << "min_max: " << min_max << endl;
+//  cout << "ap: " << ap << endl;
+
+  // for each net
+  for(int i=0; i<_netCnt; i++) {
+    NET* curNet = &netInstance[i];
+//    cout << "run: " << i << " " << curNet->Name() << endl;
+    sta::Net* curStaNet = network->findNet( curNet->Name() );
+    if( !curStaNet ) {
+      cout << "cannot find: " << curNet->Name() << endl;
+      cout << "Verilog and DEF are mismatched. Please check your input" << endl;
       exit(1);
     }
 
-    SpefTriple* netCap = new SpefTriple(lumpedCapStor[i] / CAP_SCALE);
-    sta::spef_reader->dspfBegin(net, netCap);
-
+    Parasitic* parasitic = parasitics->makeParasiticNetwork(curStaNet, false, ap);
     for(auto& curSeg : wireSegStor[i]) {
+      // check for IPin cap
+      
+      ParasiticNode *n1 = NULL, *n2 = NULL;
+
+      // existed pin cases
+      if( !curSeg.iPin.isSteiner() ) {
+        string pinName = GetPinName(curSeg.iPin, false);
+        sta::Pin* pin = network->findPin(pinName.c_str());
+        if( !pin ) {
+          cout << "cannot find: " << pinName << " in " 
+            << curNet->Name() << " net." << endl;
+          cout << "Verilog and DEF are mismatched. Please check your input" << endl;
+          exit(1);
+        }
+        n1 = parasitics->ensureParasiticNode(parasitic, pin);
+      }
+      // virtual steinerPin cases
+      // Set steiner pins' index as newPinIdx+1, newPinIdx+2, ....
+      else {
+        n1 = parasitics->ensureParasiticNode(parasitic, curStaNet, 
+            newPinIdx + curSeg.iPin.GetPinNum());
+      }
+
+      // insert cap
       if(!pin_cap_written[curSeg.iPin]) {
-        // feed << cnt++ << " " << GetPinName(curSeg.iPin)
-        // << " " << lumped_cap_at_pin[ curSeg.iPin ] / CAP_SCALE<<endl;
-        string pinName = GetPinName(curSeg.iPin, isEscape);
-        //char* pinNamePtr = GetEscapedStr( pinName.c_str(), isEscape );
-        char* pinNamePtr = GetNewStr(pinName.c_str());
-
-        SpefTriple* pinCap =
-            new SpefTriple(lumped_cap_at_pin[curSeg.iPin] / CAP_SCALE);
-
-//        cout << "PinPTR: " << pinNamePtr << endl;
-        sta::spef_reader->makeCapacitor(INT_MAX, pinNamePtr, pinCap);
+        parasitics->incrCap(n1, lumped_cap_at_pin[curSeg.iPin], ap);
         pin_cap_written[curSeg.iPin] = true;
       }
+      
+      // existed pin cases
+      if( !curSeg.oPin.isSteiner() ) {
+        string pinName = GetPinName(curSeg.oPin, false);
+        sta::Pin* pin = network->findPin(pinName.c_str());
+        if( !pin ) {
+          cout << "cannot find: " << curNet->Name() << ":" << pinName << endl;
+          cout << "Verilog and DEF are mismatched. Please check your input" << endl;
+          exit(1);
+        }
+        n2 = parasitics->ensureParasiticNode(parasitic, pin);
+      }
+      // virtual steinerPin cases
+      // Set steiner pins' index as newPinIdx+1, newPinIdx+2, ....
+      else {
+        n2 = parasitics->ensureParasiticNode(parasitic, curStaNet, 
+            newPinIdx + curSeg.oPin.GetPinNum());
+      }
+
       if(!pin_cap_written[curSeg.oPin]) {
-        // feed << cnt++ << " " << GetPinName(curSeg.oPin)
-        // << " " << lumped_cap_at_pin[ curSeg.oPin ] / CAP_SCALE<<endl;
-
-        string pinName = GetPinName(curSeg.oPin, isEscape);
-        //char* pinNamePtr = GetEscapedStr( pinName.c_str(), isEscape );
-        char* pinNamePtr = GetNewStr(pinName.c_str());
-
-        SpefTriple* pinCap =
-            new SpefTriple(lumped_cap_at_pin[curSeg.oPin] / CAP_SCALE);
-
-//        cout << "PinPTR: " << pinNamePtr << endl;
-        sta::spef_reader->makeCapacitor(INT_MAX, pinNamePtr, pinCap);
+        parasitics->incrCap(n2, lumped_cap_at_pin[curSeg.oPin], ap);
         pin_cap_written[curSeg.oPin] = true;
       }
+
+      // insert resistor.
+      parasitics->makeResistor(nullptr, n1, n2, 
+          curSeg.length / static_cast<double>(_l2d) * resPerMicron, ap);
+      
     }
-    unsigned cnt = 1;
-    for(auto& curSeg : wireSegStor[i]) {
-      // feed << cnt++ << " " << GetPinName(curSeg.iPin) << " "
-      //   << GetPinName(curSeg.oPin) << " "
-      //   << curSeg.length / static_cast<double>(_l2d)
-      //   * LOCAL_WIRE_RES_PER_MICRON / RES_SCALE << endl;
-
-      string pinName1 = GetPinName(curSeg.iPin, isEscape);
-      // char* pinNamePtr1 = GetEscapedStr( pinName1.c_str(), isEscape );
-      char* pinNamePtr1 = GetNewStr(pinName1.c_str());
-//      cout << "PinPTR2: " << pinNamePtr1 << endl;
-
-      string pinName2 = GetPinName(curSeg.oPin, isEscape);
-      // char* pinNamePtr2 = GetEscapedStr( pinName2.c_str(), isEscape );
-      char* pinNamePtr2 = GetNewStr(pinName2.c_str());
-//      cout << "PinPTR2: " << pinNamePtr2 << endl;
-      SpefTriple* pinRes =
-          new SpefTriple(curSeg.length / static_cast< double >(_l2d) *
-                         resPerMicron / RES_SCALE);
-
-      // cout << pinName1 << " " << pinName2 << " " <<
-      // pinRes->value(0) << endl;
-      sta::spef_reader->makeResistor(cnt++, pinNamePtr1, pinNamePtr2, pinRes);
-    }
-    sta::spef_reader->dspfFinish();
   }
-
-  UpdateSpefClockNetVerilog();
   _sta->graphDelayCalc()->delaysInvalid();
   _sta->search()->arrivalsInvalid(); 
 }
+
+
 void Timing::GenerateClockSta() {
   // sdc -> clock definition (unit=second)
   // float clk_period = 70e-9;
@@ -587,28 +524,6 @@ static float getNetSlack(sta::Sta* sta_, sta::Net* net) {
 }
 
 void Timing::UpdateNetWeightSta() {
-  // report_checks -path_delay min_max
-  Corner* corner = _sta->corners()->findCorner(0);
-
-  /*
-  PathEndSeq* ends =
-      _sta->findPathEnds(NULL, NULL, NULL,          // from, thru, to
-                        false,                      // unconstrained
-                         corner, MinMaxAll::max(),  // corner, delay_min_max
-                         INT_MAX, 1, false,  // max_paths, nworst, unique_pins
-                         -INF, INF,          // slack_min, slack_max
-                         true, NULL,         // sort_by_slack, group_name
-                         true, true,         // setup, hold
-                         true, true,         // recovery, removal
-                         true, true);        // clk gating setup, hold
-  if(ends->empty()) {
-    cout << "ERROR: There is no valid timing path. " << endl;
-    cout << "       Please double check your SDC and Design" << endl;
-    cout << "       or, try to use non Timing-Driven mode" << endl;
-    exit(1);
-  }
-*/
-  
   // To enable scaling 
   // boundary values
   netWeightMin = FLT_MAX;
@@ -621,13 +536,7 @@ void Timing::UpdateNetWeightSta() {
   const MinMax* cnst_min_max = MinMax::max();
   _sta->worstSlack(cnst_min_max, wns, worstVertex);
 
-  cout << "WNS: " << wns << endl;
-//  if( wns > 0 ) {
-//    for(int i=0; i<_netCnt; i++) {
-//      netInstance[i].timingWeight = 0.0f;
-//    } 
-//  }
-//  else {
+//  cout << "WNS: " << wns << endl;
 
   float minRes = FLT_MAX;
   float maxRes = FLT_MIN;
@@ -664,7 +573,7 @@ void Timing::UpdateNetWeightSta() {
     float criticality = (wns>0)? 0 : max(0.0f, netSlack / wns);
 
 //    cout << "diff: " << fabs(netSlack - MinMax::min()->initValue()) << endl;
-    cout << curNet->Name() << " netSlack: " << netSlack << " crit: " << criticality;
+//    cout << curNet->Name() << " netSlack: " << netSlack << " crit: " << criticality;
 
     // get normalized resistor
     float netRes = GetMaxResistor(_sta, curStaNet);
@@ -675,7 +584,8 @@ void Timing::UpdateNetWeightSta() {
     netWeight = (netWeight >= 1.9)? 1.9 : netWeight;
     netWeight = (netSlack < 0)? 1.8 : 1;
 
-    cout << " normRes: " << normRes << " deg: " << netDegree << " nw: " << netWeight << endl;
+//    cout << " normRes: " << normRes << " deg: " << netDegree 
+//      << " nw: " << netWeight << endl;
 
     // update timingWeight 
     netInstance[i].timingWeight = netWeight;
@@ -684,144 +594,8 @@ void Timing::UpdateNetWeightSta() {
     netWeightMin = (netWeightMin < netWeight) ? netWeightMin : netWeight;
     netWeightMax = (netWeightMax > netWeight) ? netWeightMax : netWeight;
   }
+}
 
-  return;
-
-/*
-  PathEndSeq::Iterator tmpIter(ends), pathEndIter(ends);
-  int resultCnt = 0;
-  while(tmpIter.hasNext()) {
-    tmpIter.next();
-    resultCnt++;
-  }
-
-  //    int limintCnt = resultCnt * netCut;
-  int limintCnt = resultCnt;
-
-  PrintInfoInt("Timing: NumPaths", resultCnt, 1);
-  PathEnd* end = pathEndIter.next();
-
-
-  HASH_SET<sta::Net*> netSet;
-#ifdef USE_GOOGLE_HASH
-  netSet.set_empty_key(NULL);
-#endif
-
-  // Reported path check based on reportPath5 function (search/ReportPath.cc)
-  for(int i = 0; i < limintCnt; i++) {
-//    cout << "pathName: " << end->path()->name(_sta) << endl;
-//    if( i >= 46748 ) {
-//      TimingPathPrint( _sta, end );
-//    }
-    
-    if(i % 10000 == 0 ) {
-      PrintProc("Timing: Critical path " + to_string(i) + " has been updated", 1);
-    }
-    PathExpanded expanded(end->path(), _sta);
-
-    int pinCnt = 0;
-
-    for(size_t j = 0; j < expanded.size(); j++) {
-      PathRef* path1 = expanded.path(j);
-      // TimingArc *prevArc = expanded.prevArc(j);
-      Vertex* vertex = path1->vertex(_sta);
-      Pin* pin = vertex->pin();
-      // Arrival time = path1->arrival(_sta) + timeOffset;
-      // Arrival incr(0.0);
-
-      bool isClk = path1->isClock(_sta->search());
-
-      // if( prevArc == NULL) {
-      //   cout << "is first node" << endl;
-      // }
-
-      if(isClk) {
-        continue;
-      }
-
-      PortDirection* dir = _sta->network()->direction(pin);
-      // only output pins..!!!
-      if(dir->isInput()) {
-        continue;
-      }
-
-      if(_sta->network()->isTopLevelPort(pin)) {
-        continue;
-      }
-
-      Net* net = _sta->network()->net(pin);
-      if(!net) {
-        continue;
-      }
-
-      Net* higestNet = _sta->network()->highestNetAbove(net);
-      // skip for already pushed Nets
-      if( netSet.find(higestNet) != netSet.end() ) {
-        continue;
-      }
-      string netName = string(_sta->cmdNetwork()->pathName(higestNet));
-      
-
-      auto nnPtr = netNameMap.find(netName);
-
-      if(nnPtr == netNameMap.end()) {
-        cout << "**ERROR : Cannot Find net: " << netName
-             << " (netNameMap/timingSta)" << endl;
-        // exit(0);
-      }
-      else {
-        // cout << nnPtr->second << endl;
-
-        // already calculated net is just passed!!
-//        if(abs(netInstance[nnPtr->second].timingWeight) >
-//           std::numeric_limits< prec >::epsilon()) {
-//          continue;
-//        }
-
-        NetConnectedPinIterator* connPinIter =
-            _sta->network()->connectedPinIterator(higestNet);
-
-        // extract maximum resistance for road Resistor
-        float highRes = 0.0f;
-        while(connPinIter->hasNext()) {
-          Pin* curPin = connPinIter->next();
-          // cout << sta->network()->name(curPin) << " "
-          //   << GetMaxResistor(sta, curPin) << endl;
-//          float curRes = GetMaxResistor(_sta, curPin);
-          float curRes = GetMaxResistor(_sta, NULL);
-          highRes = (highRes < curRes) ? curRes : highRes;
-          pinCnt ++;
-        }
-
-        // cout << "high Resistor: " << highRes << endl;
-        Slack wns; 
-        Vertex *worstVertex;
-        _sta->worstSlack(cnst_min_max, wns, worstVertex);
-
-        float criticality =
-            max(0.0f, end->slack(_sta) / wns);
-        int netDegree = max(2, netInstance[nnPtr->second].pinCNTinObject);
-        float netWeight = highRes * (1 + criticality) / (netDegree - 1);
-        netInstance[nnPtr->second].timingWeight = netWeight;
-        netWeightMin = (netWeightMin < netWeight) ? netWeightMin : netWeight;
-        netWeightMax = (netWeightMax > netWeight) ? netWeightMax : netWeight;
-        
-        netSet.insert( higestNet );  
-
-        // cout << "netdeg: " << netDegree << endl;
-        // cout << "crit: " << criticality<< endl;
-        // cout << "netWeight: " << netWeight << endl;
-      }
-    }
-
-    // cout << endl;
-
-    if(!pathEndIter.hasNext()) {
-      break;
-    }
-    end = pathEndIter.next();
-  }
-  */
 }
 
 // static void ExecuteCommand( const char* inp ){
@@ -869,13 +643,11 @@ GetMaxResistor(sta::Sta* sta, sta::Net* net) {
   return retRes;
 }
 
-static const char *
-escapeDividers(const char *token,
-             const sta::Network *network)
-{
-  return sta::escapeChars(token, network->pathDivider(), '\0',
-               network->pathEscape());
-}
+//static const char *
+//escapeDividers(const char *token,
+//             const sta::Network *network)
+//{
+//  return sta::escapeChars(token, network->pathDivider(), '\0',
+//               network->pathEscape());
+//}
 
-
-TIMING_NAMESPACE_CLOSE

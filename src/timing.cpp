@@ -8,7 +8,185 @@ using std::stringstream;
 using std::string;
 using std::to_string;
 
-TIMING_NAMESPACE_OPEN
+
+namespace Timing {
+
+pin::pin() : origIdx(INT_MAX),
+        owner(INT_MAX),
+        net(INT_MAX),
+        type(INT_MAX),
+        isFlopInput(false),
+        isFlopCkPort(false),
+        cap(0.0),
+        delay(0.0),
+        rTran(0.0),
+        fTran(0.0),
+        driverType(INT_MAX),
+        //    x_coord(0.0), y_coord(0.0), x_offset(0.0), y_offset(0.0),
+        isClock(false),
+        earlySlk(0.0),
+        lateSlk(0.0) {};
+
+net::net() : name(""), lumpedCap(0.0), origIdx(INT_MAX){};
+net::net(string in_name, double in_lcap, vector< int > in_sources, vector< int > in_sinks,
+      int in_idx)
+      : name(in_name),
+        lumpedCap(in_lcap),
+        sources(in_sources),
+        sinks(in_sinks),
+        origIdx(in_idx){};
+
+  
+PinInfo::PinInfo()
+      : data(0), pNum(std::numeric_limits< PINNUM_TYPE >::max()), netIdx(INT_MAX){};
+
+
+PinInfo::PinInfo(PIN* curPin) {
+  SetPinInfo(curPin);
+}
+  
+PinInfo::PinInfo(const PinInfo& k) {
+  data = k.data;
+  pNum = k.pNum;
+  netIdx = k.netIdx;
+}
+
+uint32_t PinInfo::GetData() const {
+  return data;
+};
+
+PINNUM_TYPE PinInfo::GetPinNum() const {
+  return pNum;
+};
+  
+uint32_t PinInfo::GetIdx() const {
+  return data & ((uint32_t)(1 << 31) - 1);
+};
+
+void PinInfo::SetPinInfo(PIN* curPin) {
+  netIdx = curPin->netID;
+  if(curPin->term) {
+    SetTerminal(curPin->moduleID, curPin->pinIDinModule);
+  }
+  else {
+    SetModule(curPin->moduleID, curPin->pinIDinModule);
+  }
+}
+  
+void PinInfo::SetTerminal(int termIdx, PINNUM_TYPE pinIdx) {
+  data = termIdx;
+  data |= (1 << 31);
+  pNum = pinIdx;
+}
+
+void PinInfo::SetModule(int moduleIdx, PINNUM_TYPE pinIdx) {
+  data = moduleIdx;
+  pNum = pinIdx;
+}
+  
+void PinInfo::SetSteiner(PINNUM_TYPE stnIdx, int _netIdx) {
+  data = std::numeric_limits< uint32_t >::max();
+  pNum = stnIdx;
+  netIdx = _netIdx;
+}
+  
+void PinInfo::SetImpossible() {
+  data = std::numeric_limits< uint32_t >::max();
+  pNum = std::numeric_limits< PINNUM_TYPE >::max();
+  netIdx = std::numeric_limits< int >::max();
+}
+  
+// pinName Return function
+string PinInfo::GetPinName(
+      void* ptr, 
+      vector< vector< string > >& pNameStor, 
+      bool isEscape) {
+
+  if(isModule()) {
+    string moduleName(((MODULE*)ptr)[GetIdx()].Name());
+    if( isEscape ) {
+      SetEscapedStr(moduleName);
+    }
+    return moduleName + "/" + pNameStor[GetIdx()][pNum];
+  }
+  else if(isTerminal()) {
+    // cout << "data: " << data << endl;
+    // cout << "idx: " << GetIdx() << endl;
+    // cout << "pidx: " << pNum  << endl;
+    // cout << "name: " << ((TERM* )ptr)[GetIdx()].name <<
+    // endl;
+    // cout << "pname: " << pNameStor[GetIdx()][pNum] << endl;
+
+    if(((TERM*)ptr)[GetIdx()].isTerminalNI) {
+      return pNameStor[GetIdx()][pNum];
+    }
+    else {
+      string termName(((TERM*)ptr)[GetIdx()].Name());
+      if( isEscape ) {
+        SetEscapedStr(termName);
+      }
+      return termName + "/" + pNameStor[GetIdx()][pNum];
+    }
+  }
+  // Steiner cases
+  else {
+    cout << "ERROR: GetPinName must be executed only when NOT Steiner Point"
+      << endl;
+    exit(1);
+    return string("Wrong");
+  }
+}
+  
+string PinInfo::GetStnPinName( bool isEscape ) {
+  if(!isSteiner()) {
+    cout << "ERROR: GetStnPinName must be executed only when Steiner Point"
+      << endl;
+    exit(1);
+  }
+  //            return "sp_" + to_string(pNum);
+  //            cout << netIdx << endl;
+  string netStr(netInstance[netIdx].Name());
+  if( isEscape ) {
+    SetEscapedStr(netStr);
+  }
+
+  return netStr + ":" + std::to_string(pNum);
+}
+
+bool PinInfo::isTerminal() {
+  return (1 & (data >> 31)) && data != std::numeric_limits< uint32_t >::max();
+};
+bool PinInfo::isModule() {
+  // cout << "data: " << data << " -> " << (data >> 31) << endl;
+  return (data >> 31) == 0;
+};
+bool PinInfo::isSteiner() {
+  return data == std::numeric_limits< uint32_t >::max();
+};
+
+void PinInfo::Print() {
+  if(isSteiner()) {
+    cout << "(sp_" << pNum << ")";
+  }
+  else if(isTerminal()) {
+    cout << "(T_" << GetIdx() << " " << pNum << ")";
+  }
+  else {
+    cout << "(M_" << GetIdx() << " " << pNum << ")";
+  }
+}
+
+
+wire::wire(PinInfo ipin, PinInfo opin, double len)
+  : iPin(ipin), oPin(opin), length(len) {};
+
+void wire::Print() {
+  iPin.Print();
+  cout << " -> ";
+  oPin.Print();
+  cout << " : " << length << endl;
+}
+
 
 inline string Timing::GetPinName(PIN* curPin, bool isEscape) {
   // itself is PINS in def.
@@ -46,6 +224,30 @@ inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
   return (curPin.isModule()) ? curPin.GetPinName((void*)_modules, _mPinName, isEscape)
                              : curPin.GetPinName((void*)_terms, _tPinName, isEscape);
 }
+
+  
+Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
+         int pinCnt, vector< vector< std::string > >& mPinName,
+         vector< vector< std::string > >& tPinName, std::string clkName, float clkPeriod)
+  : _modules(modules),
+  _terms(terms),
+  _nets(nets),
+  _netCnt(netCnt),
+  _pins(pins),
+  _pinCnt(pinCnt),
+  _mPinName(mPinName),
+  _tPinName(tPinName),
+  _unitX(0.0),
+  _unitY(0.0),
+  _clkName(clkName),
+  _clkPeriod(clkPeriod),
+  scriptIterCnt(0) {
+    wireSegStor.resize(netCnt);
+    lumpedCapStor.resize(netCnt);
+    SetLefDefEnv();
+  };
+
+
 
 // stn stands for steiner
 void Timing::BuildSteiner(bool scaleApplied) {
@@ -341,4 +543,5 @@ void Timing::WriteSpef(const string& spefLoc) {
   feed.clear();
 }
 
-TIMING_NAMESPACE_CLOSE
+}
+

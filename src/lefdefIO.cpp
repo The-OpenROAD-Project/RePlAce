@@ -2025,7 +2025,7 @@ void ReadPlLefDef(const char* fileName, bool isNameConvert) {
 // Timing Part
 //
 /////////////////////////////////////////////////////////
-TIMING_NAMESPACE_OPEN
+namespace Timing { 
 
 // copy scale down parameter into Timing Instance
 void Timing::SetLefDefEnv() {
@@ -2173,6 +2173,7 @@ void Timing::WriteSpefClockNetVerilog(stringstream& feed) {
   }
 }
 
+/*
 void Timing::UpdateSpefClockNetVerilog() {
   for(auto& curClockNet : clockNetsVerilog) {
     char* netNamePtr = new char[curClockNet.length() + 1];
@@ -2182,9 +2183,9 @@ void Timing::UpdateSpefClockNetVerilog() {
     sta::spef_reader->dspfBegin(net, netCap);
     sta::spef_reader->dspfFinish();
   }
-}
+}*/
 
-TIMING_NAMESPACE_CLOSE
+}
 
 
 
