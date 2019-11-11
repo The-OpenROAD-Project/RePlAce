@@ -506,23 +506,6 @@ void Timing::UpdateTimingSta() {
 }
 
 
-static float getNetSlack(sta::Sta* sta_, sta::Net* net) {
-  sta::Network* network = sta_->network();
-
-  float netSlack = MinMax::min()->initValue();
-  NetPinIterator *pin_iter = network->pinIterator(net);
-  while (pin_iter->hasNext()) {
-    Pin *pin = pin_iter->next();
-    if (network->isLoad(pin)) {
-      float pinSlack = sta_->pinSlack(pin, MinMax::max());
-      if (pinSlack < netSlack ) {
-        netSlack = pinSlack;
-      }
-    }
-  }
-  return netSlack ;
-}
-
 void Timing::UpdateNetWeightSta() {
   // To enable scaling 
   // boundary values
@@ -566,7 +549,8 @@ void Timing::UpdateNetWeightSta() {
       exit(1);
     }
 
-    float netSlack = getNetSlack( _sta, curStaNet );
+    
+    float netSlack = _sta->netSlack(curStaNet, cnst_min_max);
     netSlack = (fabs(netSlack - MinMax::min()->initValue()) <= FLT_EPSILON) ? 
       0 : netSlack;
 
@@ -581,6 +565,11 @@ void Timing::UpdateNetWeightSta() {
 
     int netDegree = max(2, netInstance[i].pinCNTinObject);
     float netWeight = 1 + normRes * (1 + criticality) / (netDegree - 1);
+
+
+    // TODO
+    // following two lines are temporal magic codes at this moment.
+    // Need to be replaced/tuned later
     netWeight = (netWeight >= 1.9)? 1.9 : netWeight;
     netWeight = (netSlack < 0)? 1.8 : 1;
 
