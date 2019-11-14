@@ -6,12 +6,12 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(DISABLE_CIMG_LIB "Disable CImg drawing library" OFF)
-if( DISABLE_CIMG_LIB )
+option(USE_CIMG_LIB "Use CImg drawing library for image drawing" OFF)
+if( USE_CIMG_LIB )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+else()
   add_definitions(-DDISABLE_CIMG_LIB=1)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
-else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
 endif()
 
 # For Multithread
@@ -76,13 +76,13 @@ find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
 # for cimg
-if( DISABLE_CIMG_LIB )
-  find_package(X11)
-  find_package(JPEG)
-else()
+if( USE_CIMG_LIB )
   find_package(X11 REQUIRED)
   find_package(JPEG REQUIRED)
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${X11_LIBRARIES} ${JPEG_LIBRARIES}")
+else()
+  find_package(X11)
+  find_package(JPEG)
 endif()
 
 

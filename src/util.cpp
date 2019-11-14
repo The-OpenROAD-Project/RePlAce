@@ -361,3 +361,78 @@ void PrintInfoRuntime(string input, double runtime, int verbose) {
   fflush(stdout);
 }
 
+
+// lef 2 def unit convert
+static prec l2d = 0.0f;
+
+//
+// To support book-shelf based tools, scale down all values..
+//
+// Set unitX as siteWidth
+// Set unitY as Vertical routing pitch (in lowest metal)
+//
+static prec unitX = 0.0f;
+static prec unitY = 0.0f;
+
+//
+// To prevent mis-matching in ROW offset.
+//
+static prec offsetX = PREC_MAX;
+static prec offsetY = PREC_MAX;
+
+
+void SetUnitX(float _unitX) {
+  unitX = _unitX;
+}
+
+void SetUnitY(float _unitY) {
+  unitY = _unitY;
+}
+
+void SetUnitY(double _unitY) {
+  unitY = _unitY;
+}
+
+void SetOffsetX(float _offsetX) { 
+  offsetX = _offsetX;
+}
+
+void SetOffsetY(float _offsetY) {
+  offsetY = _offsetY;
+}
+
+void SetDefDbu(float _dbu) {
+  l2d = _dbu;
+}
+
+prec GetUnitX() { return unitX; }
+prec GetUnitY() { return unitY; }
+prec GetOffsetX() { return offsetX; }
+prec GetOffsetY() { return offsetY; }
+prec GetDefDbu() { return l2d; }
+
+int GetScaleUpSize(prec input) {
+  return INT_CONVERT( input * GetUnitX() );
+}
+
+int GetScaleUpPointX(prec input) {
+  return INT_CONVERT( input * GetUnitX() - GetOffsetX() );
+}
+int GetScaleUpPointY(prec input) {
+  return INT_CONVERT( input * GetUnitY() - GetOffsetY() );
+}
+
+float GetScaleUpPointFloatX(float input) {
+  return input * GetUnitX() - GetOffsetX();
+}
+float GetScaleUpPointFloatY(float input) {
+  return input * GetUnitY() - GetOffsetY();
+}
+
+prec GetScaleDownSize(prec input) {
+  return input / GetUnitX();
+}
+prec GetScaleDownPoint( prec input) {
+  return (input + GetOffsetX()) / GetUnitX();
+}
+

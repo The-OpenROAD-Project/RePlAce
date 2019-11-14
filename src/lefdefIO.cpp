@@ -292,62 +292,6 @@ void ParseInput() {
   }
 }
 
-void SetUnitX(float _unitX) {
-  unitX = _unitX;
-}
-
-void SetUnitY(float _unitY) {
-  unitY = _unitY;
-}
-
-void SetUnitY(double _unitY) {
-  unitY = _unitY;
-}
-
-void SetOffsetX(float _offsetX) { 
-  offsetX = _offsetX;
-}
-
-void SetOffsetY(float _offsetY) {
-  offsetY = _offsetY;
-}
-
-void SetDefDbu(double _l2d) {
-  l2d = _l2d;
-}
-
-prec GetUnitX() { return unitX; }
-prec GetUnitY() { return unitY; }
-prec GetOffsetX() { return offsetX; }
-prec GetOffsetY() { return offsetY; }
-prec GetDefDbu() { return l2d; }
-
-int GetScaleUpSize(prec input) {
-  return INT_CONVERT( input * GetUnitX() );
-}
-
-int GetScaleUpPointX(prec input) {
-  return INT_CONVERT( input * GetUnitX() - GetOffsetX() );
-}
-int GetScaleUpPointY(prec input) {
-  return INT_CONVERT( input * GetUnitY() - GetOffsetY() );
-}
-
-float GetScaleUpPointFloatX(float input) {
-  return input * GetUnitX() - GetOffsetX();
-}
-float GetScaleUpPointFloatY(float input) {
-  return input * GetUnitY() - GetOffsetY();
-}
-
-prec GetScaleDownSize(prec input) {
-  return input / GetUnitX();
-}
-prec GetScaleDownPoint( prec input) {
-  return (input + GetOffsetX()) / GetUnitX();
-}
-
-
 inline static bool IsPrecEqual(prec a, prec b) {
   return std::fabs(a - b) < std::numeric_limits< float >::epsilon();
 }
@@ -362,8 +306,8 @@ inline static bool IsPrecEqual(prec a, prec b) {
 //
 void SetParameter() {
   // lef 2 def unit info setting
-  l2d = __ckt.defUnit;
-  PrintInfoInt("DefUnit", l2d);
+  SetDefDbu( __ckt.defUnit );
+  PrintInfoInt("DefUnit", GetDefDbu());
 
   if(__ckt.lefLayerStor.size() == 0) {
     cout << "\n** ERROR : LAYER statements not exists in lef file!" << endl;
@@ -404,12 +348,12 @@ void SetParameter() {
     exit(1);
   }
 
-  int siteSizeY = INT_CONVERT( l2d * __ckt.lefSiteStor[sitePtr->second].sizeY() );
+  int siteSizeY = INT_CONVERT( GetDefDbu() * __ckt.lefSiteStor[sitePtr->second].sizeY() );
 
-  unitY = 1.0 * siteSizeY / 9.0f;
-  unitX = unitY;
+  SetUnitY(1.0 * siteSizeY / 9.0f);
+  SetUnitX(GetUnitY());
 
-  PrintInfoPrec( "ScaleDownUnit", unitX );
+  PrintInfoPrec( "ScaleDownUnit", GetUnitX() );
 
   // offsetX & offsetY : Minimum coordinate of ROW's x/y
   if(IsPrecEqual(offsetX, PREC_MAX)) {
@@ -420,8 +364,8 @@ void SetParameter() {
 
     // Note that OffsetX should follow siteSizeY, because unitX = unitY
     // and unitY comes from siteSizeY
-    offsetX = (rowMin % siteSizeY == 0)? 
-              0 : siteSizeY - (rowMin % siteSizeY);
+    SetOffsetX( (rowMin % siteSizeY == 0)? 
+              0 : siteSizeY - (rowMin % siteSizeY) );
   }
 
   if(IsPrecEqual(offsetY, PREC_MAX)) { 
@@ -429,12 +373,20 @@ void SetParameter() {
     for(auto& curRow : __ckt.defRowStor) {
       rowMin = (rowMin > curRow.y()) ? curRow.y() : rowMin;
     }
-    
-    offsetY = (rowMin % siteSizeY == 0)? 
-              0 : siteSizeY - (rowMin % siteSizeY);
+   
+    SetOffsetY( (rowMin % siteSizeY == 0)? 
+              0 : siteSizeY - (rowMin % siteSizeY) );
   }
 
-  PrintInfoPrecPair( "OffsetCoordi", offsetX, offsetY );
+
+  PrintInfoPrecPair( "OffsetCoordi", GetOffsetX(), GetOffsetY());
+
+  // init for local global vars
+  l2d = GetDefDbu();
+  unitX = GetUnitX();
+  unitY = GetUnitY();
+  offsetX = GetOffsetX();
+  offsetY = GetOffsetY();
 }
 
 void SetVerilogTopModule() {

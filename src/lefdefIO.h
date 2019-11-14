@@ -249,6 +249,24 @@ extern Circuit __ckt;
 
 REPLACE_NAMESPACE_CLOSE
 
+void ParseInput();
+void ParseLefDef();
+
+// required for timing
+void SetVerilogTopModule();
+
+void ReadPl(const char* fileName, bool isNameConvert = false);
+void ReadPlLefDef(const char* fileName, bool isNameConvert = false);
+
+void WriteDef(const char* defOutput);
+
+void GenerateModuleTerminal(Replace::Circuit& __ckt);
+void GenerateRow(Replace::Circuit& __ckt);
+void GenerateFullRow(Replace::Circuit& __ckt);
+void GenerateDummyCell(Replace::Circuit& __ckt);
+
+void GenerateNetDefOnly(Replace::Circuit& __ckt);
+
 /////////////////////////////////////////////////////
 // DieRect struct  
 struct DieRect {
@@ -293,47 +311,6 @@ public:
   int GetUpperX( float x );
   int GetUpperY( float y );
 };
-
-void ParseInput();
-void ParseLefDef();
-
-// required for timing
-void SetVerilogTopModule();
-
-void ReadPl(const char* fileName, bool isNameConvert = false);
-void ReadPlLefDef(const char* fileName, bool isNameConvert = false);
-
-void WriteDef(const char* defOutput);
-
-void GenerateModuleTerminal(Replace::Circuit& __ckt);
-void GenerateRow(Replace::Circuit& __ckt);
-void GenerateFullRow(Replace::Circuit& __ckt);
-void GenerateDummyCell(Replace::Circuit& __ckt);
-
-void GenerateNetDefOnly(Replace::Circuit& __ckt);
-
-// custom scale down parameter setting during the stage
-void SetUnitX(float _unitX);
-void SetUnitY(float _unitY);
-void SetOffsetX(float _offsetX);
-void SetOffsetY(float _offsetY);
-void SetUnitY(double _unitY);
-void SetDefDbu(double _l2d);
-
-prec GetUnitX();
-prec GetUnitY();
-prec GetOffsetX();
-prec GetOffsetY();
-prec GetDefDbu(); 
-
-int GetScaleUpSize(float input);
-int GetScaleUpPointX(float input);
-int GetScaleUpPointY(float input);
-float GetScaleUpPointFloatX( float input);
-float GetScaleUpPointFloatY( float input);
-
-prec GetScaleDownSize(float input);
-prec GetScaleDownPoint(float input);
 
 // return Component Index
 inline int GetDefComponentIdx(Replace::Circuit& __ckt, string& compName) {
