@@ -169,14 +169,50 @@ void myNesterov::nesterov_opt() {
   malloc_free();
 }
 
-void myNesterov::InitializationCommonVar() {
-  for(int i = 0; i < 200; i++) {
-    timingCheck[i] = 1;
+
+// Check whether current iter is timing iterations.
+//
+// timingChkArr must be sorted by decreasing array.
+//
+bool myNesterov::isTimingIter(int ovlp) {
+  // no need to 
+  if( ovlp > timingChkArr[0].first ) {
+//    cout << "Must False: " << ovlp << " " << timingChkArr[0].first << endl;
+    return false;
   }
-  timingCheck[80] = timingCheck[79] = timingCheck[78] = 0;
-  timingCheck[50] = timingCheck[49] = timingCheck[48] = 0;
-  timingCheck[30] = timingCheck[29] = timingCheck[28] = 0;
-  timingCheck[16] = timingCheck[15] = timingCheck[14] = 0;
+
+  bool needTdRun = false;
+  for(auto& tPair : timingChkArr) {
+    if( tPair.first > ovlp ) {
+      if( tPair.second == false ) {
+        tPair.second = true;
+        needTdRun = true;
+      }
+      continue;
+    }
+
+    // now tPair.first <= ovlp
+    if( needTdRun ) {
+//      cout << "True: " << ovlp << " " << tPair.first << endl;
+      return true;
+    }
+    else {
+//      cout << "False: " << ovlp << " " << tPair.first << endl;
+      return false;
+    }
+  }
+  return false;
+}
+
+
+void myNesterov::InitializationCommonVar() {
+  
+  timingChkArr.push_back(make_pair(79,false));
+  timingChkArr.push_back(make_pair(64,false));
+  timingChkArr.push_back(make_pair(49,false));
+  timingChkArr.push_back(make_pair(29,false));
+  timingChkArr.push_back(make_pair(21,false));
+  timingChkArr.push_back(make_pair(15,false));
 
   N = gcell_cnt;
   N_org = moduleCNT;
@@ -796,9 +832,9 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
 
     if(isTiming) {
       int checkIter = INT_CONVERT(it->ovfl * 100);
-      if(timingCheck[checkIter] == 0) {
-        // do something
-
+      
+      // do something
+      if(isTimingIter(checkIter)) {
         auto start = std::chrono::steady_clock::now();
         TimingInst.BuildSteiner(true);
         auto finish = std::chrono::steady_clock::now();
@@ -818,10 +854,6 @@ int myNesterov::DoNesterovOptimization(Timing::Timing &TimingInst) {
                 finish - start)
                 .count();
         PrintInfoRuntime("Timing: EsecuteStaLater", elapsed_seconds, 1);
-        
-        for(int j=checkIter-2; j<=checkIter+2; j++) {
-          timingCheck[j] = 1;
-        }
       }
     }
 

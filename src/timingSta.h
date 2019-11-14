@@ -67,13 +67,11 @@
 #include "VisitPathGroupVertices.hh"
 #include "WorstSlack.hh"
 #include "ParasiticsClass.hh"
+#include "ParseBus.hh"
 
 #ifdef YY_INPUT
 #undef YY_INPUT
 #endif
-
-#include "SpefReaderPvt.hh"
-using namespace sta;
 
 // to import Swig
 extern "C" {

@@ -102,7 +102,8 @@ class myNesterov {
   prec before100iter_delta;
 
   int temp_iter;
-  int timingCheck[200];
+  std::vector<pair<int, bool> > timingChkArr;
+  bool isTimingIter(int ovlp);
 
   // myNesterov::functions
   void InitializationCommonVar(void);

@@ -524,6 +524,7 @@ extern prec netWeightMax;
 extern prec netWeightBase;
 extern prec netWeightBound;
 extern prec netWeightScale;
+extern bool netWeightApply;
 
 extern prec capPerMicron;
 extern prec resPerMicron;

@@ -120,6 +120,8 @@ void initGlobalVars() {
   netWeightBase = 1.2f;
   netWeightBound = 1.8f;
   netWeightScale = 500.0f;
+  netWeightApply = true;
+
   capPerMicron = PREC_MIN;
   resPerMicron = PREC_MIN;
 

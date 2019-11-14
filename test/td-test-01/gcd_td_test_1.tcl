@@ -3,8 +3,9 @@
 #
 
 set design gcd
-set lib_dir ./library/nangate45/
-set design_dir ./design/nangate45/${design}
+set lib_dir ../library/nangate45/
+set design_dir ../design/nangate45/${design}
+set exp_folder exp
 
 replace_external rep
 
@@ -21,10 +22,6 @@ rep set_unit_res 16
 rep set_unit_cap 0.23e-15
 rep set_timing_driven 1
 
-
-# set output folder location
-rep set_output ./output/
-
 rep set_verbose_level 0
 
 # Initialize RePlAce
@@ -32,8 +29,6 @@ rep init_replace
 
 # place_cell with initial place (BiCGSTAB)
 rep place_cell_init_place
-
-puts "initPlace HPWL: [rep get_hpwl]"
 
 # print out instances' x/y coordinates
 # rep print_instances 
@@ -45,7 +40,16 @@ rep place_cell_nesterov_place
 # rep print_instances 
 
 # Export DEF file
-rep export_def ./${design}_nan45_td.def
-puts "nesterovPlace HPWL: [rep get_hpwl]"
-puts "final WNS: [rep get_wns]"
-puts "final TNS: [rep get_tns]"
+# rep export_def ./${design}_nan45_td.def
+
+if {![file exists ${exp_folder}/]} {
+  exec mkdir ${exp_folder}
+}
+
+set fp [open ${exp_folder}/${design}_1_td.rpt w]
+puts $fp "HPWL: [rep get_hpwl]"
+puts $fp "WNS: [rep get_wns]"
+puts $fp "TNS: [rep get_tns]"
+close $fp
+
+exit
