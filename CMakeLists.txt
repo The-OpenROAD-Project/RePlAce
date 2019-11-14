@@ -215,7 +215,6 @@ target_link_libraries( replace
 
   ${OpenMP_CXX_LIBRARIES}
   Threads::Threads
-  -static-libstdc++ 
   )
 
 ############################################################

@@ -73,6 +73,31 @@ void PrintInfoString(std::string input, std::string val, int verbose = 0);
 void PrintInfoRuntime(std::string input, double runtime, int verbose = 0);
 
 
+// scaleDown vars / functions
+// custom scale down parameter setting during the stage
+void SetDefDbu(float _dbu);
+void SetUnitX(float _unitX);
+void SetUnitY(float _unitY);
+void SetOffsetX(float _offsetX);
+void SetOffsetY(float _offsetY);
+void SetUnitY(double _unitY);
+
+prec GetUnitX();
+prec GetUnitY();
+prec GetOffsetX();
+prec GetOffsetY();
+prec GetDefDbu(); 
+
+int GetScaleUpSize(float input);
+int GetScaleUpPointX(float input);
+int GetScaleUpPointY(float input);
+float GetScaleUpPointFloatX( float input);
+float GetScaleUpPointFloatY( float input);
+
+prec GetScaleDownSize(float input);
+prec GetScaleDownPoint(float input);
+
+
 
 
 #endif
