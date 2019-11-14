@@ -878,7 +878,7 @@ void net_update_wa(FPOS *st) {
   if(timeon)
     time_start(&time);
 
-  omp_set_num_threads(numThread);
+//  omp_set_num_threads(numThread);
 #pragma omp parallel default(none) shared(gcell_cnt, gcell_st, st) private(i)
   {
 //        CELL* cell = NULL;

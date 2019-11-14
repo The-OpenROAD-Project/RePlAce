@@ -43,7 +43,6 @@
 #include "replace_private.h"
 #include "opt.h"
 
-#include "CImg.h"
 #include "bookShelfIO.h"
 
 #include <sstream>
@@ -54,6 +53,8 @@
 #include <cstring>
 #include <cmath>
 
+#ifndef DISABLE_CIMG_LIB
+#include "CImg.h"
 using namespace cimg_library;
 
 // to save snapshot of the circuit.
@@ -68,6 +69,15 @@ static const unsigned char yellow[] = {255, 255, 0}, white[] = {255, 255, 255},
 
 static PlotEnv pe;
 static bool isPlotEnvInit = false;
+
+// control vector's index to plot
+static int IncreaseIdx(vector< CImg< unsigned char > > *imgStor, unsigned *curIdx) {
+  return (imgStor->size() - 1 > *curIdx) ? ++(*curIdx) : imgStor->size() - 1;
+}
+
+static int DecreaseIdx(unsigned *curIdx) {
+  return (*curIdx > 0) ? --(*curIdx) : 0;
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -614,14 +624,6 @@ void SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
   cout << "INFO: " << saveName << " image has been saved" << endl;
 }
 
-// control vector's index to plot
-int IncreaseIdx(vector< CImg< unsigned char > > *imgStor, unsigned *curIdx) {
-  return (imgStor->size() - 1 > *curIdx) ? ++(*curIdx) : imgStor->size() - 1;
-}
-
-int DecreaseIdx(unsigned *curIdx) {
-  return (*curIdx > 0) ? --(*curIdx) : 0;
-}
 
 // using X11
 void ShowPlot(string circuitName) {
@@ -759,6 +761,15 @@ void GCellPinCoordiUpdate() {
   cell_update(y_st, moduleCNT);
   free(y_st);
 }
+
+#else
+
+void SavePlot(string imgName, bool isGCell) {}
+void SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition) {}
+void SaveBinPlotAsJPEG(string imgName, string imgPosition) {}
+void SaveArrowPlotAsJPEG(string imgName, string imgPosition) {}
+
+#endif
 
 // integer -> zero-filled 4 digits string
 void idx2str4digits(int idx, char *str) {
@@ -914,6 +925,8 @@ void get_bin_power(struct BIN *bp, int *color, int *power, int lab) {
   *color = c;
   *power = p;
 }
+
+
 
 void mkdirPlot() {
   char mkdir_cmd[BUF_SZ] = {

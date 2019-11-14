@@ -6,10 +6,17 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(DISABLE_CIMG_LIB "Disable CImg drawing library" OFF)
+if( DISABLE_CIMG_LIB )
+  add_definitions(-DDISABLE_CIMG_LIB=1)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+endif()
+
 # For Multithread
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 -O3 ${OpenMP_CXX_FLAGS}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -g -ggdb -D_GLIBCXX_USE_CXX11_ABI=0")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -69,14 +76,21 @@ find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 
 # for cimg
-find_package(X11 REQUIRED)
-find_package(JPEG REQUIRED)
+if( DISABLE_CIMG_LIB )
+  find_package(X11)
+  find_package(JPEG)
+else()
+  find_package(X11 REQUIRED)
+  find_package(JPEG REQUIRED)
+  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${X11_LIBRARIES} ${JPEG_LIBRARIES}")
+endif()
+
 
 find_package(Boost REQUIRED)
 find_package(Threads REQUIRED)
 
 # for multi threads
-find_package(OpenMP REQUIRED)
+find_package(OpenMP)
 
 set (REPLACE_SRC 
   src/argument.cpp
@@ -139,7 +153,7 @@ set (REPLACE_SWIG_FILES
   src/replace.i
 )
 
-
+  
 ############################################################
 # Create a library 
 ############################################################
@@ -162,7 +176,7 @@ add_custom_command(OUTPUT ${REPLACE_HOME}/src/replace_wrap.cpp
 
 add_executable( replace
   ${REPLACE_SRC}
-)
+)  
 
 add_dependencies( replace sta )
 add_dependencies( replace flute )
@@ -265,13 +279,7 @@ target_link_libraries( replace
   clefzlib
 
   ${ZLIB_LIBRARIES}
-  ${X11_LIBRARIES}
-  ${JPEG_LIBRARIES}
   ${TCL_LIB}
-
-  ${OpenMP_CXX_LIBRARIES}
-  Threads::Threads
-  -static-libstdc++ 
 
   opendb
   )
@@ -283,5 +291,4 @@ target_link_libraries( replace
 install(FILES ${REPLACE_HEADER} DESTINATION include)
 install(TARGETS replace DESTINATION bin)
 install(TARGETS replacelib DESTINATION lib)
-
 

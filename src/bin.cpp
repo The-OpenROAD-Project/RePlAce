@@ -931,7 +931,7 @@ void bin_update7_cGP2D() {
   bool timeon = false;
   double time = 0.0f;
 
-  omp_set_num_threads(numThread);
+//  omp_set_num_threads(numThread);
   int i = 0;
 
   if(timeon) {
@@ -977,7 +977,6 @@ void bin_update7_cGP2D() {
     time_start(&time);
   }
 
-  omp_set_num_threads(numThread);
 #pragma omp parallel default(none) shared(tier) private(i)
   {
 #pragma omp for
