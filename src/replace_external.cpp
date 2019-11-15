@@ -10,10 +10,10 @@
 #include "plot.h"
 #include "routeOpt.h"
 
+using namespace std;
 
 replace_external::
 replace_external() : 
-  ckt(&Replace::__ckt), 
   timing_driven_mode(false), 
   write_bookshelf_mode(false),
   unit_r(0.0f), unit_c(0.0f),
@@ -253,13 +253,8 @@ replace_external::export_db(const char* dbLoc) {
 
 void 
 replace_external::export_def(const char* def){
-  if( use_db ) {
-    odb::dbDatabase* db = odb::dbDatabase::getDatabase( db_id ); 
-    WriteDefDb(db, def);
-  }
-  else {
-    WriteDef(def);
-  }
+  odb::dbDatabase* db = odb::dbDatabase::getDatabase( db_id ); 
+  WriteDefDb(db, def);
 }
 
 void
@@ -612,40 +607,24 @@ replace_external::get_tns() {
 void 
 replace_external::update_instance_list() {
   if( instance_list.size() == 0 ) {
-    if( use_db ) {
-      using namespace odb;
-      dbDatabase* db = dbDatabase::getDatabase( db_id ); 
+    using namespace odb;
+    dbDatabase* db = dbDatabase::getDatabase( db_id ); 
 
-      dbChip* chip = db->getChip();
-      dbBlock* block = chip->getBlock();
+    dbChip* chip = db->getChip();
+    dbBlock* block = chip->getBlock();
 
-      for(int i=0; i<moduleCNT; i++) {
-        MODULE* module = &moduleInstance[i];
-        instance_info tmp;
-        tmp.name = module->Name();
-        
-        dbInst* curInst = block->findInst( module->Name() );
-        dbMaster* curMaster = curInst->getMaster();
-        tmp.master = curMaster->getConstName();
+    for(int i=0; i<moduleCNT; i++) {
+      MODULE* module = &moduleInstance[i];
+      instance_info tmp;
+      tmp.name = module->Name();
 
-        tmp.x = module->pmin.x;
-        tmp.y = module->pmin.y;
-        instance_list.push_back(tmp);
-      }
-    }
-    else {
-      for(int i=0; i<moduleCNT; i++) {
-        MODULE* module = &moduleInstance[i];
-        instance_info tmp;
-        tmp.name = module->Name();
+      dbInst* curInst = block->findInst( module->Name() );
+      dbMaster* curMaster = curInst->getMaster();
+      tmp.master = curMaster->getConstName();
 
-        auto cmPtr = ckt->defComponentMap.find(tmp.name);
-        tmp.master = ckt->defComponentStor[cmPtr->second].name();
-
-        tmp.x = module->pmin.x;
-        tmp.y = module->pmin.y;
-        instance_list.push_back(tmp);
-      }
+      tmp.x = module->pmin.x;
+      tmp.y = module->pmin.y;
+      instance_list.push_back(tmp);
     }
   }
   else {

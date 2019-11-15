@@ -1,7 +1,6 @@
 #include "dbLefDefIO.h"
 #include "replace_private.h"
-#include "lefdefIO.h"
-#include "bookShelfIO.h"
+#include "opt.h"
 #include "defout.h"
 #include <iostream>
 
@@ -161,16 +160,16 @@ void FillReplaceParameter(dbDatabase* db) {
   PrintInfoPrec("ScaleDownUnit", GetUnitY());
   
   // Extract CoreArea from ROWS definition
-  DieRect coreArea = GetCoreFromDb(rows);
+  adsRect coreArea = GetCoreFromDb(rows);
 
-  PrintInfoPrecPair("CoreAreaLxLy", coreArea.llx, coreArea.lly);
-  PrintInfoPrecPair("CoreAreaUxUy", coreArea.urx, coreArea.ury);
+  PrintInfoPrecPair("CoreAreaLxLy", coreArea.xMin(), coreArea.yMin());
+  PrintInfoPrecPair("CoreAreaUxUy", coreArea.xMax(), coreArea.yMax());
   
-  int coreLx = INT_CONVERT(coreArea.llx);
+  int coreLx = INT_CONVERT(coreArea.xMin());
   SetOffsetX( (coreLx % rowRect.dy() == 0)?
       0 : rowRect.dy() - (coreLx % rowRect.dy()) );
 
-  int coreLy = INT_CONVERT(coreArea.lly);
+  int coreLy = INT_CONVERT(coreArea.yMin());
   SetOffsetY( (coreLy % rowRect.dy() == 0)?
       0 : rowRect.dy() - (coreLy % rowRect.dy()) );
 
@@ -472,7 +471,7 @@ void FillReplaceRow(dbSet<dbRow> &rows) {
   PrintProcBegin("Generate Rows");
 
   // get Scale-Downed coreArea 
-  DieRect coreArea = GetCoreFromDb(rows, true);
+  adsRect coreArea = GetCoreFromDb(rows, true);
 
   dbSet<dbRow>::iterator riter;
   riter = rows.begin();
@@ -481,8 +480,8 @@ void FillReplaceRow(dbSet<dbRow> &rows) {
   float siteX = GetScaleDownSize( tmpRow->getSite()->getWidth() );
   float siteY = GetScaleDownSize( tmpRow->getSite()->getHeight() );
 
-  int rowCntX = INT_CONVERT( (coreArea.urx - coreArea.llx) / siteX );
-  int rowCntY = INT_CONVERT( (coreArea.ury - coreArea.lly) / siteY );
+  int rowCntX = INT_CONVERT( (coreArea.xMax() - coreArea.xMin()) / siteX );
+  int rowCntY = INT_CONVERT( (coreArea.yMax() - coreArea.yMin()) / siteY );
 
   float rowSizeX = rowCntX * siteX;
   float rowSizeY = siteY;
@@ -494,9 +493,9 @@ void FillReplaceRow(dbSet<dbRow> &rows) {
     ROW* curRow = &row_st[i];
     new(curRow) ROW();
 
-    curRow->pmin.Set(coreArea.llx, coreArea.lly + i * siteY );
+    curRow->pmin.Set(coreArea.xMin(), coreArea.yMin() + i * siteY );
     curRow->size.Set(rowSizeX, rowSizeY);
-    curRow->pmax.Set(coreArea.llx + rowSizeX, coreArea.lly + i * siteY + rowSizeY);
+    curRow->pmax.Set(coreArea.xMin() + rowSizeX, coreArea.yMin() + i * siteY + rowSizeY);
     if( i == 0 ) {
       grow_pmin.Set(curRow->pmin);
     }
@@ -515,12 +514,12 @@ void GenerateDummyCellDb(dbSet<dbRow> &rows) {
 
 }
 
-DieRect GetDieFromDb(dbBox* bBox, bool isScaleDown) {
-  return DieRect(bBox->xMin(), bBox->yMin(), 
+adsRect GetDieFromDb(dbBox* bBox, bool isScaleDown) {
+  return adsRect (bBox->xMin(), bBox->yMin(), 
       bBox->xMax(), bBox->yMax());
 }
 
-DieRect GetCoreFromDb(dbSet<odb::dbRow> &rows, bool isScaleDown) {
+adsRect GetCoreFromDb(dbSet<odb::dbRow> &rows, bool isScaleDown) {
   float minX = FLT_MAX, minY = FLT_MAX;
   float maxX = FLT_MIN, maxY = FLT_MIN;
 
@@ -537,9 +536,9 @@ DieRect GetCoreFromDb(dbSet<odb::dbRow> &rows, bool isScaleDown) {
     maxY = (maxY < rowRect.yMax()) ? rowRect.yMax(): maxY;
   }
   return (isScaleDown)? 
-    DieRect( GetScaleDownPoint(minX), GetScaleDownPoint(minY),
+    adsRect( GetScaleDownPoint(minX), GetScaleDownPoint(minY),
             GetScaleDownPoint(maxX), GetScaleDownPoint(maxY))
-    : DieRect(minX, minY, maxX, maxY); 
+    : adsRect(minX, minY, maxX, maxY); 
 }
 
 void WriteDefDb(dbDatabase* db, const char* defName) {

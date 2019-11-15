@@ -1,10 +1,8 @@
 #ifndef __REPLACE_EXTERNAL__
-#define __REPLACE_EXTERNAL__ 0
+#define __REPLACE_EXTERNAL__ 
 
 // No hope to isolate right now...
 #include "replace_private.h"
-#include "lefdefIO.h"
-#include "plot.h"
 #include "db.h"
 
 
@@ -100,8 +98,6 @@ public:
 private:
   std::vector<instance_info> instance_list;
   void update_instance_list();
-
-  Replace::Circuit* ckt;
 
   std::vector<std::string> verilog_stor;
   std::vector<std::string> lib_stor;

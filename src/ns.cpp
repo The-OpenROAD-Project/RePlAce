@@ -48,7 +48,6 @@
 #include <ctime>
 #include <chrono>
 
-#include "bookShelfIO.h"
 #include "bin.h"
 #include "charge.h"
 #include "replace_private.h"
@@ -60,6 +59,8 @@
 #include "routeOpt.h"
 
 using std::make_pair;
+using namespace std;
+
 static int backtrack_cnt = 0;
 
 void myNesterov::nesterov_opt() {

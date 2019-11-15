@@ -45,7 +45,6 @@
 #include <ctime>
 #include <iomanip>
 
-#include "bookShelfIO.h"
 #include "bin.h"
 #include "fft.h"
 #include "gcell.h"
@@ -56,6 +55,8 @@
 #include "wlen.h"
 
 using std::to_string;
+using namespace std;
+
 
 int FILLER_PLACE;
 int NUM_ITER_FILLER_PLACE;  // fast filler pre-place, need tuning
@@ -122,18 +123,18 @@ int setup_before_opt_cGP2D(void) {
   bin_init_2D(cGP2D);
 
   // routability
-  if( isRoutability ) {
-    routeInst.Init();
-    WriteBookshelfForGR();
+//  if( isRoutability ) {
+//    routeInst.Init();
+//    WriteBookshelfForGR();
 
-    char routeLoc[BUF_SZ] = {0, };
-    sprintf(routeLoc, "%s/router_base/%s.route", dir_bnd, gbch);
+//    char routeLoc[BUF_SZ] = {0, };
+//    sprintf(routeLoc, "%s/router_base/%s.route", dir_bnd, gbch);
 
-    if(isRoutability == true) {
-      read_routes_3D( routeLoc );
-      tile_init_cGP2D(); 
-    }
-  }
+//    if(isRoutability == true) {
+//      read_routes_3D( routeLoc );
+//      tile_init_cGP2D(); 
+//    }
+//  }
 
   charge_fft_init(dim_bin_cGP2D, bin_stp_cGP2D, 0);
   wcof_init(bin_stp_cGP2D);
@@ -1173,4 +1174,506 @@ int definePOTNphase(prec curr_potn) {
   }
   // cout << "Current potnPhase" << potnPhaseDS << endl;
   return potnPhaseDS;
+}
+
+
+// function is modified by mgwoo.
+//
+// this function will
+// add pin's informations for moduleInstance & terminalInstance
+// once it meets fixed or unfixed pins..
+void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
+                                    FPOS offset, int curModuleIdx,
+                                    int curNetIdx, int curPinIdxInNet,
+                                    int curPinIdx, int curPinDirection,
+                                    int isTerminal) {
+  // pin : current Pin Object
+  // pof : current Pin Offset
+  //
+  if(currentPinCount > 0) {
+    currentPinCount++;
+    *pin = (PIN **)realloc(*pin, sizeof(struct PIN *) * currentPinCount);
+    *pof = (FPOS *)realloc(*pof, sizeof(struct FPOS) * currentPinCount);
+    //*pin_tmp = (struct PIN**)malloc(sizeof(struct
+    // PIN*)*currentPinCount, 64);
+    //*pof_tmp = (struct FPOS*)malloc(sizeof(struct
+    // FPOS)*currentPinCount, 64);
+    // memcpy(*pin_tmp, *pin, currentPinCount*(sizeof(struct PIN*)));
+    // memcpy(*pof_tmp, *pof, currentPinCount*(sizeof(struct FPOS)));
+    // free(*pin);
+    // free(*pof);
+    //*pin = (struct PIN**)malloc(sizeof(struct PIN*)*currentPinCount,
+    // 64);
+    //*pof = (struct FPOS*)malloc(sizeof(struct FPOS)*currentPinCount,
+    // 64);
+    // memcpy(*pin, *pin_tmp, currentPinCount*(sizeof(struct PIN*)));
+    // memcpy(*pof, *pof_tmp, currentPinCount*(sizeof(struct FPOS)));
+    // free(*pin_tmp);
+    // free(*pof_tmp);
+  }
+  else {
+    currentPinCount++;
+    *pin = (struct PIN **)malloc(sizeof(struct PIN *) * currentPinCount);
+    *pof = (struct FPOS *)malloc(sizeof(struct FPOS) * currentPinCount);
+  }
+
+  (*pof)[currentPinCount - 1] = offset;
+
+  (*pin)[currentPinCount - 1] = &pinInstance[curPinIdx];
+  (*pin)[currentPinCount - 1]->term = isTerminal;
+  (*pin)[currentPinCount - 1]->moduleID = curModuleIdx;
+  (*pin)[currentPinCount - 1]->netID = curNetIdx;
+  (*pin)[currentPinCount - 1]->pinIDinNet = curPinIdxInNet;
+  (*pin)[currentPinCount - 1]->pinIDinModule = currentPinCount - 1;
+  (*pin)[currentPinCount - 1]->gid = curPinIdx;
+  (*pin)[currentPinCount - 1]->IO = curPinDirection;
+}
+
+
+static bool SortRowByCoordinate(const ROW& lhs, const ROW& rhs) {
+  if(lhs.pmin.x < rhs.pmin.x) {
+    return true;
+  }
+  if(lhs.pmin.x > rhs.pmin.x) {
+    return false;
+  }
+  return (lhs.pmin.y < rhs.pmin.y);
+}
+
+
+static void GetSortedRowStor(ROW *origRowStor, int rowCnt) {
+  // sort the Y-order and X-order
+  vector< ROW > tmpRowStor;
+  for(int i = 0; i < rowCnt; i++) {
+    tmpRowStor.push_back(origRowStor[i]);
+  }
+
+  // sort function
+  sort(tmpRowStor.begin(), tmpRowStor.end(), SortRowByCoordinate);
+
+  // copy back
+  for(auto &curRow : tmpRowStor) {
+    origRowStor[&curRow - &tmpRowStor[0]] = curRow;
+    //    cout << "SORTED!!" << endl;
+    //    curRow.Dump(to_string(&curRow - &tmpRowStor[0]));
+  }
+}
+
+//
+// update tier_min, tier_max, and tier_row_cnt
+//
+void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt) {
+  prec xlen = grow_pmax.x - grow_pmin.x;
+  prec ylen = grow_pmax.y - grow_pmin.y;
+  prec aspect_ratio = (prec)ylen / (prec)xlen;
+
+  PrintInfoPrec("AspectRatio", aspect_ratio);
+  PrintInfoPrecPair("RowMinXY", grow_pmin.x, grow_pmin.y);
+  PrintInfoPrecPair("RowMaxXY", grow_pmax.x, grow_pmax.y);
+//  PrintInfoPrecPair("TerminalMinXY", terminal_pmin.x, terminal_pmin.y);
+//  PrintInfoPrecPair("TerminalMaxXY", terminal_pmax.x, terminal_pmax.y);
+
+  *tier_row_cnt = row_cnt;  
+
+  tier_min->x = grow_pmin.x;
+  tier_min->y = grow_pmin.y;
+  
+  tier_max->x = grow_pmax.x;
+  tier_max->y = grow_pmax.y;
+}
+
+void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
+  TERM *curTerminal = NULL;
+  TIER *tier = NULL;
+  MODULE *curModule = NULL;
+
+  int tot_row_cnt = tier_row_cnt * numLayer;
+
+  for(int i = 0; i < terminalCNT; i++) {
+    curTerminal = &terminalInstance[i];
+
+    // lutong
+    // if (curTerminal->center.x > grow_pmin.x)
+    // curTerminal->center.x
+    // = grow_pmin.x + (curTerminal->center.x - grow_pmin.x) *
+    // shrunk_ratio.x;
+    // if (curTerminal->center.y > grow_pmin.y)
+    // curTerminal->center.y
+    // = grow_pmin.y + (curTerminal->center.y - grow_pmin.y) *
+    // shrunk_ratio.y;
+
+    curTerminal->pmin.x = curTerminal->center.x - 0.5 * curTerminal->size.x;
+    curTerminal->pmin.y = curTerminal->center.y - 0.5 * curTerminal->size.y;
+    curTerminal->pmax.x = curTerminal->center.x + 0.5 * curTerminal->size.x;
+    curTerminal->pmax.y = curTerminal->center.y + 0.5 * curTerminal->size.y;
+  }
+
+  // mgwoo
+  //
+  assert(tot_row_cnt == row_cnt);
+
+  //    row_st = (ROW *)realloc(row_st, sizeof(struct ROW) * tot_row_cnt);
+  tier_st = (TIER *)malloc(sizeof(struct TIER) * numLayer);
+
+  placementMacroCNT = 0;
+
+  for(int i = 0; i < moduleCNT; i++) {
+    curModule = &moduleInstance[i];
+
+    if(curModule->size.y - rowHeight > Epsilon) {
+      placementMacroCNT++;
+      curModule->flg = Macro;
+    }
+    else if(curModule->size.y - rowHeight < -Epsilon) {
+      printf("Cell %s   %d height ERROR: %f\n", curModule->Name(), i,
+             curModule->size.y);
+    }
+    else {
+      curModule->flg = StdCell;
+    }
+  }
+
+  for(int i = 0; i < numLayer; i++) {
+    tier = &tier_st[i];
+    tier->row_st = &(row_st[tier_row_cnt * i]);
+    tier->row_cnt = tier_row_cnt;
+    tier->term_cnt = 0;
+
+    if(terminalCNT > 0) {
+      tier->term_st = (TERM **)malloc(sizeof(TERM *) * terminalCNT);
+    }
+    else {
+      tier->term_st = NULL;
+    }
+
+    tier->modu_cnt = 0;
+    tier->modu_st = NULL;
+    tier->mac_cnt = 0;
+    tier->mac_st = NULL;
+    tier->term_area = 0;
+    tier->virt_area = 0;
+  }
+
+  //    int curr_row_hei = tier_min->y;
+
+  //    FPOS pmin;
+  //    FPOS pmax;
+  //    FPOS size;
+
+  // site_wid= row_st[0].site_wid;
+  // site_spa= row_st[0].site_spa;
+  // ori     = row_st[0].ori;
+  // sym     = row_st[0].sym;
+  //    pmin = row_st[0].pmin;
+  //    pmax = row_st[0].pmax;
+  //    size = row_st[0].size;
+
+  //    for(int i = 0; i < tier_row_cnt; i++) {
+  // for (int j=0; j<numLayer; j++) {
+  // row = &row_st[i + tier_row_cnt*j];
+  // row->site_wid= site_wid; // lutong
+  // row->site_spa= site_spa;
+  // row->ori    = ori;
+  // row->sym    = sym;
+  // row->size.x = tier_max->x - tier_min->x;
+  // row->size.y = rowHeight;
+  // row->pmin.x = tier_min->x;
+  // row->pmin.y = curr_row_hei;
+  // row->pmax.x = row->pmin.x + row->size.x;
+  // row->pmax.y = row->pmin.y + row->size.y;
+  // row->x_cnt  = tier_max->x - tier_min->x;
+  //}
+  //        curr_row_hei += rowHeight;
+  //    }
+
+  // update global_variable
+  row_cnt = tot_row_cnt;
+
+  for(int i = 0; i < numLayer; i++) {
+    tier = &tier_st[i];
+
+    tier->pmin.x = tier_min->x;
+    tier->pmin.y = tier_min->y;
+
+    tier->pmax.x = tier_max->x;
+    tier->pmax.y = tier_max->y;
+
+    tier->size.x = tier->pmax.x - tier->pmin.x;
+    tier->size.y = tier->pmax.y - tier->pmin.y;
+
+    tier->center.x = (tier->pmin.x + tier->pmax.x) * 0.5;
+    tier->center.y = (tier->pmin.y + tier->pmax.y) * 0.5;
+
+    tier->area = tier->size.x * tier->size.y;
+  }
+
+  // TIER's term_area update!
+  // mgwoo
+  /*
+  for(int i = 0; i < terminalCNT; i++) {
+      curTerminal = &terminalInstance[i];
+      tier = &tier_st[0];
+      tier->term_st[tier->term_cnt++] = curTerminal;
+
+      // skip for IO pin informations
+//        if( curTerminal->isTerminalNI ) {
+//            continue;
+//        }
+
+      // if there is no shape's information
+      if( shapeMap.find( curTerminal->Name() ) == shapeMap.end() ) {
+          cout << "not found: " << curTerminal->Name() << " " << place_st_cnt <<
+endl;
+          // tier->term_area += get_common_area(curTerminal->pmin,
+          // curTerminal->pmax, tier->pmin, tier->pmax);
+          for(int j=0; j<place_st_cnt; j++) {
+              PLACE* curPlace = &place_st[j];
+              tier->term_area += get_common_area(curTerminal->pmin,
+                  curTerminal->pmax, curPlace->org, curPlace->end);
+          }
+      }
+      // if there exist shape's information
+      else {
+          for(auto& curIdx : shapeMap[curTerminal->Name()]) {
+              cout << "name: " << curTerminal->Name() << endl;
+              prec llx = shapeStor[curIdx].llx,
+                   lly = shapeStor[curIdx].lly,
+                   width = shapeStor[curIdx].width,
+                   height = shapeStor[curIdx].height;
+              FPOS tmpMin(llx, lly, 0), tmpMax(llx + width, lly + height, 1);
+              tmpMin.Dump("tmpMin");
+              tmpMax.Dump("tmpMax");
+              // prec commonArea = get_common_area(tmpMin, tmpMax,
+              // tier->pmin, tier->pmax);
+              for(int j=0; j<place_st_cnt; j++) {
+                  PLACE* curPlace = &place_st[j];
+                  tier->term_area += get_common_area(tmpMin, tmpMax,
+                          curPlace->org, curPlace->end);
+              }
+          }
+      }
+  }
+  */
+
+  for(int i = 0; i < numLayer; i++) {
+    tier = &tier_st[i];
+    if(tier->term_cnt > 0) {
+      tier->term_st = (TERM **)realloc(tier->term_st,
+                                       sizeof(struct TERM *) * tier->term_cnt);
+    }
+    else if(tier->term_st) {
+      free(tier->term_st);
+    }
+  }
+}
+
+//
+// update: total_macro_area,
+//          total_std_area,
+//          total_PL_area,
+//          gmov_macro_cnt,
+//
+//          placementStdcellCNT, placementMacroCNT
+//
+//          gmin, gmax // global minimum, global maximum
+//          (plotting)
+//
+//  malloc : place_st, place_backup_st // place_st_cnt
+//
+void post_read_3d(void) {
+  // int tmpMultiHeightCellCNT = 0;
+  struct MODULE *curModule = NULL;
+  struct TERM *curTerminal = NULL;
+
+  placementStdcellCNT = 0;
+  total_std_area = 0;
+  placementMacroCNT = 0;
+  total_macro_area = 0;
+
+  for(int i = 0; i < moduleCNT; i++) {
+    curModule = &moduleInstance[i];
+    if(curModule->size.y - rowHeight > Epsilon) {
+      // if (curModule->size.y - rowHeight > 24.0 + Epsilon) {
+      // //lutong
+      curModule->flg = Macro;
+      placementMacroCNT++;
+      total_macro_area += curModule->area;
+    }
+    else if(curModule->size.y - rowHeight < -Epsilon) {
+      printf("*** ERROR:  Cell \"%d\" Height ERROR \n", i);
+    }
+    else {
+      curModule->flg = StdCell;
+      placementStdcellCNT++;
+      total_std_area += curModule->area;
+      continue;
+    }
+  }
+
+  PrintInfoInt("NumPlaceStdCells", placementStdcellCNT);
+  PrintInfoInt("NumPlaceMacros", placementMacroCNT);
+
+  gmov_mac_cnt = placementMacroCNT;
+
+  // initial malloc : row_cnt
+  place_st_cnt = 0;
+  place_st = (PLACE *)malloc(sizeof(struct PLACE) * row_cnt);
+
+  ROW *last_row = NULL;
+  PLACE *curPlace = NULL;
+
+  GetSortedRowStor(row_st, row_cnt);
+
+  //
+  // Assume, height is equally distributed.
+  //
+  int place_hei = 0;
+  for(int i = 0; i < row_cnt; i++) {
+    ROW *row = &row_st[i];
+    if(i == 0) {
+      place_hei = row->size.y;
+    }
+    else if(row->pmin.x != last_row->pmin.x ||
+            row->pmax.x != last_row->pmax.x ||
+
+            row->pmin.y != last_row->pmax.y) {
+      curPlace = &place_st[place_st_cnt++];
+
+      curPlace->org.x = last_row->pmin.x;
+      curPlace->org.y = last_row->pmax.y - place_hei;
+
+      curPlace->end.x = last_row->pmax.x;
+      curPlace->end.y = last_row->pmax.y;
+
+      curPlace->stp.x = SITE_SPA;
+      curPlace->stp.y = rowHeight;
+
+      curPlace->cnt.x = curPlace->end.x - curPlace->org.x;
+      curPlace->cnt.y = curPlace->end.y - curPlace->org.y;
+
+      curPlace->area = curPlace->cnt.x * curPlace->cnt.y;
+
+      curPlace->center.x = 0.5 * (curPlace->org.x + curPlace->end.x);
+      curPlace->center.y = 0.5 * (curPlace->org.y + curPlace->end.y);
+
+      place_hei = row->size.y;
+    }
+    else {
+      place_hei += row->size.y;
+    }
+    last_row = row;
+  }
+
+  curPlace = &place_st[place_st_cnt++];
+
+  curPlace->org.x = last_row->pmin.x;
+  curPlace->org.y = last_row->pmax.y - place_hei;
+
+  curPlace->end.x = last_row->pmax.x;
+  curPlace->end.y = last_row->pmax.y;
+
+  curPlace->stp.x = SITE_SPA;
+  curPlace->stp.y = rowHeight;
+
+  curPlace->cnt.x = curPlace->end.x - curPlace->org.x;
+  curPlace->cnt.y = curPlace->end.y - curPlace->org.y;
+
+  curPlace->area = curPlace->cnt.x * curPlace->cnt.y;
+
+  curPlace->center.x = 0.5 * (curPlace->org.x + curPlace->end.x);
+  curPlace->center.y = 0.5 * (curPlace->org.y + curPlace->end.y);
+
+  //    for(int i=0; i<place_st_cnt; i++) {
+  //        place_st[i].Dump(to_string(i));
+  //    }
+
+  // second re-malloc : upto place_st_cnt;
+  place_st = (PLACE *)realloc(place_st, sizeof(struct PLACE) * place_st_cnt);
+  place_backup_st =
+      (PLACE *)realloc(place_backup_st, sizeof(struct PLACE) * place_st_cnt);
+
+  for(int i = 0; i < place_st_cnt; i++) {
+    place_backup_st[i] = place_st[i];
+  }
+
+  PrintInfoPrecPair( "RowSize", SITE_SPA, rowHeight );
+  PrintInfoInt( "NumRows", row_cnt );
+
+  // global variable 'place' update
+  place.stp.x = SITE_SPA;
+  place.stp.y = 1.0;  // rowHeight....................????
+
+  place.org = place_st[0].org;
+  place.end = place_st[0].end;
+
+  total_PL_area = 0;
+  for(int i = 0; i < place_st_cnt; i++) {
+    curPlace = &place_st[i];
+
+    place.org.x = min(place.org.x, curPlace->org.x);
+    place.org.y = min(place.org.y, curPlace->org.y);
+
+    place.end.x = max(place.end.x, curPlace->end.x);
+    place.end.y = max(place.end.y, curPlace->end.y);
+
+    total_PL_area += curPlace->area;
+  }
+
+  // global min & global max variable setting
+  gmin = place.org;
+  gmax = place.end;
+
+  for(int i = 0; i < terminalCNT; i++) {
+    curTerminal = &terminalInstance[i];
+
+    gmin.x = min(gmin.x, curTerminal->pmin.x);
+    gmin.y = min(gmin.y, curTerminal->pmin.y);
+
+    gmax.x = max(gmax.x, curTerminal->pmax.x);
+    gmax.y = max(gmax.y, curTerminal->pmax.y);
+  }
+
+
+  /*
+  // setting additional margin
+  // for plotting.. here It is not required
+
+      gmin.Dump("gmin first");
+
+      prec lx_mg = place.org.x - gmin.x,
+           ly_mg = place.org.y - gmin.y,
+           rx_mg = gmax.x - place.end.x,
+           ry_mg = gmax.y - place.end.y;
+
+  //    cout << "lx_mg: " << lx_mg << ", ly_mg: " << ly_mg << endl;
+  //    cout << "rx_mg: " << rx_mg << ", ry_mg: " << ry_mg << endl;
+
+      prec max_mg = PREC_MIN;
+      max_mg = max(max_mg, lx_mg);
+      max_mg = max(max_mg, ly_mg);
+      max_mg = max(max_mg, rx_mg);
+      max_mg = max(max_mg, ry_mg);
+
+  //    cout << "max_mg: " << max_mg << endl;
+
+      gmin.x = place.org.x - max_mg;
+      gmin.y = place.org.y - max_mg;
+
+      gmax.x = place.end.x + max_mg;
+      gmax.y = place.end.y + max_mg;
+  */
+
+  PrintInfoPrecPair("GlobalAreaLxLy", gmin.x, gmin.y);
+  PrintInfoPrecPair("GlobalAreaUxUy", gmax.x, gmax.y);
+
+  PrintInfoPrecPair("PlaceAreaLxLy", place.org.x, place.org.y);
+  PrintInfoPrecPair("PlaceAreaUxUy", place.end.x, place.end.y);
+
+  place.cnt.x = place.end.x - place.org.x;
+  place.cnt.y = place.end.y - place.org.y;
+
+  place.center.x = 0.5 * (place.org.x + place.end.x);
+  place.center.y = 0.5 * (place.org.y + place.end.y);
+
+  place.area = place.cnt.x * place.cnt.y;
 }

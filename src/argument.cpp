@@ -47,9 +47,12 @@
 
 #include "replace_private.h"
 #include "opt.h"
-#include "lefdefIO.h"
 #include "routeOpt.h"
 
+
+using std::string;
+using std::cout;
+using std::endl;
 
 void initGlobalVars() {
   bmFlagCMD = "etc";       // string
@@ -484,7 +487,7 @@ bool argument(int argc, char *argv[]) {
     else if(!strcmp(argv[i], "-gr_cap_ratio_file")) {
       i++;
       if(argv[i][0] != '-') {
-        routeInst.FillLayerCapacityRatio( string(argv[i]) );
+//        routeInst.FillLayerCapacityRatio( string(argv[i]) );
       }
       else {
         return false;

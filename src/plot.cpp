@@ -43,7 +43,6 @@
 #include "replace_private.h"
 #include "opt.h"
 
-#include "bookShelfIO.h"
 
 #include <sstream>
 #include <fstream>
@@ -52,6 +51,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
+
+using namespace std;
 
 #ifndef DISABLE_CIMG_LIB
 #include "CImg.h"

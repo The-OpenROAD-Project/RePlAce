@@ -49,12 +49,9 @@
 
 #include "replace_private.h"
 #include "opt.h"
-#include "bookShelfIO.h"
 #include "bin.h"
 
-using std::min;
-using std::max;
-
+using namespace std;
 
 void trial_main() {
   trial_HPWLs.clear();

@@ -92,6 +92,7 @@ struct ITER {
   struct FPOS alpha_dim;
 };
 
+
 // routability
 void routability();
 void routability_init();
@@ -148,6 +149,20 @@ void restore_org_CELL_info(struct CELL *cell);
 void backup_org_TERM_info(struct TERM *term);
 void prepare_bloat_TERM_info();
 void restore_org_TERM_info();
+
+// used for populating structure
+void AddPinInfoForModuleAndTerminal(PIN ***pin, FPOS **pof, int currentPinCount,
+                                    FPOS offset, int curModuleIdx,
+                                    int curNetIdx, int curPinIdxInNet,
+                                    int curPinIdx, int curPinDirection,
+                                    int isTerminal);
+
+// 
+// populating structure after having structures
+//
+void post_read_3d(void);
+void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt);
+void get_mms_3d_dim(FPOS *tier_min, FPOS *tier_max, int *tier_row_cnt);
 
 prec get_norm(struct FPOS *st, int n, prec num);
 

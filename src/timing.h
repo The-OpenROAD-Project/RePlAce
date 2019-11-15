@@ -2,7 +2,6 @@
 #define __REPLACE_TIMING__ 0
 
 #include "replace_private.h"
-#include "lefdefIO.h"
 
 #include <fstream>
 #include <flute.h>
@@ -52,17 +51,17 @@ struct net {
   double lumpedCap;
 
   // pin Index
-  vector< int > sources;
-  vector< int > sinks;
+  std::vector< int > sources;
+  std::vector< int > sinks;
 
-  vector< pair< pair< std::string, std::string >, double > > wireSegs;
+  std::vector< std::pair< std::pair< std::string, std::string >, double > > wireSegs;
 
   int origIdx;  // netInstance; clock_net --> INT_MAX
 
   // constructor
   net();
   net(std::string netname, double lcap, 
-      vector< int > sources, vector< int > xsinks, int _origIdx);
+      std::vector< int > sources, std::vector< int > xsinks, int _origIdx);
 };
 
 #define PINNUM_TYPE uint64_t
@@ -104,7 +103,7 @@ class PinInfo {
   // pinName Return function
   std::string GetPinName(
       void* ptr, 
-      vector< vector< string > >& pNameStor, 
+      std::vector< std::vector< std::string > >& pNameStor, 
       bool isEscape = true);
 
   // only for steiner point
@@ -140,11 +139,8 @@ class Timing {
   
   // due to weird structure,
   // it stores variable names in below structure...
-  vector< vector< std::string > >& _mPinName;
-  vector< vector< std::string > >& _tPinName;
-
-  int _unitX;
-  int _unitY;
+  std::vector< std::vector< std::string > >& _mPinName;
+  std::vector< std::vector< std::string > >& _tPinName;
 
   // clock Info  
   std::string _clkName;
@@ -155,17 +151,14 @@ class Timing {
   // SPEF write
   int scriptIterCnt;
 
-  // lef to def variable
-  int _l2d;
-
   sta::Sta* _sta;
   Tcl_Interp* _interp;
 
   float _targetTop;
 
   // wire segment stor
-  vector< vector< wire > > wireSegStor;
-  vector< double > lumpedCapStor;
+  std::vector< std::vector< wire > > wireSegStor;
+  std::vector< double > lumpedCapStor;
 
 
   // Fill Net and Pin Information again for clock-based placement
@@ -196,8 +189,8 @@ class Timing {
  public:
   Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
          int pinCnt, 
-         vector< vector< std::string > >& mPinName,
-         vector< vector< std::string > >& tPinName, 
+         std::vector< std::vector< std::string > >& mPinName,
+         std::vector< std::vector< std::string > >& tPinName, 
          std::string clkName, float clkPeriod);
 
   // Steiner point generating
@@ -209,12 +202,9 @@ class Timing {
   // ? not sure, but needs to be sliced?
   //        void SliceLongWire();
 
-  // copy from lefdefio.cpp
-  void SetLefDefEnv();
-
   void WriteSpef(const std::string& spefFile);
   void ExecuteStaFirst(std::string topCellName, std::string verilogName,
-                       vector< std::string >& libName, std::string sdcName);
+                       std::vector< std::string >& libName, std::string sdcName);
   void ExecuteStaLater();
 };
 
@@ -236,7 +226,7 @@ struct MyHash;
 
 template <>
 struct MyHash< std::pair< DBU, DBU > > {
-  std::size_t operator()(const pair< DBU, DBU >& k) const {
+  std::size_t operator()(const std::pair< DBU, DBU >& k) const {
     using boost::hash_combine;
     size_t seed = 0;
     hash_combine(seed, k.first);

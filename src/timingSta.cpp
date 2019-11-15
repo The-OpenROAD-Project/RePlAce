@@ -9,8 +9,7 @@
 #include <tcl.h>
 
 using namespace sta;
-using std::string;
-using std::to_string;
+using namespace std;
 
 //static const char *
 //escapeDividers(const char *token,
@@ -368,11 +367,11 @@ void Timing::MakeParasiticsForSta() {
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
     for(auto& curWireSeg : wireSegStor[i]) {
-      lumpedCapStor[i] += curWireSeg.length / (double)(_l2d)*capPerMicron;
+      lumpedCapStor[i] += curWireSeg.length / (double)(GetDefDbu())*capPerMicron;
       lumped_cap_at_pin[curWireSeg.iPin] +=
-          curWireSeg.length / (double)(_l2d)*capPerMicron * 0.5;
+          curWireSeg.length / (double)(GetDefDbu())*capPerMicron * 0.5;
       lumped_cap_at_pin[curWireSeg.oPin] +=
-          curWireSeg.length / (double)(_l2d)*capPerMicron * 0.5;
+          curWireSeg.length / (double)(GetDefDbu())*capPerMicron * 0.5;
       pin_cap_written[curWireSeg.iPin] = false;
       pin_cap_written[curWireSeg.oPin] = false;
     }
@@ -471,7 +470,7 @@ void Timing::MakeParasiticsForSta() {
 
       // insert resistor.
       parasitics->makeResistor(nullptr, n1, n2, 
-          curSeg.length / static_cast<double>(_l2d) * resPerMicron, ap);
+          curSeg.length / static_cast<double>(GetDefDbu()) * resPerMicron, ap);
       
     }
   }

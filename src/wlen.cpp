@@ -53,13 +53,8 @@
 #include "opt.h"
 #include "wlen.h"
 
-#include "lefdefIO.h"
 
-using std::min;
-using std::max;
-using std::make_pair;
-using std::fstream;
-using std::stringstream;
+using namespace std;
 
 int wcof_flg;
 int MAX_EXP;

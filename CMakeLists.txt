@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(USE_CIMG_LIB "Use CImg drawing library for image drawing" OFF)
 if( USE_CIMG_LIB )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+  set(CIMG_HOME ${PROJECT_SOURCE_DIR}/module/CImg)
 else()
   add_definitions(-DDISABLE_CIMG_LIB=1)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
@@ -25,21 +26,13 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(REPLACE_HOME ${PROJECT_SOURCE_DIR} )
-set(DEFLIB_HOME
-  ${PROJECT_SOURCE_DIR}/module/def
-)
-set(LEFLIB_HOME
-  ${PROJECT_SOURCE_DIR}/module/lef
-)
 set(FLUTE_HOME
   ${PROJECT_SOURCE_DIR}/module/flute
 )
 set(OPENSTA_HOME
   ${PROJECT_SOURCE_DIR}/module/OpenSTA
 )
-set(CIMG_HOME
-  ${PROJECT_SOURCE_DIR}/module/CImg
-)
+
 set(EIGEN_HOME
   ${PROJECT_SOURCE_DIR}/module/eigen-git-mirror 
 )
@@ -57,8 +50,8 @@ else()
   )
 endif()
 
-add_subdirectory(${DEFLIB_HOME})
-add_subdirectory(${LEFLIB_HOME})
+#add_subdirectory(${DEFLIB_HOME})
+#add_subdirectory(${LEFLIB_HOME})
 add_subdirectory(${FLUTE_HOME})
 add_subdirectory(${OPENSTA_HOME})
 add_subdirectory(${OPENDB_HOME} ${CMAKE_CURRENT_BINARY_DIR}/module/OpenDB)
@@ -71,9 +64,9 @@ find_package(GoogleHash)
 find_package(TCL REQUIRED)
 
 find_package(ZLIB REQUIRED)
-find_package(SWIG REQUIRED)
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
+#find_package(SWIG REQUIRED)
+#find_package(BISON REQUIRED)
+#find_package(FLEX REQUIRED)
 
 # for cimg
 if( USE_CIMG_LIB )
@@ -87,7 +80,7 @@ endif()
 
 
 find_package(Boost REQUIRED)
-find_package(Threads REQUIRED)
+#find_package(Threads REQUIRED)
 
 # for multi threads
 find_package(OpenMP)
@@ -95,18 +88,13 @@ find_package(OpenMP)
 set (REPLACE_SRC 
   src/argument.cpp
   src/bin.cpp
-  src/bookShelfIO.cpp
   src/charge.cpp
-  src/defParser.cpp
-  src/detailPlace.cpp
   src/fft.cpp
   src/fftsg2d.cpp
   src/fftsg3d.cpp
   src/fftsg.cpp
   src/gcell.cpp
   src/initPlacement.cpp
-  src/lefdefIO.cpp
-  src/lefParser.cpp
   src/macro.cpp
   src/main.cpp
   src/util.cpp
@@ -129,14 +117,12 @@ set (REPLACE_SRC
 
 set (REPLACE_HEADER
   src/bin.h
-  src/bookShelfIO.h
   src/charge.h
   src/fft.h
   src/gcell.h
   src/replace_private.h
   src/replace_external.h
   src/initPlacement.h
-  src/lefdefIO.h
   src/macro.h
   src/ns.h
   src/opt.h
@@ -180,14 +166,10 @@ add_executable( replace
 
 add_dependencies( replace sta )
 add_dependencies( replace flute )
-add_dependencies( replace def )
-add_dependencies( replace lef )
 add_dependencies( replace opendb )
 
 add_dependencies( replacelib sta )
 add_dependencies( replacelib flute )
-add_dependencies( replacelib def )
-add_dependencies( replacelib lef )
 add_dependencies( replacelib opendb )
 
 ############################################################
@@ -195,22 +177,9 @@ add_dependencies( replacelib opendb )
 ############################################################
 target_include_directories( replace 
   PUBLIC
-  ${X11_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
 
   ${EIGEN_HOME}
-  ${CIMG_HOME}
-
-  ${DEFLIB_HOME}/def
-  ${DEFLIB_HOME}/defzlib
-  ${DEFLIB_HOME}/cdef
-  ${DEFLIB_HOME}/cdefzlib
-
-  ${LEFLIB_HOME}/lef
-  ${LEFLIB_HOME}/lefzlib
-  ${LEFLIB_HOME}/clef
-  ${LEFLIB_HOME}/clefzlib
-
   ${FLUTE_HOME}/src
  
   ${OPENSTA_HOME}/app
@@ -231,22 +200,9 @@ target_include_directories( replace
 
 target_include_directories( replacelib 
   PUBLIC
-  ${X11_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
 
   ${EIGEN_HOME}
-  ${CIMG_HOME}
-
-  ${DEFLIB_HOME}/def
-  ${DEFLIB_HOME}/defzlib
-  ${DEFLIB_HOME}/cdef
-  ${DEFLIB_HOME}/cdefzlib
-
-  ${LEFLIB_HOME}/lef
-  ${LEFLIB_HOME}/lefzlib
-  ${LEFLIB_HOME}/clef
-  ${LEFLIB_HOME}/clefzlib
-
   ${FLUTE_HOME}/src
  
   ${OPENSTA_HOME}/app
@@ -269,14 +225,6 @@ target_link_libraries( replace
   PUBLIC
   OpenSTA
   flute
-  def
-  defzlib
-  cdef
-  cdefzlib
-  lef
-  lefzlib
-  clef
-  clefzlib
 
   ${ZLIB_LIBRARIES}
   ${TCL_LIB}

@@ -42,7 +42,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "bookShelfIO.h"
 #include "bin.h"
 #include "replace_private.h"
 #include "macro.h"
@@ -112,6 +111,10 @@ FPOS avg_mac_cnt_per_dim;
 POS sa_u;
 NODE *ovlp_node;
 seg_tree_node *ovlp_a;
+
+
+using std::cout;
+using std::endl;
 
 void sa_macro_lg(void) {
   sa_init_top();

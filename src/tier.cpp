@@ -45,11 +45,12 @@
 #include <cstring>
 #include <ctime>
 
-#include "bookShelfIO.h"
 #include "bin.h"
 #include "replace_private.h"
 #include "macro.h"
 #include "opt.h"
+
+using namespace std;
 
 void tier_init_2D(int STAGE) {
   int i = 0;
