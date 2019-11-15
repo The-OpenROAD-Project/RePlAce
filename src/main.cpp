@@ -454,12 +454,6 @@ replaceTclAppInit(Tcl_Interp *interp) {
   return TCL_OK;
 }
 
-int main(int argc, char *argv[]) {
-  Tcl_Main(1, argv, replaceTclAppInit);
-  
-  return 0;
-}
-
 // mgwoo
 void init() {
   char str_lg[BUF_SZ] = {

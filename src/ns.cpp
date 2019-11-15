@@ -63,12 +63,14 @@ using namespace std;
 
 static int backtrack_cnt = 0;
 
+sta::dbSta* Timing::_sta = nullptr;
+
 void myNesterov::nesterov_opt() {
   int last_iter = 0;
 
   Timing::Timing TimingInst(moduleInstance, terminalInstance, netInstance,
                             netCNT, pinInstance, pinCNT, mPinName, tPinName,
-                            clockPinName, timingClock);
+                            clockPinName, timingClock, Timing::_sta);
 
   if(isTiming) {
     TimingInst.BuildSteiner(true);

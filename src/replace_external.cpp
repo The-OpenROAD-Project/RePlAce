@@ -9,6 +9,8 @@
 #include "dbLefDefIO.h"
 #include "plot.h"
 #include "routeOpt.h"
+#include "timing.h"
+#include "openroad/OpenRoad.hh"
 
 using namespace std;
 
@@ -16,8 +18,7 @@ replace_external::
 replace_external() : 
   timing_driven_mode(false), 
   write_bookshelf_mode(false),
-  unit_r(0.0f), unit_c(0.0f),
-  use_db(true), db_id(INT_MAX) {
+  unit_r(0.0f), unit_c(0.0f) {
   initGlobalVars();
 };
 
@@ -28,24 +29,6 @@ void
 replace_external::help() {
   cout << endl;
   cout << "==== File I/O Commands ====" << endl;
-  cout << "import_lef [file_name]" << endl;
-  cout << "    *.lef location " << endl;
-  cout << "    (Multiple lef files supported. " << endl;
-  cout << "    Technology LEF must be ahead of other LEFs.) " << endl;
-  cout << endl; 
-  cout << "import_def [file_name]" << endl;
-  cout << "    *.def location " << endl;
-  cout << "    (Required due to FloorPlan information)" << endl;
-  cout << endl; 
-  cout <<"import_db [file_name]" << endl;
-  cout <<"     Input DB file location" << endl;
-  cout << endl;
-  cout << "export_def [file_name]" << endl;
-  cout << "    Output DEF location" << endl;
-  cout << endl; 
-  cout <<"export_db [file_name]" << endl;
-  cout <<"     Onput DB file location" << endl;
-  cout << endl;
   cout << "set_output [directory_location]" << endl;
   cout << "    Specify the location of output results. " << endl;
   cout << "    Default: ./output " << endl;
@@ -186,87 +169,6 @@ replace_external::help() {
 
 }
 
-void 
-replace_external::import_lef(const char* lef){ 
-  odb::dbDatabase * db = NULL;
-  if( db_id == INT_MAX ) {
-    db = odb::dbDatabase::create();
-    db_id = db->getId();
-  }
-  else {
-    db = odb::dbDatabase::getDatabase(db_id);
-  }
-  odb::lefin lefReader(db, false);
-  lefReader.createTechAndLib("testlib", lef);
-}
-
-void 
-replace_external::import_def(const char* def){
-  odb::dbDatabase * db = NULL;
-  if( db_id == INT_MAX ) {
-    db = odb::dbDatabase::create();
-    db_id = db->getId();
-  }
-  else {
-    db = odb::dbDatabase::getDatabase(db_id);
-  }
-  odb::defin defReader(db);
-
-  std::vector<odb::dbLib *> search_libs;
-  odb::dbSet<odb::dbLib> libs = db->getLibs();
-  odb::dbSet<odb::dbLib>::iterator itr;
-  for( itr = libs.begin(); itr != libs.end(); ++itr ) {
-    search_libs.push_back(*itr);
-  }
-  odb::dbChip* chip = defReader.createChip( search_libs,  def );
-}
-
-
-void
-replace_external::import_db(const char* dbLoc) {
-//  odb::dbDatabase* db = NULL;
-  odb::dbDatabase* db = odb::dbDatabase::create();
-
-  FILE* fp = fopen(dbLoc, "rb");
-  if( fp == NULL ) {
-    cout << "ERROR: Can't open " <<  dbLoc << endl;
-    exit(1);
-  }
-  db->odb::dbDatabase::read(fp);
-  fclose(fp);
-  db_id = db->getId(); 
-}
-
-void
-replace_external::export_db(const char* dbLoc) {
-  odb::dbDatabase* db = odb::dbDatabase::getDatabase( db_id );  
-  
-  FILE* fp = fopen(dbLoc, "wb");
-  if( fp == NULL ) {
-    cout << "ERROR: Can't open " <<  dbLoc << endl;
-    exit(1);
-  }
-
-  db->odb::dbDatabase::write(fp);
-  fclose(fp);
-}
-
-void 
-replace_external::export_def(const char* def){
-  odb::dbDatabase* db = odb::dbDatabase::getDatabase( db_id ); 
-  WriteDefDb(db, def);
-}
-
-void
-replace_external::set_db_id(int input_db_id) {
-  db_id = input_db_id;
-}
-
-void
-replace_external::set_db(odb::dbDatabase* db) {
-  db_id = db->getId();
-}
-
 void
 replace_external::set_output(const char* output) {
   output_loc = output;
@@ -281,21 +183,6 @@ replace_external::set_output_experiment_name(const char* output) {
 void
 replace_external::set_timing_driven(bool is_true) {
   timing_driven_mode = is_true;
-}
-
-void 
-replace_external::import_sdc(const char* sdc) {
-  sdc_file = sdc;
-}
-
-void
-replace_external::import_verilog(const char* verilog) {
-  verilog_stor.push_back(verilog);
-}
-
-void 
-replace_external::import_lib(const char* lib){
-  lib_stor.push_back(lib);
 }
 
 void
@@ -397,99 +284,16 @@ replace_external::set_net_weight_scale(double net_weight_scale) {
 
 bool 
 replace_external::init_replace() {
-/*
-  if( lef_stor.size() == 0 ) {
-    std::cout << "ERROR: Specify at least one LEF file!" << std::endl;
-    exit(1);
-  }
-  else if( def_stor.size() == 0 ) {
-    std::cout << "ERROR: Specify at least one DEF file!" << std::endl;
-    exit(1);
-  }
+  ord::OpenRoad *openroad = ord::OpenRoad::openRoad();
+  Timing::_sta = openroad->getSta();
+  _db = openroad->getDb();
 
-  lefStor = lef_stor;
-  defName = def_stor[0];
-  outputCMD = (output_loc == "")? "./output" : output_loc;
-
-  if( timing_driven_mode == true ) {
-    capPerMicron = unit_c;
-    resPerMicron = unit_r;
-    libStor = lib_stor;
-    sdcName = sdc_file;
-    verilogName = verilog_stor[0];
-    isTiming = true; 
-  }
-
-  initGlobalVarsAfterParse();
-  init();
-
-  ParseInput();
- 
-  // update custom net-weights 
-  if( hasCustomNetWeight ) {
-    initCustomNetWeight(net_weight_file); 
-  }
-
-  net_update_init();
-  init_tier();
-  build_data_struct(!isInitSeed);
-  update_instance_list();
-  if( write_bookshelf_mode ) {
-    setup_before_opt();
-    routeInst.Init();
-    WriteBookshelf();  
-  }
-  return true;
-*/
-}
-
-bool 
-replace_external::init_replace_db() {
-  using namespace odb;
-//  dbDatabase * db = dbDatabase::open( "chip.db", dbCreate );
-
-//  Logger::initLogger(_interp);
-  odb::dbDatabase * db = NULL;
-  if( db_id == INT_MAX ) {
-    db = odb::dbDatabase::create();
-    db_id = db->getId();
-  }
-  else {
-    db = dbDatabase::getDatabase(db_id);
-  }
-
-  /*
-  dbDatabase * db = dbDatabase::create();
-  db_id = db->getId();
-  lefin lefReader(db, false);
-  
-  lefReader.createTechAndLib("testlib", lefList);
-
-  defin defReader(db);
-
-  std::vector<dbLib *> search_libs;
-  dbSet<dbLib> libs = db->getLibs();
-  dbSet<dbLib>::iterator itr;
-  for( itr = libs.begin(); itr != libs.end(); ++itr ) {
-    search_libs.push_back(*itr);
-  }
-
-  dbChip* chip = defReader.createChip( search_libs,  def_stor[0].c_str() );
-  if( chip == NULL ) { 
-    cout << "Failed to read def file: " 
-      << def_stor[0] << endl;
-    exit(1);
-  }*/
-
-  
-//  lefStor = lef_stor;
-//  defName = def_stor[0];
   outputCMD = (output_loc == "")? "./output" : output_loc;
 
   initGlobalVarsAfterParse();
   init();
 
-  FillReplaceStructures(db);
+  FillReplaceStructures(_db);
   
   net_update_init();
   init_tier();
@@ -607,19 +411,17 @@ replace_external::get_tns() {
 void 
 replace_external::update_instance_list() {
   if( instance_list.size() == 0 ) {
-    using namespace odb;
-    dbDatabase* db = dbDatabase::getDatabase( db_id ); 
 
-    dbChip* chip = db->getChip();
-    dbBlock* block = chip->getBlock();
+    odb::dbChip* chip = _db->getChip();
+    odb::dbBlock* block = chip->getBlock();
 
     for(int i=0; i<moduleCNT; i++) {
       MODULE* module = &moduleInstance[i];
       instance_info tmp;
       tmp.name = module->Name();
 
-      dbInst* curInst = block->findInst( module->Name() );
-      dbMaster* curMaster = curInst->getMaster();
+      odb::dbInst* curInst = block->findInst( module->Name() );
+      odb::dbMaster* curMaster = curInst->getMaster();
       tmp.master = curMaster->getConstName();
 
       tmp.x = module->pmin.x;

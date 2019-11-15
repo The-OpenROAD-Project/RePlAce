@@ -5,6 +5,10 @@
 #include "replace_private.h"
 #include "db.h"
 
+namespace sta {
+class Sta;
+};
+
 
 // SWIG refuse to be inside replace_external...
 struct instance_info {
@@ -22,23 +26,10 @@ public:
   ~replace_external();
   void help();
 
-  void import_lef(const char* lef);
-  void import_def(const char* def);
-  void import_db(const char* db);
-  
-  void export_def(const char* def);
-  void export_db(const char* db);
-
-  void set_db_id(int db_id);
-  void set_db(odb::dbDatabase* db);
-
   void set_output(const char* output);
   void set_output_experiment_name(const char* output);
 
   void set_timing_driven(bool is_true);
-  void import_sdc(const char* sdc);
-  void import_verilog(const char* verilog);
-  void import_lib(const char* lib);
   void set_unit_res(double unit_r);
   void set_unit_cap(double unit_c);
 
@@ -64,7 +55,6 @@ public:
   void set_net_weight_scale(double net_weight_scale);
   
   bool init_replace();
-  bool init_replace_db();
   
   bool place_cell_init_place();
   bool place_cell_nesterov_place();
@@ -99,8 +89,6 @@ private:
   std::vector<instance_info> instance_list;
   void update_instance_list();
 
-  std::vector<std::string> verilog_stor;
-  std::vector<std::string> lib_stor;
   std::string net_weight_file;
   std::string sdc_file;
   std::string output_loc;
@@ -108,8 +96,7 @@ private:
   bool write_bookshelf_mode;
   double unit_r;
   double unit_c;
-  int db_id;
-  bool use_db;
+  odb::dbDatabase * _db;
 };
 
 #endif

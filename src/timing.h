@@ -4,7 +4,7 @@
 #include "replace_private.h"
 
 #include <fstream>
-#include <flute.h>
+#include "flute.h"
 #include <boost/functional/hash.hpp>
 #include <tcl.h>
 #include <limits>
@@ -18,11 +18,13 @@
 #define TIMING_PIN_CAP 4e-15
 
 namespace sta {
-class Sta;
+class dbSta;
 }
 
 
 namespace Timing { 
+
+extern sta::dbSta* _sta;
 
 struct pin {
   int origIdx;      // pinInst's idx
@@ -125,6 +127,7 @@ struct wire {
   void Print();
 };
 
+
 class Timing {
  private:
   
@@ -151,7 +154,7 @@ class Timing {
   // SPEF write
   int scriptIterCnt;
 
-  sta::Sta* _sta;
+  sta::dbSta* _sta;
   Tcl_Interp* _interp;
 
   float _targetTop;
@@ -191,7 +194,8 @@ class Timing {
          int pinCnt, 
          std::vector< std::vector< std::string > >& mPinName,
          std::vector< std::vector< std::string > >& tPinName, 
-         std::string clkName, float clkPeriod);
+         std::string clkName, float clkPeriod,
+	 sta::dbSta* sta);
 
   // Steiner point generating
   // it assumes that pin location is updated

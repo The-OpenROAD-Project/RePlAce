@@ -223,7 +223,8 @@ inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
   
 Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
          int pinCnt, vector< vector< std::string > >& mPinName,
-         vector< vector< std::string > >& tPinName, std::string clkName, float clkPeriod)
+	       vector< vector< std::string > >& tPinName, std::string clkName, float clkPeriod,
+	       sta::dbSta* sta)
   : _modules(modules),
   _terms(terms),
   _nets(nets),
@@ -234,7 +235,8 @@ Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
   _tPinName(tPinName),
   _clkName(clkName),
   _clkPeriod(clkPeriod),
-  scriptIterCnt(0) {
+  scriptIterCnt(0),
+  _sta(sta) {
     wireSegStor.resize(netCnt);
     lumpedCapStor.resize(netCnt);
 //    SetLefDefEnv();
