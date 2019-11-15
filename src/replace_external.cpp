@@ -290,6 +290,12 @@ replace_external::init_replace() {
 
   outputCMD = (output_loc == "")? "./output" : output_loc;
 
+  if( timing_driven_mode == true ) {
+    capPerMicron = unit_c;
+    resPerMicron = unit_r;
+    isTiming = true; 
+  }
+
   initGlobalVarsAfterParse();
   init();
 
