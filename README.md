@@ -57,6 +57,11 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
     $ replace < gcd_td_test.tcl
  
 ### How To Execute
+| <img src="/doc/image/replace_tcl_interp_example.gif" width=900px> |
+|:--:|
+| *Example usages with TCL interpreter* |
+
+
     // Tcl Interpreter Mode
     // The following command will create a TCL interpreter session.
     $ replace
