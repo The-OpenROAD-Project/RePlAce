@@ -27,7 +27,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(REPLACE_HOME ${PROJECT_SOURCE_DIR} )
 set(FLUTE_HOME
-  ${PROJECT_SOURCE_DIR}/module/flute
+  ${PROJECT_SOURCE_DIR}/module/flute3
 )
 set(OPENSTA_HOME
   ${PROJECT_SOURCE_DIR}/module/OpenSTA
@@ -180,7 +180,7 @@ target_include_directories( replace
   ${Boost_INCLUDE_DIR}
 
   ${EIGEN_HOME}
-  ${FLUTE_HOME}/src
+  ${FLUTE_HOME}
  
   ${OPENSTA_HOME}/app
   ${OPENSTA_HOME}/dcalc
@@ -203,7 +203,7 @@ target_include_directories( replacelib
   ${Boost_INCLUDE_DIR}
 
   ${EIGEN_HOME}
-  ${FLUTE_HOME}/src
+  ${FLUTE_HOME}
  
   ${OPENSTA_HOME}/app
   ${OPENSTA_HOME}/dcalc

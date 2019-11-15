@@ -3,14 +3,7 @@
 #include <sstream>
 #include <fstream>
 
-using std::ofstream;
-using std::stringstream;
-using std::string;
-using std::to_string;
-using std::cout;
-using std::endl;
-using std::vector;
-
+using namespace std;
 
 namespace Timing {
 
@@ -253,7 +246,8 @@ Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
 void Timing::BuildSteiner(bool scaleApplied) {
   CleanSteiner();
   using namespace Flute;
-  Flute::readLUT("./POWV9.dat", "./PORT9.dat");
+//  Flute::readLUT("./POWV9.dat", "./PORT9.dat");
+  Flute::readLUT();
 
   uint64_t stnPointCnt = 0;
   long long int totalStnWL = 0;
@@ -280,13 +274,11 @@ void Timing::BuildSteiner(bool scaleApplied) {
       //            cout << wl << endl;
     }
     else {
-      DBU* x = new DBU[curNet->pinCNTinObject];
-      DBU* y = new DBU[curNet->pinCNTinObject];
-
-      int* mapping = new int[curNet->pinCNTinObject];
+      Flute::DTYPE* x = new Flute::DTYPE[curNet->pinCNTinObject];
+      Flute::DTYPE* y = new Flute::DTYPE[curNet->pinCNTinObject];
 
       // x, y coordi --> pin's index
-      HASH_MAP< pair< DBU, DBU >, PinInfo, MyHash< pair< DBU, DBU > > >
+      HASH_MAP< pair< Flute::DTYPE, Flute::DTYPE >, PinInfo, MyHash< pair< Flute::DTYPE, Flute::DTYPE > > >
           pinMap;
 #ifdef USE_GOOGLE_HASH
       pinMap.set_empty_key(make_pair(DBU_MAX, DBU_MAX));
@@ -295,10 +287,10 @@ void Timing::BuildSteiner(bool scaleApplied) {
       //            cout << "pinMapBuilding" << endl;
       for(int j = 0; j < curNet->pinCNTinObject; j++) {
         PIN* curPin = curNet->pin[j];
-        x[j] = (!scaleApplied) ? (DBU)(curPin->fp.x + 0.5f)
-                               : (DBU)(curPin->fp.x * GetUnitX() + 0.5f);
-        y[j] = (!scaleApplied) ? (DBU)(curPin->fp.y + 0.5f)
-                               : (DBU)(curPin->fp.y * GetUnitY() + 0.5f);
+        x[j] = (!scaleApplied) ? (Flute::DTYPE)(curPin->fp.x + 0.5f)
+                               : (Flute::DTYPE)(curPin->fp.x * GetUnitX() + 0.5f);
+        y[j] = (!scaleApplied) ? (Flute::DTYPE)(curPin->fp.y + 0.5f)
+                               : (Flute::DTYPE)(curPin->fp.y * GetUnitY() + 0.5f);
 
         //                cout << curPin->term << " - "
         //                    << ((curPin->term)? _terms[curPin->moduleID].name
@@ -317,13 +309,12 @@ void Timing::BuildSteiner(bool scaleApplied) {
       //            cout << endl;
 
       Tree fluteTree =
-          flute(curNet->pinCNTinObject, x, y, FLUTE_ACCURACY, mapping);
+          flute(curNet->pinCNTinObject, x, y, FLUTE_ACCURACY);
       //            for(int i=0; i<curNet->pinCNTinObject; i++) {
       //                cout << i << " " << mapping[i] << endl;
       //            }
       delete[] x;
       delete[] y;
-      delete[] mapping;
 
       //            printtree(fluteTree);
 

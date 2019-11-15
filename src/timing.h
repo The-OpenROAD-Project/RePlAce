@@ -225,8 +225,8 @@ template < class T >
 struct MyHash;
 
 template <>
-struct MyHash< std::pair< DBU, DBU > > {
-  std::size_t operator()(const std::pair< DBU, DBU >& k) const {
+struct MyHash< std::pair< Flute::DTYPE, Flute::DTYPE > > {
+  std::size_t operator()(const std::pair< Flute::DTYPE, Flute::DTYPE >& k) const {
     using boost::hash_combine;
     size_t seed = 0;
     hash_combine(seed, k.first);

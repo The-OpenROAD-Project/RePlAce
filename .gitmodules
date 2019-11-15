@@ -16,3 +16,6 @@
 [submodule "module/OpenDB"]
 	path = module/OpenDB
 	url = https://github.com/The-OpenROAD-Project/OpenDB
+[submodule "module/flute3"]
+	path = module/flute3
+	url = https://github.com/The-OpenROAD-Project/flute3
