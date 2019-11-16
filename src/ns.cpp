@@ -161,8 +161,8 @@ void myNesterov::nesterov_opt() {
     TimingInst.BuildSteiner(true);
     // TimingInst.PrintNetSteiner();
 
-    string spefName = string(dir_bnd) + "/" + gbch + "_gp.spef";
-    TimingInst.WriteSpef(spefName);
+    //string spefName = string(dir_bnd) + "/" + gbch + "_gp.spef";
+    //TimingInst.WriteSpef(spefName);
     TimingInst.ExecuteStaLater();
   }
   else {
