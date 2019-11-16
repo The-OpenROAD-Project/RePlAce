@@ -90,7 +90,6 @@ private:
   void update_instance_list();
 
   std::string net_weight_file;
-  std::string sdc_file;
   std::string output_loc;
   bool timing_driven_mode;
   bool write_bookshelf_mode;
