@@ -248,8 +248,6 @@ Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
 void Timing::BuildSteiner(bool scaleApplied) {
   CleanSteiner();
   using namespace Flute;
-//  Flute::readLUT("./POWV9.dat", "./PORT9.dat");
-  Flute::readLUT();
 
   uint64_t stnPointCnt = 0;
   long long int totalStnWL = 0;
