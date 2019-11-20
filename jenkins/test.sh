@@ -1,1 +1,1 @@
-docker run -v $(pwd):/replace replace bash -c "cd test && python regression.py run"
+docker run -v $(pwd):/replace replace bash -c "cd /replace/test && python3 regression.py run"
