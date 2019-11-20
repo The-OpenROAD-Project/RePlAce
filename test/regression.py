@@ -24,7 +24,14 @@ def ExecuteCommand( cmd, log="" ):
 
 # threshold setting
 def DiffVar(gVar, tVar, threshold):
-  return True if tVar <= gVar * (1 + threshold/100) and tVar >= gVar * (1 - threshold/100) else False
+  # smaller is the better
+  if gVar >= tVar:
+    return True
+
+  if abs(gVar - tVar) / abs(gVar) <= threshold:
+    return True
+  else:
+    return False
 
 def TdGoldenCompare(orig, ok):
   f = open(orig, "r")
