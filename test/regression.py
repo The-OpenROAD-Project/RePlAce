@@ -47,12 +47,12 @@ def TdGoldenCompare(orig, ok):
     print("HPWL has more than 5 percents diff: %g %g" %(gHpwl, tHpwl))
     sys.exit(1)
 
-  if DiffVar(gWns, tWns, 5) == False:
-    print("WNS has more than 5 percents diff: %g %g" %(gWns, tWns))
+  if DiffVar(gWns, tWns, 30) == False:
+    print("WNS has more than 30 percents diff: %g %g" %(gWns, tWns))
     sys.exit(1)
 
-  if DiffVar(gTns, tTns, 5) == False:
-    print("TNS has more than 5 percents diff: %g %g" %(gTns, tTns))
+  if DiffVar(gTns, tTns, 30) == False:
+    print("TNS has more than 30 percents diff: %g %g" %(gTns, tTns))
     sys.exit(1)
 
   print("  " + ok + " passed!")
