@@ -66,11 +66,11 @@ def TdRun(tdList):
       if cFile.endswith(".tcl") == False:
         continue
       print ( "  " + cFile )
-      cmd = "replace %s/%s" % (curTdCase, cFile)
+      cmd = "./replace %s/%s" % (curTdCase, cFile)
       log = "%s/%s.log" % (curTdCase, cFile)
       # ExecuteCommand("ln -s *.dat ./%s/" % (curTdCase))
       if useValgrind:
-        cmd = "valgrind --log-fd=1 replace %s/%s" % (curTdCase, cFile)
+        cmd = "valgrind --log-fd=1 ./replace %s/%s" % (curTdCase, cFile)
         log = "%s/%s_mem_check.log" % (curTdCase, cFile)
         ExecuteCommand(cmd, log)
       elif useScreen:
