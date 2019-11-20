@@ -389,6 +389,9 @@ extern "C" {
 extern int Replace_Init(Tcl_Interp *interp);
 }
 
+static int replace_argc = 0;
+static char** replace_argv = 0;
+
 
 int 
 replaceTclAppInit(Tcl_Interp *interp) {
@@ -409,6 +412,19 @@ replaceTclAppInit(Tcl_Interp *interp) {
   command += "puts \"RePlAce Version: 1.0.0\"";
   Tcl_Eval(interp, command.c_str());
 
+  int argc = replace_argc;
+  char** argv = replace_argv;
+ 
+  if( argc == 2 ) {
+    command = "source " + string(argv[1]);
+    Tcl_Eval(interp, command.c_str());
+    return TCL_OK;
+  }
+  else if( argc >= 3) {
+    Tcl_Eval(interp, "replace_external_help");
+    exit(1);
+  }
+
 //  command = "";
 //  command += "if {$tcl_interactive} {\n";
 //  command += "package require tclreadline\n";
@@ -425,6 +441,9 @@ replaceTclAppInit(Tcl_Interp *interp) {
 }
 
 int main(int argc, char *argv[]) {
+
+  replace_argc = argc;
+  replace_argv = argv;
  
   Tcl_Main(1, argv, replaceTclAppInit);
 

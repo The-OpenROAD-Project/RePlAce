@@ -3,9 +3,9 @@
 #
 
 set design wb_dma_top 
-set lib_dir ../library/a2a/
-set design_dir ../design/a2a/${design}
-set exp_folder exp
+set lib_dir library/a2a/
+set design_dir design/a2a/${design}
+set exp_folder td-test-02 
 
 replace_external rep
 
