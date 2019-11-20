@@ -103,7 +103,6 @@ def TdRun(tdList):
 
 if len(sys.argv) <= 1:
   print("Usage: python regression.py run")
-  print("Usage: python regression.py skill")
   print("Usage: python regression.py get")
   sys.exit(0)
 
@@ -118,7 +117,5 @@ for cdir in sorted(dirList):
 
 if sys.argv[1] == "run":
   TdRun(tdList)
-elif sys.argv[1] == "skill":
-  ExecuteCommand("for scr in $(screen -ls | awk '{print $1}'); do screen -S $scr -X kill; done")
 elif sys.argv[1] == "get":
   ExecuteCommand("watch -n 3 \"grep -r 'HPWL' td-test*/*.rpt; grep -r 'WNS' td-test*/*.rpt; grep -r 'TNS' td-test*/*.rpt\"")
