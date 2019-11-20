@@ -18,6 +18,10 @@ def ExecuteCommand( cmd, log="" ):
     p.wait()
     f.close()
 
+    f = open(log, "r")
+    print( f.read() )
+    f.close()
+
 # threshold setting
 def DiffVar(gVar, tVar, threshold):
   return True if tVar <= gVar * (1 + threshold/100) and tVar >= gVar * (1 - threshold/100) else False
