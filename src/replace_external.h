@@ -88,6 +88,7 @@ public:
 private:
   std::vector<instance_info> instance_list;
   void update_instance_list();
+  void update_dbinst_locations();
 
   std::string net_weight_file;
   std::string output_loc;

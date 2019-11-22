@@ -112,8 +112,6 @@ void initGlobalVars() {
   trialRunCMD = false;           // bool
   autoEvalRC_CMD = false;        // bool
 
-  detailPlacerFlag = "";  // mgwoo
-  detailPlacerLocation = "";
   isOnlyLGinDP = (isRoutability) ? true : false;
 
   numThread = 1;  // default
@@ -199,7 +197,6 @@ void initGlobalVarsAfterParse() {
   // newly set RealPath
   globalRouterPosition = GetRealPath( globalRouterPosition );
   globalRouterSetPosition = GetRealPath( globalRouterSetPosition );
-  detailPlacerLocation = GetRealPath( detailPlacerLocation );
 
   // newline escape
   ReplaceStringInPlace(verilogName, "\r", "");
@@ -216,22 +213,7 @@ void initGlobalVarsAfterParse() {
   ExtraWSfor3D = 0;     //.12; //0.1;
   MaxExtraWSfor3D = 0;  //.20; //0.2;
 
-  // detailPlacer settings
-  detailPlacer = NoneDp;
-  if(!strcmp(detailPlacerFlag.c_str(), "NTU3")) {
-    detailPlacer = NTUplace3;
-  }
-  else if(!strcmp(detailPlacerFlag.c_str(), "NTU4")) {
-    detailPlacer = NTUplace4h;
-  }
-  else {
-    printf(
-        "\n** WARNING: Your Detail Placement Step must be skipped.\n"
-        "              (i.e. this program will be executed as -onlyGP)\n"
-        "     If you want to have DP after GP, please specify -dpflag and "
-        "-dploc.\n\n");
-    isOnlyGlobalPlace = true;
-  }
+  isOnlyGlobalPlace = true;
 
   ///////////////////////////////////////////////////////
   // flg_3dic is always to be 1...
@@ -806,42 +788,6 @@ bool argument(int argc, char *argv[]) {
       else {
         printf("\n**ERROR: Option %s requires refDeltaWL", argv[i - 1]);
         printf("ref is 346000 (INT).\n");
-        return false;
-      }
-    }
-    // detailPlacer Settings : flag
-    else if(!strcmp(argv[i], "-dpflag")) {
-      i++;
-      if(argv[i][0] != '-') {
-        detailPlacerFlag = argv[i];
-      }
-      else {
-        printf(
-            "\n**ERROR: Option %s requires which Detailed Placer you want to "
-            "use",
-            argv[i - 1]);
-        printf("currently support 3 detail placer : NTU3, and NTU4.\n");
-        printf("You must specify Detail Placer between these two.\n");
-        printf(
-            "example : ./replace -input @@ -output @@ -dpflag NTU4 -dploc "
-            "./ntuplacer4h\n");
-        return false;
-      }
-    }
-    // detailPlacer Settings : location
-    else if(!strcmp(argv[i], "-dploc")) {
-      i++;
-      if(argv[i][0] != '-') {
-        detailPlacerLocation = argv[i];
-      }
-      else {
-        printf("\n**ERROR: Option %s requires your Detailed Placer's location ",
-               argv[i - 1]);
-        printf("currently support 2 detail placer : NTU3, and NTU4.\n");
-        printf("You must specify Detail Placer between these two.\n");
-        printf(
-            "example : ./replace -input @@ -output @@ -dpflag NTU4 -dploc "
-            "./ntuplacer4h\n");
         return false;
       }
     }

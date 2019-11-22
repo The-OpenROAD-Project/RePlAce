@@ -569,12 +569,6 @@ enum {
   DETAIL_PLACE
 };
 
-// these variable is required to have detailPlacer settings
-extern int detailPlacer;
-enum { NoneDp, FastPlace, NTUplace3, NTUplace4h };
-extern std::string detailPlacerLocation;
-extern std::string detailPlacerFlag;
-
 extern bool isOnlyLGinDP;
 extern bool isSkipPlacement;
 extern bool hasDensityDP;

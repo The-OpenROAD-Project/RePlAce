@@ -350,11 +350,6 @@ string routepath_maxdistCMD;
 string gRoute_pitch_scalCMD;
 string filleriterCMD;
 
-// for detail Placer
-int detailPlacer;
-string detailPlacerLocation;
-string detailPlacerFlag;
-
 prec densityDP;
 prec routeMaxDensity; 
 bool hasDensityDP;
@@ -476,25 +471,6 @@ void init() {
   inv_RAND_MAX = (prec)1.0 / RAND_MAX;
 
   sprintf(global_router, "NCTUgr.ICCAD2012");
-
-  switch(detailPlacer) {
-    case FastPlace:
-      sprintf(str_lg, "%s", "_eplace_lg");
-      sprintf(str_dp, "%s", "_FP_dp");
-      break;
-
-    case NTUplace3:
-      sprintf(str_lg, "%s", "_eplace_lg");
-      sprintf(str_dp, "%s", ".eplace-gp.ntup");
-      sprintf(str_dp2, "%s", ".eplace-cGP3D.ntup");
-      break;
-
-    case NTUplace4h:
-      sprintf(str_lg, "%s", "_eplace_lg");
-      sprintf(str_dp, "%s", ".eplace-gp.ntup");
-      sprintf(str_dp2, "%s", ".eplace-cGP3D.ntup");
-      break;
-  }
 
   sprintf(str_dp3, ".%s.%s", bmFlagCMD.c_str(), "eplace");
 
@@ -776,56 +752,6 @@ void macroLegalization_main() {
   fflush(stdout);
   post_mac_tier();
 }
-
-/*
-void WriteBookshelfForGR() {
-  PrintProcBegin("Write Bookshelf");
-  // temporary update net->pin2 to write bookshelf
-  update_pin2();
-
-  char targetDir[BUF_SZ] = {0, };
-  sprintf( targetDir, "%s/router_base/", dir_bnd);
-  cout << targetDir << endl;
-
-  char cmd[BUF_SZ] = {0, };
-  sprintf( cmd, "mkdir -p %s", targetDir);
-  system(cmd);
-
-    // call Write Bookshelf function by its tier
-    WriteBookshelfWithTier(
-        targetDir, 
-        // tier number
-        0, 
-        // *.shape support
-//        (detailPlacer == NTUplace3 || shapeMap.size() == 0) ? false : true);
-        true, true, true);
-  PrintProcEnd("Write Bookshelf");
-}
-
-void WriteBookshelf() {
-  printf("INFO:  WRITE BOOKSHELF...");
-  // temporary update net->pin2 to write bookshelf
-  update_pin2();
-  
-  char targetDir[BUF_SZ] = {0, };
-  sprintf( targetDir, "%s/tiers/0", dir_bnd);
-  cout << targetDir << endl;
-
-  char cmd[BUF_SZ] = {0, };
-  sprintf( cmd, "mkdir -p %s", targetDir);
-  system(cmd);
-
-    // call Write Bookshelf function by its tier
-    WriteBookshelfWithTier(
-        targetDir,
-        // tier number
-        0, 
-        // *.shape support
-        (detailPlacer == NTUplace3) ? false : true,
-        false);
-  printf("PROC:  END WRITE BOOKSHELF\n\n");
-  fflush(stdout);
-}*/
 
 void free_trial_mallocs() {
   free(moduleInstance);
