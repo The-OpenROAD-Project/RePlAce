@@ -2,7 +2,6 @@
 RePlAce: Advancing Solution Quality and Routability Validation in Global Placement
 ## Features
 - Analytic and nonlinear placement algorithm. Solves electrostatic force equations using Nesterov's method. ([link](https://cseweb.ucsd.edu/~jlu/papers/eplace-todaes14/paper.pdf))
-- Fully supports commercial formats. (LEF/DEF 5.8)
 - Verified and worked well with various commercial technologies. (7/14/16/28/45/55/65nm)
 - Supports timing-driven placement mode based on commercial timer (OpenSTA).
 - Fast image drawing engine is ported (CImg).
