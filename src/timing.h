@@ -207,8 +207,7 @@ class Timing {
   //        void SliceLongWire();
 
   void WriteSpef(const std::string& spefFile);
-  void ExecuteStaFirst(std::string topCellName, std::string verilogName,
-                       std::vector< std::string >& libName, std::string sdcName);
+  void ExecuteStaFirst();
   void ExecuteStaLater();
 };
 

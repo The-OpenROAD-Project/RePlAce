@@ -66,8 +66,7 @@ inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
 }
 
 
-void Timing::ExecuteStaFirst(string , string ,
-                             vector< string >& , string ) {
+void Timing::ExecuteStaFirst() {
   MakeParasiticsForSta(); 
 
   // find_timing -full_update (true->full, false-> incremental)

@@ -801,22 +801,14 @@ extern FPOS grow_pmax;
 ///////////////////////////////////////////////////////////////////////////
 extern std::string bmFlagCMD;
 extern std::string auxCMD;
-extern std::string defName;
-extern std::string verilogName;
-extern std::string sdcName;
-extern std::vector< std::string > lefStor;
 extern std::string outputCMD;
 extern std::string experimentCMD;
-extern std::vector< std::string > libStor;
-extern std::string verilogTopModule;
 extern int defMacroCnt;
 extern int numInitPlaceIter;
 
 extern std::string benchName;
 
 extern int numThread;
-enum class InputMode { bookshelf, lefdef };
-extern InputMode inputMode;
 
 extern std::string racntiCMD;    // lutong
 extern std::string maxinflCMD;   // lutong
@@ -882,15 +874,10 @@ void store1stOrder_ExtremePointsforSecond(void);
 void reassign_trial_2ndOrder_lastEP(prec);
 void printEPs(void);
 
-void printUsage(void);
-void initArgument(int, char **);
 void initGlobalVars();
 void initGlobalVarsAfterParse();
 
 void calcTSVweight(void);
-bool argument(int, char **);
-void printCMD(int, char **);
-bool criticalArgumentError(void);
 
 int pos_eqv(struct POS p1, struct POS p2);
 void overlap_count(int iter);

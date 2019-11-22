@@ -325,7 +325,6 @@ int numInitPlaceIter;
 prec refDeltaWL;
 
 int numThread;
-InputMode inputMode;
 
 string benchName;
 
@@ -762,5 +761,4 @@ void free_trial_mallocs() {
   free(row_st);
   free(tier_st);
   free(place_st);
-
 }
