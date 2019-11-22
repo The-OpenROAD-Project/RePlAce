@@ -10,16 +10,4 @@ set design_dir ./design/a2a/${design}
 read_lef ${lib_dir}/contest.lef
 read_def ${design_dir}/${design}.def
 
-set rep [replace_external]
-$rep set_output ./output/
-$rep set_bin_grid_count 64
-
-# Initialize RePlAce
-$rep init_replace
-
-# place_cell with Nesterov method 
-$rep place_cell_nesterov_place
-
-puts "nesterovPlace HPWL: [$rep get_hpwl]"
-puts "final WNS: [$rep get_wns]"
-puts "final TNS: [$rep get_tns]"
+global_placement -bin_grid_count 64

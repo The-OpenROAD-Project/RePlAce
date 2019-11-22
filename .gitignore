@@ -1,3 +1,4 @@
+*~
 *.log
 *.log*
 *.swo
@@ -14,15 +15,10 @@ evaluation/*
 test/output/*
 test/*.def
 test/*.dat
-test/**/*.dat
-test/**/output
-test/**/exp
+test/*/*.dat
+test/*/output
+test/*/exp
 
 !*.gitignore
 
-Makefile
-CMakeCache.txt
-*.cmake
-CMakeFiles
-install_manifest.txt
 build

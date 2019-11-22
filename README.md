@@ -6,63 +6,11 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 - Verified and worked well with various commercial technologies. (7/14/16/28/45/55/65nm)
 - Supports timing-driven placement mode based on commercial timer (OpenSTA).
 - Fast image drawing engine is ported (CImg).
-- __RePlAce has TCL interpreter now!__
 
 | <img src="/doc/image/adaptec2.inf.gif" width=350px> | <img src="/doc/image/coyote_TSMC16.gif" width=400px> | 
 |:--:|:--:|
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |*Real-world Design: Coyote (TSMC16 7.5T)* |
 
-
-# Getting Started
-
-## Run using Docker
-1. Install Docker on [Windows](https://docs.docker.com/docker-for-windows/), [Mac](https://docs.docker.com/docker-for-mac/) or [Linux](https://docs.docker.com/install/).
-2. Navigate to the directory where you have the input files.
-3. Run RePlAce container:
-
-       docker run -it -v $(pwd):/data openroad/replace bash
-
-4. From the interactive bash terminal, use RePlAce scripts which reside under `/RePlAce`. You can read input files from `/data` directory inside the docker container - which mirrors the host machine directory you are in. 
-
-* The Docker image is self-contained and includes everything that RePlAce needs to work properly.
-
-## Install on a bare-metal machine
-
-### Pre-requisite
-* GCC compiler and libstdc++ static library >= 4.8.5
-* boost library >= 1.41
-* bison (for lef/def parsers) >= 3.0.4
-* tcl >= 8.4
-* X11 library (for CImg library to visualize) >= 1.6.5
-* Recommended OS: Centos6, Centos7 or Ubuntu 16.04
-
-### Clone repo and submodules 
-    $ git clone --recursive https://github.com/The-OpenROAD-Project/RePlAce.git
-    $ cd ~/RePlAce
-    $ ./prerequisite/install_centos7.sh   // for centos 7
-    $ ./prerequisite/install_ubuntu16.sh  // for ubuntu 16
-    $ mkdir build
-    $ cd build
-    $ cmake ..                            // you may specify -DCMAKE_INSTALL_PREFIX to avoid installing in /usr/local/*
-    $ make 
-    $ make install                        // if you want to install
-
-   
-### Check your installation
-    To make sure your installation is correct and the current tool version is stable enough, 
-    run a Hello World application:
-
-    $ cd RePlAce/test
-    $ replace < gcd_nontd_test.tcl
-    $ replace < gcd_td_test.tcl
- 
-### How To Execute
-    // Tcl Interpreter Mode
-    // The following command will create a TCL interpreter session.
-    $ replace
-    
-    // The following command will send all TCL commands to RePlAce's TCL interpreter
-    $ replace < run_replace.tcl
 
 ### Verified/supported Technologies
 * TSMC 65
@@ -84,11 +32,7 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 ### 3rd Party Module List
 * Eigen
 * CImg
-* [FLUTE](https://github.com/RsynTeam/rsyn-x/tree/master/rsyn/src/rsyn/3rdparty/flute) from [Rsyn-x](https://github.com/RsynTeam/rsyn-x)
-* [OpenSTA](https://github.com/The-OpenROAD-Project/OpenSTA)
-* NTUPlacer3/4h (Thanks for agreeing with redistribution)
-* LEF/DEF Si2 Parser (Modified by mgwoo)
-
+* [FLUTE](https://github.com/RsynTeam/rsyn-x/tree/master/rsyn/src/rsyn/3rdparty/flute) fro* [OpenSTA](https://github.com/The-OpenROAD-Project/OpenSTA)
 
 ### Authors
 - Ilgweon Kang and Lutong Wang (respective Ph.D. advisors: Chung-Kuan Cheng, Andrew B. Kahng), based on Dr. Jingwei Lu's Fall 2015 code implementing ePlace and ePlace-MS.

@@ -41,9 +41,6 @@ set(OPENDB_HOME ${PROJECT_SOURCE_DIR}/src/OpenDB)
 find_package(TCL REQUIRED)
 
 find_package(ZLIB REQUIRED)
-#find_package(SWIG REQUIRED)
-#find_package(BISON REQUIRED)
-#find_package(FLEX REQUIRED)
 
 # for cimg
 if( USE_CIMG_LIB )
@@ -59,6 +56,7 @@ endif()
 find_package(Boost REQUIRED)
 
 set(REPLACE_WRAP ${CMAKE_CURRENT_BINARY_DIR}/replace_wrap.cpp)
+set(REPLACE_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/ReplaceTclInitVar.cc)
 
 set (REPLACE_SRC 
   src/argument.cpp
@@ -84,11 +82,12 @@ set (REPLACE_SRC
   src/wlen.cpp
   src/replace_external.cpp
   src/replace_private.cpp
-  ${REPLACE_WRAP}
   src/replace_private.cpp
   src/dbLefDefIO.cpp
+  src/MakeReplace.cpp
+  ${REPLACE_WRAP}
+  ${REPLACE_TCL_INIT}
   )
-
 
 set (REPLACE_HEADER
   src/bin.h
@@ -108,6 +107,7 @@ set (REPLACE_HEADER
   src/wlen.h
   src/util.h
   src/dbLefDefIO.h
+  src/MakeReplace.h
 )
 
 add_custom_command(OUTPUT ${REPLACE_WRAP}
@@ -115,6 +115,12 @@ add_custom_command(OUTPUT ${REPLACE_WRAP}
   WORKING_DIRECTORY ${REPLACE_HOME}
   DEPENDS ${REPLACE_HOME}/src/replace.i "src/replace_external.h"
 )
+
+add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
+  COMMAND ${OPENSTA_HOME}/etc/TclEncode.tcl ${REPLACE_TCL_INIT} replace_tcl_inits ${REPLACE_HOME}/src/replace.tcl
+  WORKING_DIRECTORY ${REPLACE_HOME}/src
+  DEPENDS ${REPLACE_HOME}/src/replace.tcl ${OPENSTA_HOME}/etc/TclEncode.tcl
+  )
 
 ############################################################
 # Create a library 
