@@ -74,6 +74,7 @@ public:
   void print_instances();
 
   float get_hpwl();
+  // These do not belong here. OpenSTA already has tcl visible functions for wns/tns.
   float get_wns();
   float get_tns(); 
 

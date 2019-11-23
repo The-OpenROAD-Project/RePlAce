@@ -32,13 +32,21 @@ proc global_placement { args } {
     $rep set_bin_grid_count $bin_grid_count
   }
 
-  # Initialize RePlAce
-  $rep init_replace
-  
-  # place_cell with Nesterov method 
-  $rep place_cell_nesterov_place
+  if { [db_has_rows] } {
+    # Initialize RePlAce
+    $rep init_replace
+    # Don't shit all over the file system
+    $rep set_output /dev/null
 
-  puts "HP wire length: [format %.0f [$rep get_hpwl]]"
-  puts "Worst negative slack: [format %.2e [$rep get_wns]]"
-  puts "Total negative slack: [format %.2e [$rep get_tns]]"
+    # initial placement with BiCGSTAB
+    $rep place_cell_init_place
+    # place_cell with Nesterov method 
+    $rep place_cell_nesterov_place
+    
+    puts "HP wire length: [format %.0f [$rep get_hpwl]]"
+    puts "Worst slack: [format %.2e [sta::worst_slack]]"
+    puts "Total negative slack: [format %.2e [sta::total_negative_slack]]"
+  } else {
+    puts "Error: no rows defined in design. Use initialize_floorplan to add rows."
+  }
 }
