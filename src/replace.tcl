@@ -32,7 +32,7 @@ proc global_placement { args } {
     $rep set_bin_grid_count $bin_grid_count
   }
 
-  if { [db_has_rows] } {
+  if { [ord::db_has_rows] } {
     # Initialize RePlAce
     $rep init_replace
     # Don't shit all over the file system
