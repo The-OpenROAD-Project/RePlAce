@@ -1,7 +1,5 @@
 sta::define_cmd_args "global_placement" {
   [-timing_driven]\
-    [-wire_res res]\
-    [-wire_cap cap]\
     [-bin_grid_count grid_count]}
 
 proc global_placement { args } {
@@ -10,10 +8,14 @@ proc global_placement { args } {
 
   set rep [replace_external]
 
+  # Support -wire_res/-wire_cap as overrides but do not make
+  # them user visible. -cherry
   set wire_res 0.0
   if { [info exists keys(-wire_res)] } {
     set wire_res $keys(-wire_res)
     sta::check_positive_float "-wire_res" $wire_res
+  } else {
+    set wire_res [expr [sta::wire_resistance] * 1e-6]
   }
   $rep set_unit_res $wire_res
 
@@ -21,6 +23,8 @@ proc global_placement { args } {
   if { [info exists keys(-wire_cap)] } {
     set wire_cap $keys(-wire_cap)
     sta::check_positive_float "-wire_cap" $wire_cap
+  } else {
+    set wire_cap [expr [sta::wire_capacitance] * 1e-6]
   }
   $rep set_unit_cap $wire_cap
 
