@@ -39,6 +39,8 @@ proc global_placement { args } {
   if { [ord::db_has_rows] } {
     # Initialize RePlAce
     $rep init_replace
+    # Unfortunately this does not really turn off the noise. -cherry
+    $rep set_verbose_level 0
     # Don't shit all over the file system
     $rep set_output /dev/null
 

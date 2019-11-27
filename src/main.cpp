@@ -591,8 +591,8 @@ void init() {
   sprintf(defGpOutput, "%s/%s_gp.def", dir_bnd, gbch);
   sprintf(defOutput, "%s/%s_final.def", dir_bnd, gbch);
 
-  PrintInfoInt("ExperimentIndex", ver_num);
-  PrintInfoString("DirectoryPath", dir_bnd);
+  // PrintInfoInt("ExperimentIndex", ver_num);
+  // PrintInfoString("DirectoryPath", dir_bnd);
 
   sprintf(bench_aux, "%s/%s.aux", gbch_dir, gbch);
   sprintf(gbch_aux, "%s.aux", gbch);
