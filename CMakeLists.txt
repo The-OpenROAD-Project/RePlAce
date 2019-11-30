@@ -137,18 +137,14 @@ PRIVATE
   ${EIGEN_HOME}
   ${FLUTE_HOME}
  
-  ${OPENSTA_HOME}/app
-  ${OPENSTA_HOME}/dcalc
-  ${OPENSTA_HOME}/graph
+  ${OPENSTA_HOME}/util
   ${OPENSTA_HOME}/liberty
   ${OPENSTA_HOME}/network
-  ${OPENSTA_HOME}/parasitics
+  ${OPENSTA_HOME}/graph
   ${OPENSTA_HOME}/sdc
-  ${OPENSTA_HOME}/sdf
+  ${OPENSTA_HOME}/parasitics
   ${OPENSTA_HOME}/search
-  ${OPENSTA_HOME}/tcl
-  ${OPENSTA_HOME}/util
-  ${OPENSTA_HOME}/verilog
+  ${OPENSTA_HOME}/app
 
   ${OPENDB_HOME}/include/opendb
   # This SHOULD be ${OPENDB_HOME}/include but all library references are wrong

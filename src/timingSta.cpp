@@ -2,8 +2,6 @@
 #include "Machine.hh"
 #include "Network.hh"
 #include "Parasitics.hh"
-#include "Sdc.hh"
-#include "GraphDelayCalc.hh"
 #include "Corner.hh"
 #include "timing.h"
 #include "timingSta.h"
@@ -273,31 +271,9 @@ void Timing::MakeParasiticsForSta() {
       
     }
   }
-  _sta->graphDelayCalc()->delaysInvalid();
-  _sta->arrivalsInvalid(); 
+  _sta->delaysInvalid();
 }
 
-
-void Timing::GenerateClockSta() {
-  // sdc -> clock definition (unit=second)
-  // float clk_period = 70e-9;
-  FloatSeq* waveform = new FloatSeq;
-  waveform->push_back(0.0);
-  waveform->push_back(_clkPeriod / 2);
-
-  PinSet* pins = new PinSet;
-  Pin* pin =
-      _sta->network()->findPin(_sta->currentInstance(), _clkName.c_str());
-  pins->insert(pin);
-
-  _sta->makeClock(_clkName.c_str(), pins, true, _clkPeriod, waveform, NULL);
-
-  // Clock *clock_found =
-  _sta->sdc()->findClock(_clkName.c_str());
-
-  // write_sdc
-  // _sta->writeSdc("test.sdc",false,false,5);
-}
 
 void Timing::UpdateTimingSta() {
   _sta->updateTiming(true);

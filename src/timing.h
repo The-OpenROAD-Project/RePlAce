@@ -184,7 +184,6 @@ class Timing {
   void FillSpefForSta();
   void MakeParasiticsForSta();
 
-  void GenerateClockSta();
   void UpdateTimingSta();
   void UpdateNetWeightSta();
 
