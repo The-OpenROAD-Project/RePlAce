@@ -243,7 +243,6 @@ Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
   };
 
 
-
 // stn stands for steiner
 void Timing::BuildSteiner(bool scaleApplied) {
   CleanSteiner();
@@ -278,11 +277,7 @@ void Timing::BuildSteiner(bool scaleApplied) {
       Flute::DTYPE* y = new Flute::DTYPE[curNet->pinCNTinObject];
 
       // x, y coordi --> pin's index
-      HASH_MAP< pair< Flute::DTYPE, Flute::DTYPE >, PinInfo, MyHash< pair< Flute::DTYPE, Flute::DTYPE > > >
-          pinMap;
-#ifdef USE_GOOGLE_HASH
-      pinMap.set_empty_key(make_pair(DBU_MAX, DBU_MAX));
-#endif
+      std::unordered_map< FlutePair, PinInfo, FlutePairHash, FlutePairEqual> pinMap;
 
       //            cout << "pinMapBuilding" << endl;
       for(int j = 0; j < curNet->pinCNTinObject; j++) {
@@ -298,7 +293,7 @@ void Timing::BuildSteiner(bool scaleApplied) {
         //                        _modules[curPin->moduleID].name )
         //                    << ":" << curPin->pinIDinModule << endl;
 
-        pinMap[make_pair(x[j], y[j])] = PinInfo(curPin);
+	pinMap[std::make_pair(x[j], y[j])] = PinInfo(curPin);
         //                cout << "pin: ";
         //                pinMap[ make_pair(x[j], y[j]) ].Print();
         //                cout << endl;
@@ -422,18 +417,13 @@ void Timing::WriteSpef(const string& spefLoc) {
   feed << "*R_UNIT 1 OHM" << endl;
   feed << "*L_UNIT 1 UH" << endl << endl;
 
-  HASH_MAP< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
+  std::unordered_map< PinInfo, bool, PinInfoHash, PinInfoEqual > pin_cap_written;
 
   // map from pin name -> cap
-  HASH_MAP< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
+  std::unordered_map< PinInfo, double, PinInfoHash, PinInfoEqual > lumped_cap_at_pin;
 
   PinInfo tmpPin;
   tmpPin.SetImpossible();
-
-#ifdef USE_GOOGLE_HASH
-  pin_cap_written.set_empty_key(tmpPin);
-  lumped_cap_at_pin.set_empty_key(tmpPin);
-#endif
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
@@ -523,9 +513,6 @@ void Timing::WriteSpef(const string& spefLoc) {
 
     feed << "*END" << endl << endl;
   }
-
-  pin_cap_written.clear();
-  lumped_cap_at_pin.clear();
 
 //  WriteSpefClockNet(feed);
 

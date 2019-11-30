@@ -158,9 +158,9 @@ void Timing::MakeParasiticsForSta() {
   sta::Network* network = _sta->network();
   sta::Parasitics* parasitics = _sta->parasitics();
 
-  HASH_MAP< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
+  std::unordered_map< PinInfo, bool, PinInfoHash, PinInfoEqual > pin_cap_written;
   // map from pin name -> cap
-  HASH_MAP< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
+  std::unordered_map< PinInfo, double, PinInfoHash, PinInfoEqual > lumped_cap_at_pin;
 
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps

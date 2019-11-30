@@ -36,10 +36,6 @@ set(EIGEN_HOME
 set(OPENROAD_HOME ${PROJECT_SOURCE_DIR})
 set(OPENDB_HOME ${PROJECT_SOURCE_DIR}/src/OpenDB)
 
-## configure settings
-#find_package(GoogleHash)
-find_package(TCL REQUIRED)
-
 find_package(ZLIB REQUIRED)
 
 # for cimg
@@ -48,12 +44,12 @@ if( USE_CIMG_LIB )
   find_package(JPEG REQUIRED)
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${X11_LIBRARIES} ${JPEG_LIBRARIES}")
 else()
-  find_package(X11)
-  find_package(JPEG)
+#  find_package(X11)
+#  find_package(JPEG)
 endif()
 
 
-find_package(Boost REQUIRED)
+#find_package(Boost REQUIRED)
 
 set(REPLACE_WRAP ${CMAKE_CURRENT_BINARY_DIR}/replace_wrap.cpp)
 set(REPLACE_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/ReplaceTclInitVar.cc)
