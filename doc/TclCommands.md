@@ -1,34 +1,42 @@
 # Usage with TCL Interpreter
 
-RePlAce has internal TCL Interpreter. The following line will create replace_external objects.
+```
+global_placement
+    [-timing_driven]
+    [-wire_res res]
+    [-wire_cap cap]
+    [-bin_grid_count grid_count]
+```
 
-    replace_external rep
+-timing_driven Enable timing-driven mode
+res ohms per micron (for wire RC estimation)
+cap farads per micron (for wire RC estimation)
+grid_count [64,128,256,512,..., int]. Default: Defined by internal algorithm.
+
+# RePlAce internal commands.
+
+The following line will create a replace_external object.
+
+    set rep [replace_external]
     
 After having a replace_external object, a user can type any TCL commands after one spacing from the object name(e.g. rep).
 
-    rep [tcl_command]
-
+    $rep command [args]
 
 ## File I/O Commands
-* __import_lef__ [file_name] : \*.lef location (Multiple lef files supported. __Technology LEF must be ahead of other LEFs.__)
-* __import_def__ [file_name] : \*.def location (Required due to FloorPlan information)
-* __export_def__ [file_name] : Output DEF location
 * __set_output__ [directory_location] : Specify the location of output results. Default: ./output
    
 ## Flow Control
-* __init_replace__ : Initialize RePlAce's structure based on LEF and DEF.
+* __init_replace__ : Initialize RePlAce's structure from database.
 * __place_cell_init_place__ : Execute BiCGSTAB engine for initial place.
 * __place_cell_nesterov_place__ : Execute Nesterov engine for global placement.
 
 
 ## Timing-driven Mode
 * __set_timing_driven__ [true/false] : Enable timing-driven modes
-* __import_lib__ [file_name] : \*.lib location (Multiple lib files supported. Required for OpenSTA)
-* __import_sdc__ [file_name] : \*.sdc location (Required for OpenSTA). SDC: Synopsys Design Constraint (SDC)
-* __import_verilog__ [file_name] : \*.v location (Required for OpenSTA)
 * __set_unit_res__ [resistor] : Resisance per micron. Unit: Ohm. (Used for Internal RC Extraction)
 * __set_unit_cap__ [capacitance] : Capacitance per micron. Unit: Farad. (Used for Internal RC Extraction)
-
+u
 ## RePlAce tunning parameters
 __Note that the following tunning parameters must be defined before executing init_replace command__
 * __set_density__ [density] : Set target density. [0-1, float]. Default: 1.00

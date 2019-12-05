@@ -540,22 +540,3 @@ adsRect GetCoreFromDb(dbSet<odb::dbRow> &rows, bool isScaleDown) {
             GetScaleDownPoint(maxX), GetScaleDownPoint(maxY))
     : adsRect(minX, minY, maxX, maxY); 
 }
-
-void WriteDefDb(dbDatabase* db, const char* defName) {
-  dbChip* chip = db->getChip();
-  dbBlock* block = chip->getBlock();
-
-  for(int i=0; i<moduleCNT; i++)  {
-    MODULE* curModule = &moduleInstance[i];
-    
-    dbInst* curInst = block->findInst( curModule->Name() );  
-    curInst->setLocation( 
-        GetScaleUpPointX(curModule->pmin.x), 
-        GetScaleUpPointY(curModule->pmin.y));
-    curInst->setPlacementStatus(dbPlacementStatus::PLACED);
-  }
-
-  defout writer;
-  writer.setVersion( defout::DEF_5_3 );
-  writer.writeBlock( block, defName );
-}

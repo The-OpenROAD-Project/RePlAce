@@ -15,6 +15,4 @@ void GenerateDummyCellDb(odb::dbSet<odb::dbRow> &rows);
 odb::adsRect GetDieFromDb(odb::dbBox &bBox, bool isScaleDown = false);
 odb::adsRect GetCoreFromDb(odb::dbSet<odb::dbRow> &rows, bool isScaleDown = false);
 
-void WriteDefDb(odb::dbDatabase* db, const char* defName);
-
 #endif

@@ -5,7 +5,6 @@
 
 #include <fstream>
 #include "flute.h"
-#include <boost/functional/hash.hpp>
 #include <tcl.h>
 #include <limits>
 
@@ -185,7 +184,6 @@ class Timing {
   void FillSpefForSta();
   void MakeParasiticsForSta();
 
-  void GenerateClockSta();
   void UpdateTimingSta();
   void UpdateNetWeightSta();
 
@@ -207,8 +205,7 @@ class Timing {
   //        void SliceLongWire();
 
   void WriteSpef(const std::string& spefFile);
-  void ExecuteStaFirst(std::string topCellName, std::string verilogName,
-                       std::vector< std::string >& libName, std::string sdcName);
+  void ExecuteStaFirst();
   void ExecuteStaLater();
 };
 
@@ -221,35 +218,34 @@ inline bool operator!=(const PinInfo& lhs, const PinInfo& rhs) {
   return !(lhs == rhs);
 }
 
+struct PinInfoHash {
+  std::size_t operator()(const PinInfo& k) const {
+    return k.GetData() * 3 + k.GetPinNum();
+  }
+};
+
+struct PinInfoEqual {
+  bool operator()(const PinInfo& k1, const PinInfo& k2) const {
+    return k1.GetData() == k2.GetData()
+      && k1.GetPinNum() == k2.GetPinNum();
+  }
+};
+
+typedef std::pair< Flute::DTYPE, Flute::DTYPE > FlutePair;
+
+struct FlutePairHash {
+  std::size_t operator()(const FlutePair &k) const {
+    return k.first * 3 + k.second;
+  }
+};
+
+struct FlutePairEqual {
+  bool operator()(const FlutePair &p1, const FlutePair &p2) const {
+    return p1 == p2;
+  }
+};
+
 }
-
-// for hash-map enhancement
-// cusom hash -function
-template < class T >
-struct MyHash;
-
-template <>
-struct MyHash< std::pair< Flute::DTYPE, Flute::DTYPE > > {
-  std::size_t operator()(const std::pair< Flute::DTYPE, Flute::DTYPE >& k) const {
-    using boost::hash_combine;
-    size_t seed = 0;
-    hash_combine(seed, k.first);
-    hash_combine(seed, k.second);
-
-    return seed;
-  }
-};
-
-template <>
-struct MyHash< Timing::PinInfo > {
-  std::size_t operator()(const Timing::PinInfo& k) const {
-    using boost::hash_combine;
-    size_t seed = 0;
-    hash_combine(seed, k.GetData());
-    hash_combine(seed, k.GetPinNum());
-    return seed;
-  }
-};
 
 long GetTimingHPWL();
 

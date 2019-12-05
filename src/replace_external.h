@@ -74,6 +74,7 @@ public:
   void print_instances();
 
   float get_hpwl();
+  // These do not belong here. OpenSTA already has tcl visible functions for wns/tns.
   float get_wns();
   float get_tns(); 
 
@@ -88,9 +89,9 @@ public:
 private:
   std::vector<instance_info> instance_list;
   void update_instance_list();
+  void update_dbinst_locations();
 
   std::string net_weight_file;
-  std::string sdc_file;
   std::string output_loc;
   bool timing_driven_mode;
   bool write_bookshelf_mode;

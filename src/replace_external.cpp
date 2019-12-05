@@ -36,37 +36,26 @@ replace_external::help() {
   cout << endl;
   cout << "==== Flow Control ==== " << endl;
   cout << "init_replace" << endl;
-  cout << "    Initialize RePlAce's structure based on LEF and DEF." << endl;
+  cout << "    Initialize RePlAce." << endl;
   cout << endl; 
   cout << "place_cell_init_place" << endl;
-  cout << "    Execute BiCGSTAB engine for initial place." << endl;
+  cout << "    Execute BiCGSTAB engine for initial placement." << endl;
   cout << endl; 
   cout << "place_cell_nesterov_place" << endl;
   cout << "    Execute Nesterov engine for global placement. " << endl;
   cout << endl; 
   cout << "==== Timing-driven Mode ====" << endl;
   cout << "set_timing_driven [true/false]" << endl;
-  cout << "  Enable timing-driven modes" << endl;
-  cout << endl; 
-  cout << "import_lib [file_name]" << endl;
-  cout << "    *.lib location " << endl;
-  cout << "    (Multiple lib files supported. Required for OpenSTA)" << endl;
-  cout << endl; 
-  cout << "import_sdc [file_name]" << endl;
-  cout << "    *.sdc location (Required for OpenSTA). " << endl;
-  cout << "    SDC: Synopsys Design Constraint (SDC)" << endl;
-  cout << endl; 
-  cout << "import_verilog [file_name]" << endl;
-  cout << "    *.v location (Required for OpenSTA)" << endl;
+  cout << "  Enable timing-driven placement" << endl;
   cout << endl; 
   cout << "set_unit_res [resistor]" << endl;
   cout << "    Resisance per micron. Unit: Ohm. " << endl;
-  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << "    (Used for RC estimation)" << endl;
   cout << endl; 
   
   cout << "set_unit_cap [capacitance]" << endl;
   cout << "    Capacitance per micron. Unit: Farad. " << endl;
-  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << "    (Used for RC estimation)" << endl;
   cout << endl; 
   
   cout << "==== RePlAce tunning parameters ====" << endl;
@@ -325,6 +314,7 @@ replace_external::place_cell_nesterov_place() {
     cGP2DglobalPlacement_main();
   }
   update_instance_list();
+  update_dbinst_locations();
   if( isPlot ) {
     SaveCellPlotAsJPEG("Global Placement Result", false,
         string(dir_bnd) + string("/globalPlace"));
@@ -426,6 +416,8 @@ replace_external::update_instance_list() {
       instance_info tmp;
       tmp.name = module->Name();
 
+      // This should NOT be using names to find the dbInst.
+      // There should be a POINTER to it. -cherry
       odb::dbInst* curInst = block->findInst( module->Name() );
       odb::dbMaster* curMaster = curInst->getMaster();
       tmp.master = curMaster->getConstName();
@@ -441,6 +433,22 @@ replace_external::update_instance_list() {
       instance_list[i].x = module->pmin.x;
       instance_list[i].y = module->pmin.y;
     }
+  }
+}
+
+// Update the instance locations from the internal replace structs.
+void replace_external::update_dbinst_locations() {
+  odb::dbBlock* block = _db->getChip()->getBlock();
+
+  for(int i=0; i<moduleCNT; i++)  {
+    MODULE* curModule = &moduleInstance[i];
+    
+    // This should NOT be using names to find the dbInst.
+    // There should be a POINTER to it. -cherry
+    odb::dbInst* curInst = block->findInst( curModule->Name() );  
+    curInst->setLocation(GetScaleUpPointX(curModule->pmin.x), 
+			 GetScaleUpPointY(curModule->pmin.y));
+    curInst->setPlacementStatus(odb::dbPlacementStatus::PLACED);
   }
 }
 
