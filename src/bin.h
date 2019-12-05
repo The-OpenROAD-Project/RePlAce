@@ -72,11 +72,17 @@ struct BIN {
   FPOS pmin;
   FPOS pmax;
   FPOS center;
+  
+  // sum of normal&macro cells area
   prec cell_area;
+  // sum of filler cells area
   prec cell_area2;
 
+  // area that CANNOT place cells
   prec virt_area;
-  long term_area;  // mgwoo
+
+  // already PLACED/FIXED area that CANNOT place cells
+  long term_area;  
 
   prec filler_area;
   prec phi;

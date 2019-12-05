@@ -4,9 +4,3 @@
 [submodule "module/CImg"]
 	path = module/CImg
 	url = https://github.com/dtschump/CImg
-[submodule "module/lef"]
-	path = module/lef
-	url = https://github.com/The-OpenROAD-Project/lef
-[submodule "module/def"]
-	path = module/def
-	url = https://github.com/The-OpenROAD-Project/def

@@ -3,9 +3,9 @@
 #
 
 set design gcd
-set lib_dir ../library/nangate45/
-set design_dir ../design/nangate45/${design}
-set exp_folder exp
+set lib_dir library/nangate45/
+set design_dir design/nangate45/${design}
+set exp_folder td-test-01 
 
 replace_external rep
 
@@ -41,10 +41,6 @@ rep place_cell_nesterov_place
 
 # Export DEF file
 # rep export_def ./${design}_nan45_td.def
-
-if {![file exists ${exp_folder}/]} {
-  exec mkdir ${exp_folder}
-}
 
 set fp [open ${exp_folder}/${design}_2_td.rpt w]
 puts $fp "HPWL: [rep get_hpwl]"

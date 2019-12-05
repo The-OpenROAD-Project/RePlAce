@@ -5,6 +5,7 @@
 *.swp
 *.cmd
 *.cmd*
+*.rpt
 */**/*.o
 
 bench_**
