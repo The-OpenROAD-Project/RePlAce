@@ -5,7 +5,7 @@
 set design gcd
 set lib_dir library/nangate45/
 set design_dir design/nangate45/${design}
-set exp_folder td-test-01 
+set exp_folder rep-td-test-01 
 
 replace_external rep
 

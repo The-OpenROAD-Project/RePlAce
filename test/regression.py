@@ -112,7 +112,7 @@ for cdir in sorted(dirList):
   if os.path.isdir(cdir) == False:
     continue
 
-  if "td-test" in cdir:
+  if "rep-td-test" in cdir:
     tdList.append(cdir)
 
 if sys.argv[1] == "run":
