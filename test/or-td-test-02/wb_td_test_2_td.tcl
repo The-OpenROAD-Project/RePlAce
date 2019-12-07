@@ -15,7 +15,7 @@ read_def ${design_dir}/${design}.def
 read_liberty ${lib_dir}/contest.lib
 read_sdc ${design_dir}/${design}.sdc
 
-global_placement -timing_driven -wire_res 1.6 -wire_cap 0.23e-14
+global_placement -skip_initial_place -timing_driven -wire_res 1.6 -wire_cap 0.23e-14
 
 set rep [replace_external]
 set fp [open ${exp_folder}/${design}_2_td.rpt w]

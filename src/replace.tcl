@@ -1,10 +1,11 @@
 sta::define_cmd_args "global_placement" {
+  [-skip_initial_place]\
   [-timing_driven]\
     [-bin_grid_count grid_count]}
 
 proc global_placement { args } {
   sta::parse_key_args "global_placement" args \
-    keys {-bin_grid_count -wire_res -wire_cap -skip_initial_place} flags {-timing_driven}
+    keys {-bin_grid_count -wire_res -wire_cap} flags {-skip_initial_place -timing_driven}
 
   set rep [replace_external]
 
@@ -45,7 +46,7 @@ proc global_placement { args } {
     # Initialize RePlAce
     $rep init_replace
 
-    if { [info exists keys(-skip_initial_place)] == false } {
+    if { ![info exists flags(-skip_initial_place)] } {
       # initial placement with BiCGSTAB
       $rep place_cell_init_place
     }
