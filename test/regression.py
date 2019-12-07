@@ -76,11 +76,11 @@ def TdRun(binaryName, tdList):
       if cFile.endswith(".tcl") == False:
         continue
       print ( "  " + cFile )
-      cmd = "./%s %s/%s" % (binaryName, curTdCase, cFile)
+      cmd = "%s %s/%s" % (binaryName, curTdCase, cFile)
       log = "%s/%s.log" % (curTdCase, cFile)
       # ExecuteCommand("ln -s *.dat ./%s/" % (curTdCase))
       if useValgrind:
-        cmd = "valgrind --log-fd=1 ./%s %s/%s" % (binaryName, curTdCase, cFile)
+        cmd = "valgrind --log-fd=1 %s %s/%s" % (binaryName, curTdCase, cFile)
         log = "%s/%s_mem_check.log" % (curTdCase, cFile)
         ExecuteCommand(cmd, log)
       elif useScreen:
@@ -120,8 +120,8 @@ for cdir in sorted(dirList):
 
 if sys.argv[1] == "run":
   if len(sys.argv) >= 3 and sys.argv[2] == "openroad":
-    TdRun("openroad", orTdList)
+    TdRun("/OpenROAD/build/src/openroad", orTdList)
   else:
-    TdRun("replace", repTdList)
+    TdRun("./replace", repTdList)
 elif sys.argv[1] == "get":
   ExecuteCommand("watch -n 3 \"grep -r 'HPWL' td-test*/*.rpt; grep -r 'WNS' td-test*/*.rpt; grep -r 'TNS' td-test*/*.rpt\"")
