@@ -4,7 +4,7 @@ sta::define_cmd_args "global_placement" {
 
 proc global_placement { args } {
   sta::parse_key_args "global_placement" args \
-    keys {-bin_grid_count -wire_res -wire_cap} flags {-timing_driven}
+    keys {-bin_grid_count -wire_res -wire_cap -skip_initial_place} flags {-timing_driven}
 
   set rep [replace_external]
 
@@ -37,15 +37,18 @@ proc global_placement { args } {
   }
 
   if { [ord::db_has_rows] } {
-    # Initialize RePlAce
-    $rep init_replace
     # Unfortunately this does not really turn off the noise. -cherry
     $rep set_verbose_level 0
     # Don't shit all over the file system
     $rep set_output /dev/null
 
-    # initial placement with BiCGSTAB
-    $rep place_cell_init_place
+    # Initialize RePlAce
+    $rep init_replace
+
+    if { [info exists keys(-skip_initial_place)] == false } {
+      # initial placement with BiCGSTAB
+      $rep place_cell_init_place
+    }
     # place_cell with Nesterov method 
     $rep place_cell_nesterov_place
     
