@@ -7,12 +7,11 @@ useValgrind = False
 useScreen = False 
 
 def ExecuteCommand( cmd, log="" ):
-  # print( "CMD: " + cmd )
+  print( cmd )
   # print( shlex.split(cmd) )
   if log == "":
     sp.call( shlex.split(cmd), shell=False, stdout=None )
   else:
-    # print( "LOG: " + log )
     f = open(log, "w")
     p = sp.Popen( shlex.split(cmd), stdout=f, stderr=f)
     p.wait()
@@ -65,7 +64,7 @@ def TdGoldenCompare(orig, ok):
   print("  " + ok + " passed!")
 
 
-def TdRun(tdList):
+def TdRun(binaryName, tdList):
   # regression for TD test cases
   for curTdCase in tdList:
     ExecuteCommand("rm -rf %s/*.rpt" % (curTdCase))
@@ -77,11 +76,11 @@ def TdRun(tdList):
       if cFile.endswith(".tcl") == False:
         continue
       print ( "  " + cFile )
-      cmd = "./replace %s/%s" % (curTdCase, cFile)
+      cmd = "./%s %s/%s" % (binaryName, curTdCase, cFile)
       log = "%s/%s.log" % (curTdCase, cFile)
       # ExecuteCommand("ln -s *.dat ./%s/" % (curTdCase))
       if useValgrind:
-        cmd = "valgrind --log-fd=1 ./replace %s/%s" % (curTdCase, cFile)
+        cmd = "valgrind --log-fd=1 ./%s %s/%s" % (binaryName, curTdCase, cFile)
         log = "%s/%s_mem_check.log" % (curTdCase, cFile)
         ExecuteCommand(cmd, log)
       elif useScreen:
@@ -103,19 +102,26 @@ def TdRun(tdList):
 
 if len(sys.argv) <= 1:
   print("Usage: python regression.py run")
+  print("Usage: python regression.py run openroad")
   print("Usage: python regression.py get")
   sys.exit(0)
 
 dirList = os.listdir(".")
-tdList = []
+repTdList = []
+orTdList = []
 for cdir in sorted(dirList):
   if os.path.isdir(cdir) == False:
     continue
 
   if "rep-td-test" in cdir:
-    tdList.append(cdir)
+    repTdList.append(cdir)
+  if "or-td-test" in cdir:
+    orTdList.append(cdir)
 
 if sys.argv[1] == "run":
-  TdRun(tdList)
+  if len(sys.argv) >= 3 and sys.argv[2] == "openroad":
+    TdRun("openroad", orTdList)
+  else:
+    TdRun("replace", repTdList)
 elif sys.argv[1] == "get":
   ExecuteCommand("watch -n 3 \"grep -r 'HPWL' td-test*/*.rpt; grep -r 'WNS' td-test*/*.rpt; grep -r 'TNS' td-test*/*.rpt\"")
