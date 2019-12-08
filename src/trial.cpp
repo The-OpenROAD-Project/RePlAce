@@ -464,7 +464,7 @@ void get1stOrder_ExtremePointsforSecond() {
   tempMinHPWLgap = PREC_MAX;
   for(unsigned i = extPt1_2ndOrder; i < trial_HPWLs.size(); i++) {
     if(get_abs(trial_HPWLs[i].second) < tempMinHPWLgap &&
-       get_abs(trial_HPWLs[i].second != 0)) {
+       get_abs(trial_HPWLs[i].second) != 0) {
       tempMinHPWLgap = get_abs(trial_HPWLs[i].second);
       tempMinIndex = i;
     }
