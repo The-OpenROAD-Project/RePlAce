@@ -49,8 +49,6 @@ else()
 endif()
 
 
-#find_package(Boost REQUIRED)
-
 set(REPLACE_WRAP ${CMAKE_CURRENT_BINARY_DIR}/replace_wrap.cpp)
 set(REPLACE_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/ReplaceTclInitVar.cc)
 
@@ -132,8 +130,6 @@ target_include_directories( replace
 PUBLIC
   ${REPLACE_HOME}/src
 PRIVATE
-  ${Boost_INCLUDE_DIR}
-
   ${EIGEN_HOME}
   ${FLUTE_HOME}
  
