@@ -43,7 +43,6 @@
 #include <cstring>
 #include <ctgmath>
 #include <string>
-#include <omp.h>
 
 #include "bin.h"
 #include "charge.h"

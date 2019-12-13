@@ -43,7 +43,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
-#include <omp.h>
 #include <unordered_map>
 #include <fstream>
 #include <sstream>
