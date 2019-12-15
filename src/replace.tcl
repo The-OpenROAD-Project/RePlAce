@@ -36,6 +36,7 @@ proc global_placement { args } {
     sta::check_positive_integer "-bin_grid_count" $bin_grid_count
     $rep set_bin_grid_count $bin_grid_count
   }
+  sta::check_argc_eq0 "global_placement" $args
 
   if { [ord::db_has_rows] } {
     # Unfortunately this does not really turn off the noise. -cherry
