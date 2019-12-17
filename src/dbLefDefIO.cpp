@@ -370,6 +370,7 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
           break;
       }
       PIN* curPin = &pinInstance[pinIdx];
+      new(curPin) PIN(); 
       curNet->pin[netConnCounter] = curPin;
 
       auto mPtr = moduleTermMap.find(curBTerm->getConstName());
@@ -409,6 +410,7 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
       }
       
       PIN* curPin = &pinInstance[pinIdx];
+      new(curPin) PIN(); 
       curNet->pin[netConnCounter] = curPin;
 
       if( IsModule(curInst->getPlacementStatus()) ) {
