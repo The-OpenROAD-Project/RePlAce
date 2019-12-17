@@ -1,6 +1,3 @@
-[submodule "module/eigen-git-mirror"]
-	path = module/eigen-git-mirror
-	url = https://github.com/eigenteam/eigen-git-mirror
 [submodule "module/CImg"]
 	path = module/CImg
 	url = https://github.com/dtschump/CImg
