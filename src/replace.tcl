@@ -5,9 +5,16 @@ sta::define_cmd_args "global_placement" {
 
 proc global_placement { args } {
   sta::parse_key_args "global_placement" args \
-    keys {-bin_grid_count -wire_res -wire_cap} flags {-skip_initial_place -timing_driven}
-
+    keys {-bin_grid_count -wire_res -wire_cap -density} flags {-skip_initial_place -timing_driven}
+    
   set rep [replace_external]
+
+  set target_density 0.8
+  if { [info exists keys(-density)] } {
+    set target_density $keys(-density) 
+    sta::check_positive_float "-density" $target_density
+  }
+  $rep set_density $target_density
 
   # Support -wire_res/-wire_cap as overrides but do not make
   # them user visible. -cherry
