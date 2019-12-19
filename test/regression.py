@@ -8,17 +8,12 @@ useScreen = False
 
 def ExecuteCommand( cmd, log="" ):
   print( cmd )
-  # print( shlex.split(cmd) )
   if log == "":
     sp.call( shlex.split(cmd), shell=False, stdout=None )
   else:
     f = open(log, "w")
     p = sp.Popen( shlex.split(cmd), stdout=f, stderr=f)
     p.wait()
-    f.close()
-
-    f = open(log, "r")
-    print( f.read() )
     f.close()
 
 # threshold setting
