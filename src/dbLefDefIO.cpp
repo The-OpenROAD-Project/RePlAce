@@ -664,8 +664,8 @@ void GenerateDummyCellDb(dbSet<dbRow> &rows) {
   // termCnt Updates 
   int prevCnt = terminalCNT;
   terminalCNT += dummyTermStor_.size();
-//  terminalInstance = 
-//    (TERM*) realloc( terminalInstance, sizeof(TERM) * terminalCNT);
+  terminalInstance = 
+    (TERM*) realloc( terminalInstance, sizeof(TERM) * terminalCNT);
  
   // copy into original instances 
   for(int i=prevCnt; i<terminalCNT; i++) {

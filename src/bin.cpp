@@ -428,20 +428,19 @@ void bin_init_2D(int STAGE) {
     TIER *tier = &tier_st[0];
 
     // there is no shapes
-    if(shapeMap.find(term->Name()) == shapeMap.end()) {
+//    if(shapeMap.find(term->Name()) == shapeMap.end()) {
       UpdateTerminalArea(tier, &(term->pmin), &(term->pmax));
-    }
+//    }
     // there are shapes
-    else {
-      for(auto &curIdx : shapeMap[term->Name()]) {
-        prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
-             width = shapeStor[curIdx].width, height = shapeStor[curIdx].height;
-        FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
-
-        UpdateTerminalArea(tier, &tmpMin, &tmpMax);
-      }
-    }
-    //        UpdateTerminalArea(tier, &(term->pmin), &(term->pmax));
+//    else {
+//      for(auto &curIdx : shapeMap[term->Name()]) {
+//        prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
+//             width = shapeStor[curIdx].width, height = shapeStor[curIdx].height;
+//        FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
+//
+//        UpdateTerminalArea(tier, &tmpMin, &tmpMax);
+//      }
+//    }
   }
 
   if(STAGE == cGP2D) {

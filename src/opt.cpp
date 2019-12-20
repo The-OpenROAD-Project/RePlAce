@@ -216,7 +216,7 @@ void whitespace_init(void) {
     }
 
     // if there is no shapes..
-    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
+//    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
       for(int j = 0; j < place_st_cnt; j++) {
         PLACE *pl = &place_st[j];
 
@@ -235,34 +235,27 @@ void whitespace_init(void) {
       }
       //            cout << fixed <<setprecision(4) <<curTerminal->name << " : "
       //            << total_termPL_area << endl;
-    }
+//    }
     // there are shapes
-    else {
-      for(auto &curIdx : shapeMap[curTerminal->Name()]) {
-        for(int j = 0; j < place_st_cnt; j++) {
-          PLACE *pl = &place_st[j];
-
-          prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
-               width = shapeStor[curIdx].width,
-               height = shapeStor[curIdx].height;
-
-          FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
-
-          prec commonArea = pGetCommonAreaXY(tmpMin, tmpMax, pl->org, pl->end);
-
-          curTerminal->PL_area += commonArea;
-          total_termPL_area += commonArea;
-          tier->term_area += commonArea;
-        }
-      }
-    }
-    /*
-     for(int j = 0; j < place_st_cnt; j++) {
-         PLACE* pl = &place_st[j];
-         FPOS len = get_int_rgn(term->pmin, term->pmax, pl->org, pl->end);
-         term->PL_area += fp_product(len);
-     }
-     total_termPL_area += term->PL_area;*/
+//    else {
+//      for(auto &curIdx : shapeMap[curTerminal->Name()]) {
+//        for(int j = 0; j < place_st_cnt; j++) {
+//          PLACE *pl = &place_st[j];
+//
+//          prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
+//               width = shapeStor[curIdx].width,
+//               height = shapeStor[curIdx].height;
+//
+//          FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
+//
+//          prec commonArea = pGetCommonAreaXY(tmpMin, tmpMax, pl->org, pl->end);
+//
+//          curTerminal->PL_area += commonArea;
+//          total_termPL_area += commonArea;
+//          tier->term_area += commonArea;
+//        }
+//      }
+//    }
   }
 
   total_WS_area = total_PL_area - total_termPL_area;
@@ -1406,54 +1399,6 @@ void transform_3d(FPOS *tier_min, FPOS *tier_max, int tier_row_cnt) {
 
     tier->area = tier->size.x * tier->size.y;
   }
-
-  // TIER's term_area update!
-  // mgwoo
-  /*
-  for(int i = 0; i < terminalCNT; i++) {
-      curTerminal = &terminalInstance[i];
-      tier = &tier_st[0];
-      tier->term_st[tier->term_cnt++] = curTerminal;
-
-      // skip for IO pin informations
-//        if( curTerminal->isTerminalNI ) {
-//            continue;
-//        }
-
-      // if there is no shape's information
-      if( shapeMap.find( curTerminal->Name() ) == shapeMap.end() ) {
-          cout << "not found: " << curTerminal->Name() << " " << place_st_cnt <<
-endl;
-          // tier->term_area += get_common_area(curTerminal->pmin,
-          // curTerminal->pmax, tier->pmin, tier->pmax);
-          for(int j=0; j<place_st_cnt; j++) {
-              PLACE* curPlace = &place_st[j];
-              tier->term_area += get_common_area(curTerminal->pmin,
-                  curTerminal->pmax, curPlace->org, curPlace->end);
-          }
-      }
-      // if there exist shape's information
-      else {
-          for(auto& curIdx : shapeMap[curTerminal->Name()]) {
-              cout << "name: " << curTerminal->Name() << endl;
-              prec llx = shapeStor[curIdx].llx,
-                   lly = shapeStor[curIdx].lly,
-                   width = shapeStor[curIdx].width,
-                   height = shapeStor[curIdx].height;
-              FPOS tmpMin(llx, lly, 0), tmpMax(llx + width, lly + height, 1);
-              tmpMin.Dump("tmpMin");
-              tmpMax.Dump("tmpMax");
-              // prec commonArea = get_common_area(tmpMin, tmpMax,
-              // tier->pmin, tier->pmax);
-              for(int j=0; j<place_st_cnt; j++) {
-                  PLACE* curPlace = &place_st[j];
-                  tier->term_area += get_common_area(tmpMin, tmpMax,
-                          curPlace->org, curPlace->end);
-              }
-          }
-      }
-  }
-  */
 
   for(int i = 0; i < numLayer; i++) {
     tier = &tier_st[i];

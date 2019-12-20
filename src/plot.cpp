@@ -202,23 +202,23 @@ void DrawTerminal(CImgObj &img,
       continue;
     }
 
-    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
+//    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
       int x1 = pe.GetX(curTerminal->pmin);
       int x3 = pe.GetX(curTerminal->pmax);
       int y1 = pe.GetY(curTerminal->pmin);
       int y3 = pe.GetY(curTerminal->pmax);
       img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
-    }
-    else {
-      for(auto &curIdx : shapeMap[curTerminal->Name()]  ) {
-        int x1 = pe.GetX(shapeStor[curIdx].llx);
-        int y1 = pe.GetY(shapeStor[curIdx].lly);
-
-        int x3 = pe.GetX(shapeStor[curIdx].llx + shapeStor[curIdx].width);
-        int y3 = pe.GetY(shapeStor[curIdx].lly + shapeStor[curIdx].height);
-
-        img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
-      }
+//    }
+//    else {
+//      for(auto &curIdx : shapeMap[curTerminal->Name()]  ) {
+//        int x1 = pe.GetX(shapeStor[curIdx].llx);
+//        int y1 = pe.GetY(shapeStor[curIdx].lly);
+//
+//        int x3 = pe.GetX(shapeStor[curIdx].llx + shapeStor[curIdx].width);
+//        int y3 = pe.GetY(shapeStor[curIdx].lly + shapeStor[curIdx].height);
+//
+//        img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
+//      }
     }
 
     for(int j=0; j<curTerminal->pinCNTinObject; j++) {
