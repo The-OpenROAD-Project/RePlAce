@@ -8,6 +8,7 @@ void FillReplaceParameter(odb::dbDatabase* db);
 void FillReplaceModule(odb::dbSet<odb::dbInst> &insts);
 void FillReplaceTerm(odb::dbSet<odb::dbInst> &insts, odb::dbSet<odb::dbBTerm> &bterms);
 void FillReplaceRow(odb::dbSet<odb::dbRow> &rows);
+void FillReplaceNewRow(odb::dbSet<odb::dbRow> &rows);
 void FillReplaceNet(odb::dbSet<odb::dbNet> &nets);
 void GenerateDummyCellDb(odb::dbSet<odb::dbRow> &rows);
 

@@ -915,15 +915,12 @@ void net_update_wa(FPOS *st) {
       net->max_x = net->terminalMax.x;
       net->max_y = net->terminalMax.y;
 
-      //        cout << "size: " << sizeof(PIN) << endl;
-      //        cout << net->pinCNTinObject << endl;
       for(int j = 0; j < net->pinCNTinObject; j++) {
         PIN *pin = net->pin[j];
 
-        //            cout << j << " " << pin << endl;
-
         if(!pin->term) {
           MODULE *curModule = &moduleInstance[pin->moduleID];
+
           FPOS pof = curModule->pof[pin->pinIDinModule];
           FPOS center = st[pin->moduleID];
           FPOS fp;
@@ -940,8 +937,6 @@ void net_update_wa(FPOS *st) {
           continue;
         }
       }
-      //        if( i >=2 )
-      //        exit(1);
 
       prec min_x = net->min_x;
       prec min_y = net->min_y;

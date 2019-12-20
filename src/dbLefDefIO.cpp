@@ -34,6 +34,7 @@ using std::cout;
 using std::endl;
 using std::to_string;
 using std::make_pair;
+using std::vector;
 
 static std::unordered_map<string, pair<bool, int>> moduleTermMap;
 
@@ -102,6 +103,7 @@ void FillReplaceStructures(dbDatabase* db) {
   FillReplaceNet(nets);
   FillReplaceRow(rows);  
   GenerateDummyCellDb(rows);  
+  FillReplaceNewRow(rows);  
 
   FPOS tier_min, tier_max;
   int tier_row_cnt = 0;
@@ -223,7 +225,6 @@ void FillReplaceModule(dbSet<dbInst> &insts) {
     curModule->idx = i;
 
     moduleTermMap[curInst->getConstName()] = make_pair(true, i);
-//    curModule->Dump(moduleNameStor[i]);
 
     i++; 
   }
@@ -275,7 +276,6 @@ void FillReplaceTerm(dbSet<dbInst> &insts, dbSet<dbBTerm> &bterms) {
 
     moduleTermMap[curInst->getConstName()] = make_pair(false, i);
 
-//    curTerm->Dump();
     i++;
   }
  
@@ -421,6 +421,11 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
 //          << curITerm->getMTerm()->getMaster()->getConstName() << endl;
 
         // pinName
+//        cout << "mPinInfo: " << curModule->Name() << " " << mtPtr->second.second 
+//          << " " << mPinName[mtPtr->second.second].size() 
+//          << " " << curITerm->getMTerm()->getConstName() << endl;
+
+
         mPinName[mtPtr->second.second].push_back( 
             curITerm->getMTerm()->getConstName() );
 
@@ -446,7 +451,7 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
         AddPinInfoForModuleAndTerminal(
             &curTerm->pin, &curTerm->pof,
             curTerm->pinCNTinObject++, curOffset,
-            curTerm->idx, netIdx, netConnCounter++, pinIdx++, io, false); 
+            curTerm->idx, netIdx, netConnCounter++, pinIdx++, io, true); 
       }
     }
 
@@ -468,12 +473,40 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
   PrintProcEnd("Generate Nets");
 }
 
-// update rowHeight
 void FillReplaceRow(dbSet<dbRow> &rows) {
+  row_cnt = rows.size();
+  row_st = (ROW*)malloc(sizeof(ROW) * row_cnt);
+
+  int i=0;
+  for(dbRow* curDbRow : rows) {
+    ROW* curRow = &row_st[i++];
+    new(curRow) ROW();
+   
+    adsRect rowBox;
+    curDbRow->getBBox( rowBox );
+
+    float rowSizeX = GetScaleDownSize(rowBox.xMax()-rowBox.xMin());
+    float rowSizeY = GetScaleDownSize(rowBox.yMax()-rowBox.yMin());
+    float siteSizeX = GetScaleDownSize(curDbRow->getSite()->getWidth());
+
+    // Just follow the openDB itself
+    curRow->pmin.Set( GetScaleDownPoint(rowBox.xMin()), GetScaleDownPoint(rowBox.yMin()) );
+    curRow->size.Set( rowSizeX, rowSizeY ); 
+    curRow->pmax.Set( GetScaleDownPoint(rowBox.xMax()), GetScaleDownPoint(rowBox.yMax()) );
+    
+    curRow->x_cnt = rowSizeX / siteSizeX;
+    curRow->site_wid = curRow->site_spa = SITE_SPA = siteSizeX; 
+  }
+}
+// update rowHeight
+void FillReplaceNewRow(dbSet<dbRow> &rows) {
   PrintProcBegin("Generate Rows");
 
-  // get Scale-Downed coreArea 
-  adsRect coreArea = GetCoreFromDb(rows, true);
+  // get coreArea 
+  adsRect coreArea = GetCoreFromDb(rows);
+  
+  float coreLx = GetScaleDownPoint( coreArea.xMin() );
+  float coreLy = GetScaleDownPoint( coreArea.yMin() );
 
   dbSet<dbRow>::iterator riter;
   riter = rows.begin();
@@ -481,12 +514,17 @@ void FillReplaceRow(dbSet<dbRow> &rows) {
 
   float siteX = GetScaleDownSize( tmpRow->getSite()->getWidth() );
   float siteY = GetScaleDownSize( tmpRow->getSite()->getHeight() );
-
-  int rowCntX = INT_CONVERT( (coreArea.xMax() - coreArea.xMin()) / siteX );
-  int rowCntY = INT_CONVERT( (coreArea.yMax() - coreArea.yMin()) / siteY );
+  
+  int rowCntX = (coreArea.xMax() - coreArea.xMin()) / tmpRow->getSite()->getWidth();
+  int rowCntY = (coreArea.yMax() - coreArea.yMin()) / tmpRow->getSite()->getHeight();
 
   float rowSizeX = rowCntX * siteX;
   float rowSizeY = siteY;
+
+  // free previous fragmented row DEF
+  if( row_st ) {
+    free(row_st);
+  }
 
   row_cnt = rowCntY;
   row_st = (ROW*)malloc(sizeof(ROW) * row_cnt);
@@ -495,9 +533,9 @@ void FillReplaceRow(dbSet<dbRow> &rows) {
     ROW* curRow = &row_st[i];
     new(curRow) ROW();
 
-    curRow->pmin.Set(coreArea.xMin(), coreArea.yMin() + i * siteY );
+    curRow->pmin.Set(coreLx, coreLy + i * siteY );
     curRow->size.Set(rowSizeX, rowSizeY);
-    curRow->pmax.Set(coreArea.xMin() + rowSizeX, coreArea.yMin() + i * siteY + rowSizeY);
+    curRow->pmax.Set(coreLx + rowSizeX, coreLy + i * siteY + rowSizeY);
     if( i == 0 ) {
       grow_pmin.Set(curRow->pmin);
     }
@@ -505,7 +543,7 @@ void FillReplaceRow(dbSet<dbRow> &rows) {
       grow_pmax.Set(curRow->pmax);
     }
     curRow->x_cnt = rowCntX;
-    curRow->site_wid = curRow->site_spa = SITE_SPA = GetScaleDownSize(siteX);
+    curRow->site_wid = curRow->site_spa = SITE_SPA = siteX;
   }
   PrintInfoPrecPair( "RowSize", SITE_SPA, rowHeight);
   PrintInfoInt("NumRows", row_cnt);
@@ -513,7 +551,126 @@ void FillReplaceRow(dbSet<dbRow> &rows) {
 }
 
 void GenerateDummyCellDb(dbSet<dbRow> &rows) {
+  dbRow* tmpRow = *(rows.begin());
 
+  // Set Site Size
+  float siteSizeX_ = GetScaleDownSize( tmpRow->getSite()->getWidth() );
+  float siteSizeY_ = GetScaleDownSize( tmpRow->getSite()->getHeight() ) ;
+
+  // Get Scale-Downed coreArea
+  adsRect coreArea = GetCoreFromDb(rows);
+
+  float coreLx = GetScaleDownPoint( coreArea.xMin() );
+  float coreLy = GetScaleDownPoint( coreArea.yMin() );
+//  float coreUx = GetScaleDownPoint( coreArea.xMax() );
+//  float coreUy = GetScaleDownPoint( coreArea.yMax() );
+
+  // Set Array Counts 
+  int numX_ = (coreArea.xMax() - coreArea.xMin()) / tmpRow->getSite()->getWidth();
+  int numY_ = (coreArea.yMax() - coreArea.yMin()) / tmpRow->getSite()->getHeight();
+  // cout << "rowCnt: " << numX_ << " " << numY_ << endl;
+
+  float rowSizeY_ = siteSizeY_;
+  // cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
+ 
+  // Empty Array Fill 
+  ArrayInfo::CellInfo* arr_ = new ArrayInfo::CellInfo[numX_ * numY_];
+  for(int i = 0; i < numX_ * numY_; i++) {
+    arr_[i] = ArrayInfo::CellInfo::Empty;
+  }
+
+  ArrayInfo ainfo(coreLx, coreLy, siteSizeX_, siteSizeY_); 
+
+  // ROW array fill
+  for(int i=0; i<row_cnt ; i++) {
+    ROW* curRow = &row_st[i];
+
+    for(int i = ainfo.GetCoordiX(curRow->pmin.x); 
+        i < ainfo.GetCoordiX(curRow->pmax.x); i++) {
+      for(int j = ainfo.GetCoordiY(curRow->pmin.y); 
+          j < ainfo.GetCoordiY(curRow->pmax.y); j++) {
+        arr_[j * numX_ + i] = ArrayInfo::CellInfo::Row;
+      }
+    } 
+  }
+  
+  // TERM array fill
+  for(int i=0; i<terminalCNT; i++) {
+    TERM* curTerm = &terminalInstance[i];
+    if( curTerm -> isTerminalNI ) {
+      continue;
+    }
+
+    // cout << "TERM lx: " << ainfo.GetLowerX(curTerm->pmin.x) 
+    //   << " ux:" << ainfo.GetUpperX(curTerm->pmax.x);
+    // cout << " ly: " << ainfo.GetLowerY(curTerm->pmin.y) 
+    //   << " uy:" << ainfo.GetUpperY(curTerm->pmax.y)
+    //   << endl;
+    for(int i = ainfo.GetLowerX(curTerm->pmin.x); 
+        i < ainfo.GetUpperX(curTerm->pmax.x); i++) {
+      // out of CoreArea placed-cell handling
+      if( i < 0 || i >= numX_ ) {
+        continue;
+      }
+      for(int j = ainfo.GetLowerY(curTerm->pmin.y); 
+          j < ainfo.GetUpperY(curTerm->pmax.y); j++) {
+
+        // out of CoreArea placed-cell handling
+        if( j < 0 || j >= numY_ ) {
+          continue;
+        }
+        arr_[j * numX_ + i] = ArrayInfo::CellInfo::Cell;
+      }
+    }
+  }
+
+
+  int idxCnt = terminalCNT;
+  vector< TERM > dummyTermStor_;
+  for(int j = 0; j < numY_; j++) {
+    for(int i = 0; i < numX_; i++) {
+      if(arr_[j * numX_ + i] == ArrayInfo::CellInfo::Empty) {
+        int startX = i;
+        while(i < numX_ && arr_[j * numX_ + i] == ArrayInfo::CellInfo::Empty) {
+          i++;
+        }
+        int endX = i;
+
+        TERM curTerm;
+        // strcpy(curTerm.Name(),
+        //   string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
+        //
+        terminalNameStor.push_back( 
+               string("dummy_inst_" + to_string(dummyTermStor_.size())).c_str());
+        curTerm.pmin.Set((prec)(coreLx + siteSizeX_ * startX),
+                         (prec)(coreLy + j * siteSizeY_));
+        curTerm.pmax.Set((prec)(coreLx + siteSizeX_ * endX),
+                         (prec)(coreLy + j * siteSizeY_ + rowSizeY_));
+        curTerm.size.Set((prec)((endX - startX) * siteSizeX_),
+                         (prec)(rowSizeY_));
+        
+        curTerm.center.Set( curTerm.pmin.x + 0.5*curTerm.size.x,
+                            curTerm.pmin.y + 0.5*curTerm.size.y); 
+
+        curTerm.isTerminalNI = false;
+        curTerm.area = curTerm.size.GetProduct();
+        curTerm.idx = idxCnt++;
+        dummyTermStor_.push_back(curTerm);
+      }
+    }
+  }
+  PrintInfoInt("Inserted Dummy Terms", dummyTermStor_.size());
+
+  // termCnt Updates 
+  int prevCnt = terminalCNT;
+  terminalCNT += dummyTermStor_.size();
+//  terminalInstance = 
+//    (TERM*) realloc( terminalInstance, sizeof(TERM) * terminalCNT);
+ 
+  // copy into original instances 
+  for(int i=prevCnt; i<terminalCNT; i++) {
+    terminalInstance[i] = dummyTermStor_[i - prevCnt];
+  }
 }
 
 adsRect GetDieFromDb(dbBox* bBox, bool isScaleDown) {
