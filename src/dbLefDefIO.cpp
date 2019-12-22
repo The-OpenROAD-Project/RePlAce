@@ -78,21 +78,6 @@ void FillReplaceStructures(dbDatabase* db) {
   // PINS iterator
   dbSet<dbBTerm> bterms = block->getBTerms();
   terminalCNT += bterms.size();
-//  dbSet<dbBTerm>::iterator btiter;
-//  for(btiter = bterms.begin(); btiter != bterms.end(); ++btiter) {
-//    dbBTerm* curBTerm = *btiter;
-//    terminalCNT++;
-//    cout << "Bterm: " << curBTerm -> getName() << endl;
-//  }
-
-  // Instance Term
-//  dbSet<dbITerm> iterms = block->getITerms();
-//  dbSet<dbITerm>::iterator ititer;
-//  for(ititer = iterms.begin(); ititer != iterms.end(); ++ititer) {
-//    dbITerm* curITerm = *ititer;
-//    curITerm->print();
-//    cout << "Iterm: " << curITerm -> getName() << endl;
-//  }
   
   dbSet<dbNet> nets = block->getNets();
   dbSet<dbRow> rows = block->getRows();
@@ -136,22 +121,11 @@ void FillReplaceParameter(dbDatabase* db) {
   PrintInfoInt( "DEF DBU", GetDefDbu());
 
 
-//  dbBox* bBox = block->getBBox();
-//  cout << "Block: " << bBox->xMin() << " " << bBox->xMax() << endl;
-
-//  dbSet<dbRegion> reg = block->getRegions();
-//  dbSet<dbRegion>::iterator regiter;
-//  for(regiter = reg.begin(); regiter != reg.begin(); ++regiter) {
-//    dbRegion* curReg = *regiter;
-//    cout << "Region: " << curReg->getName()<<endl;
-//  } 
-
   // extract arbitrary row height
   dbSet<dbRow>::iterator riter;
   riter = rows.begin();
   dbRow* firstRow = *riter;
 
-//  cout << firstRow->getName() << endl;
   adsRect rowRect;
   firstRow->getBBox( rowRect );
   PrintInfoPrec("RowHeight", rowRect.dy() );
@@ -179,8 +153,6 @@ void FillReplaceParameter(dbDatabase* db) {
   
   rowHeight =  GetScaleDownSize( rowRect.dy() ) ;
   PrintInfoPrec("ScaleDownRowHeight", rowHeight );
-//  cout << rowRect.xMin() << " " << rowRect.yMin() << " - " << rowRect.xMax() << " " << rowRect.yMax() << endl;
-//  cout << rowRect.dx() << " " << rowRect.dy() << endl;
 
 }
 
@@ -329,7 +301,8 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
   int netIdx = 0, pinIdx = 0;
   for(nIter = nets.begin(); nIter != nets.end(); ++nIter) {
     dbNet* curDnet = *nIter;
-    
+   
+    // skip for clock/reset/power/ground nets 
     dbSigType nType = curDnet->getSigType();
     if( nType == dbSigType::GROUND ||
         nType == dbSigType::POWER ||
@@ -337,6 +310,11 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
         nType == dbSigType::RESET ) {
       continue;
     } 
+
+    // Skip for empty nets
+    if( curDnet->getBTerms().size() + curDnet->getITerms().size() == 0 ) {
+      continue;
+    }
 
     NET* curNet = &netInstance[netIdx];
     new(curNet) NET();
@@ -416,16 +394,6 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
       if( IsModule(curInst->getPlacementStatus()) ) {
         MODULE* curModule = &moduleInstance[mtPtr->second.second];
         
-//        cout << curITerm->getId() << " " 
-//          << curITerm->getMTerm()->getConstName() << " " 
-//          << curITerm->getMTerm()->getMaster()->getConstName() << endl;
-
-        // pinName
-//        cout << "mPinInfo: " << curModule->Name() << " " << mtPtr->second.second 
-//          << " " << mPinName[mtPtr->second.second].size() 
-//          << " " << curITerm->getMTerm()->getConstName() << endl;
-
-
         mPinName[mtPtr->second.second].push_back( 
             curITerm->getMTerm()->getConstName() );
 
@@ -455,13 +423,6 @@ void FillReplaceNet(dbSet<dbNet> &nets) {
       }
     }
 
-    // ITerm : instances' terminal : instances' pin
-    // BTerm : blocks' terminal : IO connection of blocks
-//    if( curNet->getBTermCount() ) {
-//      cout << curNet->getName() << " " 
-//      << curNet->getITermCount() << " " 
-//      << curNet->getBTermCount() << endl;
-//    }
     netIdx++;
   }
 
@@ -562,16 +523,12 @@ void GenerateDummyCellDb(dbSet<dbRow> &rows) {
 
   float coreLx = GetScaleDownPoint( coreArea.xMin() );
   float coreLy = GetScaleDownPoint( coreArea.yMin() );
-//  float coreUx = GetScaleDownPoint( coreArea.xMax() );
-//  float coreUy = GetScaleDownPoint( coreArea.yMax() );
 
   // Set Array Counts 
   int numX_ = (coreArea.xMax() - coreArea.xMin()) / tmpRow->getSite()->getWidth();
   int numY_ = (coreArea.yMax() - coreArea.yMin()) / tmpRow->getSite()->getHeight();
-  // cout << "rowCnt: " << numX_ << " " << numY_ << endl;
 
   float rowSizeY_ = siteSizeY_;
-  // cout << "rowSize: " << rowSizeX_ << " " << rowSizeY_ << endl;
  
   // Empty Array Fill 
   ArrayInfo::CellInfo* arr_ = new ArrayInfo::CellInfo[numX_ * numY_];
