@@ -6,6 +6,11 @@ import shlex
 useValgrind = False 
 useScreen = False 
 
+testPath = os.path.realpath(__file__)
+testDir = os.path.dirname(testPath)
+openroadDir = os.path.dirname(os.path.dirname(os.path.dirname(testDir)))
+openroadBinary = os.path.join(openroadDir, "build", "src", "openroad")
+
 def ExecuteCommand( cmd, log="" ):
   print( cmd )
   if log == "":
@@ -15,6 +20,12 @@ def ExecuteCommand( cmd, log="" ):
     p = sp.Popen( shlex.split(cmd), stdout=f, stderr=f)
     p.wait()
     f.close()
+
+def ClearFile( directory, ext):
+  for curFile in os.listdir(directory):
+    if curFile.endswith("."+ext):
+      os.remove("%s/%s" % (directory, curFile))
+  print( "%s *.%s has been removed!" % ( directory, ext ))
 
 # threshold setting
 def DiffVar(gVar, tVar, threshold):
@@ -62,8 +73,8 @@ def TdGoldenCompare(orig, ok):
 def TdRun(binaryName, tdList):
   # regression for TD test cases
   for curTdCase in tdList:
-    ExecuteCommand("rm -rf %s/*.rpt" % (curTdCase))
-    ExecuteCommand("rm -rf %s/*.log" % (curTdCase))
+    ClearFile(curTdCase, "rpt")
+    ClearFile(curTdCase, "log")
   
   for curTdCase in tdList:
     print ( "Access " + curTdCase + ":")
@@ -115,7 +126,7 @@ for cdir in sorted(dirList):
 
 if sys.argv[1] == "run":
   if len(sys.argv) >= 3 and sys.argv[2] == "openroad":
-    TdRun("/OpenROAD/build/src/openroad", orTdList)
+    TdRun(openroadBinary, orTdList)
   else:
     TdRun("./replace", repTdList)
 elif sys.argv[1] == "get":
