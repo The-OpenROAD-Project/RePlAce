@@ -98,6 +98,26 @@ prec GetScaleDownSize(float input);
 prec GetScaleDownPoint(float input);
 
 
-
+/////////////////////////////////////////////////////
+// ArrayInfo class
+class ArrayInfo {
+private:
+  float lx_;
+  float ly_;
+  float siteSizeX_;
+  float siteSizeY_;
+public:
+  enum CellInfo {Empty, Row, Cell};
+  ArrayInfo(float lx, float ly, float siteSizeX, float siteSizeY) :
+    lx_(lx), ly_(ly), siteSizeX_(siteSizeX), siteSizeY_(siteSizeY) {};
+  int GetCoordiX( float x );
+  int GetCoordiY( float y );
+  
+  int GetLowerX( float x );
+  int GetLowerY( float y );
+  
+  int GetUpperX( float x );
+  int GetUpperY( float y );
+};
 
 #endif

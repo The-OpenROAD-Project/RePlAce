@@ -43,7 +43,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
-#include <omp.h>
 #include <unordered_map>
 #include <fstream>
 #include <sstream>
@@ -53,13 +52,8 @@
 #include "opt.h"
 #include "wlen.h"
 
-#include "lefdefIO.h"
 
-using std::min;
-using std::max;
-using std::make_pair;
-using std::fstream;
-using std::stringstream;
+using namespace std;
 
 int wcof_flg;
 int MAX_EXP;
@@ -878,7 +872,7 @@ void net_update_wa(FPOS *st) {
   if(timeon)
     time_start(&time);
 
-  omp_set_num_threads(numThread);
+//  omp_set_num_threads(numThread);
 #pragma omp parallel default(none) shared(gcell_cnt, gcell_st, st) private(i)
   {
 //        CELL* cell = NULL;
@@ -921,15 +915,12 @@ void net_update_wa(FPOS *st) {
       net->max_x = net->terminalMax.x;
       net->max_y = net->terminalMax.y;
 
-      //        cout << "size: " << sizeof(PIN) << endl;
-      //        cout << net->pinCNTinObject << endl;
       for(int j = 0; j < net->pinCNTinObject; j++) {
         PIN *pin = net->pin[j];
 
-        //            cout << j << " " << pin << endl;
-
         if(!pin->term) {
           MODULE *curModule = &moduleInstance[pin->moduleID];
+
           FPOS pof = curModule->pof[pin->pinIDinModule];
           FPOS center = st[pin->moduleID];
           FPOS fp;
@@ -946,8 +937,6 @@ void net_update_wa(FPOS *st) {
           continue;
         }
       }
-      //        if( i >=2 )
-      //        exit(1);
 
       prec min_x = net->min_x;
       prec min_y = net->min_y;

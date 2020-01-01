@@ -1,16 +1,22 @@
+
+#include "db.h"
+#include "lefin.h"
+#include "defin.h"
+
 #include "replace_external.h"
 #include "wlen.h"
 #include "initPlacement.h"
+#include "dbLefDefIO.h"
 #include "plot.h"
 #include "routeOpt.h"
 #include "timing.h"
 #include "fft.h"
 #include "openroad/OpenRoad.hh"
 
+using namespace std;
 
 replace_external::
 replace_external() : 
-  ckt(&Replace::__ckt), 
   timing_driven_mode(false), 
   write_bookshelf_mode(false),
   unit_r(0.0f), unit_c(0.0f) {
@@ -24,18 +30,6 @@ void
 replace_external::help() {
   cout << endl;
   cout << "==== File I/O Commands ====" << endl;
-  cout << "import_lef [file_name]" << endl;
-  cout << "    *.lef location " << endl;
-  cout << "    (Multiple lef files supported. " << endl;
-  cout << "    Technology LEF must be ahead of other LEFs.) " << endl;
-  cout << endl; 
-  cout << "import_def [file_name]" << endl;
-  cout << "    *.def location " << endl;
-  cout << "    (Required due to FloorPlan information)" << endl;
-  cout << endl; 
-  cout << "export_def [file_name]" << endl;
-  cout << "    Output DEF location" << endl;
-  cout << endl; 
   cout << "set_output [directory_location]" << endl;
   cout << "    Specify the location of output results. " << endl;
   cout << "    Default: ./output " << endl;
@@ -43,37 +37,26 @@ replace_external::help() {
   cout << endl;
   cout << "==== Flow Control ==== " << endl;
   cout << "init_replace" << endl;
-  cout << "    Initialize RePlAce's structure based on LEF and DEF." << endl;
+  cout << "    Initialize RePlAce." << endl;
   cout << endl; 
   cout << "place_cell_init_place" << endl;
-  cout << "    Execute BiCGSTAB engine for initial place." << endl;
+  cout << "    Execute BiCGSTAB engine for initial placement." << endl;
   cout << endl; 
   cout << "place_cell_nesterov_place" << endl;
   cout << "    Execute Nesterov engine for global placement. " << endl;
   cout << endl; 
   cout << "==== Timing-driven Mode ====" << endl;
   cout << "set_timing_driven [true/false]" << endl;
-  cout << "  Enable timing-driven modes" << endl;
-  cout << endl; 
-  cout << "import_lib [file_name]" << endl;
-  cout << "    *.lib location " << endl;
-  cout << "    (Multiple lib files supported. Required for OpenSTA)" << endl;
-  cout << endl; 
-  cout << "import_sdc [file_name]" << endl;
-  cout << "    *.sdc location (Required for OpenSTA). " << endl;
-  cout << "    SDC: Synopsys Design Constraint (SDC)" << endl;
-  cout << endl; 
-  cout << "import_verilog [file_name]" << endl;
-  cout << "    *.v location (Required for OpenSTA)" << endl;
+  cout << "  Enable timing-driven placement" << endl;
   cout << endl; 
   cout << "set_unit_res [resistor]" << endl;
   cout << "    Resisance per micron. Unit: Ohm. " << endl;
-  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << "    (Used for RC estimation)" << endl;
   cout << endl; 
   
   cout << "set_unit_cap [capacitance]" << endl;
   cout << "    Capacitance per micron. Unit: Farad. " << endl;
-  cout << "    (Used for Internal RC Extraction)" << endl;
+  cout << "    (Used for RC estimation)" << endl;
   cout << endl; 
   
   cout << "==== RePlAce tunning parameters ====" << endl;
@@ -176,22 +159,6 @@ replace_external::help() {
 
 }
 
-void 
-replace_external::import_lef(const char* lef){ 
-  lef_stor.push_back(lef);
-}
-
-void 
-replace_external::import_def(const char* def){
-  def_stor.push_back(def);
-}
-
-
-void 
-replace_external::export_def(const char* def){
-  WriteDef(def);
-}
-
 void
 replace_external::set_output(const char* output) {
   output_loc = output;
@@ -206,21 +173,6 @@ replace_external::set_output_experiment_name(const char* output) {
 void
 replace_external::set_timing_driven(bool is_true) {
   timing_driven_mode = is_true;
-}
-
-void 
-replace_external::import_sdc(const char* sdc) {
-  sdc_file = sdc;
-}
-
-void
-replace_external::import_verilog(const char* verilog) {
-  verilog_stor.push_back(verilog);
-}
-
-void 
-replace_external::import_lib(const char* lib){
-  lib_stor.push_back(lib);
 }
 
 void
@@ -322,48 +274,28 @@ replace_external::set_net_weight_scale(double net_weight_scale) {
 
 bool 
 replace_external::init_replace() {
-  if( lef_stor.size() == 0 ) {
-    std::cout << "ERROR: Specify at least one LEF file!" << std::endl;
-    exit(1);
-  }
-  else if( def_stor.size() == 0 ) {
-    std::cout << "ERROR: Specify at least one DEF file!" << std::endl;
-    exit(1);
-  }
+  ord::OpenRoad *openroad = ord::OpenRoad::openRoad();
+  Timing::_sta = openroad->getSta();
+  _db = openroad->getDb();
 
-  lefStor = lef_stor;
-  defName = def_stor[0];
   outputCMD = (output_loc == "")? "./output" : output_loc;
 
   if( timing_driven_mode == true ) {
     capPerMicron = unit_c;
     resPerMicron = unit_r;
-    libStor = lib_stor;
-    sdcName = sdc_file;
-    verilogName = verilog_stor[0];
     isTiming = true; 
   }
 
   initGlobalVarsAfterParse();
   init();
 
-  ParseInput();
- 
-  // update custom net-weights 
-  if( hasCustomNetWeight ) {
-    initCustomNetWeight(net_weight_file); 
-  }
-
+  FillReplaceStructures(_db);
+  
   net_update_init();
   init_tier();
-  build_data_struct(!isInitSeed);
+  build_data_struct();
   update_instance_list();
-  if( write_bookshelf_mode ) {
-    setup_before_opt();
-    routeInst.Init();
-    WriteBookshelf();  
-  }
-  return true;
+  return true; 
 }
 
 bool 
@@ -515,6 +447,7 @@ replace_external::place_cell_nesterov_place() {
     cGP2DglobalPlacement_main();
   }
   update_instance_list();
+  update_dbinst_locations();
   if( isPlot ) {
     SaveCellPlotAsJPEG("Global Placement Result", false,
         string(dir_bnd) + string("/globalPlace"));
@@ -523,9 +456,36 @@ replace_external::place_cell_nesterov_place() {
 }
 
 
+
+
 size_t
 replace_external::get_instance_list_size() {
   return instance_list.size();
+}
+
+size_t
+replace_external::get_module_size() {
+  return moduleCNT;
+}
+
+size_t
+replace_external::get_terminal_size() {
+  return terminalCNT;
+}
+
+size_t
+replace_external::get_net_size() {
+  return netCNT;
+}
+
+size_t
+replace_external::get_pin_size() {
+  return pinCNT;
+}
+
+size_t
+replace_external::get_row_size() {
+  return row_cnt;
 }
 
 // examples for checking component names
@@ -576,40 +536,25 @@ replace_external::get_tns() {
   return globalTns;
 }
 
-size_t
-replace_external::get_module_size() {
-  return moduleCNT;
-}
-
-size_t
-replace_external::get_terminal_size() {
-  return terminalCNT;
-}
-
-size_t
-replace_external::get_net_size() {
-  return netCNT;
-}
-
-size_t
-replace_external::get_pin_size() {
-  return pinCNT;
-}
-
-size_t
-replace_external::get_row_size() {
-  return row_cnt;
-}
 
 void 
 replace_external::update_instance_list() {
   if( instance_list.size() == 0 ) {
+
+    odb::dbChip* chip = _db->getChip();
+    odb::dbBlock* block = chip->getBlock();
+
     for(int i=0; i<moduleCNT; i++) {
       MODULE* module = &moduleInstance[i];
       instance_info tmp;
       tmp.name = module->Name();
-      auto cmPtr = ckt->defComponentMap.find(tmp.name);
-      tmp.master = ckt->defComponentStor[cmPtr->second].name();
+
+      // This should NOT be using names to find the dbInst.
+      // There should be a POINTER to it. -cherry
+      odb::dbInst* curInst = block->findInst( module->Name() );
+      odb::dbMaster* curMaster = curInst->getMaster();
+      tmp.master = curMaster->getConstName();
+
       tmp.x = module->pmin.x;
       tmp.y = module->pmin.y;
       instance_list.push_back(tmp);
@@ -621,6 +566,22 @@ replace_external::update_instance_list() {
       instance_list[i].x = module->pmin.x;
       instance_list[i].y = module->pmin.y;
     }
+  }
+}
+
+// Update the instance locations from the internal replace structs.
+void replace_external::update_dbinst_locations() {
+  odb::dbBlock* block = _db->getChip()->getBlock();
+
+  for(int i=0; i<moduleCNT; i++)  {
+    MODULE* curModule = &moduleInstance[i];
+    
+    // This should NOT be using names to find the dbInst.
+    // There should be a POINTER to it. -cherry
+    odb::dbInst* curInst = block->findInst( curModule->Name() );  
+    curInst->setLocation(GetScaleUpPointX(curModule->pmin.x), 
+			 GetScaleUpPointY(curModule->pmin.y));
+    curInst->setPlacementStatus(odb::dbPlacementStatus::PLACED);
   }
 }
 

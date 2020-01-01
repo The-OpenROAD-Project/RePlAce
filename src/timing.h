@@ -2,11 +2,9 @@
 #define __REPLACE_TIMING__ 0
 
 #include "replace_private.h"
-#include "lefdefIO.h"
 
 #include <fstream>
-#include <flute.h>
-#include <boost/functional/hash.hpp>
+#include "flute.h"
 #include <tcl.h>
 #include <limits>
 
@@ -19,11 +17,13 @@
 #define TIMING_PIN_CAP 4e-15
 
 namespace sta {
-class Sta;
+class dbSta;
 }
 
 
 namespace Timing { 
+
+extern sta::dbSta* _sta;
 
 struct pin {
   int origIdx;      // pinInst's idx
@@ -52,17 +52,17 @@ struct net {
   double lumpedCap;
 
   // pin Index
-  vector< int > sources;
-  vector< int > sinks;
+  std::vector< int > sources;
+  std::vector< int > sinks;
 
-  vector< pair< pair< std::string, std::string >, double > > wireSegs;
+  std::vector< std::pair< std::pair< std::string, std::string >, double > > wireSegs;
 
   int origIdx;  // netInstance; clock_net --> INT_MAX
 
   // constructor
   net();
   net(std::string netname, double lcap, 
-      vector< int > sources, vector< int > xsinks, int _origIdx);
+      std::vector< int > sources, std::vector< int > xsinks, int _origIdx);
 };
 
 #define PINNUM_TYPE uint64_t
@@ -104,7 +104,7 @@ class PinInfo {
   // pinName Return function
   std::string GetPinName(
       void* ptr, 
-      vector< vector< string > >& pNameStor, 
+      std::vector< std::vector< std::string > >& pNameStor, 
       bool isEscape = true);
 
   // only for steiner point
@@ -126,6 +126,7 @@ struct wire {
   void Print();
 };
 
+
 class Timing {
  private:
   
@@ -140,11 +141,8 @@ class Timing {
   
   // due to weird structure,
   // it stores variable names in below structure...
-  vector< vector< std::string > >& _mPinName;
-  vector< vector< std::string > >& _tPinName;
-
-  int _unitX;
-  int _unitY;
+  std::vector< std::vector< std::string > >& _mPinName;
+  std::vector< std::vector< std::string > >& _tPinName;
 
   // clock Info  
   std::string _clkName;
@@ -155,17 +153,14 @@ class Timing {
   // SPEF write
   int scriptIterCnt;
 
-  // lef to def variable
-  int _l2d;
-
-  sta::Sta* _sta;
+  sta::dbSta* _sta;
   Tcl_Interp* _interp;
 
   float _targetTop;
 
   // wire segment stor
-  vector< vector< wire > > wireSegStor;
-  vector< double > lumpedCapStor;
+  std::vector< std::vector< wire > > wireSegStor;
+  std::vector< double > lumpedCapStor;
 
 
   // Fill Net and Pin Information again for clock-based placement
@@ -189,16 +184,16 @@ class Timing {
   void FillSpefForSta();
   void MakeParasiticsForSta();
 
-  void GenerateClockSta();
   void UpdateTimingSta();
   void UpdateNetWeightSta();
 
  public:
   Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
          int pinCnt, 
-         vector< vector< std::string > >& mPinName,
-         vector< vector< std::string > >& tPinName, 
-         std::string clkName, float clkPeriod);
+         std::vector< std::vector< std::string > >& mPinName,
+         std::vector< std::vector< std::string > >& tPinName, 
+         std::string clkName, float clkPeriod,
+	 sta::dbSta* sta);
 
   // Steiner point generating
   // it assumes that pin location is updated
@@ -209,12 +204,8 @@ class Timing {
   // ? not sure, but needs to be sliced?
   //        void SliceLongWire();
 
-  // copy from lefdefio.cpp
-  void SetLefDefEnv();
-
   void WriteSpef(const std::string& spefFile);
-  void ExecuteStaFirst(std::string topCellName, std::string verilogName,
-                       vector< std::string >& libName, std::string sdcName);
+  void ExecuteStaFirst();
   void ExecuteStaLater();
 };
 
@@ -227,35 +218,34 @@ inline bool operator!=(const PinInfo& lhs, const PinInfo& rhs) {
   return !(lhs == rhs);
 }
 
+struct PinInfoHash {
+  std::size_t operator()(const PinInfo& k) const {
+    return k.GetData() * 3 + k.GetPinNum();
+  }
+};
+
+struct PinInfoEqual {
+  bool operator()(const PinInfo& k1, const PinInfo& k2) const {
+    return k1.GetData() == k2.GetData()
+      && k1.GetPinNum() == k2.GetPinNum();
+  }
+};
+
+typedef std::pair< Flute::DTYPE, Flute::DTYPE > FlutePair;
+
+struct FlutePairHash {
+  std::size_t operator()(const FlutePair &k) const {
+    return k.first * 3 + k.second;
+  }
+};
+
+struct FlutePairEqual {
+  bool operator()(const FlutePair &p1, const FlutePair &p2) const {
+    return p1 == p2;
+  }
+};
+
 }
-
-// for hash-map enhancement
-// cusom hash -function
-template < class T >
-struct MyHash;
-
-template <>
-struct MyHash< std::pair< DBU, DBU > > {
-  std::size_t operator()(const pair< DBU, DBU >& k) const {
-    using boost::hash_combine;
-    size_t seed = 0;
-    hash_combine(seed, k.first);
-    hash_combine(seed, k.second);
-
-    return seed;
-  }
-};
-
-template <>
-struct MyHash< Timing::PinInfo > {
-  std::size_t operator()(const Timing::PinInfo& k) const {
-    using boost::hash_combine;
-    size_t seed = 0;
-    hash_combine(seed, k.GetData());
-    hash_combine(seed, k.GetPinNum());
-    return seed;
-  }
-};
 
 long GetTimingHPWL();
 

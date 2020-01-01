@@ -1,9 +1,0 @@
-src/flute
-lib/libflute.a
-include/*.h
-
-Makefile
-CMakeCache.txt
-*.cmake
-CMakeFiles
-install_manifest.txt

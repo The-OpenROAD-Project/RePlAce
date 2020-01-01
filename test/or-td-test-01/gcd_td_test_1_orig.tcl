@@ -24,7 +24,7 @@ $rep set_timing_driven 1
 $rep init_replace
 $rep place_cell_nesterov_place
 
-global_placement -timing_driven -wire_res 16 -wire_cap 0.23e-15
+# global_placement -timing_driven -wire_res 16 -wire_cap 0.23e-15
 
 set fp [open ${exp_folder}/${design}_1_orig.rpt w]
 puts $fp "HPWL: [$rep get_hpwl]"

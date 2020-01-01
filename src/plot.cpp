@@ -43,8 +43,6 @@
 #include "replace_private.h"
 #include "opt.h"
 
-#include "CImg.h"
-#include "bookShelfIO.h"
 
 #include <sstream>
 #include <fstream>
@@ -54,6 +52,10 @@
 #include <cstring>
 #include <cmath>
 
+using namespace std;
+
+#ifndef DISABLE_CIMG_LIB
+#include "CImg.h"
 using namespace cimg_library;
 
 // to save snapshot of the circuit.
@@ -68,6 +70,15 @@ static const unsigned char yellow[] = {255, 255, 0}, white[] = {255, 255, 255},
 
 static PlotEnv pe;
 static bool isPlotEnvInit = false;
+
+// control vector's index to plot
+static int IncreaseIdx(vector< CImg< unsigned char > > *imgStor, unsigned *curIdx) {
+  return (imgStor->size() - 1 > *curIdx) ? ++(*curIdx) : imgStor->size() - 1;
+}
+
+static int DecreaseIdx(unsigned *curIdx) {
+  return (*curIdx > 0) ? --(*curIdx) : 0;
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -191,23 +202,23 @@ void DrawTerminal(CImgObj &img,
       continue;
     }
 
-    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
+//    if(shapeMap.find(curTerminal->Name()) == shapeMap.end()) {
       int x1 = pe.GetX(curTerminal->pmin);
       int x3 = pe.GetX(curTerminal->pmax);
       int y1 = pe.GetY(curTerminal->pmin);
       int y3 = pe.GetY(curTerminal->pmax);
       img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
-    }
-    else {
-      for(auto &curIdx : shapeMap[curTerminal->Name()]  ) {
-        int x1 = pe.GetX(shapeStor[curIdx].llx);
-        int y1 = pe.GetY(shapeStor[curIdx].lly);
-
-        int x3 = pe.GetX(shapeStor[curIdx].llx + shapeStor[curIdx].width);
-        int y3 = pe.GetY(shapeStor[curIdx].lly + shapeStor[curIdx].height);
-
-        img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
-      }
+//    }
+//    else {
+//      for(auto &curIdx : shapeMap[curTerminal->Name()]  ) {
+//        int x1 = pe.GetX(shapeStor[curIdx].llx);
+//        int y1 = pe.GetY(shapeStor[curIdx].lly);
+//
+//        int x3 = pe.GetX(shapeStor[curIdx].llx + shapeStor[curIdx].width);
+//        int y3 = pe.GetY(shapeStor[curIdx].lly + shapeStor[curIdx].height);
+//
+//        img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
+//      }
     }
 
     for(int j=0; j<curTerminal->pinCNTinObject; j++) {
@@ -614,14 +625,6 @@ void SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
   cout << "INFO: " << saveName << " image has been saved" << endl;
 }
 
-// control vector's index to plot
-int IncreaseIdx(vector< CImg< unsigned char > > *imgStor, unsigned *curIdx) {
-  return (imgStor->size() - 1 > *curIdx) ? ++(*curIdx) : imgStor->size() - 1;
-}
-
-int DecreaseIdx(unsigned *curIdx) {
-  return (*curIdx > 0) ? --(*curIdx) : 0;
-}
 
 // using X11
 void ShowPlot(string circuitName) {
@@ -759,6 +762,15 @@ void GCellPinCoordiUpdate() {
   cell_update(y_st, moduleCNT);
   free(y_st);
 }
+
+#else
+
+void SavePlot(string imgName, bool isGCell) {}
+void SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition) {}
+void SaveBinPlotAsJPEG(string imgName, string imgPosition) {}
+void SaveArrowPlotAsJPEG(string imgName, string imgPosition) {}
+
+#endif
 
 // integer -> zero-filled 4 digits string
 void idx2str4digits(int idx, char *str) {
@@ -914,6 +926,8 @@ void get_bin_power(struct BIN *bp, int *color, int *power, int lab) {
   *color = c;
   *power = p;
 }
+
+
 
 void mkdirPlot() {
   char mkdir_cmd[BUF_SZ] = {

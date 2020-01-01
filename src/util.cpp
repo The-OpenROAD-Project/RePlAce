@@ -436,3 +436,35 @@ prec GetScaleDownPoint( prec input) {
   return (input + GetOffsetX()) / GetUnitX();
 }
 
+/////////////////////////////////////////////////////
+// ArrayInfo class
+
+int ArrayInfo::GetCoordiX( float x ) {
+  return INT_CONVERT ( ((x) - lx_ ) / siteSizeX_ );
+}
+
+int ArrayInfo::GetCoordiY( float y ) {
+  return INT_CONVERT ( ((y) - ly_ ) / siteSizeY_ );
+}
+
+int ArrayInfo::GetLowerX( float x ) {
+  return int( ((x) - lx_ ) / siteSizeX_ );
+}
+
+int ArrayInfo::GetLowerY( float y ) {
+  return int( ((y) - ly_ ) / siteSizeY_ );
+}
+
+int ArrayInfo::GetUpperX (float x) {
+  float val = ( x - lx_ ) / siteSizeX_;
+  int intVal = int( val );
+  return (fabs(val-intVal) <= 0.0001)? intVal : intVal+1;
+}
+
+int ArrayInfo::GetUpperY (float y) {
+  float val = ( y - ly_ ) / siteSizeY_;
+  int intVal = int( val );
+  return (fabs(val-intVal) <= 0.0001)? intVal : intVal+1;
+}
+
+/////////////////////////////////////////////////////

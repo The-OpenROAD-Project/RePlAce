@@ -53,16 +53,44 @@
 #include "gcell.h"
 #include "fft.h"
 #include "wlen.h"
-#include "bookShelfIO.h"
 #include "routeOpt.h"
 
 // global variable due to weird structure
-RouteInstance routeInst;
-using std::ifstream;
-using std::min;
-using std::max;
-using std::to_string;
+using namespace std;
 
+
+Layer::Layer(std::string _layerName, float _layerPitchX, float _layerPitchY, 
+    float _layerWidth, LayerDirection _layerDirection) 
+  : layerName(_layerName), 
+  layerPitchX(_layerPitchX), layerPitchY(_layerPitchY), 
+  layerWidth(_layerWidth), 
+  layerDirection(_layerDirection) {};
+  
+void Layer::Dump() {
+    cout << "name: " << layerName << endl;
+    cout << "pitch: " << layerPitchX << " " << layerPitchY << endl;
+    cout << "width: " << layerWidth << endl;
+    cout << "direction: " << 
+      ((layerDirection == LayerDirection::Horizontal)? "horizontal" : "vertical") << endl << endl;
+}
+
+  
+ReducedTrack::ReducedTrack( int _layerIdx, int _lx, int _ly, 
+      int _ux, int _uy, int _trackCnt ) : 
+    layerIdx(_layerIdx), lx(_lx), ly(_ly), 
+    ux(_ux), uy(_uy), trackCnt(_trackCnt) {};
+
+
+void ReducedTrack::Dump() {
+  cout << "layerIdx: " << layerIdx << endl;
+  cout << "tileXY: (" << lx << ", " << ly << ") - (" << ux << ", " << uy << ")" << endl;
+  cout << "track: " << trackCnt << endl << endl;
+}
+
+
+
+/*
+RouteInstance routeInst;
 void RouteInstance::Init(){
 #ifdef USE_GOOGLE_HASH
   _layerMap.set_empty_key(INIT_STR);
@@ -313,21 +341,22 @@ void RouteInstance::FillForReducedTrackStor() {
 //    rTrack.Dump();
 //  }
 }
+*/
 
 void est_congest_global_router(char *dir, string plName) {
   run_global_router(dir, plName);
   
-  string routeName = string(dir) + "/" + string(gbch) + ".est";
-  read_routing_file(routeName);
+//  string routeName = string(dir) + "/" + string(gbch) + ".est";
+//  read_routing_file(routeName);
 }
 
 void get_intermediate_pl_sol(char *dir, string plName) {
-  output_tier_pl_global_router(plName.c_str(), 0, true);
-  LinkConvertedBookshelf(dir);
+//  output_tier_pl_global_router(plName.c_str(), 0, true);
+//  LinkConvertedBookshelf(dir);
 }
 
 void run_global_router(char *dir, string plName) {
-  char cmd[BUFFERSIZE];
+  char cmd[512];
 
   sprintf(cmd, "%s ICCAD %s/%s.aux %s %s %s/%s.est",
           globalRouterPosition.c_str(), 
@@ -362,7 +391,7 @@ void evaluate_RC_by_official_script(char *dir) {
 //  cout << cmd << endl;
 //  system(cmd);
 */
-  char cmd[BUFFERSIZE] = {0, };
+  char cmd[512 ] = {0, };
   
   char realDirBnd[PATH_MAX] = {0, };
   char* ptr = realpath(dir_bnd, realDirBnd);
@@ -499,24 +528,7 @@ void congEstimation(struct FPOS *st) {
   char dir[BUF_SZ];
   int inflation_index;
 
-  /*
-    if (conges_eval_methodCMD == prob_ripple_based) {
-        cout << "INFO:  Your congestion est. method is based on probabilistic." << endl;
-        for (inflation_index=0; inflation_index<100; inflation_index++){
-            sprintf (dir, "%s/prob/tier%d/inflation_iter%d", dir_bnd, 0, inflation_index);
-            struct  stat    infl;
-            if (stat(dir, &infl) < 0) break;
-        }
-        get_intermediate_pl_sol (dir, 0);
-        if (autoEvalRC_CMD) run_global_router (dir);
-        //delete_input_files_in (dir);
-        
-        buildRMST2(st);
-        calcCong (st, prob_ripple_based);
-        clearTwoPinNets();
-        calcCong_print();
 
-    } else*/ 
 
   if(conges_eval_methodCMD == global_router_based) {
     cout << "INFO:  Your congestion est. method is based on global router "
@@ -531,6 +543,7 @@ void congEstimation(struct FPOS *st) {
     }
 
 
+    /*
     // directory create
     string command = "mkdir -p " + string(dir);
     system(command.c_str());
@@ -543,7 +556,7 @@ void congEstimation(struct FPOS *st) {
     CallNtuPlacer4h(dir, auxName.c_str(), plName.c_str());
     
     string resultPlName = string(dir) + "/" + string(gbch) + ".lg.pl";
-    ReadPl(resultPlName.c_str(), true);
+//    ReadPl(resultPlName.c_str(), true);
 
     string defOut = string(dir) + "/" + string(gbch) + ".def";
     WriteDef( defOut.c_str() );
@@ -558,6 +571,7 @@ void congEstimation(struct FPOS *st) {
     MergeBlkg2Route();
     calcCong_print();
     clean_routing_tracks_in_net();
+    */
   }
   else {
     cout << "ERROR:  Your congestion est. method is not applicable" << endl;

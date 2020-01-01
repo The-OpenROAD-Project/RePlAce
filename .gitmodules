@@ -1,15 +1,3 @@
-[submodule "module/eigen-git-mirror"]
-	path = module/eigen-git-mirror
-	url = https://github.com/eigenteam/eigen-git-mirror
 [submodule "module/CImg"]
 	path = module/CImg
 	url = https://github.com/dtschump/CImg
-[submodule "module/OpenSTA"]
-	path = module/OpenSTA
-	url = https://github.com/The-OpenROAD-Project/OpenSTA
-[submodule "module/lef"]
-	path = module/lef
-	url = https://github.com/The-OpenROAD-Project/lef
-[submodule "module/def"]
-	path = module/def
-	url = https://github.com/The-OpenROAD-Project/def

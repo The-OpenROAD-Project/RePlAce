@@ -1,33 +1,20 @@
 #ifndef __REPLACE_ROUTE__
 #define __REPLACE_ROUTE__ 0
 #include "replace_private.h"
-#include "lefdefIO.h"
-
 
 enum LayerDirection {
   Horizontal, Vertical
 };
 
 struct Layer {
-  string layerName;
+  std::string layerName;
   float layerPitchX, layerPitchY;
   float layerWidth;
   LayerDirection layerDirection;
-  Layer(string _layerName, float _layerPitchX, float _layerPitchY, 
-      float _layerWidth, LayerDirection _layerDirection) : 
-    layerName(_layerName), 
-    layerPitchX(_layerPitchX), layerPitchY(_layerPitchY), 
-    layerWidth(_layerWidth), 
-    layerDirection(_layerDirection) {};
+  Layer(std::string _layerName, float _layerPitchX, float _layerPitchY, 
+      float _layerWidth, LayerDirection _layerDirection);
 
-
-  void Dump() {
-    cout << "name: " << layerName << endl;
-    cout << "pitch: " << layerPitchX << " " << layerPitchY << endl;
-    cout << "width: " << layerWidth << endl;
-    cout << "direction: " << 
-      ((layerDirection == LayerDirection::Horizontal)? "horizontal" : "vertical") << endl << endl;
-  }
+  void Dump();
 };
 
 struct ReducedTrack {
@@ -35,17 +22,12 @@ struct ReducedTrack {
   int lx, ly, ux, uy;
   int trackCnt;
   ReducedTrack( int _layerIdx, int _lx, int _ly, 
-      int _ux, int _uy, int _trackCnt ) : 
-    layerIdx(_layerIdx), lx(_lx), ly(_ly), 
-    ux(_ux), uy(_uy), trackCnt(_trackCnt) {};
+      int _ux, int _uy, int _trackCnt );
 
-  void Dump() {
-    cout << "layerIdx: " << layerIdx << endl;
-    cout << "tileXY: (" << lx << ", " << ly << ") - (" << ux << ", " << uy << ")" << endl;
-    cout << "track: " << trackCnt << endl << endl;
-  }
+  void Dump();
 };
 
+/*
 class RouteInstance {
   private:
 
@@ -73,10 +55,10 @@ class RouteInstance {
 
     float _gridOriginX, _gridOriginY;
 
-    HASH_MAP< string, int > _layerMap; 
+    HASH_MAP< std::string, int > _layerMap; 
   
     // Layer Name -> Metal Layer Resources control 
-    HASH_MAP< string, float > _layerCapacityMap;
+    HASH_MAP< std::string, float > _layerCapacityMap;
 
     // below is for bookshelf 
     vector< ReducedTrack > _bsReducedTrackStor;
@@ -108,7 +90,7 @@ class RouteInstance {
     // located in routeOpt.cpp
     void Init();
     void FillLayerStor();
-    void FillLayerCapacityRatio(string fileName); 
+    void FillLayerCapacityRatio(std::string fileName); 
 
     // helper function
     int GetLayerCount() { return _layerStor.size(); };
@@ -123,14 +105,14 @@ class RouteInstance {
     float GetGridOriginX() {return _gridOriginX; };
     float GetGridOriginY() {return _gridOriginY; };
     Replace::Circuit* GetCircuitInst() { return _ckt; };
-    HASH_MAP<string, int>& GetLayerMap() {return _layerMap; };
+    HASH_MAP<std::string, int>& GetLayerMap() {return _layerMap; };
     
     int GetReducedTrackCount() { return _bsReducedTrackStor.size(); };
     ReducedTrack& GetReducedTrack( int idx ) { return _bsReducedTrackStor[idx]; };
     vector<ReducedTrack>& GetReducedTrackStor() { return _bsReducedTrackStor; }; 
 
-    bool IsRoutingLayer( string input ) { return _layerMap.find(input) != _layerMap.end(); };
-    int GetRoutingLayerIdx( string input ) { 
+    bool IsRoutingLayer( std::string input ) { return _layerMap.find(input) != _layerMap.end(); };
+    int GetRoutingLayerIdx( std::string input ) { 
       auto lmPtr = _layerMap.find(input); 
       if( lmPtr == _layerMap.end() ) {
         exit(1);
@@ -139,13 +121,14 @@ class RouteInstance {
     }; 
 
 }; 
+extern RouteInstance routeInst;
+*/
 
 void get_intermediate_pl_sol(char *dir, int tier);
 void evaluate_RC_by_official_script(char *dir);
 void est_congest_global_router(char *dir);
-void run_global_router(char *dir, string plName);
+void run_global_router(char *dir, std::string plName);
 
 void congEstimation(struct FPOS *st);
-extern RouteInstance routeInst;
 
 #endif

@@ -1,3 +1,8 @@
+
+#include "Machine.hh"
+#include "Network.hh"
+#include "Parasitics.hh"
+#include "Corner.hh"
 #include "timing.h"
 #include "timingSta.h"
 
@@ -9,8 +14,7 @@
 #include <tcl.h>
 
 using namespace sta;
-using std::string;
-using std::to_string;
+using namespace std;
 
 //static const char *
 //escapeDividers(const char *token,
@@ -60,211 +64,8 @@ inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
 }
 
 
-void TimingPathPrint(sta::Sta* sta, sta::PathEnd* end) {
-  cout << "===========================================================" << endl;
-  cout << "pathName: " << end->path()->name(sta) << endl;
-  cout << "pathslack: " << end->slack(sta) << " seconds" << endl;
-
-  PathExpanded expanded(end->path(), sta);
-
-  for(size_t i = 0; i < expanded.size(); i++) {
-    PathRef* path1 = expanded.path(i);
-    // TimingArc* prevArc = expanded.prevArc(i);
-    Vertex* vertex = path1->vertex(sta);
-    Pin* pin = vertex->pin();
-    // Arrival time = path1->arrival(sta) + timeOffset;
-    // Arrival incr(0.0);
-
-    // bool isClkStart = sta->network()->isRegClkPin(pin);
-    bool isClk = path1->isClock(sta->search());
-
-    // if( prevArc == NULL) {
-    //   cout << "is first node" << endl;
-    // }
-
-    if(isClk) {
-      continue;
-    }
-    cout << ((isClk) ? "C " : "UC ");
-
-    Net* pinNet = NULL;
-    if(sta->network()->isTopLevelPort(pin)) {
-      const char* pinName = sta->cmdNetwork()->pathName(pin);
-      cout << "(TL:" << pinName << ") ";
-    }
-    else {
-      Net* net = sta->network()->net(pin);
-      if(net) {
-        Net* higestNet = sta->network()->highestNetAbove(net);
-        const char* netName = sta->cmdNetwork()->pathName(higestNet);
-        cout << "(" << netName << ") ";
-        pinNet = higestNet;
-      }
-    }
-    cout << sta->network()->pathName(sta->network()->instance(pin)) << " "
-         << sta->network()->portName(pin) << " ("
-         << sta->network()->vertexIndex(pin) << ")" << endl;
-    //        cout << vertex->name(sta->network()) << endl;
-
-    PortDirection* dir = sta->network()->direction(pin);
-    // only output pins..!!!
-    if(dir->isInput()) {
-      continue;
-    }
-
-    if(pinNet) {
-      NetConnectedPinIterator* connPinIter =
-          sta->network()->connectedPinIterator(pinNet);
-
-      while(connPinIter->hasNext()) {
-        // Pin* curPin = connPinIter->next();
-        // PortDirection* dir = sta->network()->direction(curPin);
-        // if( dir->isInput() ) {
-        //   continue;
-        // }
-//        cout << sta->network()->name(curPin) << " "
-//             << GetMaxResistor(sta, curPin) << endl;
-      }
-    }
-
-    /*
-    VertexOutEdgeIterator voIter( vertex, sta->graph());
-    float maxRes = 0.0f;
-    while( voIter.hasNext() ) {
-        Edge* edge = voIter.next();
-        cout << "  Out " << edge->from(sta->graph())->name(sta->network())
-            << " -> "
-            << edge->to(sta->graph())->name(sta->network()) <<endl;
-
-        float newRes = GetMaxResistor(sta, edge->to(sta->graph())->pin());
-        maxRes = (maxRes < newRes)? newRes : maxRes;
-        edge = voIter.next();
-    }
-    cout << "  OutMaxRes: " << maxRes << endl;
-
-    VertexInEdgeIterator viIter( vertex, sta->graph());
-    while( viIter.hasNext()) {
-        Edge* edge = viIter.next();
-        cout << "  In  " << edge->from(sta->graph())->name(sta->network())
-            << " -> "
-            << edge->to(sta->graph())->name(sta->network()) <<endl;
-
-        float newRes = GetMaxResistor(sta, edge->to(sta->graph())->pin());
-        maxRes = (maxRes < newRes)? newRes : maxRes;
-        edge = viIter.next();
-    }
-    cout << "  InMaxRes: " << maxRes << endl;
-    */
-  }
-  cout << "===========================================================" << endl;
-  cout << endl;
-}
-
-void Timing::ExecuteStaFirst(string topCellName, string verilogName,
-                             vector< string >& libStor, string sdcName) {
-  cout << "Execute STA" << endl;
-  cout << "topCellName: " << topCellName << endl;
-  cout << "verilog    : " << verilogName << endl;
-  for(auto& libName : libStor) {
-    cout << "liberty    : " << libName << endl;
-  }
-  cout << "sdcName    : " << sdcName << endl << endl;
-
-  // STA object create
-  _sta = new Sta;
-
-  // Tcl Interpreter settings
-  //    Tcl_FindExecutable(argv[0]);
-  _interp = Tcl_CreateInterp();
-
-  // Initialize the TCL interpreter
-  Tcl_Init(_interp);
-
-  // define swig commands
-  Sta_Init(_interp);
-
-  // load encoded TCL functions
-  evalTclInit(_interp, tcl_inits);
-  // initialize TCL commands
-  Tcl_Eval(_interp, "sta::show_splash");
-  Tcl_Eval(_interp, "namespace import sta::*");
-  
-  Tcl_Eval(_interp, "define_sta_cmds");
-
-  // initialize STA objects
-  initSta();
-  Sta::setSta(_sta);
-  _sta->makeComponents();
-  _sta->setTclInterp(_interp);
-  _sta->setThreadCount(numThread);
-
-  // environment settings
-
-  string cornerName = "wst";
-  // string cornerNameFF="bst";
-
-  StringSet cornerNameSet;
-  cornerNameSet.insert(cornerName.c_str());
-  // cornerNameSet.insert(cornerNameFF.c_str());
-
-  // define_corners
-  _sta->makeCorners(&cornerNameSet);
-  Corner* corner = _sta->findCorner(cornerName.c_str());
-  // Corner *corner_FF = _sta->findCorner(cornerNameFF.c_str());
-
-  // read_liberty
-  for(auto& libName : libStor) {
-    _sta->readLiberty(libName.c_str(), corner, MinMaxAll::max(), false);
-  }
-
-  // LibertyLibrary *FFlib1 =
-  // _sta->readLiberty(ffLibName.c_str(), corner_FF, MinMaxAll::min(), false);
-
-  // read_netlist
-  NetworkReader* network = _sta->networkReader();
-  if(!network) {
-    cout << "ERROR: Internal OpenSTA has problem for generating networkReader" << endl;
-    exit(1);
-  }
-
-  // Parsing the Verilog
-  _sta->readNetlistBefore();
-  if( !readVerilogFile(verilogName.c_str(), _sta->networkReader()) ) {
-    cout << "ERROR: OpenSTA failed to read Verilog file!" << endl;
-    exit(1);
-  }
-
-  // link_design
-  PrintProcBegin("Timing: LinkDesign " + topCellName);
-  Tcl_Eval(_interp, string("set link_make_black_boxes 0").c_str() ); 
-  Tcl_Eval(_interp, string("link_design " + topCellName ).c_str() );
-
-  bool is_linked = network->isLinked();
-  if(is_linked) {
-    PrintProcEnd("Timing: LinkDesign " + topCellName);
-  }
-  else {
-    cout << "ERROR:  Linking Fail. Please put liberty files ";
-    cout << "to instantiate OpenSTA correctly" << endl;
-    exit(1);
-  }
-
-  // read_parasitics
-  //    cout << spefFileName << endl;
-  //  bool parasitics =
-  //      _sta->readParasitics("simple.spef",
-  //              _sta->currentInstance(),
-  //              MinMaxAll::max(), false, true, 0.0,
-  //              reduce_parasitics_to_pi_elmore, false, true, true);
-
+void Timing::ExecuteStaFirst() {
   MakeParasiticsForSta(); 
-
-  if(isClockGiven) {
-    GenerateClockSta();
-  }
-  else {
-    Tcl_Eval(_interp, string("sta::read_sdc " + sdcName).c_str());
-  }
 
   // find_timing -full_update (true->full, false-> incremental)
   UpdateTimingSta();
@@ -287,11 +88,6 @@ void Timing::ExecuteStaFirst(string topCellName, string verilogName,
 
   float tol = 0.0;
   _sta->setIncrementalDelayTolerance(tol);
-  Tcl_DeleteInterp(_interp);
-
-  // _sta->clear();
-  // _sta = NULL;
-  // delete _sta;
 }
 
 void Timing::ExecuteStaLater() {
@@ -360,19 +156,19 @@ void Timing::MakeParasiticsForSta() {
   sta::Network* network = _sta->network();
   sta::Parasitics* parasitics = _sta->parasitics();
 
-  HASH_MAP< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
+  std::unordered_map< PinInfo, bool, PinInfoHash, PinInfoEqual > pin_cap_written;
   // map from pin name -> cap
-  HASH_MAP< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
+  std::unordered_map< PinInfo, double, PinInfoHash, PinInfoEqual > lumped_cap_at_pin;
 
 
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
     for(auto& curWireSeg : wireSegStor[i]) {
-      lumpedCapStor[i] += curWireSeg.length / (double)(_l2d)*capPerMicron;
+      lumpedCapStor[i] += curWireSeg.length / (double)(GetDefDbu())*capPerMicron;
       lumped_cap_at_pin[curWireSeg.iPin] +=
-          curWireSeg.length / (double)(_l2d)*capPerMicron * 0.5;
+          curWireSeg.length / (double)(GetDefDbu())*capPerMicron * 0.5;
       lumped_cap_at_pin[curWireSeg.oPin] +=
-          curWireSeg.length / (double)(_l2d)*capPerMicron * 0.5;
+          curWireSeg.length / (double)(GetDefDbu())*capPerMicron * 0.5;
       pin_cap_written[curWireSeg.iPin] = false;
       pin_cap_written[curWireSeg.oPin] = false;
     }
@@ -471,35 +267,13 @@ void Timing::MakeParasiticsForSta() {
 
       // insert resistor.
       parasitics->makeResistor(nullptr, n1, n2, 
-          curSeg.length / static_cast<double>(_l2d) * resPerMicron, ap);
+          curSeg.length / static_cast<double>(GetDefDbu()) * resPerMicron, ap);
       
     }
   }
-  _sta->graphDelayCalc()->delaysInvalid();
-  _sta->search()->arrivalsInvalid(); 
+  _sta->delaysInvalid();
 }
 
-
-void Timing::GenerateClockSta() {
-  // sdc -> clock definition (unit=second)
-  // float clk_period = 70e-9;
-  FloatSeq* waveform = new FloatSeq;
-  waveform->push_back(0.0);
-  waveform->push_back(_clkPeriod / 2);
-
-  PinSet* pins = new PinSet;
-  Pin* pin =
-      _sta->network()->findPin(_sta->currentInstance(), _clkName.c_str());
-  pins->insert(pin);
-
-  _sta->makeClock(_clkName.c_str(), pins, true, _clkPeriod, waveform, NULL);
-
-  // Clock *clock_found =
-  _sta->findClock(_clkName.c_str());
-
-  // write_sdc
-  // _sta->writeSdc("test.sdc",false,false,5);
-}
 
 void Timing::UpdateTimingSta() {
   _sta->updateTiming(true);

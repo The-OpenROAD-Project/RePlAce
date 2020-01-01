@@ -48,7 +48,6 @@
 #include <ctime>
 #include <chrono>
 
-#include "bookShelfIO.h"
 #include "bin.h"
 #include "charge.h"
 #include "replace_private.h"
@@ -60,18 +59,22 @@
 #include "routeOpt.h"
 
 using std::make_pair;
+using namespace std;
+
 static int backtrack_cnt = 0;
+
+sta::dbSta* Timing::_sta = nullptr;
 
 void myNesterov::nesterov_opt() {
   int last_iter = 0;
 
   Timing::Timing TimingInst(moduleInstance, terminalInstance, netInstance,
                             netCNT, pinInstance, pinCNT, mPinName, tPinName,
-                            clockPinName, timingClock);
+                            clockPinName, timingClock, Timing::_sta);
 
   if(isTiming) {
     TimingInst.BuildSteiner(true);
-    TimingInst.ExecuteStaFirst(verilogTopModule, verilogName, libStor, sdcName );
+    TimingInst.ExecuteStaFirst();
   }
 
   InitializationCommonVar();
@@ -158,8 +161,8 @@ void myNesterov::nesterov_opt() {
     TimingInst.BuildSteiner(true);
     // TimingInst.PrintNetSteiner();
 
-    string spefName = string(dir_bnd) + "/" + gbch + "_gp.spef";
-    TimingInst.WriteSpef(spefName);
+    //string spefName = string(dir_bnd) + "/" + gbch + "_gp.spef";
+    //TimingInst.WriteSpef(spefName);
     TimingInst.ExecuteStaLater();
   }
   else {

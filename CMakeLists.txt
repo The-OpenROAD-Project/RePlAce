@@ -1,15 +1,23 @@
-cmake_minimum_required(VERSION 3.1)
+# Note that this file belongs in replace/src, not here.
 
-project(RePlAce)
+cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(USE_CIMG_LIB "Use CImg drawing library for image drawing" OFF)
+if( USE_CIMG_LIB )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0nnnn")
+  set(CIMG_HOME ${PROJECT_SOURCE_DIR}/module/CImg)
+else()
+  add_definitions(-DDISABLE_CIMG_LIB=1)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+endif()
+
 # For Multithread
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 -O3 ${OpenMP_CXX_FLAGS}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -g -ggdb")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -17,70 +25,41 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-set(REPLACE_HOME ${PROJECT_SOURCE_DIR} )
-set(DEFLIB_HOME
-  ${PROJECT_SOURCE_DIR}/module/def
-)
-set(LEFLIB_HOME
-  ${PROJECT_SOURCE_DIR}/module/lef
-)
-set(FLUTE_HOME
-  ${PROJECT_SOURCE_DIR}/module/flute
-)
-set(OPENSTA_HOME
-  ${PROJECT_SOURCE_DIR}/module/OpenSTA
-)
-set(CIMG_HOME
-  ${PROJECT_SOURCE_DIR}/module/CImg
-)
-set(EIGEN_HOME
-  ${PROJECT_SOURCE_DIR}/module/eigen-git-mirror 
-)
+set(REPLACE_HOME ${PROJECT_SOURCE_DIR}/src/replace )
+set(FLUTE_HOME ${PROJECT_SOURCE_DIR}/src/flute3)
+set(OPENSTA_HOME ${PROJECT_SOURCE_DIR}/src/OpenSTA)
 
-add_subdirectory(${DEFLIB_HOME})
-add_subdirectory(${LEFLIB_HOME})
-add_subdirectory(${FLUTE_HOME})
-add_subdirectory(${OPENSTA_HOME})
+set(EIGEN_HOME ${PROJECT_SOURCE_DIR}/src/eigen)
 
-set(ENV{TYPE_CALL} library)
-
-
-
-
-## configure settings
-find_package(GoogleHash)
-find_package(TCL REQUIRED)
+set(OPENROAD_HOME ${PROJECT_SOURCE_DIR})
+set(OPENDB_HOME ${PROJECT_SOURCE_DIR}/src/OpenDB)
 
 find_package(ZLIB REQUIRED)
-find_package(SWIG REQUIRED)
-find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
 
 # for cimg
-find_package(X11 REQUIRED)
-find_package(JPEG REQUIRED)
+if( USE_CIMG_LIB )
+  find_package(X11 REQUIRED)
+  find_package(JPEG REQUIRED)
+  set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${X11_LIBRARIES} ${JPEG_LIBRARIES}")
+else()
+#  find_package(X11)
+#  find_package(JPEG)
+endif()
 
-find_package(Boost REQUIRED)
-find_package(Threads REQUIRED)
 
-# for multi threads
-find_package(OpenMP REQUIRED)
+set(REPLACE_WRAP ${CMAKE_CURRENT_BINARY_DIR}/replace_wrap.cpp)
+set(REPLACE_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/ReplaceTclInitVar.cc)
 
 set (REPLACE_SRC 
   src/argument.cpp
   src/bin.cpp
-  src/bookShelfIO.cpp
   src/charge.cpp
-  src/defParser.cpp
-  src/detailPlace.cpp
   src/fft.cpp
   src/fftsg2d.cpp
   src/fftsg3d.cpp
   src/fftsg.cpp
   src/gcell.cpp
   src/initPlacement.cpp
-  src/lefdefIO.cpp
-  src/lefParser.cpp
   src/macro.cpp
   src/main.cpp
   src/util.cpp
@@ -95,20 +74,21 @@ set (REPLACE_SRC
   src/wlen.cpp
   src/replace_external.cpp
   src/replace_private.cpp
-  src/replace_wrap.cpp
+  src/replace_private.cpp
+  src/dbLefDefIO.cpp
+  src/MakeReplace.cpp
+  ${REPLACE_WRAP}
+  ${REPLACE_TCL_INIT}
   )
-
 
 set (REPLACE_HEADER
   src/bin.h
-  src/bookShelfIO.h
   src/charge.h
   src/fft.h
   src/gcell.h
   src/replace_private.h
   src/replace_external.h
   src/initPlacement.h
-  src/lefdefIO.h
   src/macro.h
   src/ns.h
   src/opt.h
@@ -118,111 +98,52 @@ set (REPLACE_HEADER
   src/timingSta.h
   src/wlen.h
   src/util.h
+  src/dbLefDefIO.h
+  src/MakeReplace.h
 )
 
-set (REPLACE_SWIG_FILES
-  src/replace.i
+add_custom_command(OUTPUT ${REPLACE_WRAP}
+  COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${REPLACE_WRAP} ${REPLACE_HOME}/src/replace.i
+  WORKING_DIRECTORY ${REPLACE_HOME}
+  DEPENDS ${REPLACE_HOME}/src/replace.i "src/replace_external.h"
+)
+
+add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
+  COMMAND ${OPENSTA_HOME}/etc/TclEncode.tcl ${REPLACE_TCL_INIT} replace_tcl_inits ${REPLACE_HOME}/src/replace.tcl
+  WORKING_DIRECTORY ${REPLACE_HOME}/src
+  DEPENDS ${REPLACE_HOME}/src/replace.tcl ${OPENSTA_HOME}/etc/TclEncode.tcl
+  )
+
+############################################################
+# Create a library 
+############################################################
+add_library( replace
+  ${REPLACE_SRC}
 )
 
 ############################################################
 # include directories 
 ############################################################
-include_directories(
-  ${X11_INCLUDE_DIR}
-  ${Boost_INCLUDE_DIR}
-
+target_include_directories( replace
+PUBLIC
+  ${REPLACE_HOME}/src
+PRIVATE
   ${EIGEN_HOME}
-  ${CIMG_HOME}
-
-  ${DEFLIB_HOME}/def
-  ${DEFLIB_HOME}/defzlib
-  ${DEFLIB_HOME}/cdef
-  ${DEFLIB_HOME}/cdefzlib
-
-  ${LEFLIB_HOME}/lef
-  ${LEFLIB_HOME}/lefzlib
-  ${LEFLIB_HOME}/clef
-  ${LEFLIB_HOME}/clefzlib
-
-  ${FLUTE_HOME}/src
+  ${FLUTE_HOME}
  
-  ${OPENSTA_HOME}/app
-  ${OPENSTA_HOME}/dcalc
-  ${OPENSTA_HOME}/graph
+  ${OPENSTA_HOME}/util
   ${OPENSTA_HOME}/liberty
   ${OPENSTA_HOME}/network
-  ${OPENSTA_HOME}/parasitics
+  ${OPENSTA_HOME}/graph
   ${OPENSTA_HOME}/sdc
-  ${OPENSTA_HOME}/sdf
+  ${OPENSTA_HOME}/parasitics
   ${OPENSTA_HOME}/search
-  ${OPENSTA_HOME}/tcl
-  ${OPENSTA_HOME}/util
-  ${OPENSTA_HOME}/verilog
+  ${OPENSTA_HOME}/app
 
+  ${OPENDB_HOME}/include/opendb
+  # This SHOULD be ${OPENDB_HOME}/include but all library references are wrong
+  # in replace -cherry
+  ${OPENDB_HOME}/include/opendb
+  ${OPENDB_HOME}/include
+  ${OPENROAD_HOME}/include
 )
-
-############################################################
-# Create a library 
-############################################################
-# add_library( replacelib  SHARED
-#   ${REPLACE_SRC}
-# )
-
-# set_target_properties( replacelib 
-#   PROPERTIES OUTPUT_NAME "replace"
-# )
-
-############################################################
-# Create an executable
-############################################################
-add_custom_command(OUTPUT ${REPLACE_HOME}/src/replace_wrap.cpp
-  COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${REPLACE_HOME}/src/replace_wrap.cpp ${REPLACE_HOME}/src/replace.i   
-  WORKING_DIRECTORY ${REPLACE_HOME}
-  DEPENDS ${REPLACE_SWIG_FILES}
-)
-
-add_executable( replace
-  ${REPLACE_SRC}
-)
-
-add_dependencies( replace sta )
-add_dependencies( replace flute )
-add_dependencies( replace def )
-add_dependencies( replace lef )
-
-#add_dependencies( replacelib sta )
-#add_dependencies( replacelib flute )
-#add_dependencies( replacelib def )
-#add_dependencies( replacelib lef )
-
-target_link_libraries( replace
-  PUBLIC
-  OpenSTA
-  flute
-  def
-  defzlib
-  cdef
-  cdefzlib
-  lef
-  lefzlib
-  clef
-  clefzlib
-
-  ${ZLIB_LIBRARIES}
-  ${X11_LIBRARIES}
-  ${JPEG_LIBRARIES}
-  ${TCL_LIB}
-
-  ${OpenMP_CXX_LIBRARIES}
-  Threads::Threads
-  )
-
-############################################################
-# Install  
-############################################################
-
-install(FILES ${REPLACE_HEADER} DESTINATION include)
-install(TARGETS replace DESTINATION bin)
-# install(TARGETS replacelib DESTINATION lib)
-
-

@@ -43,7 +43,6 @@
 #include <cstring>
 #include <ctgmath>
 #include <string>
-#include <omp.h>
 
 #include "bin.h"
 #include "charge.h"
@@ -429,20 +428,19 @@ void bin_init_2D(int STAGE) {
     TIER *tier = &tier_st[0];
 
     // there is no shapes
-    if(shapeMap.find(term->Name()) == shapeMap.end()) {
+//    if(shapeMap.find(term->Name()) == shapeMap.end()) {
       UpdateTerminalArea(tier, &(term->pmin), &(term->pmax));
-    }
+//    }
     // there are shapes
-    else {
-      for(auto &curIdx : shapeMap[term->Name()]) {
-        prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
-             width = shapeStor[curIdx].width, height = shapeStor[curIdx].height;
-        FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
-
-        UpdateTerminalArea(tier, &tmpMin, &tmpMax);
-      }
-    }
-    //        UpdateTerminalArea(tier, &(term->pmin), &(term->pmax));
+//    else {
+//      for(auto &curIdx : shapeMap[term->Name()]) {
+//        prec llx = shapeStor[curIdx].llx, lly = shapeStor[curIdx].lly,
+//             width = shapeStor[curIdx].width, height = shapeStor[curIdx].height;
+//        FPOS tmpMin(llx, lly), tmpMax(llx + width, lly + height);
+//
+//        UpdateTerminalArea(tier, &tmpMin, &tmpMax);
+//      }
+//    }
   }
 
   if(STAGE == cGP2D) {
@@ -935,7 +933,7 @@ void bin_update7_cGP2D() {
   bool timeon = false;
   double time = 0.0f;
 
-  omp_set_num_threads(numThread);
+//  omp_set_num_threads(numThread);
   int i = 0;
 
   if(timeon) {
@@ -986,7 +984,6 @@ void bin_update7_cGP2D() {
     time_start(&time);
   }
 
-  omp_set_num_threads(numThread);
 #pragma omp parallel default(none) shared(tier) private(i)
   {
 #pragma omp for

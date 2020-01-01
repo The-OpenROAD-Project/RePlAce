@@ -16,17 +16,9 @@ read_def ${design_dir}/${design}.def
 read_liberty ${lib_dir}/NangateOpenCellLibrary_typical.lib
 read_sdc ${design_dir}/${design}.sdc
 
-set_wire_rc -resistance 16 -capacitance 0.23e-15
+global_placement -skip_initial_place -timing_driven -wire_res 16 -wire_cap 0.23e-15
 
 set rep [replace_external]
-$rep set_verbose_level 3 
-
-global_placement -skip_initial_place -timing_driven
-global_placement -skip_initial_place -timing_driven
-global_placement -skip_initial_place -timing_driven
-global_placement -skip_initial_place -timing_driven
-global_placement -skip_initial_place -timing_driven
-
 set fp [open ${exp_folder}/${design}_1_td.rpt w]
 
 puts $fp "HPWL: [$rep get_hpwl]"

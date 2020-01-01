@@ -3,11 +3,7 @@
 #include <sstream>
 #include <fstream>
 
-using std::ofstream;
-using std::stringstream;
-using std::string;
-using std::to_string;
-
+using namespace std;
 
 namespace Timing {
 
@@ -22,7 +18,6 @@ pin::pin() : origIdx(INT_MAX),
         rTran(0.0),
         fTran(0.0),
         driverType(INT_MAX),
-        //    x_coord(0.0), y_coord(0.0), x_offset(0.0), y_offset(0.0),
         isClock(false),
         earlySlk(0.0),
         lateSlk(0.0) {};
@@ -228,7 +223,8 @@ inline string Timing::GetPinName(PinInfo& curPin, bool isEscape) {
   
 Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
          int pinCnt, vector< vector< std::string > >& mPinName,
-         vector< vector< std::string > >& tPinName, std::string clkName, float clkPeriod)
+	       vector< vector< std::string > >& tPinName, std::string clkName, float clkPeriod,
+	       sta::dbSta* sta)
   : _modules(modules),
   _terms(terms),
   _nets(nets),
@@ -237,23 +233,20 @@ Timing::Timing(MODULE* modules, TERM* terms, NET* nets, int netCnt, PIN* pins,
   _pinCnt(pinCnt),
   _mPinName(mPinName),
   _tPinName(tPinName),
-  _unitX(0.0),
-  _unitY(0.0),
   _clkName(clkName),
   _clkPeriod(clkPeriod),
-  scriptIterCnt(0) {
+  scriptIterCnt(0),
+  _sta(sta) {
     wireSegStor.resize(netCnt);
     lumpedCapStor.resize(netCnt);
-    SetLefDefEnv();
+//    SetLefDefEnv();
   };
-
 
 
 // stn stands for steiner
 void Timing::BuildSteiner(bool scaleApplied) {
   CleanSteiner();
   using namespace Flute;
-  Flute::readLUT("./POWV9.dat", "./PORT9.dat");
 
   uint64_t stnPointCnt = 0;
   long long int totalStnWL = 0;
@@ -271,8 +264,8 @@ void Timing::BuildSteiner(bool scaleApplied) {
       int wl = (!scaleApplied)
                    ? fabs(firPin->fp.x - secPin->fp.x) +
                          fabs(firPin->fp.y - secPin->fp.y)
-                   : fabs(firPin->fp.x - secPin->fp.x) * _unitX +
-                         fabs(firPin->fp.y - secPin->fp.y) * _unitY;
+                   : GetScaleUpSize( fabs(firPin->fp.x - secPin->fp.x)) +
+                         GetScaleUpSize( fabs(firPin->fp.y - secPin->fp.y)) ;
       //            cout << GetPinName(firPin) << " " <<  GetPinName(secPin) <<
       //            " " << wl << endl;
       wireSegStor[i].push_back(wire(PinInfo(firPin), PinInfo(secPin), wl));
@@ -280,25 +273,19 @@ void Timing::BuildSteiner(bool scaleApplied) {
       //            cout << wl << endl;
     }
     else {
-      DBU* x = new DBU[curNet->pinCNTinObject];
-      DBU* y = new DBU[curNet->pinCNTinObject];
-
-      int* mapping = new int[curNet->pinCNTinObject];
+      Flute::DTYPE* x = new Flute::DTYPE[curNet->pinCNTinObject];
+      Flute::DTYPE* y = new Flute::DTYPE[curNet->pinCNTinObject];
 
       // x, y coordi --> pin's index
-      HASH_MAP< pair< DBU, DBU >, PinInfo, MyHash< pair< DBU, DBU > > >
-          pinMap;
-#ifdef USE_GOOGLE_HASH
-      pinMap.set_empty_key(make_pair(DBU_MAX, DBU_MAX));
-#endif
+      std::unordered_map< FlutePair, PinInfo, FlutePairHash, FlutePairEqual> pinMap;
 
       //            cout << "pinMapBuilding" << endl;
       for(int j = 0; j < curNet->pinCNTinObject; j++) {
         PIN* curPin = curNet->pin[j];
-        x[j] = (!scaleApplied) ? (DBU)(curPin->fp.x + 0.5f)
-                               : (DBU)(curPin->fp.x * _unitX + 0.5f);
-        y[j] = (!scaleApplied) ? (DBU)(curPin->fp.y + 0.5f)
-                               : (DBU)(curPin->fp.y * _unitY + 0.5f);
+        x[j] = (!scaleApplied) ? (Flute::DTYPE)(curPin->fp.x + 0.5f)
+                               : (Flute::DTYPE)(curPin->fp.x * GetUnitX() + 0.5f);
+        y[j] = (!scaleApplied) ? (Flute::DTYPE)(curPin->fp.y + 0.5f)
+                               : (Flute::DTYPE)(curPin->fp.y * GetUnitY() + 0.5f);
 
         //                cout << curPin->term << " - "
         //                    << ((curPin->term)? _terms[curPin->moduleID].name
@@ -306,7 +293,7 @@ void Timing::BuildSteiner(bool scaleApplied) {
         //                        _modules[curPin->moduleID].name )
         //                    << ":" << curPin->pinIDinModule << endl;
 
-        pinMap[make_pair(x[j], y[j])] = PinInfo(curPin);
+	pinMap[std::make_pair(x[j], y[j])] = PinInfo(curPin);
         //                cout << "pin: ";
         //                pinMap[ make_pair(x[j], y[j]) ].Print();
         //                cout << endl;
@@ -317,13 +304,12 @@ void Timing::BuildSteiner(bool scaleApplied) {
       //            cout << endl;
 
       Tree fluteTree =
-          flute(curNet->pinCNTinObject, x, y, FLUTE_ACCURACY, mapping);
+          flute(curNet->pinCNTinObject, x, y, FLUTE_ACCURACY);
       //            for(int i=0; i<curNet->pinCNTinObject; i++) {
       //                cout << i << " " << mapping[i] << endl;
       //            }
       delete[] x;
       delete[] y;
-      delete[] mapping;
 
       //            printtree(fluteTree);
 
@@ -431,27 +417,22 @@ void Timing::WriteSpef(const string& spefLoc) {
   feed << "*R_UNIT 1 OHM" << endl;
   feed << "*L_UNIT 1 UH" << endl << endl;
 
-  HASH_MAP< PinInfo, bool, MyHash< PinInfo > > pin_cap_written;
+  std::unordered_map< PinInfo, bool, PinInfoHash, PinInfoEqual > pin_cap_written;
 
   // map from pin name -> cap
-  HASH_MAP< PinInfo, double, MyHash< PinInfo > > lumped_cap_at_pin;
+  std::unordered_map< PinInfo, double, PinInfoHash, PinInfoEqual > lumped_cap_at_pin;
 
   PinInfo tmpPin;
   tmpPin.SetImpossible();
 
-#ifdef USE_GOOGLE_HASH
-  pin_cap_written.set_empty_key(tmpPin);
-  lumped_cap_at_pin.set_empty_key(tmpPin);
-#endif
-
   // 1. calc. lump sum caps from wire segments (PI2-model) + load caps
   for(int i = 0; i < _netCnt; i++) {
     for(auto& curWireSeg : wireSegStor[i]) {
-      lumpedCapStor[i] += curWireSeg.length / (double)(_l2d)*capPerMicron;
+      lumpedCapStor[i] += curWireSeg.length / (double)GetDefDbu()*capPerMicron;
       lumped_cap_at_pin[curWireSeg.iPin] +=
-          curWireSeg.length / (double)(_l2d)*capPerMicron * 0.5;
+          curWireSeg.length / (double)GetDefDbu()*capPerMicron * 0.5;
       lumped_cap_at_pin[curWireSeg.oPin] +=
-          curWireSeg.length / (double)(_l2d)*capPerMicron * 0.5;
+          curWireSeg.length / (double)GetDefDbu()*capPerMicron * 0.5;
       pin_cap_written[curWireSeg.iPin] = false;
       pin_cap_written[curWireSeg.oPin] = false;
     }
@@ -527,16 +508,13 @@ void Timing::WriteSpef(const string& spefLoc) {
     for(auto& curSeg : wireSegStor[i]) {
       feed << cnt++ << " " << GetPinName(curSeg.iPin) << " "
            << GetPinName(curSeg.oPin) << " "
-           << curSeg.length / (double)_l2d * resPerMicron / RES_SCALE << endl;
+           << curSeg.length / (double)GetDefDbu() * resPerMicron / RES_SCALE << endl;
     }
 
     feed << "*END" << endl << endl;
   }
 
-  pin_cap_written.clear();
-  lumped_cap_at_pin.clear();
-
-  WriteSpefClockNet(feed);
+//  WriteSpefClockNet(feed);
 
   spefFile << feed.str();
   spefFile.close();
