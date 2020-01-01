@@ -425,7 +425,6 @@ replace_external::free_replace() {
   charge_fft_delete_2d();
   gsum_phi = gsum_ovfl = 0;
   initGlobalVars();
-  cout << "Successfully FREED!!!!" << endl;
    
   return true; 
 }
