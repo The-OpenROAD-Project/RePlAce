@@ -213,22 +213,8 @@ void initGlobalVarsAfterParse() {
   ExtraWSfor3D = 0;     //.12; //0.1;
   MaxExtraWSfor3D = 0;  //.20; //0.2;
 
-  // detailPlacer settings
-  detailPlacer = NoneDp;
-  if(!strcmp(detailPlacerFlag.c_str(), "NTU3")) {
-    detailPlacer = NTUplace3;
-  }
-  else if(!strcmp(detailPlacerFlag.c_str(), "NTU4")) {
-    detailPlacer = NTUplace4h;
-  }
-  else {
-    printf(
-        "\n** WARNING: Your Detail Placement Step must be skipped.\n"
-        "              (i.e. this program will be executed as -onlyGP)\n"
-        "     If you want to have DP after GP, please specify -dpflag and "
-        "-dploc.\n\n");
-    isOnlyGlobalPlace = true;
-  }
+  isOnlyGlobalPlace = true;
+  isFirst_gp_opt = true;
 
   ///////////////////////////////////////////////////////
   // flg_3dic is always to be 1...

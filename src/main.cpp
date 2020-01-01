@@ -911,7 +911,6 @@ void tmGP2DglobalPlacement_main() {
   calc_tier_WS();
   setup_before_opt_mGP2D();
   gp_opt();
-  post_mGP2D_delete();
   fflush(stdout);
   UpdateNetAndGetHpwl();
   printf("RESULT:\n");
@@ -943,7 +942,6 @@ void mGP2DglobalPlacement_main() {
   setup_before_opt_mGP2D();
   gp_opt();
   isFirst_gp_opt = false;
-  /*if (INPUT_FLG != ISPD)*/ post_mGP2D_delete();
   fflush(stdout);
   UpdateNetAndGetHpwl();
   if(dynamicStepCMD) {

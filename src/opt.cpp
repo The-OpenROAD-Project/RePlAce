@@ -735,23 +735,56 @@ int area_sort(const void *a, const void *b) {
 }
 
 void init_iter(struct ITER *it, int idx) {
-  it->idx = idx;
   it->wlen.x = it->wlen.y = 0;
-  it->tot_wlen = 0;
-  it->grad = 0;
   it->hpwl.x = it->hpwl.y = 0;
-  it->tot_hpwl = 0;
-  it->ovfl = 0;
-  it->wcof.x = it->wcof.y = 0;
-  it->pcof = 0;
-  it->beta = 0;
-  it->alpha00 = 0;
-  it->alpha_dim.x = it->alpha_dim.y = 0;
   it->lc_dim.x = it->lc_dim.y = 0;
+  it->wcof.x = it->wcof.y = 0;
+  
+  it->grad = 0;
+  it->tot_wlen = 0;
+  it->tot_hpwl = 0;
+
+  it->tot_stnwl = 0;
+  it->tot_wwl = 0;
+
+  it->potn = 0;
+  it->ovfl = 0;
+  it->pcof = 0;
+
+  it->idx = idx;
+
+  it->beta = 0;
+  it->dis00 = 0;
+  it->alpha00 = 0;
+  
+  it->lc = 0; 
   it->lc_w = 0;
   it->lc_p = 0;
+  
   it->cpu_curr = 0;
   it->cpu_cost = 0;
+
+  it->alpha_dim.x = it->alpha_dim.y = 0;
+}
+
+void print_iter(struct ITER* it) {
+  it->wlen.Dump("wireLength");
+  it->hpwl.Dump("hpwl");
+  it->lc_dim.Dump("lc_dim");
+  it->wcof.Dump("wireCoeff");
+  it->alpha_dim.Dump("alpha_dim");
+  cout << "grad: " << it->grad << endl;
+  cout << "totalWireLength: " << it->tot_wlen << endl;
+  cout << "totalHpwl: " << it->tot_hpwl << endl;
+  cout << "potential: " << it->potn << endl;
+  cout << "overflow: " << it->ovfl << endl;
+  cout << "pCoeff: " << it->pcof << endl;
+  cout << "beta: " << it->beta << endl;
+  cout << "dis00: " << it->dis00 << endl;
+  cout << "alpha00: " << it->alpha00 << endl;
+  cout << "lc: " << it->lc << endl;
+  cout << "lc_w: " << it->lc_w << endl;
+  cout << "lc_p: " << it->lc_p << endl;
 }
 
 void gp_opt(void) {

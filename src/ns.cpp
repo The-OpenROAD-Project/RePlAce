@@ -206,7 +206,6 @@ bool myNesterov::isTimingIter(int ovlp) {
 
 
 void myNesterov::InitializationCommonVar() {
-  
   timingChkArr.push_back(make_pair(79,false));
   timingChkArr.push_back(make_pair(64,false));
   timingChkArr.push_back(make_pair(49,false));
@@ -524,6 +523,7 @@ void myNesterov::InitializationPrecondition_DEN_ONLY_PRECON() {
 }
 
 void myNesterov::InitializationIter() {
+  init_iter(&it0, 0);
   init_iter(iter_st, 0);
   it = &iter_st[0];
   time_calc(0, &it->cpu_curr, &it->cpu_cost);
@@ -905,6 +905,8 @@ void myNesterov::malloc_free() {
   free(y0_pdstl);
   free(cellLambdaArr);
   free(pcofArr);
+
+  vector<pair<int, bool>> ().swap(timingChkArr);
   // free(alphaArrCD);
   // free(deltaArrCD);
 }

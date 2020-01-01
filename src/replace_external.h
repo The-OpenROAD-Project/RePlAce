@@ -58,6 +58,8 @@ public:
   void set_net_weight_scale(double net_weight_scale);
   
   bool init_replace();
+  bool free_replace();
+  
   bool place_cell_init_place();
   bool place_cell_nesterov_place();
 

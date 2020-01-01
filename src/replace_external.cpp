@@ -3,6 +3,9 @@
 #include "initPlacement.h"
 #include "plot.h"
 #include "routeOpt.h"
+#include "timing.h"
+#include "fft.h"
+#include "openroad/OpenRoad.hh"
 
 
 replace_external::
@@ -361,6 +364,138 @@ replace_external::init_replace() {
     WriteBookshelf();  
   }
   return true;
+}
+
+bool 
+replace_external::free_replace() {
+  ord::OpenRoad *openroad = nullptr;
+  Timing::_sta = nullptr;
+  _db = nullptr;
+  timing_driven_mode = false;
+
+  // Clear the moduleInstance
+  for(int i=0; i<moduleCNT; i++) {
+    if( moduleInstance[i].pin ) {
+      free( moduleInstance[i].pin );
+    }
+    moduleInstance[i].pin = nullptr;
+    if( moduleInstance[i].pof) {
+      free( moduleInstance[i].pof );
+    }
+    moduleInstance[i].pof = nullptr;
+  }
+  if( moduleInstance ) {
+    free(moduleInstance);
+  }
+  moduleInstance = nullptr;
+  moduleCNT = 0;
+  vector<string> ().swap(moduleNameStor);
+  vector<vector<string>> ().swap(mPinName);
+
+  // Clear the terminalInstance
+  for(int i=0; i<terminalCNT; i++) {
+    if( terminalInstance[i].pin ) {
+      free( terminalInstance[i].pin );
+    }
+    terminalInstance[i].pin = nullptr;
+    if( terminalInstance[i].pof) {
+      free( terminalInstance[i].pof );
+    }
+    terminalInstance[i].pof = nullptr;
+  }
+  if( terminalInstance ) {
+    free(terminalInstance);
+  }
+  terminalInstance = nullptr;
+  terminalCNT = 0;
+  vector<string> ().swap(terminalNameStor);
+  vector<vector<string>> ().swap(tPinName);
+
+  // clear the netInstance
+  if( netInstance ) {
+    for(int i=0; i<netCNT; i++) {
+      if( netInstance[i].pin ) {
+        free(netInstance[i].pin);
+      }
+      netInstance[i].pin = nullptr;
+    }
+    free(netInstance);
+  }
+  netInstance = nullptr;
+  netCNT = 0;
+  vector<string> ().swap(netNameStor);
+
+  // clear the pinInstance
+  if( pinInstance ) {
+    free(pinInstance);
+  }
+  pinInstance = nullptr;
+  pinCNT = 0;
+
+  // clear the gcell_st
+  if( gcell_st ) { 
+    free(gcell_st);
+  }
+  gcell_st = nullptr;
+  gcell_cnt = 0;
+  vector<string> ().swap(cellNameStor);
+
+  // clear the row_st
+  if( row_st ) {
+    free( row_st );
+  }
+  row_st = nullptr;
+  row_cnt = 0;
+
+  // clear the place_st
+  if( place_st ) {
+    free( place_st );
+  }
+  place_st = nullptr;
+  place_st_cnt = 0;
+
+  // clear the tier_st
+  if( tier_st ) {
+    for(int z=0; z<numLayer; z++) {
+      TIER* tier = &tier_st[z];
+      if( tier->bin_mat ) {
+        free(tier->bin_mat);
+      }
+      tier->bin_mat = nullptr;
+
+      // tier->row_st and row_st share the same pointer
+      tier->row_st = nullptr;
+
+      if( tier->modu_st ) {
+        free(tier->modu_st);
+      }
+      tier->modu_st = nullptr;
+
+      // terminalInstance and tier->term_st share the same pointer
+      tier->term_st = nullptr;
+
+      if( tier->mac_st) {
+        free(tier->mac_st);
+      }
+      tier->mac_st = nullptr;
+
+      // tier->cell_st, tier->cell_st_tmp, and gcell_st share the same pointer
+      tier->cell_st = nullptr;
+      tier->cell_st_tmp = nullptr;
+
+      
+      // tier->tile_mat ....
+      tier->tile_mat = nullptr;
+    }
+    free(tier_st);
+  }
+  tier_st = nullptr;
+  charge_fft_delete_2d();
+  gsum_phi = gsum_ovfl = 0;
+  initGlobalVars();
+  cout << "Successfully FREED!!!!" << endl;
+   
+  return true; 
 }
 
 bool 
