@@ -15,7 +15,7 @@ extern int Replace_Init(Tcl_Interp *interp);
 namespace ord {
 
 void *
-makeReplaceu()
+makeReplace()
 {
   return nullptr;
 }

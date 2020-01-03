@@ -1,15 +1,18 @@
 sta::define_cmd_args "global_placement" {
   [-skip_initial_place]\
+  [-density target_density]\
   [-timing_driven]\
     [-bin_grid_count grid_count]}
 
 proc global_placement { args } {
   sta::parse_key_args "global_placement" args \
-    keys {-bin_grid_count -wire_res -wire_cap -density} flags {-skip_initial_place -timing_driven}
+    keys {-bin_grid_count -wire_res -wire_cap -density \
+      -lambda -min_pcof -max_pcof -overflow -verbose_level} \
+      flags {-skip_initial_place -timing_driven}
     
   set rep [replace_external]
 
-  set target_density 0.8
+  set target_density 0.7
   if { [info exists keys(-density)] } {
     set target_density $keys(-density) 
     sta::check_positive_float "-density" $target_density
@@ -34,7 +37,40 @@ proc global_placement { args } {
   } else {
     set wire_cap [expr [sta::wire_capacitance] * 1e-6]
   }
-  $rep set_unit_cap $wire_cap
+  $rep set_unit_cap $wire_cap  
+  
+  # hidden parameter to control the RePlAce divergence
+  if { [info exists keys(-min_pcof)] } { 
+    set min_pcof $keys(-min_pcof)
+    sta::check_positive_float "-min_pcof" $min_pcof
+    $rep set_pcof_min $min_pcof
+  } 
+
+  if { [info exists keys(-max_pcof)] } { 
+    set max_pcof $keys(-max_pcof)
+    sta::check_positive_float "-max_pcof" $max_pcof
+    $rep set_pcof_max $max_pcof
+  }
+
+  if { [info exists keys(-lambda)] } {
+    set lambda $keys(-lambda)
+    sta::check_positive_float "-lambda" $lambda
+    $rep set_lambda $lambda
+  }
+  
+  if { [info exists keys(-overflow)] } {
+    set overflow $keys(-overflow)
+    sta::check_positive_float "-overflow" $overflow
+    $rep set_target_overflow $overflow
+  }
+
+  if { [info exists keys(-verbose_level)] } {
+    set verbose_level $keys(-verbose_level)
+    sta::check_positive_integer "-verbose_level" $verbose_level
+    $rep set_verbose_level $verbose_level
+  } else {
+    $rep set_verbose_level 0
+  }
 
   $rep set_timing_driven [info exists flags(-timing_driven)]
 
@@ -46,8 +82,6 @@ proc global_placement { args } {
   sta::check_argc_eq0 "global_placement" $args
 
   if { [ord::db_has_rows] } {
-    # Unfortunately this does not really turn off the noise. -cherry
-    $rep set_verbose_level 0
     # Don't shit all over the file system
     $rep set_output /dev/null
 
