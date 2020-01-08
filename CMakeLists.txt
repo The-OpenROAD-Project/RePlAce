@@ -140,10 +140,11 @@ PRIVATE
   ${OPENSTA_HOME}/search
   ${OPENSTA_HOME}/app
 
-  ${OPENDB_HOME}/include/opendb
   # This SHOULD be ${OPENDB_HOME}/include but all library references are wrong
   # in replace -cherry
   ${OPENDB_HOME}/include/opendb
   ${OPENDB_HOME}/include
   ${OPENROAD_HOME}/include
+  SYSTEM
+  ${TCL_INCLUDE_PATH}
 )
