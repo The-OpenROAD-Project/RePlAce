@@ -51,55 +51,14 @@ set(REPLACE_WRAP ${CMAKE_CURRENT_BINARY_DIR}/replace_wrap.cpp)
 set(REPLACE_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/ReplaceTclInitVar.cc)
 
 set (REPLACE_SRC 
-  src/argument.cpp
-  src/bin.cpp
-  src/charge.cpp
-  src/fft.cpp
-  src/fftsg2d.cpp
-  src/fftsg3d.cpp
-  src/fftsg.cpp
-  src/gcell.cpp
-  src/initPlacement.cpp
-  src/macro.cpp
-  src/main.cpp
-  src/util.cpp
-  src/ns.cpp
-  src/opt.cpp
-  src/plot.cpp
-  src/routeOpt.cpp
-  src/tier.cpp
-  src/timing.cpp
-  src/timingSta.cpp
-  src/trial.cpp
-  src/wlen.cpp
-  src/replace_external.cpp
-  src/replace_private.cpp
-  src/replace_private.cpp
-  src/dbLefDefIO.cpp
   src/MakeReplace.cpp
   ${REPLACE_WRAP}
   ${REPLACE_TCL_INIT}
   )
 
 set (REPLACE_HEADER
-  src/bin.h
-  src/charge.h
-  src/fft.h
-  src/gcell.h
-  src/replace_private.h
-  src/replace_external.h
-  src/initPlacement.h
-  src/macro.h
-  src/ns.h
-  src/opt.h
-  src/plot.h
-  src/routeOpt.h
-  src/timing.h
-  src/timingSta.h
-  src/wlen.h
-  src/util.h
-  src/dbLefDefIO.h
-  src/MakeReplace.h
+  include/replace/Replace.h
+  include/replace/MakeReplace.h
 )
 
 add_custom_command(OUTPUT ${REPLACE_WRAP}
@@ -126,8 +85,9 @@ add_library( replace
 ############################################################
 target_include_directories( replace
 PUBLIC
-  ${REPLACE_HOME}/src
+  ${REPLACE_HOME}/include
 PRIVATE
+  ${REPLACE_HOME}/src
   ${EIGEN_HOME}
   ${FLUTE_HOME}
  
@@ -140,9 +100,6 @@ PRIVATE
   ${OPENSTA_HOME}/search
   ${OPENSTA_HOME}/app
 
-  # This SHOULD be ${OPENDB_HOME}/include but all library references are wrong
-  # in replace -cherry
-  ${OPENDB_HOME}/include/opendb
   ${OPENDB_HOME}/include
   ${OPENROAD_HOME}/include
   SYSTEM
