@@ -34,14 +34,14 @@ __Note that the following tunning parameters must be defined before executing in
 * __set_density__ [density] : Set target density. [0-1, float]. Default: 1.00
 * __set_bin_grid_count__ [num] : Set bin_grid_count. [64,128,256,512,..., int]. Default: Defined by internal algorithm.
 * __set_lambda__ [lambda] : Set lambda for RePlAce tunning. [float]. Default : 8e-5~10e5
-* __set_pcof_min__ [pcof_min] : Set pcof_min(µ_k Lower Bound). [0.95-1.05, float]. Default: 0.95
-* __set_pcof_max__ [pcof_max] : Set pcof_max(µ_k Upper Bound). [1.00-1.20, float]. Default: 1.05
+* __set_min_pcof__ [pcof_min] : Set pcof_min(µ_k Lower Bound). [0.95-1.05, float]. Default: 0.95
+* __set_max_pcof__ [pcof_max] : Set pcof_max(µ_k Upper Bound). [1.00-1.20, float]. Default: 1.05
 * __set_step_scale__ [step_scale] : Set step_scale(∆HPWL_REF). Default: 346000
 * __set_target_overflow__ [overflow] : Set target overflow termination condition. [0.01-1.00, float]. Default: 0.1
 
 __Timing-driven related tuning parameters__
-* __set_net_weight_min__ [weight_min] : Set net_weight_min. [1.0-1.8, float]
-* __set_net_weight_max__ [weight_max] : Set net_weight_max. [weight_min-1.8, float]
+* __set_min_net_weight__ [weight_min] : Set net_weight_min. [1.0-1.8, float]
+* __set_max_net_weight__ [weight_max] : Set net_weight_max. [weight_min-1.8, float]
 * __set_net_weight_scale__ [weight_scale] : Set net_weight_scale. [200-, float]
 
 ## Other options

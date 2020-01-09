@@ -80,7 +80,7 @@ replace_external::help() {
   cout << "set_density [density]" << endl;
   cout << "    Set target density. [0-1, float]. Default: 1.00" << endl;
   cout << endl; 
-  cout << "set_bin_grid_count [num]" << endl;
+  cout << "set_number_of_bin_grids [num]" << endl;
   cout << "    Set bin_grid_count. [64,128,256,512,..., int]. " << endl;
   cout << "    Default: Defined by internal algorithm." << endl;
   cout << endl; 
@@ -88,11 +88,11 @@ replace_external::help() {
   cout << "    Set lambda for RePlAce tunning. [float]." << endl;
   cout << "    Default : 8e-5~10e5" << endl;
   cout << endl; 
-  cout << "set_pcof_min [pcof_min]" << endl;
+  cout << "set_min_pcof [pcof_min]" << endl;
   cout << "    Set pcof_min(µ_k Lower Bound). [0.95-1.05, float]." << endl;
   cout << "    Default: 0.95" << endl;
   cout << endl; 
-  cout << "set_pcof_max [pcof_max]" << endl;
+  cout << "set_max_pcof [pcof_max]" << endl;
   cout << "    Set pcof_max(µ_k Upper Bound). [1.00-1.20, float]." << endl;
   cout << "    Default: 1.05" << endl;
   cout << endl; 
@@ -105,10 +105,10 @@ replace_external::help() {
   cout << endl; 
   
   cout << "==== Timing-driven related tuning parameters ==== " << endl;
-  cout << "set_net_weight_min [weight_min]" << endl;
+  cout << "set_min_net_weight [weight_min]" << endl;
   cout << "    Set net_weight_min. [1.0-1.8, float]" << endl;
   cout << endl; 
-  cout << "set_net_weight_max [weight_max]" << endl;
+  cout << "set_max_net_weight [weight_max]" << endl;
   cout << "    Set net_weight_max. [weight_min-1.8, float]" << endl;
   cout << endl; 
   cout << "set_net_weight_scale [weight_scale]" << endl;
@@ -267,7 +267,7 @@ replace_external::set_density(double density) {
 }
 
 void
-replace_external::set_bin_grid_count(size_t grid_count) {
+replace_external::set_number_of_bin_grids(size_t grid_count) {
   dim_bin.x = dim_bin.y = grid_count;
   isBinSet = true;
 }
@@ -278,12 +278,12 @@ replace_external::set_lambda(double lambda) {
 }
 
 void
-replace_external::set_pcof_min(double pcof_min) {
+replace_external::set_min_pcof(double pcof_min) {
   LOWER_PCOF = pcof_min;
 }
 
 void
-replace_external::set_pcof_max(double pcof_max) {
+replace_external::set_max_pcof(double pcof_max) {
   UPPER_PCOF = pcof_max;
 }
 
@@ -303,12 +303,12 @@ replace_external::set_net_weight_apply(bool mode){
 }
 
 void
-replace_external::set_net_weight_min(double net_weight_min) {
+replace_external::set_min_net_weight(double net_weight_min) {
   netWeightBase = net_weight_min;
 }
 
 void
-replace_external::set_net_weight_max(double net_weight_max) {
+replace_external::set_max_net_weight(double net_weight_max) {
   netWeightBound = net_weight_max;
 }
 
@@ -496,7 +496,7 @@ replace_external::save_jpeg(const char* jpeg) {
 }
 
 void
-replace_external::import_custom_net_weight(const char* input_file) {
+replace_external::import_custom_net_weights(const char* input_file) {
   hasCustomNetWeight = true;
   net_weight_file = input_file;
 }

@@ -45,16 +45,16 @@ public:
   void set_write_bookshelf_enable(bool write_mode);
   
   void set_density(double density);
-  void set_bin_grid_count(size_t grid_count);
+  void set_number_of_bin_grids(size_t grid_count);
   void set_lambda(double lambda);
-  void set_pcof_min(double pcof_min);
-  void set_pcof_max(double pcof_max);
+  void set_min_pcof(double pcof_min);
+  void set_max_pcof(double pcof_max);
   void set_step_scale(double step_scale);
   void set_target_overflow(double overflow);
   
   void set_net_weight_apply(bool mode);
-  void set_net_weight_min(double net_weight_min);
-  void set_net_weight_max(double net_weight_max);
+  void set_min_net_weight(double net_weight_min);
+  void set_max_net_weight(double net_weight_max);
   void set_net_weight_scale(double net_weight_scale);
   
   bool init_replace();
@@ -83,7 +83,7 @@ public:
 //  int get_nesterov_iter_count();
 //  float get_nesterov_potential();
   
-  void import_custom_net_weight(const char* net_weight);
+  void import_custom_net_weights(const char* net_weight);
 
   bool save_jpeg(const char* jpeg);
 
