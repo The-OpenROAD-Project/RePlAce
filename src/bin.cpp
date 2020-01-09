@@ -180,8 +180,12 @@ void bin_init() {
       plArea += pGetCommonAreaXY(pl->org, pl->end, binp->pmin, binp->pmax);
     }
 
+    // 
+    // global_macro_area_scale == target_cell_density
+    //
+    // virt_area == area that CANNOT place cells.
+    //
     binp->virt_area = (bin_area - plArea) * global_macro_area_scale;
-    //        binp->dump(to_string(i));
   }
 
   // calculate overlap area in terminalInstance.
@@ -965,11 +969,16 @@ void bin_update7_cGP2D() {
     private(i)
   //    {
 
-  //#pragma omp for
+
+  // 
+  // updates cell_area and cell_area2 vals in BIN structure
+  //
+  // BIN->cell_area is for normal cell area
+  // BIN->cell_area2 is for filler cell area
+  //
   for(i = 0; i < tier->cell_cnt; i++) {
     den_comp_2d_cGP2D(tier->cell_st[i], tier);
   }
-  //}
 
   if(timeon) {
     time_end(&time);
@@ -984,10 +993,20 @@ void bin_update7_cGP2D() {
     for(i = 0; i < tier->tot_bin_cnt; i++) {
       BIN *bp = &tier->bin_mat[i];
 
+      // SUM of (normalCell + un-placeable area) of areas per a bin
+      // note that un-placeable area (virt_area + term_area) already multiplied by target_cell_den;
+      //
       prec area_num2 = bp->cell_area + bp->virt_area + bp->term_area;
+
+      // SUM of all consumed area (fillerCell + normalCell  + un-placeable area) per a bin.
+      // note that un-placeable area (virt_area + term_area) already multiplied by target_cell_den;
+      //
       prec area_num = area_num2 + bp->cell_area2;
 
+      // all consumed area / binArea
       bp->den = area_num * tier->inv_bin_area;
+      
+      // (normalCell + un-placecable area) / binArea
       bp->den2 = area_num2 * tier->inv_bin_area;
 
       copy_den_to_fft_2D(bp->den, bp->p);
@@ -1523,7 +1542,9 @@ void den_comp_2d_mGP2D(CELL *cell, TIER *tier) {
   }
 }
 
-// calculate
+// calculate 
+// densityArea and binArea overlaps
+//
 //
 // tier->bin_mat->cell_area (Normal & Macro) and
 // tier->bin_mat->cell_area2(Filler Cell)

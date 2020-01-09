@@ -3,9 +3,9 @@
 #
 
 set design wb_dma_top 
-set lib_dir ../library/a2a/
-set design_dir ../design/a2a/${design}
-set exp_folder exp
+set lib_dir library/a2a/
+set design_dir design/a2a/${design}
+set exp_folder rep-td-test-02 
 
 replace_external rep
 
@@ -21,6 +21,7 @@ rep import_lib ${lib_dir}/contest.lib
 rep set_unit_res 1.6
 rep set_unit_cap 0.23e-14
 rep set_timing_driven 1
+rep set_net_weight_apply false
 
 rep set_verbose_level 0
 
@@ -39,7 +40,7 @@ if {![file exists ${exp_folder}/]} {
   exec mkdir ${exp_folder}
 }
 
-set fp [open ${exp_folder}/${design}_2_td.rpt w]
+set fp [open ${exp_folder}/${design}_2_orig.rpt w]
 puts $fp "HPWL: [rep get_hpwl]"
 puts $fp "WNS: [rep get_wns]"
 puts $fp "TNS: [rep get_tns]"

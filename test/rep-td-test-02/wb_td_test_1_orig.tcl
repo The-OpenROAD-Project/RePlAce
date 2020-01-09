@@ -2,21 +2,21 @@
 # Examples for Timing-driven RePlAce with TCL usage
 #
 
-set design aes_cipher_top 
-set lib_dir ../library/nangate45/
-set design_dir ../design/nangate45/${design}
-set exp_folder exp
+set design wb_dma_top 
+set lib_dir library/a2a/
+set design_dir design/a2a/${design}
+set exp_folder rep-td-test-02 
 
 replace_external rep
 
 # Import LEF/DEF files
-rep import_lef ${lib_dir}/NangateOpenCellLibrary.lef
+rep import_lef ${lib_dir}/contest.lef
 rep import_def ${design_dir}/${design}.def
 
 # timing-driven parameters
 rep import_verilog ${design_dir}/${design}.v
 rep import_sdc ${design_dir}/${design}.sdc
-rep import_lib ${lib_dir}/NangateOpenCellLibrary_typical.lib
+rep import_lib ${lib_dir}/contest.lib
 
 rep set_unit_res 16
 rep set_unit_cap 0.23e-15
@@ -26,9 +26,6 @@ rep set_net_weight_apply false
 rep set_verbose_level 0
 
 rep init_replace
-
-# place_cell with initial place (BiCGSTAB)
-rep place_cell_init_place
 
 # place_cell with Nesterov (RePlAce)
 rep place_cell_nesterov_place 
