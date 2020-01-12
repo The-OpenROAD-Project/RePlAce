@@ -1,7 +1,6 @@
 #ifndef __REPLACE_HEADER__
 #define __REPLACE_HEADER__
 
-
 namespace odb {
   class dbDatabase;
 }
@@ -9,11 +8,19 @@ namespace sta {
   class dbSta;
 }
 
-namespace GlobalPlacer {
+namespace replace {
+
+class InitPlace;
+class NesterovPlace;
 
 class Replace
 {
   public:
+    Replace();
+    ~Replace();
+    void init();
+    void clear();
+
     void setDb(odb::dbDatabase* odb);
     void setSta(sta::dbSta* dbSta);
 
@@ -33,6 +40,8 @@ class Replace
   private:
     odb::dbDatabase* odb_;
     sta::dbSta* sta_;
+    InitPlace* init_place_;
+    NesterovPlace* nesterov_place_;
 
     int maxInitPlaceIter_;
     int maxNesterovPlaceIter_;
@@ -45,7 +54,6 @@ class Replace
     float maxPCoef_;
     float deltaHpwl_;
 };
-
 }
 
 #endif
