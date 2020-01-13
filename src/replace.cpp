@@ -1,4 +1,6 @@
 #include "replace/Replace.h"
+#include "initPlace.h"
+#include "nesterovPlace.h"
 
 namespace replace {
 
@@ -20,7 +22,6 @@ void Replace::init() {
   sta_ = nullptr;
   init_place_ = new InitPlace();
   nesterov_place_ = new NesterovPlace();
-  
 }
 
 void Replace::clear() {
@@ -35,8 +36,8 @@ void Replace::clear() {
   overflow_ = 0;
   density_ = 0;
   lambda_ = 0;
-  minPCoef = 0;
-  maxPCoef = 0;
+  minPCoef_ = 0;
+  maxPCoef_ = 0;
   deltaHpwl_ = 0;
 }
 

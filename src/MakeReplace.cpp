@@ -1,11 +1,11 @@
-#include "MakeReplace.h"
-#include "Replace.h"
+#include "replace/MakeReplace.h"
+#include "replace/Replace.h"
 
 namespace ord {
 
 replace::Replace* 
 makeReplace() {
-  return new Replace::replace();
+  return new replace::Replace();
 }
 
 void

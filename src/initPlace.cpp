@@ -1,4 +1,4 @@
-#include "InitPlace.h"
+#include "initPlace.h"
 
 namespace replace {
 
@@ -16,7 +16,7 @@ InitPlace::~InitPlace() {
   clear();
 }
 
-void InitPlace::clear()
+void InitPlace::clear() {
   db_ = nullptr;
   initPlaceVars_.clear();
   placeInsts_ = nullptr;
@@ -42,7 +42,7 @@ void InitPlace::doInitPlace() {
 
 // solve matX_ * xcg_x_ = xcg_b_ and matY_ * ycg_x_ = ycg_b_ eq.
 void InitPlace::createSparseMatrix() {
-  const int placeCnt = placeInsts->size();
+  const int placeCnt = placeInsts_->size();
   xcgX_.resize( placeCnt );
   xcgB_.resize( placeCnt );
   ycgX_.resize( placeCnt );

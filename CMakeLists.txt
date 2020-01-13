@@ -54,6 +54,9 @@ set (REPLACE_SRC
   src/MakeReplace.cpp
   ${REPLACE_WRAP}
   ${REPLACE_TCL_INIT}
+  src/replace.cpp
+  src/initPlace.cpp
+  src/nesterovPlace.cpp
   )
 
 set (REPLACE_HEADER
@@ -64,7 +67,7 @@ set (REPLACE_HEADER
 add_custom_command(OUTPUT ${REPLACE_WRAP}
   COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${REPLACE_WRAP} ${REPLACE_HOME}/src/replace.i
   WORKING_DIRECTORY ${REPLACE_HOME}
-  DEPENDS ${REPLACE_HOME}/src/replace.i "src/replace_external.h"
+  DEPENDS ${REPLACE_HOME}/src/replace.i 
 )
 
 add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
