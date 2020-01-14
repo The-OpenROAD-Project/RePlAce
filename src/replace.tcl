@@ -86,7 +86,6 @@ proc global_placement { args } {
     replace_init_place_cmd
     replace_nesterov_place_cmd
     
-    puts "HP wire length: [format %.0f]"
     puts "Worst slack: [format %.2e [sta::worst_slack]]"
     puts "Total negative slack: [format %.2e [sta::total_negative_slack]]"
   } else {

@@ -2,20 +2,25 @@
 #include "initPlace.h"
 #include "nesterovPlace.h"
 #include "placerBase.h"
+#include <iostream>
 
 namespace replace {
+
+using namespace std;
 
 Replace::Replace()
   : db_(nullptr), 
   sta_(nullptr), ip_(nullptr), 
   np_(nullptr), pb_(nullptr),
   maxInitPlaceIter_(20), 
+  maxNesterovPlaceIter_(2000),
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
   lambda_(0.00001), 
   minPCoef_(0.95), maxPCoef_(1.05),
   deltaHpwl_(346000),
-  verbose_(0) {};
+  verbose_(0) {
+};
 
 Replace::~Replace() {
   clear();
@@ -53,6 +58,10 @@ void Replace::setSta(sta::dbSta* sta) {
   sta_ = sta;
 }
 void Replace::doInitPlace() {
+  if( !pb_ || !ip_ || !np_ ) {
+    init();
+  }
+
   InitPlaceVars ipVars;
   ipVars.maxInitPlaceIter = maxInitPlaceIter_;
   ipVars.verbose = verbose_;
@@ -62,7 +71,9 @@ void Replace::doInitPlace() {
 }
 
 void Replace::doNesterovPlace() {
-
+  if( !pb_ || !ip_ || !np_ ) {
+    init();
+  }
   np_->doNesterovPlace();
 
 }

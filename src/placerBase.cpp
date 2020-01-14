@@ -1,17 +1,20 @@
 #include "placerBase.h"
 #include <opendb/db.h>
+#include <iostream>
 
 namespace replace {
 
 using namespace odb;
+using namespace std;
 
 ////////////////////////////////////////////////////////
 // Instance 
 
 Instance::Instance() : inst_(nullptr), lx_(0), ly_(0) {}
 Instance::Instance(odb::dbInst* inst) : Instance() {
+  inst_ = inst;
   int lx = 0, ly = 0;
-  inst->getLocation(lx, ly);
+  inst_->getLocation(lx, ly);
   lx_ = lx; 
   ly_ = ly;
 }
@@ -397,7 +400,7 @@ void Net::addPin(Pin* pin) {
 // PlacerBase
 
 PlacerBase::PlacerBase() : db_(nullptr) {}
-PlacerBase::PlacerBase(odb::dbDatabase* db) : PlacerBase() {
+PlacerBase::PlacerBase(odb::dbDatabase* db) : db_(db) {
   init();
 }
 
