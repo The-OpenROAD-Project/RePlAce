@@ -2,7 +2,17 @@
 
 namespace replace {
 
-NesterovPlace::NesterovPlace() {}
-NesterovPlace::~NesterovPlace() {}
+NesterovPlace::NesterovPlace() : pb_(nullptr) {}
+NesterovPlace::NesterovPlace(PlacerBase* placerBase) 
+: pb_(placerBase) {}
+
+NesterovPlace::~NesterovPlace() {
+  pb_ = nullptr;
+}
+
+void
+NesterovPlace::doNesterovPlace() {
+
+}
 
 }

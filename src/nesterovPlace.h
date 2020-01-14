@@ -3,10 +3,17 @@
 
 namespace replace 
 {
+
+class PlacerBase;
 class NesterovPlace {
 public:
   NesterovPlace();
+  NesterovPlace(PlacerBase* placerBase);
   ~NesterovPlace();
+
+  void doNesterovPlace();
+private:
+  PlacerBase* pb_;
 };
 }
 

@@ -12,6 +12,7 @@ namespace replace {
 
 class InitPlace;
 class NesterovPlace;
+class PlacerBase;
 
 class Replace
 {
@@ -27,8 +28,11 @@ class Replace
     void doInitPlace();
     void doNesterovPlace();
 
-    void setBinCntX(int binCntX);
-    void setBinCntY(int binCntY);
+    void setMaxInitPlaceIter(int iter);
+    void setMaxNesvPlaceIter(int iter);
+
+    void setBinGridCntX(int binGridCntX);
+    void setBinGridCntY(int binGridCntY);
 
     void setTargetDensity(float density);
     void setTargetOverflow(float overflow);
@@ -37,22 +41,26 @@ class Replace
     void setMaxPCoef(float maxPCoef);
     void setDeltaHpwl(float deltaHpwl);
 
+    void setVerboseLevel(int verbose);
+
   private:
-    odb::dbDatabase* odb_;
+    odb::dbDatabase* db_;
     sta::dbSta* sta_;
-    InitPlace* init_place_;
-    NesterovPlace* nesterov_place_;
+    InitPlace* ip_;
+    NesterovPlace* np_;
+    PlacerBase* pb_;
 
     int maxInitPlaceIter_;
     int maxNesterovPlaceIter_;
-    int binCntX_;
-    int binCntY_;
+    int binGridCntX_;
+    int binGridCntY_;
     float overflow_;
     float density_;
     float lambda_;
     float minPCoef_;
     float maxPCoef_;
     float deltaHpwl_;
+    int verbose_;
 };
 }
 

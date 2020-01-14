@@ -1,8 +1,20 @@
 #ifndef __PLACER_BASE__
 #define __PLACER_BASE__
 
-#include <opendb/db.h>
+#include <vector>
 #include <unordered_map>
+
+namespace odb {
+class dbDatabase;
+
+class dbInst;
+class dbITerm;
+class dbBTerm;
+class dbNet;
+
+class dbPlacementStatus;
+class dbSigType;
+}
 
 namespace replace {
 
@@ -67,6 +79,10 @@ public:
   void setMinPinY();
   void setMaxPinX();
   void setMaxPinY();
+  void unsetMinPinX();
+  void unsetMinPinY();
+  void unsetMaxPinX();
+  void unsetMaxPinY();
  
   int offsetLx();
   int offsetLy();
@@ -123,6 +139,8 @@ public:
   int hpwl();
 
   void updateBox();
+
+  std::vector<Pin*> & pins() { return pins_; }
 
   odb::dbNet* net() { return net_; }
   odb::dbSigType getSigType();

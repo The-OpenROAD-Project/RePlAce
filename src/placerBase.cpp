@@ -1,4 +1,5 @@
 #include "placerBase.h"
+#include <opendb/db.h>
 
 namespace replace {
 
@@ -161,6 +162,22 @@ void Pin::setMaxPinX() {
 
 void Pin::setMaxPinY() {
   attribute_ |= (1 << 5);
+}
+
+void Pin::unsetMinPinX() {
+  attribute_ &= 11111011;
+}
+
+void Pin::unsetMinPinY() {
+  attribute_ &= 11110111;
+}
+
+void Pin::unsetMaxPinX() {
+  attribute_ &= 11101111;
+}
+
+void Pin::unsetMaxPinY() {
+  attribute_ &= 11011111;
 }
 
 bool Pin::isITerm() {
