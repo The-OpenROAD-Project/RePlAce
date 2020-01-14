@@ -18,6 +18,7 @@ Instance::Instance(odb::dbInst* inst) : Instance() {
 Instance::~Instance() { 
   inst_ = nullptr;
   lx_ = ly_ = 0;
+  pins_.clear();
 }
 
 bool 
@@ -110,12 +111,17 @@ Instance::cy() {
   return ly_ + inst_->getBBox()->getDY()/2;
 }
 
+void
+Instance::addPin(Pin* pin) {
+  pins_.push_back(pin);
+}
+
 ////////////////////////////////////////////////////////
 // Pin 
 
 Pin::Pin()
-  : term_(nullptr), attribute_(0),
-    offsetLx_(0), offsetLy_(0),
+  : term_(nullptr), inst_(nullptr), net_(nullptr), 
+    attribute_(0), offsetLx_(0), offsetLy_(0),
     offsetUx_(0), offsetUy_(0),
     lx_(0), ly_(0) {}
 
@@ -287,6 +293,16 @@ void Pin::updateLocation(odb::dbBTerm* bTerm) {
   }
 }
 
+void 
+Pin::setInstance(Instance* inst) {
+  inst_ = inst;
+}
+
+void
+Pin::setNet(Net* net) {
+  net_ = net;
+}
+
 Pin::~Pin() {
   term_ = nullptr;
   attribute_ = 0; 
@@ -356,6 +372,10 @@ void Net::updateBox() {
   }
 }
 
+void Net::addPin(Pin* pin) {
+  pins_.push_back(pin);
+}
+
 ////////////////////////////////////////////////////////
 // PlacerBase
 
@@ -371,7 +391,8 @@ PlacerBase::~PlacerBase() {
 void PlacerBase::init() {
   dbBlock* block = db_->getChip()->getBlock();
   dbSet<dbInst> insts = block->getInsts();
-  
+ 
+  // insts fill 
   insts_.reserve(insts.size());
   for(dbInst* inst : insts) {
     Instance myInst(inst);
@@ -388,6 +409,7 @@ void PlacerBase::init() {
     }
   }
 
+  // pins fill 
   dbSet<dbBTerm> bTerms = block->getBTerms();
   dbSet<dbITerm> iTerms = block->getITerms();
   pins_.reserve(bTerms.size() + iTerms.size());
@@ -402,6 +424,7 @@ void PlacerBase::init() {
     pinMap_[(void*)iTerm] = &pins_[pins_.size()-1];
   }
 
+  // nets fill
   dbSet<dbNet> nets = block->getNets();
   nets_.reserve(nets.size());
   for(dbNet* net : nets) {
@@ -409,6 +432,35 @@ void PlacerBase::init() {
     nets_.push_back( myNet );
     netMap_[net] = &nets_[nets_.size()-1];
   }
+
+  // insts_' pins_ fill
+  for(auto& inst : insts_) {
+    for(dbITerm* iTerm : inst.inst()->getITerms()) {
+      inst.addPin( dbToPlace(iTerm) );
+    }
+  }
+
+  // pins' net and instance fill 
+  for(auto& pin : pins_) {
+    if( pin.isITerm() ) {
+      pin.setInstance( dbToPlace( pin.iTerm()->getInst() ) );
+      pin.setNet( dbToPlace( pin.iTerm()->getNet() ) );
+    }
+    else if( pin.isBTerm() ) {
+      pin.setNet( dbToPlace( pin.bTerm()->getNet() ) );
+    }
+  }
+ 
+  //nets' pin update
+  for(auto& net : nets_) {
+    for(dbITerm* iTerm : net.net()->getITerms()) {
+      net.addPin( dbToPlace( iTerm ) );
+    }
+    for(dbBTerm* bTerm : net.net()->getBTerms()) {
+      net.addPin( dbToPlace( bTerm ) );
+    }
+  }
+
 }
 
 void PlacerBase::clear() {
@@ -433,8 +485,25 @@ int PlacerBase::hpwl() {
   return hpwl;
 }
 
+Instance* PlacerBase::dbToPlace(odb::dbInst* inst) {
+  auto instPtr = instMap_.find(inst);
+  return (instPtr == instMap_.end())? nullptr : instPtr->second;
+}
 
+Pin* PlacerBase::dbToPlace(odb::dbITerm* term) {
+  auto pinPtr = pinMap_.find((void*)term);
+  return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
+}
 
+Pin* PlacerBase::dbToPlace(odb::dbBTerm* term) {
+  auto pinPtr = pinMap_.find((void*)term);
+  return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
+}
+
+Net* PlacerBase::dbToPlace(odb::dbNet* net) {
+  auto netPtr = netMap_.find(net);
+  return (netPtr == netMap_.end())? nullptr : netPtr->second;
+}
 
 }
 

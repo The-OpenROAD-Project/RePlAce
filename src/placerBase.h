@@ -2,9 +2,12 @@
 #define __PLACER_BASE__
 
 #include <opendb/db.h>
-#include <map>
+#include <unordered_map>
 
 namespace replace {
+
+class Pin;
+class Net;
 
 class Instance {
 public:
@@ -31,8 +34,12 @@ public:
   int cx();
   int cy();
 
+  void addPin(Pin* pin);
+  std::vector<Pin*> & pins() { return pins_; }
+
 private:
   odb::dbInst* inst_;
+  std::vector<Pin*> pins_;
   int lx_;
   int ly_;
 };
@@ -75,9 +82,19 @@ public:
   
   void updateLocation();
 
+  void setInstance(Instance* inst);
+  void setNet(Net* net);
+
+  Instance* instance() { return inst_; }
+  Net* net() { return net_; }
+
 private:
   void* term_;
+  Instance* inst_;
+  Net* net_;
+  
   uint8_t attribute_;
+
   int offsetLx_;
   int offsetLy_;
   int offsetUx_;
@@ -110,8 +127,11 @@ public:
   odb::dbNet* net() { return net_; }
   odb::dbSigType getSigType();
 
+  void addPin(Pin* pin);
+
 private:
   odb::dbNet* net_;
+  std::vector<Pin*> pins_;
   int lx_;
   int ly_;
   int ux_;
@@ -146,9 +166,9 @@ private:
   std::vector<Instance> insts_;
   std::vector<Pin> pins_;
   std::vector<Net> nets_;
-  std::map<odb::dbInst*, Instance*> instMap_;
-  std::map<void*, Pin*> pinMap_;
-  std::map<odb::dbNet*, Net*> netMap_;
+  std::unordered_map<odb::dbInst*, Instance*> instMap_;
+  std::unordered_map<void*, Pin*> pinMap_;
+  std::unordered_map<odb::dbNet*, Net*> netMap_;
   
   std::vector<Instance*> placeInsts_;
   std::vector<Instance*> fixedInsts_;
