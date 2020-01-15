@@ -10,6 +10,7 @@ class PlacerBase;
 class InitPlaceVars {
 public:
   int maxInitPlaceIter;
+  int minDiffLength;
   int verbose;
   InitPlaceVars();
   void clear();
@@ -33,6 +34,9 @@ class InitPlace {
     Eigen::VectorXf xcgX_, xcgB_;
     Eigen::VectorXf ycgX_, ycgB_;
     SMatrix matX_, matY_;
+
+    void placeInstsCenter();
+    void setPlaceInstExtId();
     void updatePinInfo();
     void createSparseMatrix();
 };

@@ -66,7 +66,7 @@ proc global_placement { args } {
   if { [info exists keys(-verbose_level)] } {
     set verbose_level $keys(-verbose_level)
     sta::check_positive_integer "-verbose_level" $verbose_level
-    set_replace_verbose_cmd $verbose_level
+    set_replace_verbose_level_cmd $verbose_level
   } 
 
   if { [info exists keys(-bin_grid_count)] } {

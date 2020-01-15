@@ -14,6 +14,10 @@ class dbNet;
 
 class dbPlacementStatus;
 class dbSigType;
+
+class dbBox;
+
+class adsRect;
 }
 
 namespace replace {
@@ -45,6 +49,9 @@ public:
   int uy();
   int cx();
   int cy();
+  
+  void setExtId(int extId);
+  int extId() { return extId_; }
 
   void addPin(Pin* pin);
   std::vector<Pin*> & pins() { return pins_; }
@@ -54,6 +61,7 @@ private:
   std::vector<Pin*> pins_;
   int lx_;
   int ly_;
+  int extId_;
 };
 
 class Pin {
@@ -156,6 +164,41 @@ private:
   int uy_;
 };
 
+class Die {
+public:
+  Die();
+  Die(odb::dbBox* dieBox, odb::adsRect* coreRect);
+  ~Die();
+
+  void setDieBox(odb::dbBox* dieBox);
+  void setCoreBox(odb::adsRect* coreBox);
+
+  int dieLx() { return dieLx_; }
+  int dieLy() { return dieLy_; }
+  int dieUx() { return dieUx_; }
+  int dieUy() { return dieUy_; }
+
+  int coreLx() { return coreLx_; }
+  int coreLy() { return coreLy_; }
+  int coreUx() { return coreUx_; }
+  int coreUy() { return coreUy_; }
+
+  int dieCx(); 
+  int dieCy();
+  int coreCx();
+  int coreCy();
+
+private:
+  int dieLx_; 
+  int dieLy_;
+  int dieUx_;
+  int dieUy_;
+  int coreLx_;
+  int coreLy_;
+  int coreUx_;
+  int coreUy_;
+};
+
 class PlacerBase {
 public:
   PlacerBase();
@@ -172,15 +215,19 @@ public:
   std::vector<Instance*>& placeInsts() { return placeInsts_; }
   std::vector<Instance*>& fixedInsts() { return fixedInsts_; }
 
+  Die& die() { return die_; }
+
   Instance* dbToPlace(odb::dbInst* inst);
   Pin* dbToPlace(odb::dbITerm* pin);
   Pin* dbToPlace(odb::dbBTerm* pin);
   Net* dbToPlace(odb::dbNet* net);
 
   int hpwl();
+  void printInfo();
 
 private:
   odb::dbDatabase* db_;
+  Die die_;
   std::vector<Instance> insts_;
   std::vector<Pin> pins_;
   std::vector<Net> nets_;

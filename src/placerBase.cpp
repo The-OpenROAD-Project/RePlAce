@@ -7,10 +7,14 @@ namespace replace {
 using namespace odb;
 using namespace std;
 
+static odb::adsRect 
+getCoreRectFromDb(dbSet<odb::dbRow> &rows);
+
 ////////////////////////////////////////////////////////
 // Instance 
 
-Instance::Instance() : inst_(nullptr), lx_(0), ly_(0) {}
+Instance::Instance() : inst_(nullptr), 
+  lx_(0), ly_(0), extId_(INT_MIN) {}
 Instance::Instance(odb::dbInst* inst) : Instance() {
   inst_ = inst;
   int lx = 0, ly = 0;
@@ -118,6 +122,11 @@ Instance::cy() {
 void
 Instance::addPin(Pin* pin) {
   pins_.push_back(pin);
+}
+
+void
+Instance::setExtId(int extId) {
+  extId_ = extId;
 }
 
 ////////////////////////////////////////////////////////
@@ -397,6 +406,60 @@ void Net::addPin(Pin* pin) {
 }
 
 ////////////////////////////////////////////////////////
+// Die 
+
+Die::Die() : 
+  dieLx_(0), dieLy_(0), dieUx_(0), dieUy_(0),
+  coreLx_(0), coreLy_(0), coreUx_(0), coreUy_(0) {}
+
+Die::Die(odb::dbBox* dieBox, 
+    odb::adsRect* coreRect) : Die() {
+  setDieBox(dieBox);
+  setCoreBox(coreRect);
+}
+
+Die::~Die() {
+  dieLx_ = dieLy_ = dieUx_ = dieUy_ = 0;
+  coreLx_ = coreLy_ = coreUx_ = coreUy_ = 0;
+}
+
+void
+Die::setDieBox(odb::dbBox* dieBox) {
+  dieLx_ = dieBox->xMin();
+  dieLy_ = dieBox->yMin();
+  dieUx_ = dieBox->xMax();
+  dieUy_ = dieBox->yMax();
+}
+
+void
+Die::setCoreBox(odb::adsRect* coreRect) {
+  coreLx_ = coreRect->xMin();
+  coreLy_ = coreRect->yMin();
+  coreUx_ = coreRect->xMax();
+  coreUy_ = coreRect->yMax();
+}
+
+int
+Die::dieCx() { 
+  return (dieLx_ + dieUx_)/2;
+}
+
+int
+Die::dieCy() { 
+  return (dieLy_ + dieUy_)/2;
+}
+
+int
+Die::coreCx() {
+  return (coreLx_ + coreUx_)/2;
+}
+
+int
+Die::coreCy() {
+  return (coreLy_ + coreUy_)/2;
+}
+
+////////////////////////////////////////////////////////
 // PlacerBase
 
 PlacerBase::PlacerBase() : db_(nullptr) {}
@@ -408,7 +471,8 @@ PlacerBase::~PlacerBase() {
   clear();
 }
 
-void PlacerBase::init() {
+void 
+PlacerBase::init() {
   dbBlock* block = db_->getChip()->getBlock();
   dbSet<dbInst> insts = block->getInsts();
  
@@ -481,9 +545,16 @@ void PlacerBase::init() {
     }
   }
 
+  dbSet<dbRow> rows = block->getRows();
+
+  odb::adsRect coreRect = getCoreRectFromDb(rows);
+  die_ = Die(block->getBBox(), &coreRect);
+
+  printInfo();
 }
 
-void PlacerBase::clear() {
+void
+PlacerBase::clear() {
   db_ = nullptr;
   insts_.clear();
   pins_.clear();
@@ -496,7 +567,8 @@ void PlacerBase::clear() {
   fixedInsts_.clear();
 }
 
-int PlacerBase::hpwl() {
+int 
+PlacerBase::hpwl() {
   int hpwl = 0;
   for(auto& net : nets_) {
     net.updateBox();
@@ -505,25 +577,87 @@ int PlacerBase::hpwl() {
   return hpwl;
 }
 
-Instance* PlacerBase::dbToPlace(odb::dbInst* inst) {
+Instance* 
+PlacerBase::dbToPlace(odb::dbInst* inst) {
   auto instPtr = instMap_.find(inst);
   return (instPtr == instMap_.end())? nullptr : instPtr->second;
 }
 
-Pin* PlacerBase::dbToPlace(odb::dbITerm* term) {
+Pin* 
+PlacerBase::dbToPlace(odb::dbITerm* term) {
   auto pinPtr = pinMap_.find((void*)term);
   return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
 }
 
-Pin* PlacerBase::dbToPlace(odb::dbBTerm* term) {
+Pin* 
+PlacerBase::dbToPlace(odb::dbBTerm* term) {
   auto pinPtr = pinMap_.find((void*)term);
   return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
 }
 
-Net* PlacerBase::dbToPlace(odb::dbNet* net) {
+Net* 
+PlacerBase::dbToPlace(odb::dbNet* net) {
   auto netPtr = netMap_.find(net);
   return (netPtr == netMap_.end())? nullptr : netPtr->second;
 }
+
+void 
+PlacerBase::printInfo() { 
+  cout << "Design Info" << endl;
+  cout << "Instances      : " << insts_.size() << endl;
+  cout << "PlaceInstances : " << placeInsts_.size() << endl;
+  cout << "FixedInstances : " << fixedInsts_.size() << endl;
+  cout << "Nets           : " << nets_.size() << endl;
+  cout << "Pins           : " << pins_.size() << endl;
+
+  int maxFanout = INT_MIN;
+  int sumFanout = 0;
+  dbNet* maxFanoutNet = nullptr;
+  for(auto& net : nets_) {
+    if( maxFanout < (int)net.pins().size() ) {
+      maxFanout = (int)net.pins().size();
+      maxFanoutNet = net.net();
+    }
+    sumFanout += (int)net.pins().size();
+  }
+  cout << "MaxFanout      : " << maxFanout << endl;
+  cout << "MaxFanoutNet   : " 
+    << maxFanoutNet->getConstName() << endl;
+  cout << "AvgFanout      : " 
+    << static_cast<float>(sumFanout) / nets_.size() << endl; 
+  cout << endl;
+
+  cout << "DieBox         : ( " 
+    << die_.dieLx() << " " << die_.dieLy() 
+    << " ) - ( " 
+    << die_.dieUx() << " " << die_.dieUy() 
+    << " ) " << endl;
+  cout << "CoreBox        : ( " 
+    << die_.coreLx() << " " << die_.coreLy() 
+    << " ) - ( " 
+    << die_.coreUx() << " " << die_.coreUy() 
+    << " ) " << endl;
+}
+
+
+static odb::adsRect 
+getCoreRectFromDb(dbSet<odb::dbRow> &rows) {
+  int minX = INT_MAX, minY = INT_MAX;
+  int maxX = INT_MIN, maxY = INT_MIN;
+
+  for(dbRow* row : rows) {
+    adsRect rowRect;
+    row->getBBox( rowRect );
+
+    minX = (minX > rowRect.xMin()) ? rowRect.xMin(): minX;
+    minY = (minY > rowRect.yMin()) ? rowRect.yMin(): minY;
+    maxX = (maxX < rowRect.xMax()) ? rowRect.xMax(): maxX;
+    maxY = (maxY < rowRect.yMax()) ? rowRect.yMax(): maxY;
+  }
+  return odb::adsRect(minX, minY, maxX, maxY);
+}
+
+
 
 }
 
