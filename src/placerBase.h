@@ -53,51 +53,17 @@ public:
   int cx();
   int cy();
 
-  int dLx() { return dLx_; }
-  int dLy() { return dLy_; }
-  int dUx() { return dUx_; }
-  int dUy() { return dUy_; }
-  int dCx();
-  int dCy();
-
   void setExtId(int extId);
   int extId() { return extId_; }
 
   void addPin(Pin* pin);
   std::vector<Pin*> & pins() { return pins_; }
 
-  void setDensityLocation(int dLx, int dLy);
-  void setDensityCenterLocation(int dCx, int dCy);
-
-  void setGradientX();
-  void setGradientY();
-  void setDensityScale();
-
-  float gradientX() { return gradientX_; }
-  float gradientY() { return gradientY_; }
-  float densityScale() { return densityScale_; }
-
 private:
   odb::dbInst* inst_;
   std::vector<Pin*> pins_;
   int lx_;
   int ly_;
-
-  enum CellBitFields {
-    instanceField,
-    fillerField
-  };
-  uint8_t attribute_;
-
-  int dLx_;
-  int dLy_;
-  int dUx_;
-  int dUy_;
-
-  float gradientX_;
-  float gradientY_;
-  float densityScale_;
-
   int extId_;
 };
 
