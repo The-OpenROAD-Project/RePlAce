@@ -31,9 +31,12 @@ public:
   Instance(odb::dbInst* inst);
   ~Instance();
 
-  odb::dbInst* inst() { return inst_; }
+  odb::dbInst* dbInst() { return inst_; }
   bool isFixed();
+  bool isInstance();
+  bool isFiller();
 
+  void setFiller();
   void setLocation(int x, int y);
   void setCenterLocation(int x, int y);
 
@@ -42,25 +45,59 @@ public:
   void dbSetLocation();
   void dbSetLocation(int x, int y);
   void dbSetCenterLocation(int x, int y);
-  
+
   int lx();
   int ly();
   int ux();
   int uy();
   int cx();
   int cy();
-  
+
+  int dLx() { return dLx_; }
+  int dLy() { return dLy_; }
+  int dUx() { return dUx_; }
+  int dUy() { return dUy_; }
+  int dCx();
+  int dCy();
+
   void setExtId(int extId);
   int extId() { return extId_; }
 
   void addPin(Pin* pin);
   std::vector<Pin*> & pins() { return pins_; }
 
+  void setDensityLocation(int dLx, int dLy);
+  void setDensityCenterLocation(int dCx, int dCy);
+
+  void setGradientX();
+  void setGradientY();
+  void setDensityScale();
+
+  float gradientX() { return gradientX_; }
+  float gradientY() { return gradientY_; }
+  float densityScale() { return densityScale_; }
+
 private:
   odb::dbInst* inst_;
   std::vector<Pin*> pins_;
   int lx_;
   int ly_;
+
+  enum CellBitFields {
+    instanceField,
+    fillerField
+  };
+  uint8_t attribute_;
+
+  int dLx_;
+  int dLy_;
+  int dUx_;
+  int dUy_;
+
+  float gradientX_;
+  float gradientY_;
+  float densityScale_;
+
   int extId_;
 };
 
@@ -71,8 +108,8 @@ public:
   Pin(odb::dbBTerm* bTerm);
   ~Pin();
 
-  odb::dbITerm* iTerm();
-  odb::dbBTerm* bTerm();
+  odb::dbITerm* dbITerm();
+  odb::dbBTerm* dbBTerm();
 
   bool isITerm();
   bool isBTerm();
@@ -91,7 +128,7 @@ public:
   void unsetMinPinY();
   void unsetMaxPinX();
   void unsetMaxPinY();
- 
+
   int offsetLx();
   int offsetLy();
   int offsetUx();
@@ -103,7 +140,7 @@ public:
   int uy();
   int cx();
   int cy();
-  
+
   void updateLocation();
   void updateLocation(Instance* inst);
 
@@ -126,7 +163,7 @@ private:
     maxPinXField,
     maxPinYField
   };
-  
+
   uint8_t attribute_;
 
   int offsetLx_;
@@ -160,7 +197,7 @@ public:
 
   std::vector<Pin*> & pins() { return pins_; }
 
-  odb::dbNet* net() { return net_; }
+  odb::dbNet* dbNet() { return net_; }
   odb::dbSigType getSigType();
 
   void addPin(Pin* pin);
@@ -193,13 +230,13 @@ public:
   int coreUx() { return coreUx_; }
   int coreUy() { return coreUy_; }
 
-  int dieCx(); 
+  int dieCx();
   int dieCy();
   int coreCx();
   int coreCy();
 
 private:
-  int dieLx_; 
+  int dieLx_;
   int dieLy_;
   int dieUx_;
   int dieUy_;
@@ -246,7 +283,7 @@ private:
   std::unordered_map<odb::dbInst*, Instance*> instMap_;
   std::unordered_map<void*, Pin*> pinMap_;
   std::unordered_map<odb::dbNet*, Net*> netMap_;
-  
+
   std::vector<Instance*> placeInsts_;
   std::vector<Instance*> fixedInsts_;
 };

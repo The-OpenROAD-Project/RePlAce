@@ -138,14 +138,14 @@ Pin::Pin()
     offsetUx_(0), offsetUy_(0),
     lx_(0), ly_(0) {}
 
-Pin::Pin(dbITerm* iTerm): Pin() {
+Pin::Pin(odb::dbITerm* iTerm): Pin() {
   setITerm();
   term_ = (void*)iTerm;
   updateOffset(iTerm);
   updateLocation(iTerm);
 }
 
-Pin::Pin(dbBTerm* bTerm): Pin() {
+Pin::Pin(odb::dbBTerm* bTerm): Pin() {
   setBTerm();
   term_ = (void*)bTerm;
   updateOffset(bTerm);
@@ -240,10 +240,10 @@ int Pin::cy() {
   return ly_ + (offsetLy_ + offsetUy_)/2;
 }
 
-odb::dbITerm* Pin::iTerm() {
+odb::dbITerm* Pin::dbITerm() {
   return (isITerm())? (odb::dbITerm*) term_ : nullptr;
 }
-odb::dbBTerm* Pin::bTerm() {
+odb::dbBTerm* Pin::dbBTerm() {
   return (isBTerm())? (odb::dbBTerm*) term_ : nullptr;
 }
 
@@ -529,7 +529,7 @@ PlacerBase::init() {
 
   // insts_' pins_ fill
   for(auto& inst : insts_) {
-    for(dbITerm* iTerm : inst.inst()->getITerms()) {
+    for(dbITerm* iTerm : inst.dbInst()->getITerms()) {
       inst.addPin( dbToPlace(iTerm) );
     }
   }
@@ -537,20 +537,20 @@ PlacerBase::init() {
   // pins' net and instance fill 
   for(auto& pin : pins_) {
     if( pin.isITerm() ) {
-      pin.setInstance( dbToPlace( pin.iTerm()->getInst() ) );
-      pin.setNet( dbToPlace( pin.iTerm()->getNet() ) );
+      pin.setInstance( dbToPlace( pin.dbITerm()->getInst() ) );
+      pin.setNet( dbToPlace( pin.dbITerm()->getNet() ) );
     }
     else if( pin.isBTerm() ) {
-      pin.setNet( dbToPlace( pin.bTerm()->getNet() ) );
+      pin.setNet( dbToPlace( pin.dbBTerm()->getNet() ) );
     }
   }
  
   //nets' pin update
   for(auto& net : nets_) {
-    for(dbITerm* iTerm : net.net()->getITerms()) {
+    for(dbITerm* iTerm : net.dbNet()->getITerms()) {
       net.addPin( dbToPlace( iTerm ) );
     }
-    for(dbBTerm* bTerm : net.net()->getBTerms()) {
+    for(dbBTerm* bTerm : net.dbNet()->getBTerms()) {
       net.addPin( dbToPlace( bTerm ) );
     }
   }
@@ -626,7 +626,7 @@ PlacerBase::printInfo() {
   for(auto& net : nets_) {
     if( maxFanout < (int)net.pins().size() ) {
       maxFanout = (int)net.pins().size();
-      maxFanoutNet = net.net();
+      maxFanoutNet = net.dbNet();
     }
     sumFanout += (int)net.pins().size();
   }
