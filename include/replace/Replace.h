@@ -36,7 +36,7 @@ class Replace
 
     void setTargetDensity(float density);
     void setTargetOverflow(float overflow);
-    void setInitPenalityFactor(float penalityFactor);
+    void setInitPenalityFactor(float penaltyFactor);
     void setMinPCoef(float minPCoef);
     void setMaxPCoef(float maxPCoef);
     void setDeltaHpwl(float deltaHpwl);

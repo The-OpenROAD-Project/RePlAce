@@ -86,10 +86,10 @@ set_replace_max_pcoef_cmd(float max_pcoef)
 }
 
 void
-set_replace_init_penality_factor_cmd(float penalityFactor)
+set_replace_init_penalty_factor_cmd(float penaltyFactor)
 {
   Replace* replace = getReplace();
-  replace->setInitPenalityFactor(penalityFactor);
+  replace->setInitPenalityFactor(penaltyFactor);
 }
 
 void

@@ -123,8 +123,8 @@ Replace::setTargetDensity(float density) {
 }
 
 void
-Replace::setInitPenalityFactor(float penalityFactor) {
-  initPenalityFactor_ = penalityFactor;
+Replace::setInitPenalityFactor(float penaltyFactor) {
+  initPenalityFactor_ = penaltyFactor;
 }
 
 void
