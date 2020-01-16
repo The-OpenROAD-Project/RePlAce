@@ -16,7 +16,7 @@ Replace::Replace()
   maxNesterovPlaceIter_(2000),
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
-  lambda_(0.00001), 
+  initPenalityFactor_(0.00001), 
   minPCoef_(0.95), maxPCoef_(1.05),
   deltaHpwl_(346000),
   verbose_(0) {
@@ -58,7 +58,7 @@ void Replace::clear() {
   binGridCntX_ = binGridCntY_ = 0;
   overflow_ = 0;
   density_ = 0;
-  lambda_ = 0;
+  initPenalityFactor_ = 0;
   minPCoef_ = 0;
   maxPCoef_ = 0;
   deltaHpwl_ = 0;
@@ -123,8 +123,8 @@ Replace::setTargetDensity(float density) {
 }
 
 void
-Replace::setInitLambda(float lambda) {
-  lambda_ = lambda;
+Replace::setInitPenalityFactor(float penalityFactor) {
+  initPenalityFactor_ = penalityFactor;
 }
 
 void

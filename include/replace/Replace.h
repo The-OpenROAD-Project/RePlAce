@@ -36,7 +36,7 @@ class Replace
 
     void setTargetDensity(float density);
     void setTargetOverflow(float overflow);
-    void setInitLambda(float lambda);
+    void setInitPenalityFactor(float penalityFactor);
     void setMinPCoef(float minPCoef);
     void setMaxPCoef(float maxPCoef);
     void setDeltaHpwl(float deltaHpwl);
@@ -56,7 +56,7 @@ class Replace
     int binGridCntY_;
     float overflow_;
     float density_;
-    float lambda_;
+    float initPenalityFactor_;
     float minPCoef_;
     float maxPCoef_;
     float deltaHpwl_;

@@ -86,10 +86,10 @@ set_replace_max_pcoef_cmd(float max_pcoef)
 }
 
 void
-set_replace_lambda_cmd(float lambda)
+set_replace_init_penality_factor_cmd(float penalityFactor)
 {
   Replace* replace = getReplace();
-  replace->setInitLambda(lambda);
+  replace->setInitPenalityFactor(penalityFactor);
 }
 
 void
