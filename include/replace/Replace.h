@@ -10,7 +10,7 @@ namespace sta {
 
 namespace replace {
 
-class InitPlace;
+class InitialPlace;
 class NesterovPlace;
 class PlacerBase;
 
@@ -25,10 +25,10 @@ class Replace
     void setDb(odb::dbDatabase* odb);
     void setSta(sta::dbSta* dbSta);
 
-    void doInitPlace();
+    void doInitialPlace();
     void doNesterovPlace();
 
-    void setMaxInitPlaceIter(int iter);
+    void setMaxInitialPlaceIter(int iter);
     void setMaxNesvPlaceIter(int iter);
 
     void setBinGridCntX(int binGridCntX);
@@ -46,11 +46,11 @@ class Replace
   private:
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
-    InitPlace* ip_;
+    InitialPlace* ip_;
     NesterovPlace* np_;
     PlacerBase* pb_;
 
-    int maxInitPlaceIter_;
+    int maxInitialPlaceIter_;
     int maxNesterovPlaceIter_;
     int binGridCntX_;
     int binGridCntY_;

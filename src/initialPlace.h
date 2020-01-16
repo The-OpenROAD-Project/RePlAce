@@ -7,31 +7,31 @@
 namespace replace {
 
 class PlacerBase;
-class InitPlaceVars {
+class InitialPlaceVars {
 public:
-  int maxInitPlaceIter;
+  int maxInitialPlaceIter;
   int minDiffLength;
   int solverIterMax;
   float netWeightScale;
   int verbose;
-  InitPlaceVars();
+  InitialPlaceVars();
   void clear();
 };
 
 typedef Eigen::SparseMatrix<float, Eigen::RowMajor> SMatrix;
 
-class InitPlace {
+class InitialPlace {
   public:
-    InitPlace();
-    InitPlace(PlacerBase* placerBase);
-    ~InitPlace();
+    InitialPlace();
+    InitialPlace(PlacerBase* placerBase);
+    ~InitialPlace();
     
     void clear();
-    void setInitPlaceVars(InitPlaceVars initPlaceVars);
-    void doInitPlace();
+    void setInitialPlaceVars(InitialPlaceVars initialPlaceVars);
+    void doBicgstabPlace();
 
   private:
-    InitPlaceVars initPlaceVars_;
+    InitialPlaceVars initialPlaceVars_;
     PlacerBase* pb_;
     Eigen::VectorXf xcgX_, xcgB_;
     Eigen::VectorXf ycgX_, ycgB_;

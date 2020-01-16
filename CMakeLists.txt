@@ -55,7 +55,7 @@ set (REPLACE_SRC
   ${REPLACE_WRAP}
   ${REPLACE_TCL_INIT}
   src/replace.cpp
-  src/initPlace.cpp
+  src/initialPlace.cpp
   src/nesterovPlace.cpp
   src/placerBase.cpp
   )

@@ -1,4 +1,4 @@
-#include "initPlace.h"
+#include "initialPlace.h"
 #include "placerBase.h"
 #include <iostream>
 
@@ -12,39 +12,39 @@ using Eigen::IdentityPreconditioner;
 
 typedef Eigen::Triplet< float > T;
 
-InitPlaceVars::InitPlaceVars() 
-  : maxInitPlaceIter(0), 
+InitialPlaceVars::InitialPlaceVars() 
+  : maxInitialPlaceIter(0), 
   minDiffLength(1500), 
   verbose(0) {}
 
-void InitPlaceVars::clear() {
-  maxInitPlaceIter = 0;
+void InitialPlaceVars::clear() {
+  maxInitialPlaceIter = 0;
   minDiffLength = 0;
   verbose = 0;
 }
 
-InitPlace::InitPlace()
-: pb_(nullptr), initPlaceVars_() {};
+InitialPlace::InitialPlace()
+: pb_(nullptr), initialPlaceVars_() {};
 
-InitPlace::InitPlace(PlacerBase* placerBase)
-: pb_(placerBase), initPlaceVars_() {};
+InitialPlace::InitialPlace(PlacerBase* placerBase)
+: pb_(placerBase), initialPlaceVars_() {};
 
-InitPlace::~InitPlace() {
+InitialPlace::~InitialPlace() {
   clear();
 }
 
-void InitPlace::clear() {
+void InitialPlace::clear() {
   pb_ = nullptr;
-  initPlaceVars_.clear();
+  initialPlaceVars_.clear();
 }
 
-void InitPlace::setInitPlaceVars(InitPlaceVars initPlaceVars) {
-  initPlaceVars_ = initPlaceVars;
+void InitialPlace::setInitialPlaceVars(InitialPlaceVars initialPlaceVars) {
+  initialPlaceVars_ = initialPlaceVars;
 }
 
-void InitPlace::doInitPlace() {
-  if( initPlaceVars_.verbose > 0 ) {
-    cout << "Begin InitPlace ..." << endl;
+void InitialPlace::doBicgstabPlace() {
+  if( initialPlaceVars_.verbose > 0 ) {
+    cout << "Begin InitialPlace ..." << endl;
   }
 
   const int itmax = 100;
@@ -53,7 +53,7 @@ void InitPlace::doInitPlace() {
   placeInstsCenter();
   // set ExtId for idx reference // easy recovery
   setPlaceInstExtId();
-  for(int i=1; i<=initPlaceVars_.maxInitPlaceIter; i++) {
+  for(int i=1; i<=initialPlaceVars_.maxInitialPlaceIter; i++) {
     updatePinInfo();
     createSparseMatrix();
 
@@ -68,15 +68,19 @@ void InitPlace::doInitPlace() {
     ycgX_ = solver.solveWithGuess(ycgB_, ycgX_);
     errorY = solver.error();
 
-    cout << "[InitPlace]  Iter: " << i 
+    cout << "[InitialPlace]  Iter: " << i 
       << " CG Error: " << max(errorX, errorY)
       << " HPWL: " << pb_->hpwl() << endl; 
     updateCoordi();
   }
+
+  if( initialPlaceVars_.verbose > 0 ) {
+    cout << "End InitialPlace" << endl;
+  }
 }
 
 // starting point of initial place is center.
-void InitPlace::placeInstsCenter() {
+void InitialPlace::placeInstsCenter() {
   const int centerX = pb_->die().coreCx();
   const int centerY = pb_->die().coreCy();
 
@@ -88,7 +92,7 @@ void InitPlace::placeInstsCenter() {
   }
 }
 
-void InitPlace::setPlaceInstExtId() {
+void InitialPlace::setPlaceInstExtId() {
   // clear ExtId for all instances
   for(auto& inst : pb_->insts()) {
     inst.setExtId(INT_MAX);
@@ -99,7 +103,7 @@ void InitPlace::setPlaceInstExtId() {
   }
 }
 
-void InitPlace::updatePinInfo() {
+void InitialPlace::updatePinInfo() {
   // clear all MinMax attributes
   for(auto& pin : pb_->pins()) {
     pin.unsetMinPinX();
@@ -187,7 +191,7 @@ void InitPlace::updatePinInfo() {
 }
 
 // solve matX_ * xcg_x_ = xcg_b_ and matY_ * ycg_x_ = ycg_b_ eq.
-void InitPlace::createSparseMatrix() {
+void InitialPlace::createSparseMatrix() {
   const int placeCnt = pb_->placeInsts().size();
   xcgX_.resize( placeCnt );
   xcgB_.resize( placeCnt );
@@ -246,12 +250,12 @@ void InitPlace::createSparseMatrix() {
             pin2->isMinPinX() || pin2->isMaxPinX() ) {
           int diffX = abs(pin1->cx() - pin2->cx());
           float weightX = 0;
-          if( diffX > initPlaceVars_.minDiffLength ) {
+          if( diffX > initialPlaceVars_.minDiffLength ) {
             weightX = netWeight / diffX;
           }
           else {
             weightX = netWeight 
-              / initPlaceVars_.minDiffLength;
+              / initialPlaceVars_.minDiffLength;
           }
           //cout << weightX << endl;
 
@@ -305,12 +309,12 @@ void InitPlace::createSparseMatrix() {
           
           int diffY = abs(pin1->cy() - pin2->cy());
           float weightY = 0;
-          if( diffY > initPlaceVars_.minDiffLength ) {
+          if( diffY > initialPlaceVars_.minDiffLength ) {
             weightY = netWeight / diffY;
           }
           else {
             weightY = netWeight 
-              / initPlaceVars_.minDiffLength;
+              / initialPlaceVars_.minDiffLength;
           }
 
           // both pin cames from instance
@@ -364,7 +368,7 @@ void InitPlace::createSparseMatrix() {
   matY_.setFromTriplets(listY.begin(), listY.end());
 }
 
-void InitPlace::updateCoordi() {
+void InitialPlace::updateCoordi() {
   const int placeCnt = pb_->placeInsts().size();
   for(auto& inst : pb_->placeInsts()) {
     int idx = inst->extId();

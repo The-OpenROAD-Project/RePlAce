@@ -19,7 +19,7 @@ void
 replace_init_place_cmd()
 {
   Replace* replace = getReplace();
-  replace->doInitPlace();
+  replace->doInitialPlace();
 }
 
 void 
@@ -40,7 +40,7 @@ void
 set_replace_init_place_iter_cmd(int iter)
 {
   Replace* replace = getReplace();
-  replace->setMaxInitPlaceIter(iter); 
+  replace->setMaxInitialPlaceIter(iter); 
 }
 
 void
