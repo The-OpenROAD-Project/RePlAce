@@ -36,12 +36,12 @@ Instance::isFixed() {
     case dbPlacementStatus::UNPLACED:
     case dbPlacementStatus::SUGGESTED:
     case dbPlacementStatus::PLACED:
-      return true;
+      return false;
       break;
     case dbPlacementStatus::LOCKED:
     case dbPlacementStatus::FIRM:
     case dbPlacementStatus::COVER:
-      return false;
+      return true;
       break;
   }
   return false;
@@ -153,67 +153,67 @@ Pin::Pin(dbBTerm* bTerm): Pin() {
 }
 
 void Pin::setITerm() {
-  attribute_ |= (1 << 0);
+  attribute_ |= (1 << iTermField);
 }
 
 void Pin::setBTerm() {
-  attribute_ |= (1 << 1);
+  attribute_ |= (1 << bTermField);
 }
 
 void Pin::setMinPinX() {
-  attribute_ |= (1 << 2);
+  attribute_ |= (1 << minPinXField);
 }
 
 void Pin::setMinPinY() {
-  attribute_ |= (1 << 3);
+  attribute_ |= (1 << minPinYField);
 }
 
 void Pin::setMaxPinX() {
-  attribute_ |= (1 << 4);
+  attribute_ |= (1 << maxPinXField);
 }
 
 void Pin::setMaxPinY() {
-  attribute_ |= (1 << 5);
+  attribute_ |= (1 << maxPinYField);
 }
 
 void Pin::unsetMinPinX() {
-  attribute_ &= 11111011;
+  attribute_ &= ~(1 << minPinXField);
 }
 
 void Pin::unsetMinPinY() {
-  attribute_ &= 11110111;
+  attribute_ &= ~(1 << minPinYField);
 }
 
 void Pin::unsetMaxPinX() {
-  attribute_ &= 11101111;
+  attribute_ &= ~(1 << maxPinXField);
 }
 
 void Pin::unsetMaxPinY() {
-  attribute_ &= 11011111;
+  attribute_ &= ~(1 << maxPinYField);
 }
 
 bool Pin::isITerm() {
-  return (attribute_ & (1 << 0) == 1);
+  return ((attribute_ >> iTermField) & 1 == 1);
 }
 
 bool Pin::isBTerm() {
-  return (attribute_ & (1 << 1) == 1);
+  return ((attribute_ >> bTermField) & 1 == 1);
 }
 
 bool Pin::isMinPinX() {
-  return (attribute_ & (1 << 2) == 1);
+  return ((attribute_ >> minPinXField) & 1 == 1);
 }
 
 bool Pin::isMinPinY() {
-  return (attribute_ & (1 << 3) == 1);
+  return ((attribute_ >> minPinYField) & 1 == 1);
 }
 
 bool Pin::isMaxPinX() {
-  return (attribute_ & (1 << 4) == 1);
+  return ((attribute_ >> maxPinXField) & 1 == 1);
 }
 
 bool Pin::isMaxPinY() {
-  return (attribute_ & (1 << 5) == 1);
+  return ((attribute_ >> maxPinYField) & 1 == 1);
 }
 
 int Pin::lx() {
@@ -323,6 +323,12 @@ void Pin::updateLocation(odb::dbBTerm* bTerm) {
 }
 
 void 
+Pin::updateLocation(Instance* inst) {
+  lx_ = inst->lx() + offsetLx_;
+  ly_ = inst->ly() + offsetLy_; 
+}
+
+void 
 Pin::setInstance(Instance* inst) {
   inst_ = inst;
 }
@@ -388,15 +394,19 @@ void Net::updateBox() {
     dbBox* box = iTerm->getInst()->getBBox();
     lx_ = (lx_ > box->xMin())? box->xMin() : lx_;
     ly_ = (ly_ > box->yMin())? box->yMin() : ly_;
-    ux_ = (ux_ > box->xMax())? box->xMax() : ux_;
-    uy_ = (uy_ > box->yMax())? box->yMax() : uy_;
+    ux_ = (ux_ < box->xMax())? box->xMax() : ux_;
+    uy_ = (uy_ < box->yMax())? box->yMax() : uy_;
   }
   for(dbBTerm* bTerm : net_->getBTerms()) {
     for(dbBPin* bPin : bTerm->getBPins()) {
       lx_ = (lx_ > bPin->getBox()->xMin())? 
         bPin->getBox()->xMin() : lx_;
-      ly_ = (ly_> bPin->getBox()->yMin())? 
+      ly_ = (ly_ > bPin->getBox()->yMin())? 
         bPin->getBox()->yMin() : ly_;
+      ux_ = (ux_ < bPin->getBox()->xMax())? 
+        bPin->getBox()->xMax() : ux_;
+      uy_ = (uy_ < bPin->getBox()->yMax())? 
+        bPin->getBox()->yMax() : uy_;
     }
   }
 }

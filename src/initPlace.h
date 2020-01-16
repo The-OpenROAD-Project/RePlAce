@@ -11,12 +11,14 @@ class InitPlaceVars {
 public:
   int maxInitPlaceIter;
   int minDiffLength;
+  int solverIterMax;
+  float netWeightScale;
   int verbose;
   InitPlaceVars();
   void clear();
 };
 
-typedef Eigen::SparseMatrix<int, Eigen::RowMajor> SMatrix;
+typedef Eigen::SparseMatrix<float, Eigen::RowMajor> SMatrix;
 
 class InitPlace {
   public:
@@ -39,6 +41,7 @@ class InitPlace {
     void setPlaceInstExtId();
     void updatePinInfo();
     void createSparseMatrix();
+    void updateCoordi();
 };
 
 }

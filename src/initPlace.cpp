@@ -2,14 +2,19 @@
 #include "placerBase.h"
 #include <iostream>
 
+#include <Eigen/IterativeLinearSolvers>
+
 namespace replace {
 using namespace std;
 
-typedef Eigen::Triplet< int > T;
+using Eigen::BiCGSTAB;
+using Eigen::IdentityPreconditioner;
+
+typedef Eigen::Triplet< float > T;
 
 InitPlaceVars::InitPlaceVars() 
   : maxInitPlaceIter(0), 
-  minDiffLength(25), 
+  minDiffLength(1500), 
   verbose(0) {}
 
 void InitPlaceVars::clear() {
@@ -41,6 +46,9 @@ void InitPlace::doInitPlace() {
   if( initPlaceVars_.verbose > 0 ) {
     cout << "Begin InitPlace ..." << endl;
   }
+
+  const int itmax = 100;
+  float errorX = 0.0f, errorY = 0.0f;
   
   placeInstsCenter();
   // set ExtId for idx reference // easy recovery
@@ -48,13 +56,35 @@ void InitPlace::doInitPlace() {
   for(int i=1; i<=initPlaceVars_.maxInitPlaceIter; i++) {
     updatePinInfo();
     createSparseMatrix();
+
+    // BiCGSTAB solver for initial place
+    BiCGSTAB< SMatrix, IdentityPreconditioner > solver;
+    solver.setMaxIterations(itmax);
+    solver.compute(matX_);
+    xcgX_ = solver.solveWithGuess(xcgB_, xcgX_);
+    errorX = solver.error();
+
+    solver.compute(matY_);
+    ycgX_ = solver.solveWithGuess(ycgB_, ycgX_);
+    errorY = solver.error();
+
+    cout << "[InitPlace]  Iter: " << i 
+      << " CG Error: " << max(errorX, errorY)
+      << " HPWL: " << pb_->hpwl() << endl; 
+    updateCoordi();
   }
 }
 
 // starting point of initial place is center.
 void InitPlace::placeInstsCenter() {
+  const int centerX = pb_->die().coreCx();
+  const int centerY = pb_->die().coreCy();
+
   for(auto& inst: pb_->insts()) {
-     
+    inst.setCenterLocation(centerX, centerY);
+    for(auto& pin: inst.pins()) {
+      pin->updateLocation(&inst);
+    }
   }
 }
 
@@ -102,7 +132,7 @@ void InitPlace::updatePinInfo() {
       
       if( pinMaxX ) {
         if( ux < pin->cx() ) {
-          ux = pinMinX->cx();
+          ux = pinMaxX->cx();
           pinMaxX->unsetMaxPinX();
           pinMaxX = pin; 
           pinMaxX->setMaxPinX();
@@ -130,7 +160,7 @@ void InitPlace::updatePinInfo() {
       
       if( pinMaxY ) {
         if( uy < pin->cy() ) {
-          uy = pinMinY->cy();
+          uy = pinMaxY->cy();
           pinMaxY->unsetMaxPinY();
           pinMaxY = pin; 
           pinMaxY->setMaxPinY();
@@ -142,6 +172,17 @@ void InitPlace::updatePinInfo() {
         pinMaxY->setMaxPinY();
       }
     }
+//    cout << "pinAddr: " << pinMinX << " " 
+//      << pinMaxX << " " 
+//      << pinMinY << " " 
+//      << pinMaxY << endl;
+//    cout << pinMinX->isMinPinX() << endl;
+
+//      cout << "final bbox: " 
+//        << pinMinX->cx() << " " 
+//        << pinMinY->cy() << " " 
+//        << pinMaxX->cx() << " " 
+//        << pinMaxY->cy() << endl; 
   } 
 }
 
@@ -161,6 +202,16 @@ void InitPlace::createSparseMatrix() {
   listX.reserve(1000000);
   listY.reserve(1000000);
 
+  // initialize vector
+  for(auto& inst : pb_->placeInsts()) {
+    int idx = inst->extId(); 
+    
+    xcgX_(idx) = inst->cx();
+    ycgX_(idx) = inst->cy();
+
+    xcgB_(idx) = ycgB_(idx) = 0;
+  }
+
   // for each net
   for(auto& net : pb_->nets()) {
 
@@ -170,6 +221,7 @@ void InitPlace::createSparseMatrix() {
     }
 
     float netWeight = 1.0 / (net.pins().size() - 1);
+    //cout << "net: " << net.net()->getConstName() << endl;
 
     // foreach two pins in single nets.
     for(auto& pin1 : net.pins()) {
@@ -189,6 +241,7 @@ void InitPlace::createSparseMatrix() {
           continue;
         }
 
+        // B2B modeling on min/maxX pins.
         if( pin1->isMinPinX() || pin1->isMaxPinX() ||
             pin2->isMinPinX() || pin2->isMaxPinX() ) {
           int diffX = abs(pin1->cx() - pin2->cx());
@@ -197,36 +250,132 @@ void InitPlace::createSparseMatrix() {
             weightX = netWeight / diffX;
           }
           else {
-            weightX = netWeight / initPlaceVars_.minDiffLength;
+            weightX = netWeight 
+              / initPlaceVars_.minDiffLength;
+          }
+          //cout << weightX << endl;
+
+          // both pin cames from instance
+          if( pin1->instance() && pin2->instance() ) {
+            const int inst1 = pin1->instance()->extId();
+            const int inst2 = pin2->instance()->extId();
+            //cout << "inst: " << inst1 << " " << inst2 << endl;
+
+            listX.push_back( T(inst1, inst1, weightX) );
+            listX.push_back( T(inst2, inst2, weightX) );
+
+            listX.push_back( T(inst1, inst2, -weightX) );
+            listX.push_back( T(inst2, inst1, -weightX) );
+
+            //cout << pin1->cx() << " " 
+            //  << pin1->instance()->cx() << endl;
+            xcgB_(inst1) += 
+              -weightX * (
+              (pin1->cx() - pin1->instance()->cx()) - 
+              (pin2->cx() - pin2->instance()->cx()));
+
+            xcgB_(inst2) +=
+              -weightX * (
+              (pin2->cx() - pin2->instance()->cx()) -
+              (pin1->cx() - pin1->instance()->cx())); 
+          }
+          // pin1 from IO port / pin2 from Instance
+          else if( !pin1->instance() && pin2->instance() ) {
+            const int inst2 = pin2->instance()->extId();
+            //cout << "inst2: " << inst2 << endl;
+            listX.push_back( T(inst2, inst2, weightX) );
+            xcgB_(inst2) += weightX * 
+              ( pin1->cx() - 
+                ( pin2->cx() - pin2->instance()->cx()) );
+          }
+          // pin1 from Instance / pin2 from IO port
+          else if( pin1->instance() && !pin2->instance() ) {
+            const int inst1 = pin1->instance()->extId();
+            //cout << "inst1: " << inst1 << endl;
+            listX.push_back( T(inst1, inst1, weightX) );
+            xcgB_(inst1) += weightX *
+              ( pin2->cx() -
+                ( pin1->cx() - pin1->instance()->cx()) );
+          }
+        }
+        
+        // B2B modeling on min/maxY pins.
+        if( pin1->isMinPinY() || pin1->isMaxPinY() ||
+            pin2->isMinPinY() || pin2->isMaxPinY() ) {
+          
+          int diffY = abs(pin1->cy() - pin2->cy());
+          float weightY = 0;
+          if( diffY > initPlaceVars_.minDiffLength ) {
+            weightY = netWeight / diffY;
+          }
+          else {
+            weightY = netWeight 
+              / initPlaceVars_.minDiffLength;
           }
 
           // both pin cames from instance
           if( pin1->instance() && pin2->instance() ) {
-            // pin1->extId()
+            const int inst1 = pin1->instance()->extId();
+            const int inst2 = pin2->instance()->extId();
+
+            listY.push_back( T(inst1, inst1, weightY) );
+            listY.push_back( T(inst2, inst2, weightY) );
+
+            listY.push_back( T(inst1, inst2, -weightY) );
+            listY.push_back( T(inst2, inst1, -weightY) );
+
+            ycgB_(inst1) += 
+              -weightY * (
+              (pin1->cy() - pin1->instance()->cy()) - 
+              (pin2->cy() - pin2->instance()->cy()));
+
+            ycgB_(inst2) +=
+              -weightY * (
+              (pin2->cy() - pin2->instance()->cy()) -
+              (pin1->cy() - pin1->instance()->cy())); 
           }
           // pin1 from IO port / pin2 from Instance
           else if( !pin1->instance() && pin2->instance() ) {
-
+            const int inst2 = pin2->instance()->extId();
+            listY.push_back( T(inst2, inst2, weightY) );
+            ycgB_(inst2) += weightY * 
+              ( pin1->cy() - 
+                ( pin2->cy() - pin2->instance()->cy()) );
           }
           // pin1 from Instance / pin2 from IO port
           else if( pin1->instance() && !pin2->instance() ) {
-
+            const int inst1 = pin1->instance()->extId();
+            listY.push_back( T(inst1, inst1, weightY) );
+            ycgB_(inst1) += weightY *
+              ( pin2->cy() -
+                ( pin1->cy() - pin1->instance()->cy()) );
           }
-
-
-          
-
-
-
-
         }
-
       }
     }
-
   } 
 
+//  for(auto& t : listX) {
+//    cout << t.row() << " " << t.col() << " " << t.value() << endl; 
+//  }
 
+  
+  matX_.setFromTriplets(listX.begin(), listX.end());
+  matY_.setFromTriplets(listY.begin(), listY.end());
+}
+
+void InitPlace::updateCoordi() {
+  const int placeCnt = pb_->placeInsts().size();
+  for(auto& inst : pb_->placeInsts()) {
+    int idx = inst->extId();
+    //cout << "extId: " << idx << endl;
+    inst->dbSetCenterLocation( xcgX_(idx), ycgX_(idx) );
+    for(auto& pin: inst->pins()) {
+      pin->updateLocation(inst);
+    }
+    //cout << "xcgX_(" << idx << "): " << xcgX_(idx) 
+    //  << " ycgX_(" << idx << "): " << ycgX_(idx) << endl;
+  }
 }
 
 }

@@ -105,6 +105,7 @@ public:
   int cy();
   
   void updateLocation();
+  void updateLocation(Instance* inst);
 
   void setInstance(Instance* inst);
   void setNet(Net* net);
@@ -116,6 +117,15 @@ private:
   void* term_;
   Instance* inst_;
   Net* net_;
+
+  enum PinBitFields {
+    iTermField,
+    bTermField,
+    minPinXField,
+    minPinYField,
+    maxPinXField,
+    maxPinYField
+  };
   
   uint8_t attribute_;
 
@@ -228,9 +238,11 @@ public:
 private:
   odb::dbDatabase* db_;
   Die die_;
+
   std::vector<Instance> insts_;
   std::vector<Pin> pins_;
   std::vector<Net> nets_;
+
   std::unordered_map<odb::dbInst*, Instance*> instMap_;
   std::unordered_map<void*, Pin*> pinMap_;
   std::unordered_map<odb::dbNet*, Net*> netMap_;
