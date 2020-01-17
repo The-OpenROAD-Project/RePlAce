@@ -202,6 +202,16 @@ void InitialPlace::createSparseMatrix() {
   matY_.resize( placeCnt, placeCnt );
 
 
+  // 
+  // listX and listY is a temporary vector that have tuples, (idx1, idx2, val)
+  //
+  // listX finally becomes matX_
+  // listY finally becomes matY_
+  //
+  // The triplet vector is recommended usages 
+  // to fill in SparseMatrix from Eigen docs.
+  //
+
   vector< T > listX, listY;
   listX.reserve(1000000);
   listY.reserve(1000000);
