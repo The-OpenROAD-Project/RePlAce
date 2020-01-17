@@ -7,14 +7,6 @@ namespace replace
 class PlacerBase;
 class Instance;
 
-class Bin {
-public:
-  Bin();
-  ~Bin();
-
-private:
-};
-
 class NesterovPlace {
 public:
   NesterovPlace();
