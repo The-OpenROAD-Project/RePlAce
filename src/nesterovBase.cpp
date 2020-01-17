@@ -320,6 +320,8 @@ Bin::setElectroForce(float electroForce) {
   electroForce_ = electroForce;
 }
 
+////////////////////////////////////////////////
+// BinGrid
 
 BinGrid::BinGrid()
   : lx_(0), ly_(0), ux_(0), uy_(0),
@@ -366,10 +368,6 @@ BinGrid::setBinCntY(int binCntY) {
   binCntY_ = binCntY;
 }
 
-void
-BinGrid::updateBinsArea(std::vector<GCell>& cells) {
-  
-}
 
 int
 BinGrid::lx() {
@@ -447,7 +445,23 @@ BinGrid::initBins() {
   }
 }
 
+// Core Part
+void
+BinGrid::updateBinsArea(std::vector<GCell>& cells) {
+  for(auto& cell : cells) {
 
+    
+  }  
+}
 
+std::pair<int, int>
+BinGrid::getMinMaxIdxX(GCell* gcell) {
+
+}
+
+std::pair<int, int>
+BinGrid::getMinMaxIdxY(GCell* gcell) {
+
+}
 
 }

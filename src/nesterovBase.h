@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <pair>
 
 namespace replace {
 
@@ -83,6 +84,9 @@ private:
   float gradientY_;
 };
 
+// TODO
+//class GNet : class Net {};
+//class GPin : class Pin {};
 
 class Bin {
 public:
@@ -96,7 +100,7 @@ public:
   int uy();
   int cx();
   int cy();
-  int dx(); 
+  int dx();
   int dy();
 
   float phi();
@@ -129,8 +133,8 @@ private:
   friend class BinGrid;
 };
 
-// 
-// The bin can be non-uniform because of 
+//
+// The bin can be non-uniform because of
 // "integer" coordinates
 //
 class BinGrid {
@@ -154,14 +158,18 @@ public:
   int ux();
   int uy();
   int cx();
-  int cy(); 
+  int cy();
   int dx();
   int dy();
-  
+
   int binCntX();
   int binCntY();
   int binSizeX();
-  int binSizeY(); 
+  int binSizeY();
+
+  // return bins_ index with given gcell
+  std::pair<int, int> getMinMaxIdxX(GCell* gcell);
+  std::pair<int, int> getMinMaxIdxY(GCell* gcell);
 
   std::vector<Bin*> & bins() { return binsPtr_; }
 
@@ -202,8 +210,6 @@ class NesterovBase {
     std::vector<GCell*> gcellFillers_;
 
 };
-
-
 
 }
 
