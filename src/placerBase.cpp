@@ -135,9 +135,12 @@ Instance::setExtId(int extId) {
 
 Pin::Pin()
   : term_(nullptr), inst_(nullptr), net_(nullptr), 
-    attribute_(0), offsetLx_(0), offsetLy_(0),
+    offsetLx_(0), offsetLy_(0),
     offsetUx_(0), offsetUy_(0),
-    lx_(0), ly_(0) {}
+    lx_(0), ly_(0),
+    iTermField_(0), bTermField_(0),
+    minPinXField_(0), minPinYField_(0),
+    maxPinXField_(0), maxPinYField_(0) {}
 
 Pin::Pin(odb::dbITerm* iTerm): Pin() {
   setITerm();
@@ -154,67 +157,67 @@ Pin::Pin(odb::dbBTerm* bTerm): Pin() {
 }
 
 void Pin::setITerm() {
-  attribute_ |= (1 << iTermField);
+  iTermField_ = 1;
 }
 
 void Pin::setBTerm() {
-  attribute_ |= (1 << bTermField);
+  bTermField_ = 1;
 }
 
 void Pin::setMinPinX() {
-  attribute_ |= (1 << minPinXField);
+  minPinXField_ = 1;
 }
 
 void Pin::setMinPinY() {
-  attribute_ |= (1 << minPinYField);
+  minPinYField_ = 1;
 }
 
 void Pin::setMaxPinX() {
-  attribute_ |= (1 << maxPinXField);
+  maxPinXField_ = 1;
 }
 
 void Pin::setMaxPinY() {
-  attribute_ |= (1 << maxPinYField);
+  maxPinYField_ = 1;
 }
 
 void Pin::unsetMinPinX() {
-  attribute_ &= ~(1 << minPinXField);
+  minPinXField_ = 0;
 }
 
 void Pin::unsetMinPinY() {
-  attribute_ &= ~(1 << minPinYField);
+  minPinYField_ = 0;
 }
 
 void Pin::unsetMaxPinX() {
-  attribute_ &= ~(1 << maxPinXField);
+  maxPinXField_ = 0;
 }
 
 void Pin::unsetMaxPinY() {
-  attribute_ &= ~(1 << maxPinYField);
+  maxPinYField_ = 0; 
 }
 
 bool Pin::isITerm() {
-  return ((attribute_ >> iTermField) & 1 == 1);
+  return (iTermField_ == 1);
 }
 
 bool Pin::isBTerm() {
-  return ((attribute_ >> bTermField) & 1 == 1);
+  return (bTermField_ == 1);
 }
 
 bool Pin::isMinPinX() {
-  return ((attribute_ >> minPinXField) & 1 == 1);
+  return (minPinXField_ == 1);
 }
 
 bool Pin::isMinPinY() {
-  return ((attribute_ >> minPinYField) & 1 == 1);
+  return (minPinYField_ == 1);
 }
 
 bool Pin::isMaxPinX() {
-  return ((attribute_ >> maxPinXField) & 1 == 1);
+  return (maxPinXField_ == 1);
 }
 
 bool Pin::isMaxPinY() {
-  return ((attribute_ >> maxPinYField) & 1 == 1);
+  return (maxPinYField_ == 1);
 }
 
 int Pin::lx() {
@@ -341,7 +344,8 @@ Pin::setNet(Net* net) {
 
 Pin::~Pin() {
   term_ = nullptr;
-  attribute_ = 0; 
+  inst_ = nullptr;
+  net_ = nullptr;
 }
 
 ////////////////////////////////////////////////////////

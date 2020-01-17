@@ -128,23 +128,20 @@ private:
   Instance* inst_;
   Net* net_;
 
-  enum PinBitFields {
-    iTermField,
-    bTermField,
-    minPinXField,
-    minPinYField,
-    maxPinXField,
-    maxPinYField
-  };
-
-  uint8_t attribute_;
-
   int offsetLx_;
   int offsetLy_;
   int offsetUx_;
   int offsetUy_;
   int lx_;
   int ly_;
+  
+  unsigned char iTermField_:1;
+  unsigned char bTermField_:1;
+  unsigned char minPinXField_:1;
+  unsigned char minPinYField_:1;
+  unsigned char maxPinXField_:1;
+  unsigned char maxPinYField_:1;
+
   void updateOffset();
   void updateOffset(odb::dbITerm* iTerm);
   void updateOffset(odb::dbBTerm* bTerm);
