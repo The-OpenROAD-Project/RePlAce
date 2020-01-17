@@ -58,6 +58,7 @@ set (REPLACE_SRC
   src/initialPlace.cpp
   src/nesterovPlace.cpp
   src/placerBase.cpp
+  src/nesterovBase.cpp
   )
 
 set (REPLACE_HEADER

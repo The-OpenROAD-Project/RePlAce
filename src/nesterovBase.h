@@ -2,10 +2,14 @@
 #define __NESTEROV_BASE__
 
 #include <vector>
+#include <cstdint>
 
 namespace replace {
 
 class Instance;
+class Die;
+class PlacerBase;
+
 class GCell {
 public:
   GCell();
@@ -16,7 +20,7 @@ public:
   Instance* instance();
   std::vector<Instance*> & insts() { return insts_; }
 
-  void setClusterdInstance(std::vector<Instance*>& insts);
+  void setClusteredInstance(std::vector<Instance*>& insts);
   void setInstance(Instance* inst);
   void setFiller();
 
@@ -57,6 +61,10 @@ public:
   float gradientY() { return gradientY_; }
   float densityScale() { return densityScale_; }
 
+  bool isInstance();
+  bool isClusteredInstance();
+  bool isFiller();
+
 
 private:
   std::vector<Instance*> insts_;
@@ -70,23 +78,16 @@ private:
   int dUx_;
   int dUy_;
 
-  enum {
-    InstField,
-    clusteredInstField,
-    fillerField
-  };
-
-  uint8_t attribute_;
-
   float densityScale_;
-  float gradX_;
-  float gradY_;
+  float gradientX_;
+  float gradientY_;
 };
 
 
 class Bin {
 public:
   Bin();
+  Bin(int lx, int ly, int ux, int uy);
   ~Bin();
 
   int lx();
@@ -95,10 +96,20 @@ public:
   int uy();
   int cx();
   int cy();
+  int dx(); 
+  int dy();
+
+  float phi();
+  float density();
+  float electroForce();
+
+  void setPhi(float phi);
+  void setDensity(float density);
+  void setElectroForce(float electroForce);
 
 protected:
-  uint32_t & fixedArea();
-  uint32_t & placeArea();
+  uint32_t & nonPlaceArea();
+  uint32_t & placedArea();
   uint32_t & fillerArea();
 
 private:
@@ -107,25 +118,56 @@ private:
   int ux_;
   int uy_;
 
-  uint32_t fixedArea_;
-  uint32_t placeArea_;
+  uint32_t nonPlaceArea_;
+  uint32_t placedArea_;
   uint32_t fillerArea_;
 
   float phi_;
   float density_;
+  float electroForce_;
 
   friend class BinGrid;
 };
 
+// 
+// The bin can be non-uniform because of 
+// "integer" coordinates
+//
 class BinGrid {
 public:
   BinGrid();
+  BinGrid(Die* die);
   ~BinGrid();
 
-  void updateBins(std::vector<GCell>& cells);
+  void setCoordi(Die* die);
+  void setBinCnt(int binCntX, int binCntY);
+  void setBinCntX(int binCntX);
+  void setBinCntY(int binCntY);
+  void updateCoordi(Die* die);
+  void updateBinsArea(std::vector<GCell>& cells);
+
+  void initBins();
+
+  // lx, ly, ux, uy will hold coreArea
+  int lx();
+  int ly();
+  int ux();
+  int uy();
+  int cx();
+  int cy(); 
+  int dx();
+  int dy();
+  
+  int binCntX();
+  int binCntY();
+  int binSizeX();
+  int binSizeY(); 
+
+  std::vector<Bin*> & bins() { return binsPtr_; }
 
 private:
   std::vector<Bin> bins_;
+  std::vector<Bin*> binsPtr_;
   int lx_;
   int ly_;
   int ux_;
@@ -134,6 +176,30 @@ private:
   int binCntY_;
   int binSizeX_;
   int binSizeY_;
+  unsigned char isSetBinCntX_:1;
+  unsigned char isSetBinCntY_:1;
+};
+
+class NesterovBase {
+  public:
+    NesterovBase();
+    NesterovBase(PlacerBase* pb);
+    ~NesterovBase();
+
+    std::vector<GCell*> & gCells();
+    std::vector<GCell*> & gcellInsts();
+    std::vector<GCell*> & gcellFillers();
+
+    void initGCells();
+    void initBinGrid();
+
+  private:
+    PlacerBase* pb_;
+    BinGrid binGrid_;
+    std::vector<GCell> gCells_;
+    std::vector<GCell*> gcellsPtr_;
+    std::vector<GCell*> gcellInsts_;
+    std::vector<GCell*> gcellFillers_;
 
 };
 
