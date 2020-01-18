@@ -30,6 +30,7 @@ class Instance {
 public:
   Instance();
   Instance(odb::dbInst* inst);
+  Instance(int lx, int ly, int ux, int uy);
   ~Instance();
 
   odb::dbInst* dbInst() { return inst_; }
@@ -42,6 +43,7 @@ public:
 
   // Dummy is virtual instance to fill in 
   // empty fragmented row structures.
+  // will have inst_ as nullptr
   bool isDummy();
 
   void setLocation(int x, int y);
@@ -71,6 +73,8 @@ private:
   std::vector<Pin*> pins_;
   int lx_;
   int ly_;
+  int ux_;
+  int uy_;
   int extId_;
 };
 
@@ -329,8 +333,17 @@ public:
   std::vector<Pin>& pins() { return pins_; }
   std::vector<Net>& nets() { return nets_; }
 
+  // 
+  // placeInsts : a real instance that need to be placed
+  // fixedInsts : a real instance that is fixed (e.g. macros, tapcells)
+  // dummyInsts : a fake instance that is for fragmented-row handling
+  //
+  // nonPlaceInsts : fixedInsts + dummyInsts to enable fast-iterate on Bin-init
+  //
   std::vector<Instance*>& placeInsts() { return placeInsts_; }
   std::vector<Instance*>& fixedInsts() { return fixedInsts_; }
+  std::vector<Instance*>& dummyInsts() { return dummyInsts_; }
+  std::vector<Instance*>& nonPlaceInsts() { return nonPlaceInsts_; }
 
   Die& die() { return die_; }
 
@@ -338,6 +351,9 @@ public:
   Pin* dbToPlace(odb::dbITerm* pin);
   Pin* dbToPlace(odb::dbBTerm* pin);
   Net* dbToPlace(odb::dbNet* net);
+
+  int siteSizeX() { return siteSizeX_; }
+  int siteSizeY() { return siteSizeY_; }
 
   int hpwl();
   void printInfo();
@@ -358,6 +374,11 @@ private:
 
   std::vector<Instance*> placeInsts_;
   std::vector<Instance*> fixedInsts_;
+  std::vector<Instance*> dummyInsts_;
+  std::vector<Instance*> nonPlaceInsts_;
+
+  int siteSizeX_;
+  int siteSizeY_;
   
   void initBinGrid();
 };

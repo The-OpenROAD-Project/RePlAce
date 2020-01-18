@@ -11,27 +11,62 @@ using namespace std;
 static odb::adsRect 
 getCoreRectFromDb(dbSet<odb::dbRow> &rows);
 
+static int 
+fastModule(const int input, const int ceil);
+
+static std::pair<int, int>
+getMinMaxIdx(int ll, int uu, int coreLL, 
+    int siteSize);
+
+
 ////////////////////////////////////////////////////////
 // Instance 
 
 Instance::Instance() : inst_(nullptr), 
-  lx_(0), ly_(0), extId_(INT_MIN) {}
+  lx_(0), ly_(0), ux_(0), uy_(0), extId_(INT_MIN) {}
+
+// for movable real instances
 Instance::Instance(odb::dbInst* inst) : Instance() {
   inst_ = inst;
   int lx = 0, ly = 0;
   inst_->getLocation(lx, ly);
   lx_ = lx; 
   ly_ = ly;
+  ux_ = lx + inst_->getBBox()->getDX();
+  uy_ = ly + inst_->getBBox()->getDY();
+
+  // 
+  // TODO
+  // need additional adjustment 
+  // if instance is fixed and
+  // its coordi is not multiple of rows' integer. 
 }
+
+// for dummy instances
+Instance::Instance(int lx, int ly, int ux, int uy) 
+  : Instance() {
+  inst_ = nullptr;
+  lx_ = lx;
+  ly_ = ly;
+  ux_ = ux; 
+  uy_ = uy;
+}
+
 
 Instance::~Instance() { 
   inst_ = nullptr;
   lx_ = ly_ = 0;
+  ux_ = uy_ = 0;
   pins_.clear();
 }
 
 bool 
 Instance::isFixed() {
+  // dummy instance is always fixed
+  if( isDummy() ) {
+    return true;
+  }
+
   switch( inst_->getPlacementStatus() ) {
     case dbPlacementStatus::NONE:
     case dbPlacementStatus::UNPLACED:
@@ -48,16 +83,33 @@ Instance::isFixed() {
   return false;
 }
 
+bool
+Instance::isInstance() {
+  return (inst_ != nullptr);
+}
+
+bool
+Instance::isDummy() {
+  return (inst_ == nullptr);
+}
+
 void
 Instance::setLocation(int x, int y) {
+  ux_ = x + (ux_ - lx_);
+  uy_ = y + (uy_ - ly_);
+
   lx_ = x; 
   ly_ = y; 
 }
 
 void
 Instance::setCenterLocation(int x, int y) {
-  lx_ = x - inst_->getBBox()->getDX()/2;
-  ly_ = y - inst_->getBBox()->getDY()/2;
+  const int halfX = (ux_ - lx_)/2;
+  const int halfY = (uy_ - ly_)/2;
+  lx_ = x - halfX; 
+  ly_ = y - halfY;
+  ux_ = x + halfX;
+  uy_ = y + halfY;
 }
 
 void
@@ -77,15 +129,13 @@ Instance::dbSetLocation() {
 
 void
 Instance::dbSetLocation(int x, int y) {
-  lx_ = x;
-  ly_ = y;
+  setLocation(x, y);
   dbSetLocation();
 }
 
 void
 Instance::dbSetCenterLocation(int x, int y) {
-  lx_ = x - inst_->getBBox()->getDX()/2;
-  ly_ = y - inst_->getBBox()->getDY()/2;
+  setCenterLocation(x, y);
   dbSetLocation();
 }
 
@@ -102,22 +152,22 @@ Instance::ly() {
 
 int
 Instance::ux() {
-  return lx_ + inst_->getBBox()->getDX();
+  return ux_; 
 }
 
 int
 Instance::uy() {
-  return ly_ + inst_->getBBox()->getDY();
+  return uy_; 
 }
 
 int
 Instance::cx() {
-  return lx_ + inst_->getBBox()->getDX()/2;
+  return (lx_ + ux_)/2; 
 }
 
 int
 Instance::cy() {
-  return ly_ + inst_->getBBox()->getDY()/2;
+  return (ly_ + uy_)/2; 
 }
 
 void
@@ -758,11 +808,6 @@ BinGrid::updateBinsArea(std::vector<GCell*>& cells) {
   }  
 }
 
-// https://stackoverflow.com/questions/33333363/built-in-mod-vs-custom-mod-function-improve-the-performance-of-modulus-op
-static int 
-fastModule(const int input, const int ceil) {
-  return input >= ceil? input % ceil : input;
-}
 
 std::pair<int, int>
 BinGrid::getMinMaxIdxX(GCell* gcell) {
@@ -797,6 +842,7 @@ PlacerBase::~PlacerBase() {
   clear();
 }
 
+
 void 
 PlacerBase::init() {
   dbBlock* block = db_->getChip()->getBlock();
@@ -813,6 +859,7 @@ PlacerBase::init() {
   for(auto& inst : insts_) {
     if(inst.isFixed()) {
       fixedInsts_.push_back(&inst); 
+      nonPlaceInsts_.push_back(&inst);
     }
     else {
       placeInsts_.push_back(&inst);
@@ -871,10 +918,113 @@ PlacerBase::init() {
     }
   }
 
+  // die-core area update
   dbSet<dbRow> rows = block->getRows();
-
   odb::adsRect coreRect = getCoreRectFromDb(rows);
   die_ = Die(block->getBBox(), &coreRect);
+
+  // dummy cell update to understand fragmented-row
+  //
+  dbRow* firstRow = *(rows.begin());
+  const int siteWidth = firstRow->getSite()->getWidth();
+  const int siteHeight = firstRow->getSite()->getHeight();
+
+  int siteCountX = (die_.coreUx()-die_.coreLx())/siteWidth;
+  int siteCountY = (die_.coreUy()-die_.coreLy())/siteHeight;
+
+  
+  enum PlaceInfo {
+    Empty, Row, FixedInst
+  };
+ 
+  // 
+  // Initialize siteGrid as empty
+  //
+  std::vector<PlaceInfo> 
+    siteGrid (
+        siteCountX * siteCountY, 
+        PlaceInfo::Empty);
+  cout << "siteCountX: " << siteCountX << endl;
+  cout << "siteCountY: " << siteCountX << endl;
+  
+
+  // fill in rows' bbox
+  for(dbRow* row : rows) {
+    adsRect rect;
+    row->getBBox(rect);
+    
+    std::pair<int, int> pairX 
+      = getMinMaxIdx(rect.xMin(), rect.xMax(), 
+          die_.coreLx(), siteWidth);
+
+    std::pair<int, int> pairY
+      = getMinMaxIdx(rect.yMin(), rect.yMax(),
+          die_.coreLy(), siteHeight);
+
+    for(int i=pairX.first; i<pairX.second; i++) {
+      for(int j=pairY.first; j<pairY.second; j++) {
+        siteGrid[ j * siteCountX + i ] = Row; 
+      }
+    }
+  }
+
+  // fill fixed instances' bbox
+  for(auto& fixedInst : fixedInsts_) {
+    std::pair<int, int> pairX 
+      = getMinMaxIdx(fixedInst->lx(), fixedInst->ux(),
+          die_.coreLx(), siteWidth);
+    std::pair<int, int> pairY 
+      = getMinMaxIdx(fixedInst->ly(), fixedInst->uy(),
+          die_.coreLy(), siteHeight);
+
+    for(int i=pairX.first; i<pairX.second; i++) {
+      for(int j=pairY.first; j<pairY.second; j++) {
+        siteGrid[ j * siteCountX + i ] = FixedInst; 
+      }
+    }
+  }
+
+  const int placedInstEndIdx = insts_.size();
+  // 
+  // Search the "Empty" coordinates on site-grid
+  // --> These sites need to be dummyInstance
+  //
+  for(int j=0; j<siteCountY; j++) {
+    for(int i=0; i<siteCountX; i++) {
+      // if empty spot found
+      if( siteGrid[j * siteCountX + i] == Empty ) {
+        int startX = i;
+        // find end points
+        while(i < siteCountX &&
+            siteGrid[j*siteCountX + i] == Empty) {
+          i++;
+        }
+        int endX = i;
+        Instance myInst(
+            die_.coreLx() + siteWidth * startX,
+            die_.coreLy() + siteHeight * j, 
+            die_.coreLx() + siteWidth * endX,
+            die_.coreLy() + siteHeight * (j+1));
+        insts_.push_back( myInst );
+      }
+    }
+  }
+
+
+  nonPlaceInsts_.reserve( 
+      nonPlaceInsts_.size() 
+      + insts_.size() - placedInstEndIdx + 1);
+
+  dummyInsts_.reserve(
+      insts_.size() - placedInstEndIdx + 1);
+
+  for(auto& inst : insts_) {
+    if( &inst - &insts_[0] < placedInstEndIdx ) {
+      continue;
+    }
+    nonPlaceInsts_.push_back(&inst);
+    dummyInsts_.push_back(&inst);
+  }
 
   printInfo();
 }
@@ -933,6 +1083,7 @@ PlacerBase::printInfo() {
   cout << "Instances      : " << insts_.size() << endl;
   cout << "PlaceInstances : " << placeInsts_.size() << endl;
   cout << "FixedInstances : " << fixedInsts_.size() << endl;
+  cout << "DummyInstances : " << dummyInsts_.size() << endl;
   cout << "Nets           : " << nets_.size() << endl;
   cout << "Pins           : " << pins_.size() << endl;
 
@@ -983,6 +1134,20 @@ getCoreRectFromDb(dbSet<odb::dbRow> &rows) {
   return odb::adsRect(minX, minY, maxX, maxY);
 }
 
+// https://stackoverflow.com/questions/33333363/built-in-mod-vs-custom-mod-function-improve-the-performance-of-modulus-op
+static int 
+fastModule(const int input, const int ceil) {
+  return input >= ceil? input % ceil : input;
+}
+
+static std::pair<int, int>
+getMinMaxIdx(int ll, int uu, int coreLL, int siteSize) {
+  int lowerIdx = (ll - coreLL)/siteSize;
+  int upperIdx =
+   ( fastModule((uu - coreLL), siteSize) == 0)? 
+   (uu - coreLL) / siteSize : (uu - coreLL)/siteSize + 1;
+  return std::make_pair(lowerIdx, upperIdx);
+}
 
 
 }
