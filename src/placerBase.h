@@ -61,6 +61,8 @@ public:
   int uy();
   int cx();
   int cy();
+  int dx();
+  int dy();
 
   void setExtId(int extId);
   int extId() { return extId_; }
@@ -379,8 +381,12 @@ private:
 
   int siteSizeX_;
   int siteSizeY_;
+
+  uint64_t placeInstsArea_;
+  uint64_t nonPlaceInstsArea_;
   
   void initBinGrid();
+  void initInstsForFragmentedRow();
 };
 
 }

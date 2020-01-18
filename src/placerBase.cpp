@@ -170,6 +170,16 @@ Instance::cy() {
   return (ly_ + uy_)/2; 
 }
 
+int
+Instance::dx() {
+  return (ux_ - lx_);
+}
+
+int
+Instance::dy() {
+  return (uy_ - ly_);
+}
+
 void
 Instance::addPin(Pin* pin) {
   pins_.push_back(pin);
@@ -833,7 +843,10 @@ BinGrid::getMinMaxIdxY(GCell* gcell) {
 ////////////////////////////////////////////////////////
 // PlacerBase
 
-PlacerBase::PlacerBase() : db_(nullptr) {}
+PlacerBase::PlacerBase() 
+  : db_(nullptr), siteSizeX_(0), siteSizeY_(0),
+  placeInstsArea_(0), nonPlaceInstsArea_(0) {}
+
 PlacerBase::PlacerBase(odb::dbDatabase* db) : db_(db) {
   init();
 }
@@ -847,22 +860,45 @@ void
 PlacerBase::init() {
   dbBlock* block = db_->getChip()->getBlock();
   dbSet<dbInst> insts = block->getInsts();
+  
+  // die-core area update
+  dbSet<dbRow> rows = block->getRows();
+  odb::adsRect coreRect = getCoreRectFromDb(rows);
+  die_ = Die(block->getBBox(), &coreRect);
  
-  // insts fill 
+  // siteSize update 
+  dbRow* firstRow = *(rows.begin());
+  siteSizeX_ = firstRow->getSite()->getWidth();
+  siteSizeY_ = firstRow->getSite()->getHeight();
+  
+  // insts fill with real instances
   insts_.reserve(insts.size());
   for(dbInst* inst : insts) {
     Instance myInst(inst);
     insts_.push_back( myInst );
-    instMap_[inst] = &insts_[insts_.size()-1];  
   }
 
+  // insts fill with fake instances (fragmented row)
+  initInstsForFragmentedRow();
+
+  // init inst ptrs and areas
   for(auto& inst : insts_) {
-    if(inst.isFixed()) {
-      fixedInsts_.push_back(&inst); 
-      nonPlaceInsts_.push_back(&inst);
+    if(inst.isInstance()) {
+      if(inst.isFixed()) {
+        fixedInsts_.push_back(&inst); 
+        nonPlaceInsts_.push_back(&inst);
+        nonPlaceInstsArea_ += inst.dx() * inst.dy();
+      }
+      else {
+        placeInsts_.push_back(&inst);
+        placeInstsArea_ += inst.dx() * inst.dy();
+      }
+      instMap_[inst.dbInst()] = &inst;
     }
-    else {
-      placeInsts_.push_back(&inst);
+    else if(inst.isDummy()) {
+      dummyInsts_.push_back(&inst);
+      nonPlaceInsts_.push_back(&inst);
+      nonPlaceInstsArea_ += inst.dx() * inst.dy();
     }
   }
 
@@ -892,6 +928,9 @@ PlacerBase::init() {
 
   // insts_' pins_ fill
   for(auto& inst : insts_) {
+    if( !inst.isInstance() ) {
+      continue;
+    }
     for(dbITerm* iTerm : inst.dbInst()->getITerms()) {
       inst.addPin( dbToPlace(iTerm) );
     }
@@ -918,20 +957,18 @@ PlacerBase::init() {
     }
   }
 
-  // die-core area update
-  dbSet<dbRow> rows = block->getRows();
-  odb::adsRect coreRect = getCoreRectFromDb(rows);
-  die_ = Die(block->getBBox(), &coreRect);
+  printInfo();
+}
 
+void
+PlacerBase::initInstsForFragmentedRow() {
+  dbSet<dbRow> rows = db_->getChip()->getBlock()->getRows();
+  
   // dummy cell update to understand fragmented-row
   //
-  dbRow* firstRow = *(rows.begin());
-  const int siteWidth = firstRow->getSite()->getWidth();
-  const int siteHeight = firstRow->getSite()->getHeight();
 
-  int siteCountX = (die_.coreUx()-die_.coreLx())/siteWidth;
-  int siteCountY = (die_.coreUy()-die_.coreLy())/siteHeight;
-
+  int siteCountX = (die_.coreUx()-die_.coreLx())/siteSizeX_;
+  int siteCountY = (die_.coreUy()-die_.coreLy())/siteSizeY_;
   
   enum PlaceInfo {
     Empty, Row, FixedInst
@@ -944,8 +981,6 @@ PlacerBase::init() {
     siteGrid (
         siteCountX * siteCountY, 
         PlaceInfo::Empty);
-  cout << "siteCountX: " << siteCountX << endl;
-  cout << "siteCountY: " << siteCountX << endl;
   
 
   // fill in rows' bbox
@@ -955,11 +990,11 @@ PlacerBase::init() {
     
     std::pair<int, int> pairX 
       = getMinMaxIdx(rect.xMin(), rect.xMax(), 
-          die_.coreLx(), siteWidth);
+          die_.coreLx(), siteSizeX_);
 
     std::pair<int, int> pairY
       = getMinMaxIdx(rect.yMin(), rect.yMax(),
-          die_.coreLy(), siteHeight);
+          die_.coreLy(), siteSizeY_);
 
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
@@ -972,10 +1007,10 @@ PlacerBase::init() {
   for(auto& fixedInst : fixedInsts_) {
     std::pair<int, int> pairX 
       = getMinMaxIdx(fixedInst->lx(), fixedInst->ux(),
-          die_.coreLx(), siteWidth);
+          die_.coreLx(), siteSizeX_);
     std::pair<int, int> pairY 
       = getMinMaxIdx(fixedInst->ly(), fixedInst->uy(),
-          die_.coreLy(), siteHeight);
+          die_.coreLy(), siteSizeY_);
 
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
@@ -984,7 +1019,6 @@ PlacerBase::init() {
     }
   }
 
-  const int placedInstEndIdx = insts_.size();
   // 
   // Search the "Empty" coordinates on site-grid
   // --> These sites need to be dummyInstance
@@ -1001,32 +1035,14 @@ PlacerBase::init() {
         }
         int endX = i;
         Instance myInst(
-            die_.coreLx() + siteWidth * startX,
-            die_.coreLy() + siteHeight * j, 
-            die_.coreLx() + siteWidth * endX,
-            die_.coreLy() + siteHeight * (j+1));
+            die_.coreLx() + siteSizeX_ * startX,
+            die_.coreLy() + siteSizeY_ * j, 
+            die_.coreLx() + siteSizeX_ * endX,
+            die_.coreLy() + siteSizeY_ * (j+1));
         insts_.push_back( myInst );
       }
     }
   }
-
-
-  nonPlaceInsts_.reserve( 
-      nonPlaceInsts_.size() 
-      + insts_.size() - placedInstEndIdx + 1);
-
-  dummyInsts_.reserve(
-      insts_.size() - placedInstEndIdx + 1);
-
-  for(auto& inst : insts_) {
-    if( &inst - &insts_[0] < placedInstEndIdx ) {
-      continue;
-    }
-    nonPlaceInsts_.push_back(&inst);
-    dummyInsts_.push_back(&inst);
-  }
-
-  printInfo();
 }
 
 void
@@ -1114,6 +1130,26 @@ PlacerBase::printInfo() {
     << " ) - ( " 
     << die_.coreUx() << " " << die_.coreUy() 
     << " ) " << endl;
+
+  uint64_t coreArea = 
+    static_cast<uint64_t>(die_.coreUx() - die_.coreLx()) * 
+    static_cast<uint64_t>(die_.coreUy() - die_.coreLy());
+  float util = 
+    static_cast<float>(placeInstsArea_) 
+    / (coreArea - nonPlaceInstsArea_) * 100;
+
+  cout << "coreArea       : " << coreArea << endl;
+  cout << "placeInstsArea : " << placeInstsArea_ << endl;
+  cout << "nonPlaceInstsArea : " << nonPlaceInstsArea_ << endl;
+  cout << "utilization    : " << util << endl; 
+  cout << endl;
+
+  if( util >= 100.1 ) {
+    cout << "Error: Util exceeds 100%." << endl;
+    cout << "       Please double-check your die/row size" << endl;
+    exit(1);
+  }
+
 }
 
 
