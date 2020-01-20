@@ -121,61 +121,41 @@ void InitialPlace::updatePinInfo() {
 
     // Mark B2B info on Pin structures
     for(auto& pin : net->pins()) {
-      if( pinMinX ) {
-        if( lx > pin->cx() ) {
-          lx = pin->cx();
+      if( lx > pin->cx() ) {
+        if( pinMinX ) {
           pinMinX->unsetMinPinX();
-          pinMinX = pin; 
-          pinMinX->setMinPinX();
         }
-      } 
-      else {
         lx = pin->cx();
-        pinMinX = pin;
+        pinMinX = pin; 
         pinMinX->setMinPinX();
-      }
+      } 
       
-      if( pinMaxX ) {
-        if( ux < pin->cx() ) {
-          ux = pin->cx();
+      if( ux < pin->cx() ) {
+        if( pinMaxX ) {
           pinMaxX->unsetMaxPinX();
-          pinMaxX = pin; 
-          pinMaxX->setMaxPinX();
         }
-      } 
-      else {
         ux = pin->cx();
-        pinMaxX = pin;
+        pinMaxX = pin; 
         pinMaxX->setMaxPinX();
-      }
+      } 
 
-      if( pinMinY ) {
-        if( ly > pin->cy() ) {
-          ly = pin->cy();
+      if( ly > pin->cy() ) {
+        if( pinMinY ) {
           pinMinY->unsetMinPinY();
-          pinMinY = pin; 
-          pinMinY->setMinPinY();
         }
-      } 
-      else {
         ly = pin->cy();
-        pinMinY = pin;
+        pinMinY = pin; 
         pinMinY->setMinPinY();
-      }
-      
-      if( pinMaxY ) {
-        if( uy < pin->cy() ) {
-          uy = pin->cy();
-          pinMaxY->unsetMaxPinY();
-          pinMaxY = pin; 
-          pinMaxY->setMaxPinY();
-        }
       } 
-      else {
+      
+      if( uy < pin->cy() ) {
+        if( pinMaxY ) {
+          pinMaxY->unsetMaxPinY();
+        }
         uy = pin->cy();
-        pinMaxY = pin;
+        pinMaxY = pin; 
         pinMaxY->setMaxPinY();
-      }
+      } 
     }
 //    cout << "pinAddr: " << pinMinX << " " 
 //      << pinMaxX << " " 
