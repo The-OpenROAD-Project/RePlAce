@@ -13,12 +13,14 @@ using Eigen::IdentityPreconditioner;
 typedef Eigen::Triplet< float > T;
 
 InitialPlaceVars::InitialPlaceVars() 
-  : maxInitialPlaceIter(0), 
+  : maxIter(20), 
   minDiffLength(1500), 
+  maxSolverIter(100),
+  netWeightScale(800.0),
   verbose(0) {}
 
 void InitialPlaceVars::reset() {
-  maxInitialPlaceIter = 0;
+  maxIter = 0;
   minDiffLength = 0;
   verbose = 0;
 }
@@ -47,19 +49,18 @@ void InitialPlace::doBicgstabPlace() {
     cout << "Begin InitialPlace ..." << endl;
   }
 
-  const int itmax = 100;
   float errorX = 0.0f, errorY = 0.0f;
   
   placeInstsCenter();
   // set ExtId for idx reference // easy recovery
   setPlaceInstExtId();
-  for(int i=1; i<=initialPlaceVars_.maxInitialPlaceIter; i++) {
+  for(int i=1; i<=initialPlaceVars_.maxIter; i++) {
     updatePinInfo();
     createSparseMatrix();
 
     // BiCGSTAB solver for initial place
     BiCGSTAB< SMatrix, IdentityPreconditioner > solver;
-    solver.setMaxIterations(itmax);
+    solver.setMaxIterations(initialPlaceVars_.maxSolverIter);
     solver.compute(matX_);
     xcgX_ = solver.solveWithGuess(xcgB_, xcgX_);
     errorX = solver.error();
@@ -234,7 +235,8 @@ void InitialPlace::createSparseMatrix() {
       continue;
     }
 
-    float netWeight = 1.0 / (net->pins().size() - 1);
+    float netWeight = initialPlaceVars_.netWeightScale 
+      / (net->pins().size() - 1);
     //cout << "net: " << net.net()->getConstName() << endl;
 
     // foreach two pins in single nets.

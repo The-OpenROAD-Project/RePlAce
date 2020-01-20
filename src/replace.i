@@ -40,14 +40,14 @@ void
 set_replace_init_place_iter_cmd(int iter)
 {
   Replace* replace = getReplace();
-  replace->setMaxInitialPlaceIter(iter); 
+  replace->setInitialPlaceMaxIter(iter); 
 }
 
 void
 set_replace_nesv_place_iter_cmd(int iter)
 {
   Replace* replace = getReplace();
-  replace->setMaxNesvPlaceIter(iter);
+  replace->setNesterovPlaceMaxIter(iter);
 }
 
 void

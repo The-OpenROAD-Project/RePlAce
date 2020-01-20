@@ -9,11 +9,12 @@ namespace replace {
 class PlacerBase;
 class InitialPlaceVars {
 public:
-  int maxInitialPlaceIter;
+  int maxIter;
   int minDiffLength;
-  int solverIterMax;
+  int maxSolverIter;
   float netWeightScale;
   int verbose;
+
   InitialPlaceVars();
   void reset();
 };

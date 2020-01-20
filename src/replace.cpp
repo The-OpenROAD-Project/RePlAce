@@ -12,8 +12,11 @@ Replace::Replace()
   : db_(nullptr), 
   sta_(nullptr), ip_(nullptr), 
   np_(nullptr), pb_(nullptr),
-  maxInitialPlaceIter_(20), 
-  maxNesterovPlaceIter_(2000),
+  initialPlaceMaxIter_(20), 
+  initialPlaceMinDiffLength_(1500),
+  initialPlaceMaxSolverIter_(100),
+  initialPlaceNetWeightScale_(800),
+  nesterovPlaceMaxIter_(2000),
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
   initPenalityFactor_(0.00001), 
@@ -47,8 +50,12 @@ void Replace::reset() {
   delete np_;
   np_ = nullptr;
 
-  maxInitialPlaceIter_ = 0;
-  maxNesterovPlaceIter_ = 0;
+  initialPlaceMaxIter_ = 20;
+  initialPlaceMinDiffLength_ = 1500;
+  initialPlaceMaxSolverIter_ = 100;
+  initialPlaceNetWeightScale_ = 800;
+
+  nesterovPlaceMaxIter_ = 2000;
   binGridCntX_ = binGridCntY_ = 0;
   overflow_ = 0;
   density_ = 0;
@@ -71,7 +78,10 @@ void Replace::doInitialPlace() {
   }
 
   InitialPlaceVars ipVars;
-  ipVars.maxInitialPlaceIter = maxInitialPlaceIter_;
+  ipVars.maxIter = initialPlaceMaxIter_;
+  ipVars.minDiffLength = initialPlaceMinDiffLength_;
+  ipVars.maxSolverIter = initialPlaceMaxSolverIter_;
+  ipVars.netWeightScale = initialPlaceNetWeightScale_;
   ipVars.verbose = verbose_;
 
   ip_->setInitialPlaceVars(ipVars);
@@ -88,12 +98,28 @@ void Replace::doNesterovPlace() {
 
 
 void
-Replace::setMaxInitialPlaceIter(int iter) {
-  maxInitialPlaceIter_ = iter; 
+Replace::setInitialPlaceMaxIter(int iter) {
+  initialPlaceMaxIter_ = iter; 
 }
+
 void
-Replace::setMaxNesvPlaceIter(int iter) {
-  maxNesterovPlaceIter_ = iter;
+Replace::setInitialPlaceMinDiffLength(int length) {
+  initialPlaceMinDiffLength_ = length; 
+}
+
+void
+Replace::setInitialPlaceMaxSolverIter(int iter) {
+  initialPlaceMaxSolverIter_ = iter;
+}
+
+void
+Replace::setInitialPlaceNetWeightScale(float scale) {
+  initialPlaceNetWeightScale_ = scale;
+}
+
+void
+Replace::setNesterovPlaceMaxIter(int iter) {
+  nesterovPlaceMaxIter_ = iter;
 }
 
 void 

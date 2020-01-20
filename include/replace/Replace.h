@@ -29,8 +29,13 @@ class Replace
     void doInitialPlace();
     void doNesterovPlace();
 
-    void setMaxInitialPlaceIter(int iter);
-    void setMaxNesvPlaceIter(int iter);
+    // Initial Place param settings
+    void setInitialPlaceMaxIter(int iter);
+    void setInitialPlaceMinDiffLength(int length);
+    void setInitialPlaceMaxSolverIter(int iter);
+    void setInitialPlaceNetWeightScale(float scale);
+
+    void setNesterovPlaceMaxIter(int iter);
 
     void setBinGridCntX(int binGridCntX);
     void setBinGridCntY(int binGridCntY);
@@ -53,8 +58,12 @@ class Replace
     NesterovPlace* np_;
     PlacerBase* pb_;
 
-    int maxInitialPlaceIter_;
-    int maxNesterovPlaceIter_;
+    int initialPlaceMaxIter_;
+    int initialPlaceMinDiffLength_;
+    int initialPlaceMaxSolverIter_;
+    float initialPlaceNetWeightScale_;
+
+    int nesterovPlaceMaxIter_;
     int binGridCntX_;
     int binGridCntY_;
     float overflow_;
