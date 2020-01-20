@@ -15,7 +15,7 @@ public:
   float netWeightScale;
   int verbose;
   InitialPlaceVars();
-  void clear();
+  void reset();
 };
 
 typedef Eigen::SparseMatrix<float, Eigen::RowMajor> SMatrix;
@@ -26,7 +26,7 @@ class InitialPlace {
     InitialPlace(PlacerBase* placerBase);
     ~InitialPlace();
     
-    void clear();
+    void reset();
     void setInitialPlaceVars(InitialPlaceVars initialPlaceVars);
     void doBicgstabPlace();
 

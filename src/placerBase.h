@@ -326,7 +326,7 @@ public:
   ~PlacerBase();
 
   void init();
-  void clear();
+  void reset();
 
   const std::vector<Instance*>& insts() const { return insts_; }
   const std::vector<Pin*>& pins() const { return pins_; }

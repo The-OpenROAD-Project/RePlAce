@@ -17,7 +17,7 @@ InitialPlaceVars::InitialPlaceVars()
   minDiffLength(1500), 
   verbose(0) {}
 
-void InitialPlaceVars::clear() {
+void InitialPlaceVars::reset() {
   maxInitialPlaceIter = 0;
   minDiffLength = 0;
   verbose = 0;
@@ -30,12 +30,12 @@ InitialPlace::InitialPlace(PlacerBase* placerBase)
 : pb_(placerBase), initialPlaceVars_() {};
 
 InitialPlace::~InitialPlace() {
-  clear();
+  reset();
 }
 
-void InitialPlace::clear() {
+void InitialPlace::reset() {
   pb_ = nullptr;
-  initialPlaceVars_.clear();
+  initialPlaceVars_.reset();
 }
 
 void InitialPlace::setInitialPlaceVars(InitialPlaceVars initialPlaceVars) {
@@ -93,7 +93,7 @@ void InitialPlace::placeInstsCenter() {
 }
 
 void InitialPlace::setPlaceInstExtId() {
-  // clear ExtId for all instances
+  // reset ExtId for all instances
   for(auto& inst : pb_->insts()) {
     inst->setExtId(INT_MAX);
   }
@@ -104,7 +104,7 @@ void InitialPlace::setPlaceInstExtId() {
 }
 
 void InitialPlace::updatePinInfo() {
-  // clear all MinMax attributes
+  // reset all MinMax attributes
   for(auto& pin : pb_->pins()) {
     pin->unsetMinPinX();
     pin->unsetMinPinY();

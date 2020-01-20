@@ -19,8 +19,9 @@ class Replace
   public:
     Replace();
     ~Replace();
+
     void init();
-    void clear();
+    void reset();
 
     void setDb(odb::dbDatabase* odb);
     void setSta(sta::dbSta* dbSta);
@@ -39,13 +40,15 @@ class Replace
     void setInitPenalityFactor(float penaltyFactor);
     void setMinPCoef(float minPCoef);
     void setMaxPCoef(float maxPCoef);
-    void setDeltaHpwl(float deltaHpwl);
 
+    // HPWL: half-parameter wire length.
+    void setDeltaHpwl(float deltaHpwl);
     void setVerboseLevel(int verbose);
 
   private:
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
+
     InitialPlace* ip_;
     NesterovPlace* np_;
     PlacerBase* pb_;

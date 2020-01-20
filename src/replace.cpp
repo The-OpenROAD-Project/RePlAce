@@ -23,7 +23,7 @@ Replace::Replace()
 };
 
 Replace::~Replace() {
-  clear();
+  reset();
 }
 
 void Replace::init() {
@@ -32,25 +32,19 @@ void Replace::init() {
   np_ = new NesterovPlace(pb_);
 }
 
-void Replace::clear() {
+void Replace::reset() {
   // two pointers should not be freed.
   db_ = nullptr;
   sta_ = nullptr;
 
   // below objects were from replace
-  if( pb_ ) {
-    delete pb_;
-  }
+  delete pb_;
   pb_ = nullptr;
 
-  if( ip_ ) {
-    delete ip_;
-  }
+  delete ip_;
   ip_ = nullptr;
 
-  if( np_ ) {
-    delete np_;
-  }
+  delete np_;
   np_ = nullptr;
 
   maxInitialPlaceIter_ = 0;

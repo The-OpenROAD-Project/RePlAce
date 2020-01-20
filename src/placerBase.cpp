@@ -38,7 +38,7 @@ Instance::Instance(odb::dbInst* inst) : Instance() {
   // 
   // TODO
   // need additional adjustment 
-  // if instance is fixed and
+  // if instance (macro) is fixed and
   // its coordi is not multiple of rows' integer. 
 }
 
@@ -856,7 +856,7 @@ PlacerBase::PlacerBase(odb::dbDatabase* db) : db_(db) {
 }
 
 PlacerBase::~PlacerBase() {
-  clear();
+  reset();
 }
 
 
@@ -1057,7 +1057,7 @@ PlacerBase::initInstsForFragmentedRow() {
 }
 
 void
-PlacerBase::clear() {
+PlacerBase::reset() {
   db_ = nullptr;
   instStor_.clear();
   pinStor_.clear();
