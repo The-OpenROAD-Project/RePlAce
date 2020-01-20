@@ -22,33 +22,33 @@ public:
   GCell(std::vector<Instance*>& insts);
   ~GCell();
 
-  Instance* instance();
-  std::vector<Instance*> & insts() { return insts_; }
-  std::vector<GPin*> & gPins() { return gPins_; }
+  Instance* instance() const;
+  const std::vector<Instance*> & insts() const { return insts_; }
+  const std::vector<GPin*> & gPins() const { return gPins_; }
 
   void setClusteredInstance(std::vector<Instance*>& insts);
   void setInstance(Instance* inst);
   void setFiller();
 
   // normal coordinates
-  int lx();
-  int ly();
-  int ux();
-  int uy();
-  int cx();
-  int cy();
-  int dx();
-  int dy();
+  int lx() const;
+  int ly() const;
+  int ux() const;
+  int uy() const;
+  int cx() const;
+  int cy() const;
+  int dx() const;
+  int dy() const;
 
   // virtual density coordinates
-  int dLx();
-  int dLy();
-  int dUx();
-  int dUy();
-  int dCx();
-  int dCy();
-  int dDx();
-  int dDy();
+  int dLx() const;
+  int dLy() const;
+  int dUx() const;
+  int dUy() const;
+  int dCx() const;
+  int dCy() const;
+  int dDx() const;
+  int dDy() const;
 
 
   void setLocation(int lx, int ly);
@@ -63,13 +63,13 @@ public:
   void setGradientX(float gradX);
   void setGradientY(float gradY);
 
-  float gradientX() { return gradientX_; }
-  float gradientY() { return gradientY_; }
-  float densityScale() { return densityScale_; }
+  float gradientX() const { return gradientX_; }
+  float gradientY() const { return gradientY_; }
+  float densityScale() const { return densityScale_; }
 
-  bool isInstance();
-  bool isClusteredInstance();
-  bool isFiller();
+  bool isInstance() const;
+  bool isClusteredInstance() const;
+  bool isFiller() const;
 
 
 private:
@@ -97,13 +97,15 @@ class GNet {
     GNet(std::vector<Net*>& nets);
     ~GNet();
 
-    Net* net();
-    std::vector<Net*> & nets() { return nets_; }
+    Net* net() const;
+    const std::vector<Net*> & nets() const { return nets_; }
+    const std::vector<GPin*> & gPins() const { return gPins_; }
 
-    std::vector<GPin*> & gPins() { return gPins_; }
+    void setCustomWeight( float customWeight );
+    float customWeight() const { return customWeight_; }
+    float netWeight() const { return weight_; }
 
-    void setCustomNetWeight();
-    float netWeight() { return netWeight_; }
+    void addGPin(GPin* gPin);
 
   private:
     std::vector<GPin*> gPins_;
@@ -113,8 +115,8 @@ class GNet {
     int ux_;
     int uy_;
 
-    float netCustomWeight_;
-    float netWeight_;
+    float customWeight_;
+    float weight_;
 
     //
     // weighted average WL model stor for better indexing
@@ -162,11 +164,21 @@ class GPin {
     GPin(std::vector<Pin*>& pins);
     ~GPin();
 
-    Pin* pin();
-    std::vector<Pin*> & pins() { return pins_; }
+    Pin* pin() const;
+    const std::vector<Pin*> & pins() const { return pins_; }
 
-    GCell* gCell() { return gCell_; }
-    GNet* gNet() { return gNet_; }
+    GCell* gCell() const { return gCell_; }
+    GNet* gNet() const { return gNet_; }
+
+    int cx() const { return cx_; }
+    int cy() const { return cy_; }
+
+    float posExpSum() const { return posExpSum_; }
+    float negExpSum() const { return negExpSum_; }
+
+    bool hasPosExpSum() const { return (hasPosExpSum_ == 1); }
+    bool hasNegExpSum() const { return (hasNegExpSum_ == 1); }
+
   private:
     GCell* gCell_;
     GNet* gNet_;
@@ -201,15 +213,17 @@ class NesterovBase {
     NesterovBase();
     NesterovBase(PlacerBase* pb);
     ~NesterovBase();
+    
+    void init();
+    void reset();
 
-    std::vector<GCell*> & gCells() { return gCellsPtr_; }
-    std::vector<GCell*> & gCellInsts() { return gCellInsts_; }
-    std::vector<GCell*> & gCellFillers() { return gCellFillers_; }
+    const std::vector<GCell*> & gCells() const { return gCellsPtr_; }
+    const std::vector<GCell*> & gCellInsts() const { return gCellInsts_; }
+    const std::vector<GCell*> & gCellFillers() const { return gCellFillers_; }
 
-    std::vector<GNet*> & gNets() { return gNetsPtr_; }
-    std::vector<GPin*> & gPins() { return gPinsPtr_; }
+    const std::vector<GNet*> & gNets() const { return gNetsPtr_; }
+    const std::vector<GPin*> & gPins() const { return gPinsPtr_; }
 
-    void initGBases();
 
   private:
     PlacerBase* pb_;

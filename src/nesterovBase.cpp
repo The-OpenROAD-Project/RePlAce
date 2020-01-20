@@ -43,81 +43,81 @@ GCell::setClusteredInstance(std::vector<Instance*>& insts) {
 }
 
 int
-GCell::lx() {
+GCell::lx() const {
   return lx_;
 }
 int
-GCell::ly() {
+GCell::ly() const {
   return ly_; 
 }
 
 int
-GCell::ux() { 
+GCell::ux() const { 
   return ux_; 
 }
 
 int
-GCell::uy() {
+GCell::uy() const {
   return uy_; 
 }
 
 int
-GCell::cx() {
+GCell::cx() const {
   return (lx_ + ux_)/2;
 }
 
 int
-GCell::cy() {
+GCell::cy() const {
   return (ly_ + uy_)/2;
 }
 
 int 
-GCell::dx() {
+GCell::dx() const {
   return ux_ - lx_; 
 }
 
 int
-GCell::dy() {
+GCell::dy() const {
   return uy_ - ly_;
 }
 
 int
-GCell::dLx() {
+GCell::dLx() const {
   return dLx_;
 }
 
 int
-GCell::dLy() {
+GCell::dLy() const {
   return dLy_;
 }
 
 int
-GCell::dUx() {
+GCell::dUx() const {
   return dUx_;
 }
 
 int
-GCell::dUy() {
+GCell::dUy() const {
   return dUy_;
 }
 
 int
-GCell::dCx() {
+GCell::dCx() const {
   return (dUx_ - dLx_)/2;
 }
 
 int
-GCell::dCy() {
+GCell::dCy() const {
   return (dUy_ - dLy_)/2;
 }
 
 int
-GCell::dDx() {
+GCell::dDx() const {
   return dUx_ - dLx_; 
 }
 
 int
-GCell::dDy() {
+GCell::dDy() const {
   return dUy_ - dLy_;
 }
 
@@ -199,19 +199,114 @@ GCell::setGradientY(float gradientY) {
 }
 
 bool 
-GCell::isInstance() {
+GCell::isInstance() const {
   return (insts_.size() == 1);
 }
 
 bool
-GCell::isClusteredInstance() {
+GCell::isClusteredInstance() const {
   return (insts_.size() > 0);
 }
 
 bool
-GCell::isFiller() {
+GCell::isFiller() const {
   return (insts_.size() == 0);
 }
+
+
+GNet::GNet()
+  : lx_(0), ly_(0), ux_(0), uy_(0),
+  customWeight_(1), weight_(1),
+  waExpMinSumStorX_(0), waXExpMinSumStorX_(0),
+  waExpMaxSumStorX_(0), waXExpMaxSumStorX_(0),
+  waExpMinSumStorY_(0), waYExpMinSumStorY_(0),
+  waExpMaxSumStorY_(0), waYExpMaxSumStorY_(0) {}
+
+GNet::GNet(Net* net) : GNet() {
+  nets_.push_back(net);
+}
+
+GNet::GNet(std::vector<Net*>& nets) : GNet() {
+  nets_ = nets;
+}
+
+GNet::~GNet() {
+  gPins_.clear();
+  nets_.clear();
+}
+
+Net* 
+GNet::net() const { 
+  return *nets_.begin();
+}
+
+void
+GNet::setCustomWeight(float customWeight) {
+  customWeight_ = customWeight; 
+}
+
+void
+GNet::addGPin(GPin* gPin) {
+  gPins_.push_back(gPin);
+}
+
+
+GPin::GPin()
+  : gCell_(nullptr), gNet_(nullptr),
+  offsetCx_(0), offsetCy_(0),
+  cx_(0), cy_(0),
+  posExpSum_(0), negExpSum_(0),
+  hasPosExpSum_(0), hasNegExpSum_(0) {}
+
+GPin::GPin(Pin* pin)
+  : GPin() {
+  pins_.push_back(pin);
+}
+
+GPin::GPin(std::vector<Pin*> & pins) {
+  pins_ = pins;
+}
+
+GPin::~GPin() {
+  gCell_ = nullptr;
+  gNet_ = nullptr;
+  pins_.clear();
+}
+
+Pin* 
+GPin::pin() const {
+  return *pins_.begin();
+}
+
+
+
+NesterovBase::NesterovBase()
+  : pb_(nullptr) {}
+
+NesterovBase::NesterovBase(PlacerBase* pb)
+  : NesterovBase() {
+  pb_ = pb;
+}
+
+NesterovBase::~NesterovBase() {
+  pb_ = nullptr;
+}
+
+void
+NesterovBase::init() {
+
+}
+
+void
+NesterovBase::reset() { 
+
+}
+
+
+
+
+
+
 
 
 }
