@@ -33,18 +33,18 @@ public:
   Instance(int lx, int ly, int ux, int uy);
   ~Instance();
 
-  odb::dbInst* dbInst() { return inst_; }
+  odb::dbInst* dbInst() const { return inst_; }
 
   // a cell that no need to be moved.
-  bool isFixed();
+  bool isFixed() const;
 
   // a instance that need to be moved.
-  bool isInstance();
+  bool isInstance() const;
 
   // Dummy is virtual instance to fill in 
   // empty fragmented row structures.
   // will have inst_ as nullptr
-  bool isDummy();
+  bool isDummy() const;
 
   void setLocation(int x, int y);
   void setCenterLocation(int x, int y);
@@ -55,20 +55,20 @@ public:
   void dbSetLocation(int x, int y);
   void dbSetCenterLocation(int x, int y);
 
-  int lx();
-  int ly();
-  int ux();
-  int uy();
-  int cx();
-  int cy();
-  int dx();
-  int dy();
+  int lx() const;
+  int ly() const;
+  int ux() const;
+  int uy() const;
+  int cx() const;
+  int cy() const;
+  int dx() const;
+  int dy() const;
 
   void setExtId(int extId);
-  int extId() { return extId_; }
+  int extId() const { return extId_; }
 
   void addPin(Pin* pin);
-  std::vector<Pin*> & pins() { return pins_; }
+  const std::vector<Pin*> & pins() const { return pins_; }
 
 private:
   odb::dbInst* inst_;
@@ -87,15 +87,15 @@ public:
   Pin(odb::dbBTerm* bTerm);
   ~Pin();
 
-  odb::dbITerm* dbITerm();
-  odb::dbBTerm* dbBTerm();
+  odb::dbITerm* dbITerm() const;
+  odb::dbBTerm* dbBTerm() const;
 
-  bool isITerm();
-  bool isBTerm();
-  bool isMinPinX();
-  bool isMaxPinX();
-  bool isMinPinY();
-  bool isMaxPinY();
+  bool isITerm() const;
+  bool isBTerm() const;
+  bool isMinPinX() const;
+  bool isMaxPinX() const;
+  bool isMinPinY() const;
+  bool isMaxPinY() const;
 
   void setITerm();
   void setBTerm();
@@ -108,26 +108,21 @@ public:
   void unsetMaxPinX();
   void unsetMaxPinY();
 
-  int offsetLx();
-  int offsetLy();
-  int offsetUx();
-  int offsetUy();
-
-  int lx();
-  int ly();
-  int ux();
-  int uy();
-  int cx();
-  int cy();
+  int lx() const;
+  int ly() const;
+  int ux() const;
+  int uy() const;
+  int cx() const;
+  int cy() const;
 
   void updateLocation();
-  void updateLocation(Instance* inst);
+  void updateLocation(const Instance* inst);
 
   void setInstance(Instance* inst);
   void setNet(Net* net);
 
-  Instance* instance() { return inst_; }
-  Net* net() { return net_; }
+  Instance* instance() const { return inst_; }
+  Net* net() const { return net_; }
 
 private:
   void* term_;
@@ -161,20 +156,22 @@ public:
   Net(odb::dbNet* net);
   ~Net();
 
-  int lx();
-  int ly();
-  int ux();
-  int uy();
-  int cx();
-  int cy();
-  int hpwl();
+  int lx() const;
+  int ly() const;
+  int ux() const;
+  int uy() const;
+  int cx() const;
+  int cy() const;
+
+  // HPWL: half-parameter-wire-length
+  int hpwl() const;
 
   void updateBox();
 
-  std::vector<Pin*> & pins() { return pins_; }
+  const std::vector<Pin*> & pins() const { return pins_; }
 
-  odb::dbNet* dbNet() { return net_; }
-  odb::dbSigType getSigType();
+  odb::dbNet* dbNet() const { return net_; }
+  odb::dbSigType getSigType() const;
 
   void addPin(Pin* pin);
 
@@ -196,20 +193,20 @@ public:
   void setDieBox(odb::dbBox* dieBox);
   void setCoreBox(odb::adsRect* coreBox);
 
-  int dieLx() { return dieLx_; }
-  int dieLy() { return dieLy_; }
-  int dieUx() { return dieUx_; }
-  int dieUy() { return dieUy_; }
+  int dieLx() const { return dieLx_; }
+  int dieLy() const { return dieLy_; }
+  int dieUx() const { return dieUx_; }
+  int dieUy() const { return dieUy_; }
 
-  int coreLx() { return coreLx_; }
-  int coreLy() { return coreLy_; }
-  int coreUx() { return coreUx_; }
-  int coreUy() { return coreUy_; }
+  int coreLx() const { return coreLx_; }
+  int coreLy() const { return coreLy_; }
+  int coreUx() const { return coreUx_; }
+  int coreUy() const { return coreUy_; }
 
-  int dieCx();
-  int dieCy();
-  int coreCx();
-  int coreCy();
+  int dieCx() const;
+  int dieCy() const;
+  int coreCx() const;
+  int coreCy() const;
 
 private:
   int dieLx_;
@@ -228,18 +225,18 @@ public:
   Bin(int lx, int ly, int ux, int uy);
   ~Bin();
 
-  int lx();
-  int ly();
-  int ux();
-  int uy();
-  int cx();
-  int cy();
-  int dx();
-  int dy();
+  int lx() const;
+  int ly() const;
+  int ux() const;
+  int uy() const;
+  int cx() const;
+  int cy() const;
+  int dx() const;
+  int dy() const;
 
-  float phi();
-  float density();
-  float electroForce();
+  float phi() const;
+  float density() const;
+  float electroForce() const;
 
   void setPhi(float phi);
   void setDensity(float density);
@@ -287,25 +284,25 @@ public:
   void initBins();
 
   // lx, ly, ux, uy will hold coreArea
-  int lx();
-  int ly();
-  int ux();
-  int uy();
-  int cx();
-  int cy();
-  int dx();
-  int dy();
+  int lx() const;
+  int ly() const;
+  int ux() const;
+  int uy() const;
+  int cx() const;
+  int cy() const;
+  int dx() const;
+  int dy() const;
 
-  int binCntX();
-  int binCntY();
-  int binSizeX();
-  int binSizeY();
+  int binCntX() const;
+  int binCntY() const;
+  int binSizeX() const;
+  int binSizeY() const;
 
   // return bins_ index with given gcell
   std::pair<int, int> getMinMaxIdxX(GCell* gcell);
   std::pair<int, int> getMinMaxIdxY(GCell* gcell);
 
-  std::vector<Bin*> & bins() { return binsPtr_; }
+  const std::vector<Bin*> & bins() const { return binsPtr_; }
 
 private:
   std::vector<Bin> bins_;
@@ -331,9 +328,9 @@ public:
   void init();
   void clear();
 
-  std::vector<Instance>& insts() { return insts_; }
-  std::vector<Pin>& pins() { return pins_; }
-  std::vector<Net>& nets() { return nets_; }
+  const std::vector<Instance*>& insts() const { return insts_; }
+  const std::vector<Pin*>& pins() const { return pins_; }
+  const std::vector<Net*>& nets() const { return nets_; }
 
   // 
   // placeInsts : a real instance that need to be placed
@@ -342,23 +339,23 @@ public:
   //
   // nonPlaceInsts : fixedInsts + dummyInsts to enable fast-iterate on Bin-init
   //
-  std::vector<Instance*>& placeInsts() { return placeInsts_; }
-  std::vector<Instance*>& fixedInsts() { return fixedInsts_; }
-  std::vector<Instance*>& dummyInsts() { return dummyInsts_; }
-  std::vector<Instance*>& nonPlaceInsts() { return nonPlaceInsts_; }
+  const std::vector<Instance*>& placeInsts() const { return placeInsts_; }
+  const std::vector<Instance*>& fixedInsts() const { return fixedInsts_; }
+  const std::vector<Instance*>& dummyInsts() const { return dummyInsts_; }
+  const std::vector<Instance*>& nonPlaceInsts() const { return nonPlaceInsts_; }
 
   Die& die() { return die_; }
 
-  Instance* dbToPlace(odb::dbInst* inst);
-  Pin* dbToPlace(odb::dbITerm* pin);
-  Pin* dbToPlace(odb::dbBTerm* pin);
-  Net* dbToPlace(odb::dbNet* net);
+  Instance* dbToPlace(odb::dbInst* inst) const;
+  Pin* dbToPlace(odb::dbITerm* pin) const;
+  Pin* dbToPlace(odb::dbBTerm* pin) const;
+  Net* dbToPlace(odb::dbNet* net) const;
 
-  int siteSizeX() { return siteSizeX_; }
-  int siteSizeY() { return siteSizeY_; }
+  int siteSizeX() const { return siteSizeX_; }
+  int siteSizeY() const { return siteSizeY_; }
 
-  int hpwl();
-  void printInfo();
+  int hpwl() const;
+  void printInfo() const;
 
 private:
   odb::dbDatabase* db_;
@@ -366,9 +363,13 @@ private:
   BinGrid binGrid_;
   Die die_;
 
-  std::vector<Instance> insts_;
-  std::vector<Pin> pins_;
-  std::vector<Net> nets_;
+  std::vector<Instance> instStor_;
+  std::vector<Pin> pinStor_;
+  std::vector<Net> netStor_;
+
+  std::vector<Instance*> insts_;
+  std::vector<Pin*> pins_;
+  std::vector<Net*> nets_;
 
   std::unordered_map<odb::dbInst*, Instance*> instMap_;
   std::unordered_map<void*, Pin*> pinMap_;

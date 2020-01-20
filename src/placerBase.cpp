@@ -61,7 +61,7 @@ Instance::~Instance() {
 }
 
 bool 
-Instance::isFixed() {
+Instance::isFixed() const {
   // dummy instance is always fixed
   if( isDummy() ) {
     return true;
@@ -84,12 +84,12 @@ Instance::isFixed() {
 }
 
 bool
-Instance::isInstance() {
+Instance::isInstance() const {
   return (inst_ != nullptr);
 }
 
 bool
-Instance::isDummy() {
+Instance::isDummy() const {
   return (inst_ == nullptr);
 }
 
@@ -141,42 +141,42 @@ Instance::dbSetCenterLocation(int x, int y) {
 
 
 int
-Instance::lx() {
+Instance::lx() const {
   return lx_;
 }
 
 int
-Instance::ly() {
+Instance::ly() const {
   return ly_; 
 }
 
 int
-Instance::ux() {
+Instance::ux() const {
   return ux_; 
 }
 
 int
-Instance::uy() {
+Instance::uy() const {
   return uy_; 
 }
 
 int
-Instance::cx() {
+Instance::cx() const {
   return (lx_ + ux_)/2; 
 }
 
 int
-Instance::cy() {
+Instance::cy() const {
   return (ly_ + uy_)/2; 
 }
 
 int
-Instance::dx() {
+Instance::dx() const {
   return (ux_ - lx_);
 }
 
 int
-Instance::dy() {
+Instance::dy() const {
   return (uy_ - ly_);
 }
 
@@ -256,58 +256,58 @@ void Pin::unsetMaxPinY() {
   maxPinYField_ = 0; 
 }
 
-bool Pin::isITerm() {
+bool Pin::isITerm() const {
   return (iTermField_ == 1);
 }
 
-bool Pin::isBTerm() {
+bool Pin::isBTerm() const {
   return (bTermField_ == 1);
 }
 
-bool Pin::isMinPinX() {
+bool Pin::isMinPinX() const {
   return (minPinXField_ == 1);
 }
 
-bool Pin::isMinPinY() {
+bool Pin::isMinPinY() const {
   return (minPinYField_ == 1);
 }
 
-bool Pin::isMaxPinX() {
+bool Pin::isMaxPinX() const {
   return (maxPinXField_ == 1);
 }
 
-bool Pin::isMaxPinY() {
+bool Pin::isMaxPinY() const {
   return (maxPinYField_ == 1);
 }
 
-int Pin::lx() {
+int Pin::lx() const {
   return lx_;
 }
 
-int Pin::ly() {
+int Pin::ly() const {
   return ly_;
 }
 
-int Pin::ux() {
+int Pin::ux() const {
   return lx_ + offsetUx_;
 }
 
-int Pin::uy() {
+int Pin::uy() const {
   return ly_ + offsetUy_;
 }
 
-int Pin::cx() {
+int Pin::cx() const {
   return lx_ + (offsetLx_ + offsetUx_)/2; 
 }
 
-int Pin::cy() {
+int Pin::cy() const {
   return ly_ + (offsetLy_ + offsetUy_)/2;
 }
 
-odb::dbITerm* Pin::dbITerm() {
+odb::dbITerm* Pin::dbITerm() const {
   return (isITerm())? (odb::dbITerm*) term_ : nullptr;
 }
-odb::dbBTerm* Pin::dbBTerm() {
+odb::dbBTerm* Pin::dbBTerm() const {
   return (isBTerm())? (odb::dbBTerm*) term_ : nullptr;
 }
 
@@ -387,7 +387,7 @@ void Pin::updateLocation(odb::dbBTerm* bTerm) {
 }
 
 void 
-Pin::updateLocation(Instance* inst) {
+Pin::updateLocation(const Instance* inst) {
   lx_ = inst->lx() + offsetLx_;
   ly_ = inst->ly() + offsetLy_; 
 }
@@ -422,31 +422,31 @@ Net::~Net() {
   lx_ = ly_ = ux_ = uy_ = 0;
 }
 
-int Net::lx() {
+int Net::lx() const {
   return lx_;
 }
 
-int Net::ly() {
+int Net::ly() const {
   return ly_;
 }
 
-int Net::ux() {
+int Net::ux() const {
   return ux_;
 }
 
-int Net::uy() {
+int Net::uy() const {
   return uy_;
 }
 
-int Net::cx() {
+int Net::cx() const {
   return (lx_ + ux_)/2;
 }
 
-int Net::cy() {
+int Net::cy() const {
   return (ly_ + uy_)/2;
 }
 
-int Net::hpwl() {
+int Net::hpwl() const {
   return (ux_-lx_) + (uy_-ly_);
 }
 
@@ -478,6 +478,10 @@ void Net::updateBox() {
 
 void Net::addPin(Pin* pin) {
   pins_.push_back(pin);
+}
+
+odb::dbSigType Net::getSigType() const { 
+  return net_->getSigType();
 }
 
 ////////////////////////////////////////////////////////
@@ -515,22 +519,22 @@ Die::setCoreBox(odb::adsRect* coreRect) {
 }
 
 int
-Die::dieCx() { 
+Die::dieCx() const { 
   return (dieLx_ + dieUx_)/2;
 }
 
 int
-Die::dieCy() { 
+Die::dieCy() const { 
   return (dieLy_ + dieUy_)/2;
 }
 
 int
-Die::coreCx() {
+Die::coreCx() const {
   return (coreLx_ + coreUx_)/2;
 }
 
 int
-Die::coreCy() {
+Die::coreCy() const {
   return (coreLy_ + coreUy_)/2;
 }
 
@@ -559,40 +563,40 @@ Bin::~Bin() {
 }
 
 int 
-Bin::lx() {
+Bin::lx() const {
   return lx_;
 }
 int
-Bin::ly() { 
+Bin::ly() const { 
   return ly_;
 }
 
 int
-Bin::ux() { 
+Bin::ux() const { 
   return ux_;
 }
 
 int
-Bin::uy() { 
+Bin::uy() const { 
   return uy_;
 }
 
 int
-Bin::cx() { 
+Bin::cx() const { 
   return (ux_ - lx_)/2;
 }
 
 int
-Bin::cy() { 
+Bin::cy() const { 
   return (uy_ - ly_)/2;
 }
 
 int
-Bin::dx() { 
+Bin::dx() const { 
   return (ux_ - lx_);
 } 
 int
-Bin::dy() { 
+Bin::dy() const { 
   return (uy_ - ly_);
 }
 
@@ -612,17 +616,17 @@ Bin::fillerArea() {
 }
 
 float
-Bin::phi() {
+Bin::phi() const {
   return phi_;
 }
 
 float
-Bin::density() {
+Bin::density() const {
   return density_;
 }
 
 float
-Bin::electroForce() {
+Bin::electroForce() const {
   return electroForce_;
 }
 
@@ -691,40 +695,40 @@ BinGrid::setBinCntY(int binCntY) {
 
 
 int
-BinGrid::lx() {
+BinGrid::lx() const {
   return lx_;
 }
 int
-BinGrid::ly() { 
+BinGrid::ly() const { 
   return ly_;
 }
 
 int
-BinGrid::ux() { 
+BinGrid::ux() const { 
   return ux_;
 }
 
 int
-BinGrid::uy() { 
+BinGrid::uy() const { 
   return uy_;
 }
 
 int
-BinGrid::cx() { 
+BinGrid::cx() const { 
   return (ux_ - lx_)/2;
 }
 
 int
-BinGrid::cy() { 
+BinGrid::cy() const { 
   return (uy_ - ly_)/2;
 }
 
 int
-BinGrid::dx() { 
+BinGrid::dx() const { 
   return (ux_ - lx_);
 } 
 int
-BinGrid::dy() { 
+BinGrid::dy() const { 
   return (uy_ - ly_);
 }
 
@@ -872,17 +876,19 @@ PlacerBase::init() {
   siteSizeY_ = firstRow->getSite()->getHeight();
   
   // insts fill with real instances
-  insts_.reserve(insts.size());
+  instStor_.reserve(insts.size());
   for(dbInst* inst : insts) {
     Instance myInst(inst);
-    insts_.push_back( myInst );
+    instStor_.push_back( myInst );
   }
 
   // insts fill with fake instances (fragmented row)
   initInstsForFragmentedRow();
 
+
   // init inst ptrs and areas
-  for(auto& inst : insts_) {
+  insts_.reserve(instStor_.size());
+  for(auto& inst : instStor_) {
     if(inst.isInstance()) {
       if(inst.isFixed()) {
         fixedInsts_.push_back(&inst); 
@@ -900,34 +906,35 @@ PlacerBase::init() {
       nonPlaceInsts_.push_back(&inst);
       nonPlaceInstsArea_ += inst.dx() * inst.dy();
     }
+    insts_.push_back(&inst);
   }
 
   // pins fill 
   dbSet<dbBTerm> bTerms = block->getBTerms();
   dbSet<dbITerm> iTerms = block->getITerms();
-  pins_.reserve(bTerms.size() + iTerms.size());
+  pinStor_.reserve(bTerms.size() + iTerms.size());
   for(dbBTerm* bTerm : bTerms) {
     Pin myPin(bTerm);
-    pins_.push_back( myPin );
-    pinMap_[(void*)bTerm] = &pins_[pins_.size()-1];
+    pinStor_.push_back( myPin );
+    pinMap_[(void*)bTerm] = &pinStor_[pinStor_.size()-1];
   }
   for(dbITerm* iTerm : iTerms) {
     Pin myPin(iTerm);
-    pins_.push_back( myPin );
-    pinMap_[(void*)iTerm] = &pins_[pins_.size()-1];
+    pinStor_.push_back( myPin );
+    pinMap_[(void*)iTerm] = &pinStor_[pinStor_.size()-1];
   }
 
   // nets fill
   dbSet<dbNet> nets = block->getNets();
-  nets_.reserve(nets.size());
+  netStor_.reserve(nets.size());
   for(dbNet* net : nets) {
     Net myNet(net);
-    nets_.push_back( myNet );
-    netMap_[net] = &nets_[nets_.size()-1];
+    netStor_.push_back( myNet );
+    netMap_[net] = &netStor_[netStor_.size()-1];
   }
 
-  // insts_' pins_ fill
-  for(auto& inst : insts_) {
+  // instStor_'s pins_ fill
+  for(auto& inst : instStor_ ) {
     if( !inst.isInstance() ) {
       continue;
     }
@@ -937,7 +944,8 @@ PlacerBase::init() {
   }
 
   // pins' net and instance fill 
-  for(auto& pin : pins_) {
+  pins_.reserve(pinStor_.size());
+  for(auto& pin : pinStor_) {
     if( pin.isITerm() ) {
       pin.setInstance( dbToPlace( pin.dbITerm()->getInst() ) );
       pin.setNet( dbToPlace( pin.dbITerm()->getNet() ) );
@@ -945,16 +953,19 @@ PlacerBase::init() {
     else if( pin.isBTerm() ) {
       pin.setNet( dbToPlace( pin.dbBTerm()->getNet() ) );
     }
+    pins_.push_back(&pin);
   }
  
   //nets' pin update
-  for(auto& net : nets_) {
+  nets_.reserve(netStor_.size());
+  for(auto& net : netStor_) {
     for(dbITerm* iTerm : net.dbNet()->getITerms()) {
       net.addPin( dbToPlace( iTerm ) );
     }
     for(dbBTerm* bTerm : net.dbNet()->getBTerms()) {
       net.addPin( dbToPlace( bTerm ) );
     }
+    nets_.push_back(&net);
   }
 
   printInfo();
@@ -1039,7 +1050,7 @@ PlacerBase::initInstsForFragmentedRow() {
             die_.coreLy() + siteSizeY_ * j, 
             die_.coreLx() + siteSizeX_ * endX,
             die_.coreLy() + siteSizeY_ * (j+1));
-        insts_.push_back( myInst );
+        instStor_.push_back( myInst );
       }
     }
   }
@@ -1048,55 +1059,61 @@ PlacerBase::initInstsForFragmentedRow() {
 void
 PlacerBase::clear() {
   db_ = nullptr;
-  insts_.clear();
+  instStor_.clear();
+  pinStor_.clear();
+  netStor_.clear();
+
   pins_.clear();
   nets_.clear();
+  insts_.clear();
+
   instMap_.clear();
   pinMap_.clear();
   netMap_.clear();
   
   placeInsts_.clear();
   fixedInsts_.clear();
+  nonPlaceInsts_.clear();
 }
 
 int 
-PlacerBase::hpwl() {
+PlacerBase::hpwl() const {
   int hpwl = 0;
   for(auto& net : nets_) {
-    net.updateBox();
-    hpwl += net.hpwl();
+    net->updateBox();
+    hpwl += net->hpwl();
   }
   return hpwl;
 }
 
 Instance* 
-PlacerBase::dbToPlace(odb::dbInst* inst) {
+PlacerBase::dbToPlace(odb::dbInst* inst) const {
   auto instPtr = instMap_.find(inst);
   return (instPtr == instMap_.end())? nullptr : instPtr->second;
 }
 
 Pin* 
-PlacerBase::dbToPlace(odb::dbITerm* term) {
+PlacerBase::dbToPlace(odb::dbITerm* term) const {
   auto pinPtr = pinMap_.find((void*)term);
   return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
 }
 
 Pin* 
-PlacerBase::dbToPlace(odb::dbBTerm* term) {
+PlacerBase::dbToPlace(odb::dbBTerm* term) const {
   auto pinPtr = pinMap_.find((void*)term);
   return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
 }
 
 Net* 
-PlacerBase::dbToPlace(odb::dbNet* net) {
+PlacerBase::dbToPlace(odb::dbNet* net) const {
   auto netPtr = netMap_.find(net);
   return (netPtr == netMap_.end())? nullptr : netPtr->second;
 }
 
 void 
-PlacerBase::printInfo() { 
+PlacerBase::printInfo() const { 
   cout << "Design Info" << endl;
-  cout << "Instances      : " << insts_.size() << endl;
+  cout << "Instances      : " << instStor_.size() << endl;
   cout << "PlaceInstances : " << placeInsts_.size() << endl;
   cout << "FixedInstances : " << fixedInsts_.size() << endl;
   cout << "DummyInstances : " << dummyInsts_.size() << endl;
@@ -1107,11 +1124,11 @@ PlacerBase::printInfo() {
   int sumFanout = 0;
   dbNet* maxFanoutNet = nullptr;
   for(auto& net : nets_) {
-    if( maxFanout < (int)net.pins().size() ) {
-      maxFanout = (int)net.pins().size();
-      maxFanoutNet = net.dbNet();
+    if( maxFanout < (int)net->pins().size() ) {
+      maxFanout = (int)net->pins().size();
+      maxFanoutNet = net->dbNet();
     }
-    sumFanout += (int)net.pins().size();
+    sumFanout += (int)net->pins().size();
   }
   cout << "MaxFanout      : " << maxFanout << endl;
   cout << "MaxFanoutNet   : " 

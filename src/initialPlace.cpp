@@ -85,9 +85,9 @@ void InitialPlace::placeInstsCenter() {
   const int centerY = pb_->die().coreCy();
 
   for(auto& inst: pb_->insts()) {
-    inst.setCenterLocation(centerX, centerY);
-    for(auto& pin: inst.pins()) {
-      pin->updateLocation(&inst);
+    inst->setCenterLocation(centerX, centerY);
+    for(auto& pin: inst->pins()) {
+      pin->updateLocation(inst);
     }
   }
 }
@@ -95,7 +95,7 @@ void InitialPlace::placeInstsCenter() {
 void InitialPlace::setPlaceInstExtId() {
   // clear ExtId for all instances
   for(auto& inst : pb_->insts()) {
-    inst.setExtId(INT_MAX);
+    inst->setExtId(INT_MAX);
   }
   // set index only with place-able instances
   for(auto& inst : pb_->placeInsts()) {
@@ -106,10 +106,10 @@ void InitialPlace::setPlaceInstExtId() {
 void InitialPlace::updatePinInfo() {
   // clear all MinMax attributes
   for(auto& pin : pb_->pins()) {
-    pin.unsetMinPinX();
-    pin.unsetMinPinY();
-    pin.unsetMaxPinX();
-    pin.unsetMaxPinY();
+    pin->unsetMinPinX();
+    pin->unsetMinPinY();
+    pin->unsetMaxPinX();
+    pin->unsetMaxPinY();
   }
 
   for(auto& net : pb_->nets()) {
@@ -119,7 +119,7 @@ void InitialPlace::updatePinInfo() {
     int ux = INT_MIN, uy = INT_MIN;
 
     // Mark B2B info on Pin structures
-    for(auto& pin : net.pins()) {
+    for(auto& pin : net->pins()) {
       if( pinMinX ) {
         if( lx > pin->cx() ) {
           lx = pinMinX->cx();
@@ -230,24 +230,24 @@ void InitialPlace::createSparseMatrix() {
   for(auto& net : pb_->nets()) {
 
     // skip for small nets.
-    if( net.pins().size() <= 1 ) {
+    if( net->pins().size() <= 1 ) {
       continue;
     }
 
-    float netWeight = 1.0 / (net.pins().size() - 1);
+    float netWeight = 1.0 / (net->pins().size() - 1);
     //cout << "net: " << net.net()->getConstName() << endl;
 
     // foreach two pins in single nets.
-    for(auto& pin1 : net.pins()) {
-      int pinIdx1 = &pin1 - &(net.pins()[0]);
-      for(auto& pin2 : net.pins()) {
-        int pinIdx2 = &pin2 - &(net.pins()[0]);
+    for(auto& pin1 : net->pins()) {
+      int pinIdx1 = &pin1 - &(net->pins()[0]);
+      for(auto& pin2 : net->pins()) {
+        int pinIdx2 = &pin2 - &(net->pins()[0]);
 
         // 
         // will compare two pins "only once."
         //
-        if( pinIdx1 >= pinIdx2 ) {
-          continue;
+        if( pinIdx1 < pinIdx2 ) {
+          break;
         }
 
         // no need to fill in when instance is same
