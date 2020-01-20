@@ -122,7 +122,7 @@ void InitialPlace::updatePinInfo() {
     for(auto& pin : net->pins()) {
       if( pinMinX ) {
         if( lx > pin->cx() ) {
-          lx = pinMinX->cx();
+          lx = pin->cx();
           pinMinX->unsetMinPinX();
           pinMinX = pin; 
           pinMinX->setMinPinX();
@@ -136,7 +136,7 @@ void InitialPlace::updatePinInfo() {
       
       if( pinMaxX ) {
         if( ux < pin->cx() ) {
-          ux = pinMaxX->cx();
+          ux = pin->cx();
           pinMaxX->unsetMaxPinX();
           pinMaxX = pin; 
           pinMaxX->setMaxPinX();
@@ -150,7 +150,7 @@ void InitialPlace::updatePinInfo() {
 
       if( pinMinY ) {
         if( ly > pin->cy() ) {
-          ly = pinMinY->cy();
+          ly = pin->cy();
           pinMinY->unsetMinPinY();
           pinMinY = pin; 
           pinMinY->setMinPinY();
@@ -164,7 +164,7 @@ void InitialPlace::updatePinInfo() {
       
       if( pinMaxY ) {
         if( uy < pin->cy() ) {
-          uy = pinMaxY->cy();
+          uy = pin->cy();
           pinMaxY->unsetMaxPinY();
           pinMaxY = pin; 
           pinMaxY->setMaxPinY();
