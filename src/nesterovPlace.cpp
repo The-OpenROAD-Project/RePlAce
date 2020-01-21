@@ -2,12 +2,13 @@
 
 namespace replace {
 
-NesterovPlace::NesterovPlace() : pb_(nullptr) {}
-NesterovPlace::NesterovPlace(PlacerBase* placerBase) 
-: pb_(placerBase) {}
+NesterovPlace::NesterovPlace() : pb_(nullptr), nb_(nullptr) {}
+NesterovPlace::NesterovPlace(PlacerBase* placerBase, NesterovBase* nesterovBase) 
+: pb_(placerBase), nb_(nesterovBase) {}
 
 NesterovPlace::~NesterovPlace() {
   pb_ = nullptr;
+  nb_ = nullptr;
 }
 
 void

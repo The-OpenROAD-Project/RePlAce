@@ -10,9 +10,11 @@ namespace sta {
 
 namespace replace {
 
+class PlacerBase;
+class NesterovBase;
+
 class InitialPlace;
 class NesterovPlace;
-class PlacerBase;
 
 class Replace
 {
@@ -54,9 +56,11 @@ class Replace
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
 
+    PlacerBase* pb_;
+    NesterovBase* nb_;
+
     InitialPlace* ip_;
     NesterovPlace* np_;
-    PlacerBase* pb_;
 
     int initialPlaceMaxIter_;
     int initialPlaceMinDiffLength_;

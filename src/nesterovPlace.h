@@ -6,18 +6,22 @@ namespace replace
 
 class PlacerBase;
 class Instance;
+class NesterovBase;
 
 class NesterovPlace {
 public:
   NesterovPlace();
-  NesterovPlace(PlacerBase* placerBase);
+  NesterovPlace(PlacerBase* placerBase, NesterovBase* nesterovBase);
   ~NesterovPlace();
 
-  void init();
   void doNesterovPlace();
 
 private:
   PlacerBase* pb_;
+  NesterovBase* nb_;
+  
+  void init();
+  void reset();
 
 };
 }

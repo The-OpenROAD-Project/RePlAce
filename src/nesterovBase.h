@@ -213,9 +213,6 @@ class NesterovBase {
     NesterovBase();
     NesterovBase(PlacerBase* pb);
     ~NesterovBase();
-    
-    void init();
-    void reset();
 
     const std::vector<GCell*> & gCells() const { return gCellsPtr_; }
     const std::vector<GCell*> & gCellInsts() const { return gCellInsts_; }
@@ -227,6 +224,7 @@ class NesterovBase {
 
   private:
     PlacerBase* pb_;
+    
     std::vector<GCell> gCells_;
     std::vector<GNet> gNets_;
     std::vector<GPin> gPins_;
@@ -238,6 +236,8 @@ class NesterovBase {
     std::vector<GNet*> gNetsPtr_;
     std::vector<GPin*> gPinsPtr_;
 
+    void init();
+    void reset();
 };
 
 }

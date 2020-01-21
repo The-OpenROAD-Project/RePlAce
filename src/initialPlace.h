@@ -27,7 +27,6 @@ class InitialPlace {
     InitialPlace(PlacerBase* placerBase);
     ~InitialPlace();
     
-    void reset();
     void setInitialPlaceVars(InitialPlaceVars initialPlaceVars);
     void doBicgstabPlace();
 
@@ -60,6 +59,7 @@ class InitialPlace {
     void updatePinInfo();
     void createSparseMatrix();
     void updateCoordi();
+    void reset();
 };
 
 }

@@ -2,6 +2,7 @@
 #include "initialPlace.h"
 #include "nesterovPlace.h"
 #include "placerBase.h"
+#include "nesterovBase.h"
 #include <iostream>
 
 namespace replace {
@@ -10,8 +11,9 @@ using namespace std;
 
 Replace::Replace()
   : db_(nullptr), 
-  sta_(nullptr), ip_(nullptr), 
-  np_(nullptr), pb_(nullptr),
+  sta_(nullptr), 
+  pb_(nullptr), nb_(nullptr), 
+  ip_(nullptr), np_(nullptr),
   initialPlaceMaxIter_(20), 
   initialPlaceMinDiffLength_(1500),
   initialPlaceMaxSolverIter_(100),
@@ -32,7 +34,8 @@ Replace::~Replace() {
 void Replace::init() {
   pb_ = new PlacerBase(db_);
   ip_ = new InitialPlace(pb_);
-  np_ = new NesterovPlace(pb_);
+  nb_ = new NesterovBase(pb_);
+  np_ = new NesterovPlace(pb_, nb_);
 }
 
 void Replace::reset() {

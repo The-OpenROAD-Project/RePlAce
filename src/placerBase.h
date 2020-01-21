@@ -325,9 +325,6 @@ public:
   PlacerBase(odb::dbDatabase* db);
   ~PlacerBase();
 
-  void init();
-  void reset();
-
   const std::vector<Instance*>& insts() const { return insts_; }
   const std::vector<Pin*>& pins() const { return pins_; }
   const std::vector<Net*>& nets() const { return nets_; }
@@ -386,8 +383,11 @@ private:
   uint64_t placeInstsArea_;
   uint64_t nonPlaceInstsArea_;
   
+  void init();
   void initBinGrid();
   void initInstsForFragmentedRow();
+  
+  void reset();
 };
 
 }

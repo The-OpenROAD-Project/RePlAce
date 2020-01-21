@@ -12,7 +12,7 @@ static odb::adsRect
 getCoreRectFromDb(dbSet<odb::dbRow> &rows);
 
 static int 
-fastModule(const int input, const int ceil);
+fastModulo(const int input, const int ceil);
 
 static std::pair<int, int>
 getMinMaxIdx(int ll, int uu, int coreLL, 
@@ -100,6 +100,11 @@ Instance::setLocation(int x, int y) {
 
   lx_ = x; 
   ly_ = y; 
+
+  // pins update
+  for(auto& pin : pins_) {
+    pin->updateLocation(this);
+  }
 }
 
 void
@@ -110,6 +115,11 @@ Instance::setCenterLocation(int x, int y) {
   ly_ = y - halfY;
   ux_ = x + halfX;
   uy_ = y + halfY;
+
+  // pins update
+  for(auto& pin : pins_) {
+    pin->updateLocation(this);
+  }
 }
 
 void
@@ -827,7 +837,7 @@ std::pair<int, int>
 BinGrid::getMinMaxIdxX(GCell* gcell) {
   int lowerIdx = (gcell->lx() - lx())/binSizeX_;
   int upperIdx = 
-   ( fastModule((gcell->ux() - lx()), binSizeX_) == 0)? 
+   ( fastModulo((gcell->ux() - lx()), binSizeX_) == 0)? 
    (gcell->ux() - lx()) / binSizeX_ : (gcell->ux()-lx())/binSizeX_ + 1;
   return std::make_pair(lowerIdx, upperIdx);
 }
@@ -836,7 +846,7 @@ std::pair<int, int>
 BinGrid::getMinMaxIdxY(GCell* gcell) {
   int lowerIdx = (gcell->ly() - ly())/binSizeY_;
   int upperIdx =
-   ( fastModule((gcell->uy() - ly()), binSizeY_) == 0)? 
+   ( fastModulo((gcell->uy() - ly()), binSizeY_) == 0)? 
    (gcell->uy() - ly()) / binSizeY_ : (gcell->uy()-ly())/binSizeY_ + 1;
   return std::make_pair(lowerIdx, upperIdx);
 }
@@ -1189,7 +1199,7 @@ getCoreRectFromDb(dbSet<odb::dbRow> &rows) {
 
 // https://stackoverflow.com/questions/33333363/built-in-mod-vs-custom-mod-function-improve-the-performance-of-modulus-op
 static int 
-fastModule(const int input, const int ceil) {
+fastModulo(const int input, const int ceil) {
   return input >= ceil? input % ceil : input;
 }
 
@@ -1197,7 +1207,7 @@ static std::pair<int, int>
 getMinMaxIdx(int ll, int uu, int coreLL, int siteSize) {
   int lowerIdx = (ll - coreLL)/siteSize;
   int upperIdx =
-   ( fastModule((uu - coreLL), siteSize) == 0)? 
+   ( fastModulo((uu - coreLL), siteSize) == 0)? 
    (uu - coreLL) / siteSize : (uu - coreLL)/siteSize + 1;
   return std::make_pair(lowerIdx, upperIdx);
 }
