@@ -3,6 +3,8 @@
 #include "nesterovBase.h"
 #include "placerBase.h"
 
+#include <algorithm>
+#include <iostream>
 
 namespace replace {
 
@@ -311,7 +313,7 @@ GPin::updateLocation(const GCell* gCell) {
 NesterovBase::NesterovBase()
   : pb_(nullptr) {}
 
-NesterovBase::NesterovBase(PlacerBase* pb)
+NesterovBase::NesterovBase(std::shared_ptr<PlacerBase> pb)
   : NesterovBase() {
   pb_ = pb;
   init();
@@ -323,7 +325,6 @@ NesterovBase::~NesterovBase() {
 
 void
 NesterovBase::init() {
-
   // gCellStor init
   gCellStor_.reserve(pb_->insts().size());
   for(auto& inst: pb_->insts()) {
@@ -345,10 +346,55 @@ NesterovBase::init() {
     gPinStor_.push_back(myGPin);
   }
 
-  
-
+  // update gFillerCells
+  initFillerGCells();
 
 }
+
+
+// virtual filler GCells
+void
+NesterovBase::initFillerGCells() {
+  // extract average dx/dy/area in range (10%, 90%)
+  vector<uint32_t> areaStor;
+  vector<int> dxStor;
+  vector<int> dyStor;
+
+  areaStor.reserve(pb_->placeInsts().size());
+  for(auto& placeInst : pb_->placeInsts()) {
+    areaStor.push_back(placeInst->dx() * placeInst->dy());
+    dxStor.push_back(placeInst->dx());
+    dyStor.push_back(placeInst->dy());
+  }
+  
+  // sort
+  std::sort(areaStor.begin(), areaStor.end());
+  std::sort(dxStor.begin(), dxStor.end());
+  std::sort(dyStor.begin(), dyStor.end());
+
+  // average from (10 - 90%) .
+  uint64_t areaSum = 0;
+  uint32_t dxSum = 0, dySum = 0;
+
+  int minIdx = areaStor.size()*0.10;
+  int maxIdx = areaStor.size()*0.90;
+  for(int i=minIdx; i<maxIdx; i++) {
+    areaSum += areaStor[i];
+    dxSum += dxStor[i];
+    dySum += dyStor[i];
+  }
+
+  uint32_t avgCellArea = static_cast<uint32_t>(areaSum / (maxIdx - minIdx));
+  int avgDx = static_cast<int>(dxSum / (maxIdx - minIdx));
+  int avgDy = static_cast<int>(dySum / (maxIdx - minIdx));
+
+  cout << "Filler Size    : ( " 
+    << avgDx << ", " << avgDy << " )" << endl;
+
+//  uint64_t whiteSpaceArea =  
+
+}
+
 
 void
 NesterovBase::reset() { 

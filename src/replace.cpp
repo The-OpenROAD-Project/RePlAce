@@ -32,26 +32,12 @@ Replace::~Replace() {
 }
 
 void Replace::init() {
-  pb_ = new PlacerBase(db_);
-  ip_ = new InitialPlace(pb_);
-  nb_ = new NesterovBase(pb_);
-  np_ = new NesterovPlace(pb_, nb_);
 }
 
 void Replace::reset() {
   // two pointers should not be freed.
   db_ = nullptr;
   sta_ = nullptr;
-
-  // below objects were from replace
-  delete pb_;
-  pb_ = nullptr;
-
-  delete ip_;
-  ip_ = nullptr;
-
-  delete np_;
-  np_ = nullptr;
 
   initialPlaceMaxIter_ = 20;
   initialPlaceMinDiffLength_ = 1500;
@@ -76,9 +62,11 @@ void Replace::setSta(sta::dbSta* sta) {
   sta_ = sta;
 }
 void Replace::doInitialPlace() {
-  if( !pb_ || !ip_ || !np_ ) {
-    init();
-  }
+  std::shared_ptr<PlacerBase> pb(new PlacerBase(db_));
+  pb_ = pb;
+
+  std::unique_ptr<InitialPlace> ip(new InitialPlace(pb_));
+  ip_ = std::move(ip);
 
   InitialPlaceVars ipVars;
   ipVars.maxIter = initialPlaceMaxIter_;
@@ -92,11 +80,18 @@ void Replace::doInitialPlace() {
 }
 
 void Replace::doNesterovPlace() {
-  if( !pb_ || !ip_ || !np_ ) {
-    init();
+  if( !pb_ ) {
+    std::shared_ptr<PlacerBase> pb(new PlacerBase(db_));
+    pb_ = pb;
   }
-  np_->doNesterovPlace();
 
+  std::shared_ptr<NesterovBase> nb(new NesterovBase(pb_));
+  nb_ = nb;
+
+  std::unique_ptr<NesterovPlace> np(new NesterovPlace(pb_, nb_));
+  np_ = std::move(np);
+
+  np_->doNesterovPlace();
 }
 
 

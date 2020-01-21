@@ -1,6 +1,8 @@
 #ifndef __REPLACE_HEADER__
 #define __REPLACE_HEADER__
 
+#include <memory>
+
 namespace odb {
   class dbDatabase;
 }
@@ -56,11 +58,11 @@ class Replace
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
 
-    PlacerBase* pb_;
-    NesterovBase* nb_;
+    std::shared_ptr<PlacerBase> pb_;
+    std::shared_ptr<NesterovBase> nb_;
 
-    InitialPlace* ip_;
-    NesterovPlace* np_;
+    std::unique_ptr<InitialPlace> ip_;
+    std::unique_ptr<NesterovPlace> np_;
 
     int initialPlaceMaxIter_;
     int initialPlaceMinDiffLength_;

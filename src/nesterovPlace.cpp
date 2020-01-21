@@ -2,14 +2,15 @@
 
 namespace replace {
 
-NesterovPlace::NesterovPlace() : pb_(nullptr), nb_(nullptr) {}
-NesterovPlace::NesterovPlace(PlacerBase* placerBase, NesterovBase* nesterovBase) 
-: pb_(placerBase), nb_(nesterovBase) {}
+NesterovPlace::NesterovPlace() 
+  : pb_(nullptr), nb_(nullptr) {}
 
-NesterovPlace::~NesterovPlace() {
-  pb_ = nullptr;
-  nb_ = nullptr;
-}
+NesterovPlace::NesterovPlace(
+    std::shared_ptr<PlacerBase> pb, 
+    std::shared_ptr<NesterovBase> nb) 
+: pb_(pb), nb_(nb) {}
+
+NesterovPlace::~NesterovPlace() {}
 
 void
 NesterovPlace::doNesterovPlace() {

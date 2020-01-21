@@ -253,6 +253,9 @@ public:
   int hpwl() const;
   void printInfo() const;
 
+  uint64_t placeInstsArea() const { return placeInstsArea_; }
+  uint64_t nonPlaceInstsArea() const { return nonPlaceInstsArea_; }
+
 private:
   odb::dbDatabase* db_;
 

@@ -2,6 +2,7 @@
 #define __NESTEROV_BASE__
 
 #include <vector>
+#include <memory>
 
 namespace replace {
 
@@ -314,7 +315,7 @@ private:
 class NesterovBase {
   public:
     NesterovBase();
-    NesterovBase(PlacerBase* pb);
+    NesterovBase(std::shared_ptr<PlacerBase> pb);
     ~NesterovBase();
 
     const std::vector<GCell*> & gCells() const { return gCells_; }
@@ -325,8 +326,9 @@ class NesterovBase {
     const std::vector<GPin*> & gPins() const { return gPins_; }
 
 
+
   private:
-    PlacerBase* pb_;
+    std::shared_ptr<PlacerBase> pb_;
 
     BinGrid bg_;
 
@@ -342,6 +344,7 @@ class NesterovBase {
     std::vector<GPin*> gPins_;
 
     void init();
+    void initFillerGCells();
     void initBinGrid();
 
     void reset();

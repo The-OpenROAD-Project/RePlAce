@@ -28,8 +28,8 @@ void InitialPlaceVars::reset() {
 InitialPlace::InitialPlace()
 : pb_(nullptr), initialPlaceVars_() {};
 
-InitialPlace::InitialPlace(PlacerBase* placerBase)
-: pb_(placerBase), initialPlaceVars_() {};
+InitialPlace::InitialPlace(std::shared_ptr<PlacerBase> pb)
+: pb_(pb), initialPlaceVars_() {};
 
 InitialPlace::~InitialPlace() {
   reset();
