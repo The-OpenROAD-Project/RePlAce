@@ -9,17 +9,23 @@ namespace replace {
 using namespace std;
 using namespace odb;
 
-GCell::GCell() :
-  lx_(0), ly_(0), ux_(0), uy_(0),
+////////////////////////////////////////////////
+// GCell 
+
+GCell::GCell() 
+  : lx_(0), ly_(0), ux_(0), uy_(0),
   dLx_(0), dLy_(0), dUx_(0), dUy_(0),
-  densityScale_(0), gradientX_(0), gradientY_(0) {}
+  densityScale_(0), 
+  gradientX_(0), gradientY_(0) {}
 
 
-GCell::GCell(Instance* inst) : GCell() {
+GCell::GCell(Instance* inst) 
+  : GCell() {
   setInstance(inst);
 }
 
-GCell::GCell(std::vector<Instance*>& insts) : GCell() {
+GCell::GCell(std::vector<Instance*>& insts) 
+  : GCell() {
   setClusteredInstance(insts);
 }
 
@@ -213,6 +219,8 @@ GCell::isFiller() const {
   return (insts_.size() == 0);
 }
 
+////////////////////////////////////////////////
+// GNet
 
 GNet::GNet()
   : lx_(0), ly_(0), ux_(0), uy_(0),
@@ -250,6 +258,8 @@ GNet::addGPin(GPin* gPin) {
   gPins_.push_back(gPin);
 }
 
+////////////////////////////////////////////////
+// GPin 
 
 GPin::GPin()
   : gCell_(nullptr), gNet_(nullptr),
@@ -261,6 +271,10 @@ GPin::GPin()
 GPin::GPin(Pin* pin)
   : GPin() {
   pins_.push_back(pin);
+  cx_ = pin->cx();
+  cy_ = pin->cy();
+  offsetCx_ = pin->offsetCx();
+  offsetCy_ = pin->offsetCy();
 }
 
 GPin::GPin(std::vector<Pin*> & pins) {
@@ -278,7 +292,20 @@ GPin::pin() const {
   return *pins_.begin();
 }
 
+void
+GPin::setCenterLocation(int cx, int cy) {
 
+}
+
+void
+GPin::updateLocation(GCell* gCell) {
+  cx_ = gCell->lx() + offsetCx_;
+  cy_ = gCell->ly() + offsetCy_;
+}
+
+
+////////////////////////////////////////////////
+// NesterovBase 
 
 NesterovBase::NesterovBase()
   : pb_(nullptr) {}

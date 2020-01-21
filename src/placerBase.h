@@ -108,14 +108,12 @@ public:
   void unsetMaxPinX();
   void unsetMaxPinY();
 
-  int lx() const;
-  int ly() const;
-  int ux() const;
-  int uy() const;
   int cx() const;
   int cy() const;
 
-  void updateLocation();
+  int offsetCx() const;
+  int offsetCy() const;
+
   void updateLocation(const Instance* inst);
 
   void setInstance(Instance* inst);
@@ -129,13 +127,17 @@ private:
   Instance* inst_;
   Net* net_;
 
-  int offsetLx_;
-  int offsetLy_;
-  int offsetUx_;
-  int offsetUy_;
-  int lx_;
-  int ly_;
-  
+  // pin center coordinate is enough
+  // Pins' placed location.
+  int cx_;
+  int cy_;
+
+  // offset coordinates inside instance.
+  // origin point is lower-left corner of instance.
+  // (e.g. (0,0) )
+  int offsetCx_;
+  int offsetCy_;
+
   unsigned char iTermField_:1;
   unsigned char bTermField_:1;
   unsigned char minPinXField_:1;
@@ -143,11 +145,8 @@ private:
   unsigned char maxPinXField_:1;
   unsigned char maxPinYField_:1;
 
-  void updateOffset();
-  void updateOffset(odb::dbITerm* iTerm);
-  void updateOffset(odb::dbBTerm* bTerm);
-  void updateLocation(odb::dbITerm* iTerm);
-  void updateLocation(odb::dbBTerm* bTerm);
+  void updateCoordi(odb::dbITerm* iTerm);
+  void updateCoordi(odb::dbBTerm* bTerm);
 };
 
 class Net {
@@ -329,7 +328,7 @@ public:
   const std::vector<Pin*>& pins() const { return pins_; }
   const std::vector<Net*>& nets() const { return nets_; }
 
-  // 
+  //
   // placeInsts : a real instance that need to be placed
   // fixedInsts : a real instance that is fixed (e.g. macros, tapcells)
   // dummyInsts : a fake instance that is for fragmented-row handling
@@ -356,7 +355,7 @@ public:
 
 private:
   odb::dbDatabase* db_;
-  
+
   BinGrid binGrid_;
   Die die_;
 
@@ -382,11 +381,11 @@ private:
 
   uint64_t placeInstsArea_;
   uint64_t nonPlaceInstsArea_;
-  
+
   void init();
   void initBinGrid();
   void initInstsForFragmentedRow();
-  
+
   void reset();
 };
 

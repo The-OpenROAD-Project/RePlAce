@@ -179,6 +179,9 @@ class GPin {
     bool hasPosExpSum() const { return (hasPosExpSum_ == 1); }
     bool hasNegExpSum() const { return (hasNegExpSum_ == 1); }
 
+    void setCenterLocation(int cx, int cy);
+    void updateLocation(GCell* gCell);
+
   private:
     GCell* gCell_;
     GNet* gNet_;

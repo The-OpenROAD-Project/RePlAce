@@ -205,9 +205,8 @@ Instance::setExtId(int extId) {
 
 Pin::Pin()
   : term_(nullptr), inst_(nullptr), net_(nullptr), 
-    offsetLx_(0), offsetLy_(0),
-    offsetUx_(0), offsetUy_(0),
-    lx_(0), ly_(0),
+    offsetCx_(0), offsetCy_(0),
+    cx_(0), cy_(0),
     iTermField_(0), bTermField_(0),
     minPinXField_(0), minPinYField_(0),
     maxPinXField_(0), maxPinYField_(0) {}
@@ -215,15 +214,13 @@ Pin::Pin()
 Pin::Pin(odb::dbITerm* iTerm): Pin() {
   setITerm();
   term_ = (void*)iTerm;
-  updateOffset(iTerm);
-  updateLocation(iTerm);
+  updateCoordi(iTerm);
 }
 
 Pin::Pin(odb::dbBTerm* bTerm): Pin() {
   setBTerm();
   term_ = (void*)bTerm;
-  updateOffset(bTerm);
-  updateLocation(bTerm);
+  updateCoordi(bTerm);
 }
 
 void Pin::setITerm() {
@@ -290,28 +287,20 @@ bool Pin::isMaxPinY() const {
   return (maxPinYField_ == 1);
 }
 
-int Pin::lx() const {
-  return lx_;
-}
-
-int Pin::ly() const {
-  return ly_;
-}
-
-int Pin::ux() const {
-  return lx_ + offsetUx_;
-}
-
-int Pin::uy() const {
-  return ly_ + offsetUy_;
-}
-
 int Pin::cx() const {
-  return lx_ + (offsetLx_ + offsetUx_)/2; 
+  return cx_; 
 }
 
 int Pin::cy() const {
-  return ly_ + (offsetLy_ + offsetUy_)/2;
+  return cy_;
+}
+
+int Pin::offsetCx() const { 
+  return offsetCx_; 
+}
+
+int Pin::offsetCy() const { 
+  return offsetCy_;
 }
 
 odb::dbITerm* Pin::dbITerm() const {
@@ -321,85 +310,90 @@ odb::dbBTerm* Pin::dbBTerm() const {
   return (isBTerm())? (odb::dbBTerm*) term_ : nullptr;
 }
 
-void Pin::updateOffset(odb::dbITerm* iTerm) {
-  offsetLx_ = INT_MAX;
-  offsetLy_ = INT_MAX;
-  offsetUx_ = INT_MIN;
-  offsetUy_ = INT_MIN;
+void Pin::updateCoordi(odb::dbITerm* iTerm) {
+  int offsetLx = INT_MAX;
+  int offsetLy = INT_MAX;
+  int offsetUx = INT_MIN;
+  int offsetUy = INT_MIN;
 
   for(dbMPin* mPin : iTerm->getMTerm()->getMPins()) {
     for(dbBox* box : mPin->getGeometry()) {
-      offsetLx_ = (offsetLx_ > box->xMin())? box->xMin() : offsetLx_;
-      offsetLy_ = (offsetLy_ > box->yMin())? box->yMin() : offsetLy_;
-      offsetUx_ = (offsetUx_ < box->xMax())? box->xMax() : offsetUx_;
-      offsetUy_ = (offsetUy_ < box->yMax())? box->yMax() : offsetUy_;
+      offsetLx = (offsetLx > box->xMin())? 
+        box->xMin() : offsetLx;
+      offsetLy = (offsetLy > box->yMin())? 
+        box->yMin() : offsetLy;
+      offsetUx = (offsetUx < box->xMax())? 
+        box->xMax() : offsetUx;
+      offsetUy = (offsetUy < box->yMax())? 
+        box->yMax() : offsetUy;
     } 
   }
 
-  // NOT FOUND
-  if( offsetLx_ == INT_MAX || offsetLy_ == INT_MAX || 
-      offsetUx_ == INT_MIN || offsetUy_ == INT_MIN ) {
-    offsetLx_ = iTerm->getInst()->getBBox()->xMin();
-    offsetLy_ = iTerm->getInst()->getBBox()->yMin();
-    offsetUx_ = iTerm->getInst()->getBBox()->xMax();
-    offsetUy_ = iTerm->getInst()->getBBox()->yMax();
+  int lx = iTerm->getInst()->getBBox()->xMin();
+  int ly = iTerm->getInst()->getBBox()->yMin();
+  int ux = iTerm->getInst()->getBBox()->xMax();
+  int uy = iTerm->getInst()->getBBox()->yMax();
+
+  // Pin SHAPE is NOT FOUND; 
+  // (may happen on OpenDB bug case)
+  if( offsetLx == INT_MAX || offsetLy == INT_MAX || 
+      offsetUx == INT_MIN || offsetUy == INT_MIN ) {
+    
+    // offset is center of instances
+    offsetCx_ = iTerm->getInst()->getBBox()->getDX()/2;
+    offsetCy_ = iTerm->getInst()->getBBox()->getDY()/2;
   }
+  // usual case
+  else {
+    // offset is Pin BBoxs' center
+    offsetCx_ = (offsetLx + offsetUx)/2;
+    offsetCy_ = (offsetLy + offsetUy)/2;
+  }
+
+  cx_ = lx + offsetCx_;
+  cy_ = ly + offsetCy_;
 }
 
 // 
 // for BTerm, offset* will hold bbox info.
 //
-void Pin::updateOffset(odb::dbBTerm* bTerm) {
-  offsetLx_ = INT_MAX;
-  offsetLy_ = INT_MAX;
-  offsetUx_ = INT_MIN;
-  offsetUy_ = INT_MIN;
+void Pin::updateCoordi(odb::dbBTerm* bTerm) {
+  int lx = INT_MAX;
+  int ly = INT_MAX;
+  int ux = INT_MIN;
+  int uy = INT_MIN;
 
   for(dbBPin* bPin : bTerm->getBPins()) {
-    offsetLx_ = (offsetLx_ > bPin->getBox()->xMin())? 
-      bPin->getBox()->xMin() : offsetLx_;
-    offsetLy_ = (offsetLy_ > bPin->getBox()->yMin())? 
-      bPin->getBox()->yMin() : offsetLy_;
-    offsetUx_ = (offsetUx_ < bPin->getBox()->xMax())? 
-      bPin->getBox()->xMax() : offsetUx_;
-    offsetUy_ = (offsetUy_ < bPin->getBox()->yMax())? 
-      bPin->getBox()->yMax() : offsetUy_;
+    lx = (lx > bPin->getBox()->xMin())? 
+      bPin->getBox()->xMin() : lx;
+    ly = (ly > bPin->getBox()->yMin())? 
+      bPin->getBox()->yMin() : ly;
+    ux = (ux < bPin->getBox()->xMax())? 
+      bPin->getBox()->xMax() : ux;
+    uy = (uy < bPin->getBox()->yMax())? 
+      bPin->getBox()->yMax() : uy;
   }
-  offsetUx_ = offsetUx_ - offsetLx_;
-  offsetUy_ = offsetUy_ - offsetLy_;
-  offsetLx_ = 0;
-  offsetLy_ = 0;
-}
 
-void Pin::updateLocation() {
-  // only ITerm can be updated. 
-  // BTerm is fixed on placer.
-  if( isITerm() ) {
-    updateLocation((odb::dbITerm*) term_);
+  if( lx == INT_MAX || ly == INT_MAX ||
+      ux == INT_MIN || uy == INT_MIN ) {
+    cout << "Error: " << bTerm->getConstName() 
+      << "I/O port is not placed!" << endl;
+    cout << "       Please Run ioPlacer to place I/O ports" << endl;
+    exit(1);
   }
-}
-void Pin::updateLocation(odb::dbITerm* iTerm) {
-  iTerm->getInst()->getLocation(lx_, ly_);
-  lx_ += offsetLx_;
-  ly_ += offsetLy_;
-}
 
-void Pin::updateLocation(odb::dbBTerm* bTerm) {
-  lx_ = INT_MAX;
-  ly_ = INT_MAX;  
+  // same with BoxSize/2 
+  offsetCx_ = (ux - lx)/2;
+  offsetCy_ = (uy - ly)/2;
 
-  for(dbBPin* bPin : bTerm->getBPins()) {
-    lx_ = (lx_ > bPin->getBox()->xMin())? 
-      bPin->getBox()->xMin() : lx_;
-    ly_ = (ly_> bPin->getBox()->yMin())? 
-      bPin->getBox()->yMin() : ly_;
-  }
+  cx_ = (lx + ux)/2;
+  cy_ = (ly + uy)/2;
 }
 
-void 
+void
 Pin::updateLocation(const Instance* inst) {
-  lx_ = inst->lx() + offsetLx_;
-  ly_ = inst->ly() + offsetLy_; 
+  cx_ = inst->lx() + offsetCx_;
+  cy_ = inst->ly() + offsetCy_;
 }
 
 void 
@@ -861,7 +855,9 @@ PlacerBase::PlacerBase()
   : db_(nullptr), siteSizeX_(0), siteSizeY_(0),
   placeInstsArea_(0), nonPlaceInstsArea_(0) {}
 
-PlacerBase::PlacerBase(odb::dbDatabase* db) : db_(db) {
+PlacerBase::PlacerBase(odb::dbDatabase* db)
+  : PlacerBase() {
+  db_ = db;
   init();
 }
 
