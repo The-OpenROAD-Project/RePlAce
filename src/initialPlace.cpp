@@ -87,9 +87,6 @@ void InitialPlace::placeInstsCenter() {
 
   for(auto& inst: pb_->insts()) {
     inst->setCenterLocation(centerX, centerY);
-    for(auto& pin: inst->pins()) {
-      pin->updateLocation(inst);
-    }
   }
 }
 
@@ -366,9 +363,6 @@ void InitialPlace::updateCoordi() {
     int idx = inst->extId();
     //cout << "extId: " << idx << endl;
     inst->dbSetCenterLocation( xcgX_(idx), ycgX_(idx) );
-    for(auto& pin: inst->pins()) {
-      pin->updateLocation(inst);
-    }
     //cout << "xcgX_(" << idx << "): " << xcgX_(idx) 
     //  << " ycgX_(" << idx << "): " << ycgX_(idx) << endl;
   }
