@@ -294,11 +294,12 @@ GPin::pin() const {
 
 void
 GPin::setCenterLocation(int cx, int cy) {
-
+  cx_ = cx;
+  cy_ = cy;
 }
 
 void
-GPin::updateLocation(GCell* gCell) {
+GPin::updateLocation(const GCell* gCell) {
   cx_ = gCell->lx() + offsetCx_;
   cy_ = gCell->ly() + offsetCy_;
 }
@@ -313,6 +314,7 @@ NesterovBase::NesterovBase()
 NesterovBase::NesterovBase(PlacerBase* pb)
   : NesterovBase() {
   pb_ = pb;
+  init();
 }
 
 NesterovBase::~NesterovBase() {
@@ -322,11 +324,35 @@ NesterovBase::~NesterovBase() {
 void
 NesterovBase::init() {
 
+  // gCellStor init
+  gCellStor_.reserve(pb_->insts().size());
+  for(auto& inst: pb_->insts()) {
+    GCell myGCell(inst); 
+    gCellStor_.push_back(myGCell);
+  }
+
+  // gNetStor init
+  gNetStor_.reserve(pb_->nets().size());
+  for(auto& net : pb_->nets()) {
+    GNet myGNet(net);
+    gNetStor_.push_back(myGNet);
+  }
+
+  // gPinStor init
+  gPinStor_.reserve(pb_->pins().size());
+  for(auto& pin : pb_->pins()) {
+    GPin myGPin(pin);
+    gPinStor_.push_back(myGPin);
+  }
+
+  
+
+
 }
 
 void
 NesterovBase::reset() { 
-
+  pb_ = nullptr;
 }
 
 

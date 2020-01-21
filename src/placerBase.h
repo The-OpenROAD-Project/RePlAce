@@ -41,7 +41,7 @@ public:
   // a instance that need to be moved.
   bool isInstance() const;
 
-  // Dummy is virtual instance to fill in 
+  // Dummy is virtual instance to fill in
   // empty fragmented row structures.
   // will have inst_ as nullptr
   bool isDummy() const;
@@ -218,106 +218,6 @@ private:
   int coreUy_;
 };
 
-class Bin {
-public:
-  Bin();
-  Bin(int lx, int ly, int ux, int uy);
-  ~Bin();
-
-  int lx() const;
-  int ly() const;
-  int ux() const;
-  int uy() const;
-  int cx() const;
-  int cy() const;
-  int dx() const;
-  int dy() const;
-
-  float phi() const;
-  float density() const;
-  float electroForce() const;
-
-  void setPhi(float phi);
-  void setDensity(float density);
-  void setElectroForce(float electroForce);
-
-protected:
-  uint32_t & nonPlaceArea();
-  uint32_t & placedArea();
-  uint32_t & fillerArea();
-
-private:
-  int lx_;
-  int ly_;
-  int ux_;
-  int uy_;
-
-  uint32_t nonPlaceArea_;
-  uint32_t placedArea_;
-  uint32_t fillerArea_;
-
-  float phi_;
-  float density_;
-  float electroForce_;
-
-  friend class BinGrid;
-};
-
-//
-// The bin can be non-uniform because of
-// "integer" coordinates
-//
-class BinGrid {
-public:
-  BinGrid();
-  BinGrid(Die* die);
-  ~BinGrid();
-
-  void setCoordi(Die* die);
-  void setBinCnt(int binCntX, int binCntY);
-  void setBinCntX(int binCntX);
-  void setBinCntY(int binCntY);
-  void updateBinsArea(std::vector<GCell*>& cells);
-  void updateBinsNonplaceArea(std::vector<Instance*>& fixedCells);
-
-  void initBins();
-
-  // lx, ly, ux, uy will hold coreArea
-  int lx() const;
-  int ly() const;
-  int ux() const;
-  int uy() const;
-  int cx() const;
-  int cy() const;
-  int dx() const;
-  int dy() const;
-
-  int binCntX() const;
-  int binCntY() const;
-  int binSizeX() const;
-  int binSizeY() const;
-
-  // return bins_ index with given gcell
-  std::pair<int, int> getMinMaxIdxX(GCell* gcell);
-  std::pair<int, int> getMinMaxIdxY(GCell* gcell);
-
-  const std::vector<Bin*> & bins() const { return binsPtr_; }
-
-private:
-  std::vector<Bin> bins_;
-  std::vector<Bin*> binsPtr_;
-  int lx_;
-  int ly_;
-  int ux_;
-  int uy_;
-  int binCntX_;
-  int binCntY_;
-  int binSizeX_;
-  int binSizeY_;
-  unsigned char isSetBinCntX_:1;
-  unsigned char isSetBinCntY_:1;
-};
-
 class PlacerBase {
 public:
   PlacerBase();
@@ -356,7 +256,6 @@ public:
 private:
   odb::dbDatabase* db_;
 
-  BinGrid binGrid_;
   Die die_;
 
   std::vector<Instance> instStor_;
@@ -383,7 +282,6 @@ private:
   uint64_t nonPlaceInstsArea_;
 
   void init();
-  void initBinGrid();
   void initInstsForFragmentedRow();
 
   void reset();
