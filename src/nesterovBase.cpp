@@ -306,6 +306,21 @@ GPin::updateLocation(const GCell* gCell) {
   cy_ = gCell->ly() + offsetCy_;
 }
 
+////////////////////////////////////////////////
+// NesterovBaseVars
+NesterovBaseVars::NesterovBaseVars() 
+: targetDensity(1.0), minAvgCut(0.1), maxAvgCut(0.9),
+isSetBinCntX(0), isSetBinCntY(0), binCntX(0), binCntY(0) {}
+
+void 
+NesterovBaseVars::reset() {
+  targetDensity = 1.0;
+  minAvgCut = 0.1;
+  maxAvgCut = 0.9;
+  isSetBinCntX = isSetBinCntY = 0;
+  binCntX = binCntY = 0;
+}
+
 
 ////////////////////////////////////////////////
 // NesterovBase 
@@ -313,8 +328,11 @@ GPin::updateLocation(const GCell* gCell) {
 NesterovBase::NesterovBase()
   : pb_(nullptr) {}
 
-NesterovBase::NesterovBase(std::shared_ptr<PlacerBase> pb)
+NesterovBase::NesterovBase(
+    NesterovBaseVars nbVars, 
+    std::shared_ptr<PlacerBase> pb)
   : NesterovBase() {
+  nbVars_ = nbVars;
   pb_ = pb;
   init();
 }
@@ -355,36 +373,31 @@ NesterovBase::init() {
 // virtual filler GCells
 void
 NesterovBase::initFillerGCells() {
-  // extract average dx/dy/area in range (10%, 90%)
-  vector<uint32_t> areaStor;
+  // extract average dx/dy in range (10%, 90%)
   vector<int> dxStor;
   vector<int> dyStor;
 
-  areaStor.reserve(pb_->placeInsts().size());
+  dxStor.reserve(pb_->placeInsts().size());
+  dyStor.reserve(pb_->placeInsts().size());
   for(auto& placeInst : pb_->placeInsts()) {
-    areaStor.push_back(placeInst->dx() * placeInst->dy());
     dxStor.push_back(placeInst->dx());
     dyStor.push_back(placeInst->dy());
   }
   
   // sort
-  std::sort(areaStor.begin(), areaStor.end());
   std::sort(dxStor.begin(), dxStor.end());
   std::sort(dyStor.begin(), dyStor.end());
 
   // average from (10 - 90%) .
-  uint64_t areaSum = 0;
   uint32_t dxSum = 0, dySum = 0;
 
-  int minIdx = areaStor.size()*0.10;
-  int maxIdx = areaStor.size()*0.90;
+  int minIdx = dxStor.size()*0.10;
+  int maxIdx = dxStor.size()*0.90;
   for(int i=minIdx; i<maxIdx; i++) {
-    areaSum += areaStor[i];
     dxSum += dxStor[i];
     dySum += dyStor[i];
   }
 
-  uint32_t avgCellArea = static_cast<uint32_t>(areaSum / (maxIdx - minIdx));
   int avgDx = static_cast<int>(dxSum / (maxIdx - minIdx));
   int avgDy = static_cast<int>(dySum / (maxIdx - minIdx));
 

@@ -65,17 +65,15 @@ void Replace::doInitialPlace() {
   std::shared_ptr<PlacerBase> pb(new PlacerBase(db_));
   pb_ = pb;
 
-  std::unique_ptr<InitialPlace> ip(new InitialPlace(pb_));
-  ip_ = std::move(ip);
-
   InitialPlaceVars ipVars;
   ipVars.maxIter = initialPlaceMaxIter_;
   ipVars.minDiffLength = initialPlaceMinDiffLength_;
   ipVars.maxSolverIter = initialPlaceMaxSolverIter_;
   ipVars.netWeightScale = initialPlaceNetWeightScale_;
   ipVars.verbose = verbose_;
-
-  ip_->setInitialPlaceVars(ipVars);
+  
+  std::unique_ptr<InitialPlace> ip(new InitialPlace(ipVars, pb_));
+  ip_ = std::move(ip);
   ip_->doBicgstabPlace();
 }
 
@@ -85,7 +83,10 @@ void Replace::doNesterovPlace() {
     pb_ = pb;
   }
 
-  std::shared_ptr<NesterovBase> nb(new NesterovBase(pb_));
+  NesterovBaseVars nbVars;
+  nbVars.targetDensity = density_;
+
+  std::shared_ptr<NesterovBase> nb(new NesterovBase(nbVars, pb_));
   nb_ = nb;
 
   std::unique_ptr<NesterovPlace> np(new NesterovPlace(pb_, nb_));

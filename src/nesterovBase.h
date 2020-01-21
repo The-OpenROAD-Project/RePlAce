@@ -311,43 +311,55 @@ private:
   unsigned char isSetBinCntY_:1;
 };
 
+class NesterovBaseVars {
+public:
+  float targetDensity;
+  float minAvgCut;
+  float maxAvgCut;
+  int binCntX;
+  int binCntY;
+  unsigned char isSetBinCntX:1;
+  unsigned char isSetBinCntY:1;
+
+  NesterovBaseVars();
+  void reset();
+};
 
 class NesterovBase {
-  public:
-    NesterovBase();
-    NesterovBase(std::shared_ptr<PlacerBase> pb);
-    ~NesterovBase();
+public:
+  NesterovBase();
+  NesterovBase(NesterovBaseVars nbVars, std::shared_ptr<PlacerBase> pb);
+  ~NesterovBase();
 
-    const std::vector<GCell*> & gCells() const { return gCells_; }
-    const std::vector<GCell*> & gCellInsts() const { return gCellInsts_; }
-    const std::vector<GCell*> & gCellFillers() const { return gCellFillers_; }
+  const std::vector<GCell*> & gCells() const { return gCells_; }
+  const std::vector<GCell*> & gCellInsts() const { return gCellInsts_; }
+  const std::vector<GCell*> & gCellFillers() const { return gCellFillers_; }
 
-    const std::vector<GNet*> & gNets() const { return gNets_; }
-    const std::vector<GPin*> & gPins() const { return gPins_; }
+  const std::vector<GNet*> & gNets() const { return gNets_; }
+  const std::vector<GPin*> & gPins() const { return gPins_; }
 
+private:
+  NesterovBaseVars nbVars_;
+  std::shared_ptr<PlacerBase> pb_;
 
+  BinGrid bg_;
 
-  private:
-    std::shared_ptr<PlacerBase> pb_;
+  std::vector<GCell> gCellStor_;
+  std::vector<GNet> gNetStor_;
+  std::vector<GPin> gPinStor_;
 
-    BinGrid bg_;
+  std::vector<GCell*> gCells_;
+  std::vector<GCell*> gCellInsts_;
+  std::vector<GCell*> gCellFillers_;
 
-    std::vector<GCell> gCellStor_;
-    std::vector<GNet> gNetStor_;
-    std::vector<GPin> gPinStor_;
+  std::vector<GNet*> gNets_;
+  std::vector<GPin*> gPins_;
 
-    std::vector<GCell*> gCells_;
-    std::vector<GCell*> gCellInsts_;
-    std::vector<GCell*> gCellFillers_;
+  void init();
+  void initFillerGCells();
+  void initBinGrid();
 
-    std::vector<GNet*> gNets_;
-    std::vector<GPin*> gPins_;
-
-    void init();
-    void initFillerGCells();
-    void initBinGrid();
-
-    void reset();
+  void reset();
 };
 
 }

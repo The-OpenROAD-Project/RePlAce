@@ -25,14 +25,13 @@ typedef Eigen::SparseMatrix<float, Eigen::RowMajor> SMatrix;
 class InitialPlace {
   public:
     InitialPlace();
-    InitialPlace(std::shared_ptr<PlacerBase> pb);
+    InitialPlace(InitialPlaceVars ipVars, std::shared_ptr<PlacerBase> pb);
     ~InitialPlace();
 
-    void setInitialPlaceVars(InitialPlaceVars initialPlaceVars);
     void doBicgstabPlace();
 
   private:
-    InitialPlaceVars initialPlaceVars_;
+    InitialPlaceVars ipVars_;
     std::shared_ptr<PlacerBase> pb_;
 
     // Solve two SparseMatrix equations here;

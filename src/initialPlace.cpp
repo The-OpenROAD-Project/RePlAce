@@ -26,10 +26,10 @@ void InitialPlaceVars::reset() {
 }
 
 InitialPlace::InitialPlace()
-: pb_(nullptr), initialPlaceVars_() {};
+: pb_(nullptr), ipVars_() {};
 
-InitialPlace::InitialPlace(std::shared_ptr<PlacerBase> pb)
-: pb_(pb), initialPlaceVars_() {};
+InitialPlace::InitialPlace(InitialPlaceVars ipVars, std::shared_ptr<PlacerBase> pb)
+: pb_(pb), ipVars_(ipVars) {};
 
 InitialPlace::~InitialPlace() {
   reset();
@@ -37,15 +37,11 @@ InitialPlace::~InitialPlace() {
 
 void InitialPlace::reset() {
   pb_ = nullptr;
-  initialPlaceVars_.reset();
-}
-
-void InitialPlace::setInitialPlaceVars(InitialPlaceVars initialPlaceVars) {
-  initialPlaceVars_ = initialPlaceVars;
+  ipVars_.reset();
 }
 
 void InitialPlace::doBicgstabPlace() {
-  if( initialPlaceVars_.verbose > 0 ) {
+  if( ipVars_.verbose > 0 ) {
     cout << "Begin InitialPlace ..." << endl;
   }
 
@@ -54,13 +50,13 @@ void InitialPlace::doBicgstabPlace() {
   placeInstsCenter();
   // set ExtId for idx reference // easy recovery
   setPlaceInstExtId();
-  for(int i=1; i<=initialPlaceVars_.maxIter; i++) {
+  for(int i=1; i<=ipVars_.maxIter; i++) {
     updatePinInfo();
     createSparseMatrix();
 
     // BiCGSTAB solver for initial place
     BiCGSTAB< SMatrix, IdentityPreconditioner > solver;
-    solver.setMaxIterations(initialPlaceVars_.maxSolverIter);
+    solver.setMaxIterations(ipVars_.maxSolverIter);
     solver.compute(matX_);
     xcgX_ = solver.solveWithGuess(xcgB_, xcgX_);
     errorX = solver.error();
@@ -75,7 +71,7 @@ void InitialPlace::doBicgstabPlace() {
     updateCoordi();
   }
 
-  if( initialPlaceVars_.verbose > 0 ) {
+  if( ipVars_.verbose > 0 ) {
     cout << "End InitialPlace" << endl;
   }
 }
@@ -212,7 +208,7 @@ void InitialPlace::createSparseMatrix() {
       continue;
     }
 
-    float netWeight = initialPlaceVars_.netWeightScale 
+    float netWeight = ipVars_.netWeightScale 
       / (net->pins().size() - 1);
     //cout << "net: " << net.net()->getConstName() << endl;
 
@@ -239,12 +235,12 @@ void InitialPlace::createSparseMatrix() {
             pin2->isMinPinX() || pin2->isMaxPinX() ) {
           int diffX = abs(pin1->cx() - pin2->cx());
           float weightX = 0;
-          if( diffX > initialPlaceVars_.minDiffLength ) {
+          if( diffX > ipVars_.minDiffLength ) {
             weightX = netWeight / diffX;
           }
           else {
             weightX = netWeight 
-              / initialPlaceVars_.minDiffLength;
+              / ipVars_.minDiffLength;
           }
           //cout << weightX << endl;
 
@@ -298,12 +294,12 @@ void InitialPlace::createSparseMatrix() {
           
           int diffY = abs(pin1->cy() - pin2->cy());
           float weightY = 0;
-          if( diffY > initialPlaceVars_.minDiffLength ) {
+          if( diffY > ipVars_.minDiffLength ) {
             weightY = netWeight / diffY;
           }
           else {
             weightY = netWeight 
-              / initialPlaceVars_.minDiffLength;
+              / ipVars_.minDiffLength;
           }
 
           // both pin cames from instance
