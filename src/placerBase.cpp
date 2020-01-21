@@ -331,8 +331,6 @@ void Pin::updateCoordi(odb::dbITerm* iTerm) {
 
   int lx = iTerm->getInst()->getBBox()->xMin();
   int ly = iTerm->getInst()->getBBox()->yMin();
-  int ux = iTerm->getInst()->getBBox()->xMax();
-  int uy = iTerm->getInst()->getBBox()->yMax();
 
   // Pin SHAPE is NOT FOUND; 
   // (may happen on OpenDB bug case)
