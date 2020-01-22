@@ -204,8 +204,12 @@ public:
 
   int dieCx() const;
   int dieCy() const;
+  int dieDx() const;
+  int dieDy() const;
   int coreCx() const;
   int coreCy() const;
+  int coreDx() const;
+  int coreDy() const;
 
 private:
   int dieLx_;

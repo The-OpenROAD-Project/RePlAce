@@ -531,6 +531,16 @@ Die::dieCy() const {
 }
 
 int
+Die::dieDx() const { 
+  return dieUx_ - dieLx_;
+}
+
+int 
+Die::dieDy() const {
+  return dieUy_ - dieLy_;
+}
+
+int
 Die::coreCx() const {
   return (coreLx_ + coreUx_)/2;
 }
@@ -538,6 +548,16 @@ Die::coreCx() const {
 int
 Die::coreCy() const {
   return (coreLy_ + coreUy_)/2;
+}
+
+int
+Die::coreDx() const {
+  return coreUx_ - coreLx_;
+}
+
+int
+Die::coreDy() const {
+  return coreUy_ - coreLy_;
 }
 
 ////////////////////////////////////////////////////////

@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <random>
 
 namespace replace {
 
@@ -29,6 +30,15 @@ GCell::GCell(Instance* inst)
 GCell::GCell(std::vector<Instance*>& insts) 
   : GCell() {
   setClusteredInstance(insts);
+}
+
+GCell::GCell(int cx, int cy, int dx, int dy) 
+  : GCell() {
+  lx_ = cx - dx/2;
+  ly_ = cy - dy/2;
+  ux_ = cx + dx/2;
+  uy_ = cy + dy/2; 
+  setFiller();
 }
 
 GCell::~GCell() {
@@ -398,14 +408,49 @@ NesterovBase::initFillerGCells() {
     dySum += dyStor[i];
   }
 
+  // the avgDx and avgDy will be used as filler cells' 
+  // width and height
   int avgDx = static_cast<int>(dxSum / (maxIdx - minIdx));
   int avgDy = static_cast<int>(dySum / (maxIdx - minIdx));
 
-  cout << "Filler Size    : ( " 
+  cout << "FillerSize     : ( " 
     << avgDx << ", " << avgDy << " )" << endl;
 
-//  uint64_t whiteSpaceArea =  
+  int64_t coreArea = 
+    static_cast<int64_t>(pb_->die().coreDx()) *
+    static_cast<int64_t>(pb_->die().coreDy()); 
 
+  int64_t whiteSpaceArea = coreArea - 
+    static_cast<int64_t>(pb_->nonPlaceInstsArea());
+
+  int64_t movableArea = whiteSpaceArea * nbVars_.targetDensity;
+  int64_t totalFillerArea = movableArea 
+    - static_cast<int64_t>(pb_->placeInstsArea());
+
+  if( totalFillerArea < 0 ) {
+    cout << "ERROR: Filler area is negative!!" << endl;
+    cout << "       Please put higher target density or " << endl;
+    cout << "       Re-floorplan to have enough coreArea" << endl;
+    exit(1);
+  }
+
+  int fillerCnt = 
+    static_cast<int>(totalFillerArea 
+        / static_cast<int32_t>(avgDx * avgDy));
+
+  cout << "FillerCells    : " << fillerCnt << endl;
+
+  mt19937 randVal(0);
+  for(int i=0; i<fillerCnt; i++) {
+    // place filler cells on random coordi and
+    // set size as avgDx and avgDy
+    GCell myGCell(
+        randVal() % pb_->die().coreDx() + pb_->die().coreLx(), 
+        randVal() % pb_->die().coreDy() + pb_->die().coreLy(),
+        avgDx, avgDy );
+
+    gCellStor_.push_back(myGCell);
+  }
 }
 
 

@@ -19,8 +19,13 @@ class GPin;
 class GCell {
 public:
   GCell();
+
+  // instance cells
   GCell(Instance* inst);
   GCell(std::vector<Instance*>& insts);
+
+  // filler cells
+  GCell(int cx, int cy, int dx, int dy);
   ~GCell();
 
   Instance* instance() const;
