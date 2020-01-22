@@ -391,16 +391,16 @@ Bin::dy() const {
 }
 
 
-uint32_t& 
+int32_t& 
 Bin::nonPlaceArea() {
   return nonPlaceArea_; 
 }
-uint32_t&
+int32_t&
 Bin::placedArea() {
   return placedArea_; 
 }
 
-uint32_t&
+int32_t&
 Bin::fillerArea() {
   return fillerArea_;
 }
@@ -536,18 +536,22 @@ BinGrid::dy() const {
 void
 BinGrid::initBins() {
 
-  int32_t totalBinArea 
-    = static_cast<int32_t>(ux_ - lx_) 
-    * static_cast<int32_t>(uy_ - ly_);
+  int64_t totalBinArea 
+    = static_cast<int64_t>(ux_ - lx_) 
+    * static_cast<int64_t>(uy_ - ly_);
 
   int32_t averagePlaceInstArea 
-    = totalBinArea / pb_->placeInsts().size();
+    = pb_->placeInstsArea() / pb_->placeInsts().size();
 
-  int32_t idealBinArea = averagePlaceInstArea / targetDensity_;
+  int32_t idealBinArea = 
+    std::round(static_cast<float>(averagePlaceInstArea) / targetDensity_);
   int idealBinCnt = totalBinArea / idealBinArea; 
   
-  cout << "idealBinArea   : " << idealBinArea << endl;
-  cout << "idealBinCnt    : " << idealBinCnt << endl;
+  cout << "TargetDensity  : " << targetDensity_ << endl;
+  cout << "AveragePlaceInstArea: : " << averagePlaceInstArea << endl;
+  cout << "IdealBinArea   : " << idealBinArea << endl;
+  cout << "IdealBinCnt    : " << idealBinCnt << endl;
+  cout << "TotalBinArea   : " << totalBinArea << endl;
 
   int foundBinCnt = 2;
   // find binCnt: 2, 4, 8, 16, 32, 64, ...
@@ -569,7 +573,7 @@ BinGrid::initBins() {
     binCntY_ = foundBinCnt;
   }
 
-  cout << "binCnt         : ( " << binCntX_ 
+  cout << "BinCnt         : ( " << binCntX_ 
     << ", " << binCntY_ << " )" << endl;
   
   binSizeX_ = ceil(
@@ -577,7 +581,7 @@ BinGrid::initBins() {
   binSizeY_ = ceil(
       static_cast<float>((uy_ - ly_))/binCntY_);
   
-  cout << "binSize        : ( " << binSizeX_
+  cout << "BinSize        : ( " << binSizeX_
     << ", " << binSizeY_ << " )" << endl;
 
   // initialize binStor_, bins_ vector

@@ -240,9 +240,9 @@ public:
   void setElectroForce(float electroForce);
 
 protected:
-  uint32_t & nonPlaceArea();
-  uint32_t & placedArea();
-  uint32_t & fillerArea();
+  int32_t & nonPlaceArea();
+  int32_t & placedArea();
+  int32_t & fillerArea();
 
 private:
   int lx_;
@@ -250,9 +250,9 @@ private:
   int ux_;
   int uy_;
 
-  uint32_t nonPlaceArea_;
-  uint32_t placedArea_;
-  uint32_t fillerArea_;
+  int32_t nonPlaceArea_;
+  int32_t placedArea_;
+  int32_t fillerArea_;
 
   float phi_;
   float density_;
