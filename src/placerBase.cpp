@@ -318,14 +318,10 @@ void Pin::updateCoordi(odb::dbITerm* iTerm) {
 
   for(dbMPin* mPin : iTerm->getMTerm()->getMPins()) {
     for(dbBox* box : mPin->getGeometry()) {
-      offsetLx = (offsetLx > box->xMin())? 
-        box->xMin() : offsetLx;
-      offsetLy = (offsetLy > box->yMin())? 
-        box->yMin() : offsetLy;
-      offsetUx = (offsetUx < box->xMax())? 
-        box->xMax() : offsetUx;
-      offsetUy = (offsetUy < box->yMax())? 
-        box->yMax() : offsetUy;
+      offsetLx = std::min(box->xMin(), offsetLx);
+      offsetLy = std::min(box->yMin(), offsetLy);
+      offsetUx = std::max(box->xMax(), offsetUx);
+      offsetUy = std::max(box->yMax(), offsetUy);
     } 
   }
 
@@ -362,14 +358,10 @@ void Pin::updateCoordi(odb::dbBTerm* bTerm) {
   int uy = INT_MIN;
 
   for(dbBPin* bPin : bTerm->getBPins()) {
-    lx = (lx > bPin->getBox()->xMin())? 
-      bPin->getBox()->xMin() : lx;
-    ly = (ly > bPin->getBox()->yMin())? 
-      bPin->getBox()->yMin() : ly;
-    ux = (ux < bPin->getBox()->xMax())? 
-      bPin->getBox()->xMax() : ux;
-    uy = (uy < bPin->getBox()->yMax())? 
-      bPin->getBox()->yMax() : uy;
+    lx = std::min(bPin->getBox()->xMin(), lx);
+    ly = std::min(bPin->getBox()->yMin(), ly);
+    ux = std::max(bPin->getBox()->xMax(), ux);
+    uy = std::max(bPin->getBox()->yMax(), uy);
   }
 
   if( lx == INT_MAX || ly == INT_MAX ||
@@ -459,21 +451,17 @@ void Net::updateBox() {
   uy_ = INT_MIN;
   for(dbITerm* iTerm : net_->getITerms()) {
     dbBox* box = iTerm->getInst()->getBBox();
-    lx_ = (lx_ > box->xMin())? box->xMin() : lx_;
-    ly_ = (ly_ > box->yMin())? box->yMin() : ly_;
-    ux_ = (ux_ < box->xMax())? box->xMax() : ux_;
-    uy_ = (uy_ < box->yMax())? box->yMax() : uy_;
+    lx_ = std::min(box->xMin(), lx_);
+    ly_ = std::min(box->yMin(), ly_);
+    ux_ = std::max(box->xMax(), ux_);
+    uy_ = std::max(box->yMax(), uy_);
   }
   for(dbBTerm* bTerm : net_->getBTerms()) {
     for(dbBPin* bPin : bTerm->getBPins()) {
-      lx_ = (lx_ > bPin->getBox()->xMin())? 
-        bPin->getBox()->xMin() : lx_;
-      ly_ = (ly_ > bPin->getBox()->yMin())? 
-        bPin->getBox()->yMin() : ly_;
-      ux_ = (ux_ < bPin->getBox()->xMax())? 
-        bPin->getBox()->xMax() : ux_;
-      uy_ = (uy_ < bPin->getBox()->yMax())? 
-        bPin->getBox()->yMax() : uy_;
+      lx_ = std::min(bPin->getBox()->xMin(), lx_);
+      ly_ = std::min(bPin->getBox()->yMin(), ly_);
+      ux_ = std::max(bPin->getBox()->xMax(), ux_);
+      uy_ = std::max(bPin->getBox()->yMax(), uy_);
     }
   }
 }
@@ -1203,10 +1191,10 @@ getCoreRectFromDb(dbSet<odb::dbRow> &rows) {
     adsRect rowRect;
     row->getBBox( rowRect );
 
-    minX = (minX > rowRect.xMin()) ? rowRect.xMin(): minX;
-    minY = (minY > rowRect.yMin()) ? rowRect.yMin(): minY;
-    maxX = (maxX < rowRect.xMax()) ? rowRect.xMax(): maxX;
-    maxY = (maxY < rowRect.yMax()) ? rowRect.yMax(): maxY;
+    minX = std::min(rowRect.xMin(), minX);
+    minY = std::min(rowRect.yMin(), minY);
+    maxX = std::max(rowRect.xMax(), maxX);
+    maxY = std::max(rowRect.yMax(), maxY);
   }
   return odb::adsRect(minX, minY, maxX, maxY);
 }
