@@ -57,12 +57,12 @@ void InitialPlace::doBicgstabPlace() {
     // BiCGSTAB solver for initial place
     BiCGSTAB< SMatrix, IdentityPreconditioner > solver;
     solver.setMaxIterations(ipVars_.maxSolverIter);
-    solver.compute(matX_);
-    xcgX_ = solver.solveWithGuess(xcgB_, xcgX_);
+    solver.compute(placeInstForceMatrixX_);
+    instLocVecX_ = solver.solveWithGuess(fixedInstForceVecX_, instLocVecX_);
     errorX = solver.error();
 
-    solver.compute(matY_);
-    ycgX_ = solver.solveWithGuess(ycgB_, ycgX_);
+    solver.compute(placeInstForceMatrixY_);
+    instLocVecY_ = solver.solveWithGuess(fixedInstForceVecY_, instLocVecY_);
     errorY = solver.error();
 
     cout << "[InitialPlace]  Iter: " << i 
@@ -164,23 +164,23 @@ void InitialPlace::updatePinInfo() {
   } 
 }
 
-// solve matX_ * xcg_x_ = xcg_b_ and matY_ * ycg_x_ = ycg_b_ eq.
+// solve placeInstForceMatrixX_ * xcg_x_ = xcg_b_ and placeInstForceMatrixY_ * ycg_x_ = ycg_b_ eq.
 void InitialPlace::createSparseMatrix() {
   const int placeCnt = pb_->placeInsts().size();
-  xcgX_.resize( placeCnt );
-  xcgB_.resize( placeCnt );
-  ycgX_.resize( placeCnt );
-  ycgB_.resize( placeCnt );
+  instLocVecX_.resize( placeCnt );
+  fixedInstForceVecX_.resize( placeCnt );
+  instLocVecY_.resize( placeCnt );
+  fixedInstForceVecY_.resize( placeCnt );
 
-  matX_.resize( placeCnt, placeCnt );
-  matY_.resize( placeCnt, placeCnt );
+  placeInstForceMatrixX_.resize( placeCnt, placeCnt );
+  placeInstForceMatrixY_.resize( placeCnt, placeCnt );
 
 
   // 
   // listX and listY is a temporary vector that have tuples, (idx1, idx2, val)
   //
-  // listX finally becomes matX_
-  // listY finally becomes matY_
+  // listX finally becomes placeInstForceMatrixX_
+  // listY finally becomes placeInstForceMatrixY_
   //
   // The triplet vector is recommended usages 
   // to fill in SparseMatrix from Eigen docs.
@@ -194,10 +194,10 @@ void InitialPlace::createSparseMatrix() {
   for(auto& inst : pb_->placeInsts()) {
     int idx = inst->extId(); 
     
-    xcgX_(idx) = inst->cx();
-    ycgX_(idx) = inst->cy();
+    instLocVecX_(idx) = inst->cx();
+    instLocVecY_(idx) = inst->cy();
 
-    xcgB_(idx) = ycgB_(idx) = 0;
+    fixedInstForceVecX_(idx) = fixedInstForceVecY_(idx) = 0;
   }
 
   // for each net
@@ -258,12 +258,12 @@ void InitialPlace::createSparseMatrix() {
 
             //cout << pin1->cx() << " " 
             //  << pin1->instance()->cx() << endl;
-            xcgB_(inst1) += 
+            fixedInstForceVecX_(inst1) += 
               -weightX * (
               (pin1->cx() - pin1->instance()->cx()) - 
               (pin2->cx() - pin2->instance()->cx()));
 
-            xcgB_(inst2) +=
+            fixedInstForceVecX_(inst2) +=
               -weightX * (
               (pin2->cx() - pin2->instance()->cx()) -
               (pin1->cx() - pin1->instance()->cx())); 
@@ -273,7 +273,7 @@ void InitialPlace::createSparseMatrix() {
             const int inst2 = pin2->instance()->extId();
             //cout << "inst2: " << inst2 << endl;
             listX.push_back( T(inst2, inst2, weightX) );
-            xcgB_(inst2) += weightX * 
+            fixedInstForceVecX_(inst2) += weightX * 
               ( pin1->cx() - 
                 ( pin2->cx() - pin2->instance()->cx()) );
           }
@@ -282,7 +282,7 @@ void InitialPlace::createSparseMatrix() {
             const int inst1 = pin1->instance()->extId();
             //cout << "inst1: " << inst1 << endl;
             listX.push_back( T(inst1, inst1, weightX) );
-            xcgB_(inst1) += weightX *
+            fixedInstForceVecX_(inst1) += weightX *
               ( pin2->cx() -
                 ( pin1->cx() - pin1->instance()->cx()) );
           }
@@ -313,12 +313,12 @@ void InitialPlace::createSparseMatrix() {
             listY.push_back( T(inst1, inst2, -weightY) );
             listY.push_back( T(inst2, inst1, -weightY) );
 
-            ycgB_(inst1) += 
+            fixedInstForceVecY_(inst1) += 
               -weightY * (
               (pin1->cy() - pin1->instance()->cy()) - 
               (pin2->cy() - pin2->instance()->cy()));
 
-            ycgB_(inst2) +=
+            fixedInstForceVecY_(inst2) +=
               -weightY * (
               (pin2->cy() - pin2->instance()->cy()) -
               (pin1->cy() - pin1->instance()->cy())); 
@@ -327,7 +327,7 @@ void InitialPlace::createSparseMatrix() {
           else if( !pin1->instance() && pin2->instance() ) {
             const int inst2 = pin2->instance()->extId();
             listY.push_back( T(inst2, inst2, weightY) );
-            ycgB_(inst2) += weightY * 
+            fixedInstForceVecY_(inst2) += weightY * 
               ( pin1->cy() - 
                 ( pin2->cy() - pin2->instance()->cy()) );
           }
@@ -335,7 +335,7 @@ void InitialPlace::createSparseMatrix() {
           else if( pin1->instance() && !pin2->instance() ) {
             const int inst1 = pin1->instance()->extId();
             listY.push_back( T(inst1, inst1, weightY) );
-            ycgB_(inst1) += weightY *
+            fixedInstForceVecY_(inst1) += weightY *
               ( pin2->cy() -
                 ( pin1->cy() - pin1->instance()->cy()) );
           }
@@ -349,8 +349,8 @@ void InitialPlace::createSparseMatrix() {
 //  }
 
   
-  matX_.setFromTriplets(listX.begin(), listX.end());
-  matY_.setFromTriplets(listY.begin(), listY.end());
+  placeInstForceMatrixX_.setFromTriplets(listX.begin(), listX.end());
+  placeInstForceMatrixY_.setFromTriplets(listY.begin(), listY.end());
 }
 
 void InitialPlace::updateCoordi() {
@@ -358,9 +358,9 @@ void InitialPlace::updateCoordi() {
   for(auto& inst : pb_->placeInsts()) {
     int idx = inst->extId();
     //cout << "extId: " << idx << endl;
-    inst->dbSetCenterLocation( xcgX_(idx), ycgX_(idx) );
-    //cout << "xcgX_(" << idx << "): " << xcgX_(idx) 
-    //  << " ycgX_(" << idx << "): " << ycgX_(idx) << endl;
+    inst->dbSetCenterLocation( instLocVecX_(idx), instLocVecY_(idx) );
+    //cout << "instLocVecX_(" << idx << "): " << instLocVecX_(idx) 
+    //  << " instLocVecY_(" << idx << "): " << instLocVecY_(idx) << endl;
   }
 }
 

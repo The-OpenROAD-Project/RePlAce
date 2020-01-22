@@ -36,23 +36,29 @@ class InitialPlace {
 
     // Solve two SparseMatrix equations here;
     //
-    // find xcgX_ s.t. satisfies matX_ * xcgX_ = xcgB_
-    // find ycgX_ s.t. satisfies matY_ * ycgX_ = ycgB_
+    // find instLocVecX_
+    // s.t. satisfies placeInstForceMatrixX_ * instLocVecX_ = fixedInstForceVecX_
     //
-    // xcgX_ : current/target instances' center X coordinates. 1-col vector.
-    // ycgX_ : current/target instances' center Y coordinates. 1-col vector.
+    // find instLocVecY_
+    // s.t. satisfies placeInstForceMatrixY_ * instLocVecY_ = fixedInstForceVecY_
     //
-    // xcgB_ : contains fixed instances' forces toward X coordi. 1-col vector.
-    // ycgB_ : contains fixed instances' forces toward Y coordi. 1-col vector.
+    // instLocVecX_ : current/target instances' center X coordinates. 1-col vector.
+    // instLocVecY_ : current/target instances' center Y coordinates. 1-col vector.
     //
-    // matX_ : SparseMatrix that contains connectivity forces on X // B2B model is used
-    // matY_ : SparseMatrix that contains connectivity forces on Y // B2B model is used
+    // fixedInstForceVecX_ : contains fixed instances' forces toward X coordi. 1-col vector.
+    // fixedInstForceVecY_ : contains fixed instances' forces toward Y coordi. 1-col vector.
+    //
+    // placeInstForceMatrixX_ :
+    //        SparseMatrix that contains connectivity forces on X // B2B model is used
+    //
+    // placeInstForceMatrixY_ :
+    //        SparseMatrix that contains connectivity forces on Y // B2B model is used
     //
     // Used the interative BiCGSTAB solver to solve matrix eqs.
 
-    Eigen::VectorXf xcgX_, xcgB_;
-    Eigen::VectorXf ycgX_, ycgB_;
-    SMatrix matX_, matY_;
+    Eigen::VectorXf instLocVecX_, fixedInstForceVecX_;
+    Eigen::VectorXf instLocVecY_, fixedInstForceVecY_;
+    SMatrix placeInstForceMatrixX_, placeInstForceMatrixY_;
 
     void placeInstsCenter();
     void setPlaceInstExtId();
