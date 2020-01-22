@@ -62,8 +62,7 @@ void Replace::setSta(sta::dbSta* sta) {
   sta_ = sta;
 }
 void Replace::doInitialPlace() {
-  std::shared_ptr<PlacerBase> pb(new PlacerBase(db_));
-  pb_ = pb;
+  pb_ = std::make_shared<PlacerBase>(db_);
 
   InitialPlaceVars ipVars;
   ipVars.maxIter = initialPlaceMaxIter_;
@@ -79,15 +78,13 @@ void Replace::doInitialPlace() {
 
 void Replace::doNesterovPlace() {
   if( !pb_ ) {
-    std::shared_ptr<PlacerBase> pb(new PlacerBase(db_));
-    pb_ = pb;
+    pb_ = std::make_shared<PlacerBase>(db_);
   }
 
   NesterovBaseVars nbVars;
   nbVars.targetDensity = density_;
 
-  std::shared_ptr<NesterovBase> nb(new NesterovBase(nbVars, pb_));
-  nb_ = nb;
+  nb_ = std::make_shared<NesterovBase>(nbVars, pb_);
 
   std::unique_ptr<NesterovPlace> np(new NesterovPlace(pb_, nb_));
   np_ = std::move(np);
