@@ -271,10 +271,12 @@ public:
   BinGrid(Die* die);
   ~BinGrid();
 
+  void setPlacerBase(std::shared_ptr<PlacerBase> pb);
   void setCoordi(Die* die);
   void setBinCnt(int binCntX, int binCntY);
   void setBinCntX(int binCntX);
   void setBinCntY(int binCntY);
+  void setTargetDensity(float density);
   void updateBinsArea(std::vector<GCell*>& cells);
   void updateBinsNonplaceArea(std::vector<Instance*>& fixedCells);
 
@@ -299,11 +301,12 @@ public:
   std::pair<int, int> getMinMaxIdxX(GCell* gcell);
   std::pair<int, int> getMinMaxIdxY(GCell* gcell);
 
-  const std::vector<Bin*> & bins() const { return binsPtr_; }
+  const std::vector<Bin*> & bins() const { return bins_; }
 
 private:
-  std::vector<Bin> bins_;
-  std::vector<Bin*> binsPtr_;
+  std::vector<Bin> binStor_;
+  std::vector<Bin*> bins_;
+  std::shared_ptr<PlacerBase> pb_;
   int lx_;
   int ly_;
   int ux_;
@@ -312,6 +315,7 @@ private:
   int binCntY_;
   int binSizeX_;
   int binSizeY_;
+  float targetDensity_;
   unsigned char isSetBinCntX_:1;
   unsigned char isSetBinCntY_:1;
 };

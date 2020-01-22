@@ -12,6 +12,9 @@ namespace replace {
 using namespace std;
 using namespace odb;
 
+static int 
+fastModulo(const int input, const int ceil);
+
 ////////////////////////////////////////////////
 // GCell 
 
@@ -316,6 +319,359 @@ GPin::updateLocation(const GCell* gCell) {
   cy_ = gCell->ly() + offsetCy_;
 }
 
+////////////////////////////////////////////////////////
+// Bin
+
+Bin::Bin() 
+  : lx_(0), ly_(0),
+  ux_(0), uy_(0), 
+  nonPlaceArea_(0), placedArea_(0),
+  fillerArea_(0),
+  phi_(0), density_(0) {}
+
+Bin::Bin(int lx, int ly, int ux, int uy) 
+  : Bin() {
+  lx_ = lx; 
+  ly_ = ly;
+  ux_ = ux;
+  uy_ = uy;
+}
+
+Bin::~Bin() {
+  lx_ = ly_ = ux_ = uy_ = 0;
+  nonPlaceArea_ = placedArea_ = fillerArea_ = 0;
+  phi_ = density_ = electroForce_ = 0;
+}
+
+int 
+Bin::lx() const {
+  return lx_;
+}
+int
+Bin::ly() const { 
+  return ly_;
+}
+
+int
+Bin::ux() const { 
+  return ux_;
+}
+
+int
+Bin::uy() const { 
+  return uy_;
+}
+
+int
+Bin::cx() const { 
+  return (ux_ - lx_)/2;
+}
+
+int
+Bin::cy() const { 
+  return (uy_ - ly_)/2;
+}
+
+int
+Bin::dx() const { 
+  return (ux_ - lx_);
+} 
+int
+Bin::dy() const { 
+  return (uy_ - ly_);
+}
+
+
+uint32_t& 
+Bin::nonPlaceArea() {
+  return nonPlaceArea_; 
+}
+uint32_t&
+Bin::placedArea() {
+  return placedArea_; 
+}
+
+uint32_t&
+Bin::fillerArea() {
+  return fillerArea_;
+}
+
+float
+Bin::phi() const {
+  return phi_;
+}
+
+float
+Bin::density() const {
+  return density_;
+}
+
+float
+Bin::electroForce() const {
+  return electroForce_;
+}
+
+void
+Bin::setPhi(float phi) {
+  phi_ = phi;
+}
+
+void
+Bin::setDensity(float density) {
+  density_ = density;
+}
+
+void
+Bin::setElectroForce(float electroForce) {
+  electroForce_ = electroForce;
+}
+
+////////////////////////////////////////////////
+// BinGrid
+
+BinGrid::BinGrid()
+  : lx_(0), ly_(0), ux_(0), uy_(0),
+  binCntX_(0), binCntY_(0),
+  binSizeX_(0), binSizeY_(0),
+  targetDensity_(0), 
+  isSetBinCntX_(0), isSetBinCntY_(0) {}
+
+BinGrid::BinGrid(Die* die) : BinGrid() {
+  setCoordi(die);
+}
+
+BinGrid::~BinGrid() {
+  std::vector<Bin> ().swap(binStor_);
+  std::vector<Bin*> ().swap(bins_);
+  lx_ = ly_ = ux_ = uy_ = 0;
+  binCntX_ = binCntY_ = 0;
+  binSizeX_ = binSizeY_ = 0;
+  isSetBinCntX_ = isSetBinCntY_ = 0;
+}
+
+void
+BinGrid::setCoordi(Die* die) {
+  lx_ = die->coreLx();
+  ly_ = die->coreLy();
+  ux_ = die->coreUx();
+  uy_ = die->coreUy();
+}
+
+void
+BinGrid::setPlacerBase(std::shared_ptr<PlacerBase> pb) {
+  pb_ = pb;
+}
+
+void
+BinGrid::setTargetDensity(float density) {
+  targetDensity_ = density;
+}
+
+void
+BinGrid::setBinCnt(int binCntX, int binCntY) {
+  setBinCntX(binCntX);
+  setBinCntY(binCntY);
+}
+
+void
+BinGrid::setBinCntX(int binCntX) {
+  isSetBinCntX_ = 1;
+  binCntX_ = binCntX;
+}
+
+void
+BinGrid::setBinCntY(int binCntY) {
+  isSetBinCntY_ = 1;
+  binCntY_ = binCntY;
+}
+
+
+int
+BinGrid::lx() const {
+  return lx_;
+}
+int
+BinGrid::ly() const { 
+  return ly_;
+}
+
+int
+BinGrid::ux() const { 
+  return ux_;
+}
+
+int
+BinGrid::uy() const { 
+  return uy_;
+}
+
+int
+BinGrid::cx() const { 
+  return (ux_ - lx_)/2;
+}
+
+int
+BinGrid::cy() const { 
+  return (uy_ - ly_)/2;
+}
+
+int
+BinGrid::dx() const { 
+  return (ux_ - lx_);
+} 
+int
+BinGrid::dy() const { 
+  return (uy_ - ly_);
+}
+
+void
+BinGrid::initBins() {
+
+  int32_t totalBinArea 
+    = static_cast<int32_t>(ux_ - lx_) 
+    * static_cast<int32_t>(uy_ - ly_);
+
+  int32_t averagePlaceInstArea 
+    = totalBinArea / pb_->placeInsts().size();
+
+  int32_t idealBinArea = averagePlaceInstArea / targetDensity_;
+  int idealBinCnt = totalBinArea / idealBinArea; 
+  
+  cout << "idealBinArea   : " << idealBinArea << endl;
+  cout << "idealBinCnt    : " << idealBinCnt << endl;
+
+  int foundBinCnt = 2;
+  // find binCnt: 2, 4, 8, 16, 32, 64, ...
+  // s.t. binCnt^2 <= idealBinCnt <= (binCnt*2)^2.
+  for(foundBinCnt = 2; foundBinCnt <= 1024; foundBinCnt *= 2) {
+    if( foundBinCnt * foundBinCnt <= idealBinCnt 
+        && 4 * foundBinCnt * foundBinCnt > idealBinCnt ) {
+      break;
+    }
+  }
+
+  // setBinCntX_;
+  if( !isSetBinCntX_ ) {
+    binCntX_ = foundBinCnt;
+  }
+
+  // setBinCntY_;
+  if( !isSetBinCntY_ ) {
+    binCntY_ = foundBinCnt;
+  }
+
+  cout << "binCnt         : ( " << binCntX_ 
+    << ", " << binCntY_ << " )" << endl;
+  
+  binSizeX_ = ceil(
+      static_cast<float>((ux_ - lx_))/binCntX_);
+  binSizeY_ = ceil(
+      static_cast<float>((uy_ - ly_))/binCntY_);
+  
+  cout << "binSize        : ( " << binSizeX_
+    << ", " << binSizeY_ << " )" << endl;
+
+  // initialize binStor_, bins_ vector
+  binStor_.resize(binCntX_ * binCntY_);
+  int x = lx_, y = ly_;
+  for(auto& bin : binStor_) {
+
+    int sizeX = (x + binSizeX_ > ux_)? 
+      ux_ - x : binSizeX_;
+    int sizeY = (y + binSizeY_ > uy_)? 
+      uy_ - y : binSizeY_;
+
+    //cout << x << " " << y 
+    //  << " " << x+sizeX << " " << y+sizeY << endl;
+    bin = Bin(x, y, x+sizeX, y+sizeY);
+    
+    // move x, y coordinates.
+    x += binSizeX_;
+    if( x > ux_ ) {
+      y += binSizeY_;
+      x = lx_; 
+    }
+
+    bins_.push_back( &bin );
+  }
+  cout << "TotalBinCnt    : " << bins_.size() << endl;
+}
+
+static uint32_t 
+getOverlapArea(Bin* bin, GCell* cell) {
+  uint32_t area = 0;
+
+  return area;
+}
+
+
+static uint32_t
+getOverlapArea(Bin* bin, Instance* inst) {
+  uint32_t area = 0;
+
+  return area;
+}
+
+void
+BinGrid::updateBinsNonplaceArea(std::vector<Instance*>& fixedCells) {
+  
+}
+
+
+// Core Part
+void
+BinGrid::updateBinsArea(std::vector<GCell*>& cells) {
+  // clear the Bin-area info
+  for(auto& bin : binStor_) {
+    bin.placedArea_ = bin.fillerArea_ = 0;
+  }
+
+  for(auto& cell : cells) {
+    std::pair<int, int> pairX = getMinMaxIdxX(cell);
+    std::pair<int, int> pairY = getMinMaxIdxY(cell);
+   
+    if( cell->isInstance() ) {
+      for(int i = pairX.first; i <= pairX.second; i++) {
+        for(int j = pairY.first; j <= pairY.second; j++) {
+          Bin* bin = &binStor_[ j * binCntX_ + i ];
+          bin->placedArea() += getOverlapArea(bin, cell); 
+        }
+      }
+    }
+    else if( cell->isFiller() ) {
+      for(int i = pairX.first; i <= pairX.second; i++) {
+        for(int j = pairY.first; j <= pairY.second; j++) {
+          Bin* bin = &binStor_[ j * binCntX_ + i ];
+          bin->fillerArea() += getOverlapArea(bin, cell); 
+        }
+      }
+    }
+  }  
+}
+
+
+std::pair<int, int>
+BinGrid::getMinMaxIdxX(GCell* gcell) {
+  int lowerIdx = (gcell->lx() - lx())/binSizeX_;
+  int upperIdx = 
+   ( fastModulo((gcell->ux() - lx()), binSizeX_) == 0)? 
+   (gcell->ux() - lx()) / binSizeX_ : (gcell->ux()-lx())/binSizeX_ + 1;
+  return std::make_pair(lowerIdx, upperIdx);
+}
+
+std::pair<int, int>
+BinGrid::getMinMaxIdxY(GCell* gcell) {
+  int lowerIdx = (gcell->ly() - ly())/binSizeY_;
+  int upperIdx =
+   ( fastModulo((gcell->uy() - ly()), binSizeY_) == 0)? 
+   (gcell->uy() - ly()) / binSizeY_ : (gcell->uy()-ly())/binSizeY_ + 1;
+  return std::make_pair(lowerIdx, upperIdx);
+}
+
+
+
+
+
 ////////////////////////////////////////////////
 // NesterovBaseVars
 NesterovBaseVars::NesterovBaseVars() 
@@ -360,6 +716,8 @@ NesterovBase::init() {
     gCellStor_.push_back(myGCell);
   }
 
+  cout << "InstGCells     : " << gCellStor_.size() << endl;
+
   // gNetStor init
   gNetStor_.reserve(pb_->nets().size());
   for(auto& net : pb_->nets()) {
@@ -377,6 +735,21 @@ NesterovBase::init() {
   // update gFillerCells
   initFillerGCells();
 
+  // send param into binGrid structure
+  if( nbVars_.isSetBinCntX ) {
+    bg_.setBinCntX(nbVars_.binCntX);
+  }
+  
+  if( nbVars_.isSetBinCntY ) {
+    bg_.setBinCntY(nbVars_.binCntY);
+  }
+
+  bg_.setPlacerBase(pb_);
+  bg_.setCoordi(&(pb_->die()));
+  bg_.setTargetDensity(nbVars_.targetDensity);
+  
+  // update binGrid info
+  bg_.initBins();
 }
 
 
@@ -438,8 +811,12 @@ NesterovBase::initFillerGCells() {
     static_cast<int>(totalFillerArea 
         / static_cast<int32_t>(avgDx * avgDy));
 
-  cout << "FillerCells    : " << fillerCnt << endl;
+  cout << "FillerGCells   : " << fillerCnt << endl;
 
+  // 
+  // mt19937 supports huge range of random values.
+  // rand()'s RAND_MAX is only 32767.
+  //
   mt19937 randVal(0);
   for(int i=0; i<fillerCnt; i++) {
     // place filler cells on random coordi and
@@ -460,6 +837,11 @@ NesterovBase::reset() {
 }
 
 
+// https://stackoverflow.com/questions/33333363/built-in-mod-vs-custom-mod-function-improve-the-performance-of-modulus-op
+static int 
+fastModulo(const int input, const int ceil) {
+  return input >= ceil? input % ceil : input;
+}
 
 
 
