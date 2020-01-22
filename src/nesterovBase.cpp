@@ -15,13 +15,13 @@ using namespace odb;
 static int 
 fastModulo(const int input, const int ceil);
 
-static uint32_t 
+static int32_t 
 getOverlapArea(Bin* bin, GCell* cell);
 
-static uint32_t
+static int32_t
 getOverlapArea(Bin* bin, Instance* inst);
 
-static uint32_t
+static int32_t
 getDensityOverlapArea(Bin* bin, GCell* cell);
 
 
@@ -840,7 +840,7 @@ fastModulo(const int input, const int ceil) {
   return input >= ceil? input % ceil : input;
 }
 
-static uint32_t 
+static int32_t 
 getOverlapArea(Bin* bin, GCell* cell) {
   int rectLx = max(bin->lx(), cell->lx()), 
       rectLy = max(bin->ly(), cell->ly()),
@@ -856,7 +856,7 @@ getOverlapArea(Bin* bin, GCell* cell) {
   }
 }
 
-static uint32_t 
+static int32_t 
 getDensityOverlapArea(Bin* bin, GCell* cell) {
   int rectLx = max(bin->lx(), cell->dLx()), 
       rectLy = max(bin->ly(), cell->dLy()),
@@ -873,7 +873,7 @@ getDensityOverlapArea(Bin* bin, GCell* cell) {
 }
 
 
-static uint32_t
+static int32_t
 getOverlapArea(Bin* bin, Instance* inst) {
   int rectLx = max(bin->lx(), inst->lx()), 
       rectLy = max(bin->ly(), inst->ly()),
