@@ -15,6 +15,16 @@ using namespace odb;
 static int 
 fastModulo(const int input, const int ceil);
 
+static uint32_t 
+getOverlapArea(Bin* bin, GCell* cell);
+
+static uint32_t
+getOverlapArea(Bin* bin, Instance* inst);
+
+static uint32_t
+getDensityOverlapArea(Bin* bin, GCell* cell);
+
+
 ////////////////////////////////////////////////
 // GCell 
 
@@ -47,7 +57,6 @@ GCell::GCell(int cx, int cy, int dx, int dy)
 GCell::~GCell() {
   vector<Instance*> ().swap(insts_);
 }
-
 void
 GCell::setInstance(Instance* inst) {
   insts_.push_back(inst);
@@ -597,24 +606,8 @@ BinGrid::initBins() {
   cout << "TotalBinCnt    : " << bins_.size() << endl;
 }
 
-static uint32_t 
-getOverlapArea(Bin* bin, GCell* cell) {
-  uint32_t area = 0;
-
-  return area;
-}
-
-
-static uint32_t
-getOverlapArea(Bin* bin, Instance* inst) {
-  uint32_t area = 0;
-
-  return area;
-}
-
 void
-BinGrid::updateBinsNonplaceArea(std::vector<Instance*>& fixedCells) {
-  
+BinGrid::updateBinsNonplaceArea(std::vector<Instance*>& nonPlaceInsts) {
 }
 
 
@@ -843,8 +836,54 @@ fastModulo(const int input, const int ceil) {
   return input >= ceil? input % ceil : input;
 }
 
+static uint32_t 
+getOverlapArea(Bin* bin, GCell* cell) {
+  int rectLx = max(bin->lx(), cell->lx()), 
+      rectLy = max(bin->ly(), cell->ly()),
+      rectUx = min(bin->ux(), cell->ux()), 
+      rectUy = min(bin->uy(), cell->uy());
+
+  if( rectLx >= rectUx || rectLy >= rectUy ) {
+    return 0;
+  }
+  else {
+    return static_cast<int32_t>(rectUx - rectLx) 
+      * static_cast<int32_t>(rectUy - rectLy);
+  }
+}
+
+static uint32_t 
+getDensityOverlapArea(Bin* bin, GCell* cell) {
+  int rectLx = max(bin->lx(), cell->dLx()), 
+      rectLy = max(bin->ly(), cell->dLy()),
+      rectUx = min(bin->ux(), cell->dUx()), 
+      rectUy = min(bin->uy(), cell->dUy());
+
+  if( rectLx >= rectUx || rectLy >= rectUy ) {
+    return 0;
+  }
+  else {
+    return static_cast<int32_t>(rectUx - rectLx) 
+      * static_cast<int32_t>(rectUy - rectLy);
+  }
+}
 
 
+static uint32_t
+getOverlapArea(Bin* bin, Instance* inst) {
+  int rectLx = max(bin->lx(), inst->lx()), 
+      rectLy = max(bin->ly(), inst->ly()),
+      rectUx = min(bin->ux(), inst->ux()), 
+      rectUy = min(bin->uy(), inst->uy());
+
+  if( rectLx >= rectUx || rectLy >= rectUy ) {
+    return 0;
+  }
+  else {
+    return static_cast<int32_t>(rectUx - rectLx) 
+      * static_cast<int32_t>(rectUy - rectLy);
+  }
+}
 
 
 
