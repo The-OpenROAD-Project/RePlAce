@@ -1,5 +1,8 @@
 # RePlAce
 RePlAce: Advancing Solution Quality and Routability Validation in Global Placement
+
+If you want to use this as part of the OpenROAD project you should build it and use it from inside the integrated [openroad app](https://github.com/The-OpenROAD-Project/OpenROAD). The standalone version is available as legacy code.
+
 ## Features
 - Analytic and nonlinear placement algorithm. Solves electrostatic force equations using Nesterov's method. ([link](https://cseweb.ucsd.edu/~jlu/papers/eplace-todaes14/paper.pdf))
 - Fully supports commercial formats. (LEF/DEF 5.8)
