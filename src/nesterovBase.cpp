@@ -22,7 +22,7 @@ static int32_t
 getOverlapArea(Bin* bin, Instance* inst);
 
 static int32_t
-getDensityOverlapArea(Bin* bin, GCell* cell);
+getOverlapDensityArea(Bin* bin, GCell* cell);
 
 
 ////////////////////////////////////////////////
@@ -57,10 +57,22 @@ GCell::GCell(int cx, int cy, int dx, int dy)
 GCell::~GCell() {
   vector<Instance*> ().swap(insts_);
 }
+
 void
 GCell::setInstance(Instance* inst) {
   insts_.push_back(inst);
 }
+
+Instance*
+GCell::instance() const {
+  return *insts_.begin();
+}
+
+void
+GCell::addGPin(GPin* gPin) {
+  gPins_.push_back(gPin);
+}
+
 
 // do nothing
 void
@@ -157,6 +169,10 @@ GCell::setLocation(int lx, int ly) {
   uy_ = ly + (uy_ - ly_);
   lx = lx_;
   ly = ly_;
+
+  for(auto& gPin: gPins_) {
+    gPin->updateLocation(this);
+  }
 }
 
 void
@@ -168,6 +184,10 @@ GCell::setCenterLocation(int cx, int cy) {
   ly_ = cy - halfDy;
   ux_ = cx + halfDx;
   uy_ = cy + halfDy;
+
+  for(auto& gPin: gPins_) {
+    gPin->updateLocation(this);
+  }
 }
 
 // changing size and preserve center coordinates
@@ -252,7 +272,8 @@ GNet::GNet()
   waExpMinSumStorX_(0), waXExpMinSumStorX_(0),
   waExpMaxSumStorX_(0), waXExpMaxSumStorX_(0),
   waExpMinSumStorY_(0), waYExpMinSumStorY_(0),
-  waExpMaxSumStorY_(0), waYExpMaxSumStorY_(0) {}
+  waExpMaxSumStorY_(0), waYExpMaxSumStorY_(0),
+  isDontCare_(0) {}
 
 GNet::GNet(Net* net) : GNet() {
   nets_.push_back(net);
@@ -280,6 +301,29 @@ GNet::setCustomWeight(float customWeight) {
 void
 GNet::addGPin(GPin* gPin) {
   gPins_.push_back(gPin);
+}
+
+void
+GNet::updateBox() {
+  lx_ = ly_ = INT_MAX;
+  ux_ = uy_ = INT_MIN;
+
+  for(auto& gPin : gPins_) {
+    lx_ = std::min(gPin->cx(), lx_);
+    ly_ = std::min(gPin->cy(), ly_);
+    ux_ = std::max(gPin->cx(), ux_);
+    uy_ = std::max(gPin->cy(), uy_);
+  } 
+}
+
+void
+GNet::setDontCare() {
+  isDontCare_ = 1;
+}
+
+bool
+GNet::isDontCare() {
+  return (gPins_.size() == 0) || (isDontCare_ == 1);
 }
 
 ////////////////////////////////////////////////
@@ -317,6 +361,16 @@ GPin::pin() const {
 }
 
 void
+GPin::setGCell(GCell* gCell) {
+  gCell_ = gCell;
+}
+
+void
+GPin::setGNet(GNet* gNet) {
+  gNet_ = gNet;
+}
+
+void
 GPin::setCenterLocation(int cx, int cy) {
   cx_ = cx;
   cy_ = cy;
@@ -324,8 +378,8 @@ GPin::setCenterLocation(int cx, int cy) {
 
 void
 GPin::updateLocation(const GCell* gCell) {
-  cx_ = gCell->lx() + offsetCx_;
-  cy_ = gCell->ly() + offsetCy_;
+  cx_ = gCell->cx() + offsetCx_;
+  cy_ = gCell->cy() + offsetCy_;
 }
 
 ////////////////////////////////////////////////////////
@@ -607,17 +661,36 @@ BinGrid::initBins() {
 
     bins_.push_back( &bin );
   }
+
   cout << "TotalBinCnt    : " << bins_.size() << endl;
+
+  // only initialized once
+  updateBinsNonPlaceArea();
 }
 
 void
-BinGrid::updateBinsNonplaceArea(std::vector<Instance*>& nonPlaceInsts) {
+BinGrid::updateBinsNonPlaceArea() {
+  for(auto& bin : binStor_) {
+    bin.nonPlaceArea_ = 0;
+  }
+
+  for(auto& inst : pb_->nonPlaceInsts()) {
+    std::pair<int, int> pairX = getMinMaxIdxX(inst);
+    std::pair<int, int> pairY = getMinMaxIdxY(inst);
+   
+    for(int i = pairX.first; i <= pairX.second; i++) {
+      for(int j = pairY.first; j <= pairY.second; j++) {
+        Bin* bin = &binStor_[ j * binCntX_ + i ];
+        bin->nonPlaceArea() += getOverlapArea(bin, inst); 
+      }
+    }
+  }
 }
 
 
 // Core Part
 void
-BinGrid::updateBinsArea(std::vector<GCell*>& cells) {
+BinGrid::updateBinsGCellArea(std::vector<GCell*>& cells) {
   // clear the Bin-area info
   for(auto& bin : binStor_) {
     bin.placedArea_ = bin.fillerArea_ = 0;
@@ -646,13 +719,46 @@ BinGrid::updateBinsArea(std::vector<GCell*>& cells) {
   }  
 }
 
+// Core Part
+void
+BinGrid::updateBinsGCellDensityArea(
+    std::vector<GCell*>& cells) {
+  // clear the Bin-area info
+  for(auto& bin : binStor_) {
+    bin.placedArea_ = bin.fillerArea_ = 0;
+  }
+
+  for(auto& cell : cells) {
+    std::pair<int, int> pairX = getMinMaxIdxX(cell);
+    std::pair<int, int> pairY = getMinMaxIdxY(cell);
+   
+    if( cell->isInstance() ) {
+      for(int i = pairX.first; i <= pairX.second; i++) {
+        for(int j = pairY.first; j <= pairY.second; j++) {
+          Bin* bin = &binStor_[ j * binCntX_ + i ];
+          bin->placedArea() += getOverlapDensityArea(bin, cell); 
+        }
+      }
+    }
+    else if( cell->isFiller() ) {
+      for(int i = pairX.first; i <= pairX.second; i++) {
+        for(int j = pairY.first; j <= pairY.second; j++) {
+          Bin* bin = &binStor_[ j * binCntX_ + i ];
+          bin->fillerArea() += getOverlapDensityArea(bin, cell); 
+        }
+      }
+    }
+  }  
+}
+
 
 std::pair<int, int>
 BinGrid::getMinMaxIdxX(GCell* gcell) {
   int lowerIdx = (gcell->lx() - lx())/binSizeX_;
   int upperIdx = 
    ( fastModulo((gcell->ux() - lx()), binSizeX_) == 0)? 
-   (gcell->ux() - lx()) / binSizeX_ : (gcell->ux()-lx())/binSizeX_ + 1;
+   (gcell->ux() - lx()) / binSizeX_ 
+   : (gcell->ux() - lx()) / binSizeX_ + 1;
   return std::make_pair(lowerIdx, upperIdx);
 }
 
@@ -661,10 +767,31 @@ BinGrid::getMinMaxIdxY(GCell* gcell) {
   int lowerIdx = (gcell->ly() - ly())/binSizeY_;
   int upperIdx =
    ( fastModulo((gcell->uy() - ly()), binSizeY_) == 0)? 
-   (gcell->uy() - ly()) / binSizeY_ : (gcell->uy()-ly())/binSizeY_ + 1;
+   (gcell->uy() - ly()) / binSizeY_ 
+   : (gcell->uy() - ly()) / binSizeY_ + 1;
   return std::make_pair(lowerIdx, upperIdx);
 }
 
+
+std::pair<int, int>
+BinGrid::getMinMaxIdxX(Instance* inst) {
+  int lowerIdx = (inst->lx() - lx()) / binSizeX_;
+  int upperIdx = 
+   ( fastModulo((inst->ux() - lx()), binSizeX_) == 0)? 
+   (inst->ux() - lx()) / binSizeX_ 
+   : (inst->ux() - lx()) / binSizeX_ + 1;
+  return std::make_pair(lowerIdx, upperIdx);
+}
+
+std::pair<int, int>
+BinGrid::getMinMaxIdxY(Instance* inst) {
+  int lowerIdx = (inst->ly() - ly()) / binSizeY_;
+  int upperIdx = 
+   ( fastModulo((inst->uy() - ly()), binSizeY_) == 0)? 
+   (inst->uy() - ly()) / binSizeY_ 
+   : (inst->uy() - ly()) / binSizeY_ + 1;
+  return std::make_pair(lowerIdx, upperIdx);
+}
 
 
 
@@ -713,14 +840,12 @@ NesterovBase::init() {
     gCellStor_.push_back(myGCell);
   }
 
-  cout << "InstGCells     : " << gCellStor_.size() << endl;
-
-  // gNetStor init
-  gNetStor_.reserve(pb_->nets().size());
-  for(auto& net : pb_->nets()) {
-    GNet myGNet(net);
-    gNetStor_.push_back(myGNet);
-  }
+  cout << "InstGCells     : " 
+    << gCellStor_.size() << endl;
+  
+  // TODO: 
+  // at this moment, GNet and GPin is equal to
+  // Net and Pin
 
   // gPinStor init
   gPinStor_.reserve(pb_->pins().size());
@@ -729,9 +854,74 @@ NesterovBase::init() {
     gPinStor_.push_back(myGPin);
   }
 
+  // gNetStor init
+  gNetStor_.reserve(pb_->nets().size());
+  for(auto& net : pb_->nets()) {
+    GNet myGNet(net);
+    gNetStor_.push_back(myGNet);
+  }
+
+
   // update gFillerCells
   initFillerGCells();
 
+  // gCell ptr init
+  gCells_.reserve(gCellStor_.size());
+  for(auto& gCell : gCellStor_) {
+    gCells_.push_back(&gCell);
+    if( gCell.isInstance() ) {
+      gCellMap_[gCell.instance()] = &gCell;
+    }
+  }
+  
+  // gPin ptr init
+  gPins_.reserve(gPinStor_.size());
+  for(auto& gPin : gPinStor_) {
+    gPins_.push_back(&gPin);
+    gPinMap_[gPin.pin()] = &gPin;
+  }
+
+  // gNet ptr init
+  gNets_.reserve(gNetStor_.size());
+  for(auto& gNet : gNetStor_) {
+    gNets_.push_back(&gNet);
+    gNetMap_[gNet.net()] = &gNet;
+  }
+
+  // gCellStor_'s pins_ fill
+  for(auto& gCell : gCellStor_) {
+    if( gCell.isFiller()) {
+      continue;
+    }
+
+    for( auto& pin : gCell.instance()->pins() ) {
+      gCell.addGPin( placerToNesterov(pin) );
+    }
+  }
+
+  // gPinStor_' GNet and GCell fill
+  for(auto& gPin : gPinStor_) {
+    gPin.setGCell( 
+        placerToNesterov(gPin.pin()->instance()));
+    gPin.setGNet(
+        placerToNesterov(gPin.pin()->net()));
+  } 
+
+  // gNetStor_'s GPin fill
+  for(auto& gNet : gNetStor_) {
+    for(auto& pin : gNet.net()->pins()) {
+      gNet.addGPin( placerToNesterov(pin) );
+    }
+  }
+
+  cout << "GCells         : " 
+    << gCells_.size() << endl;
+  cout << "GNets          : " 
+    << gNets_.size() << endl;
+  cout << "GPins          : " 
+    << gPins_.size() << endl;
+
+  // initialize bin grid structure
   // send param into binGrid structure
   if( nbVars_.isSetBinCntX ) {
     bg_.setBinCntX(nbVars_.binCntX);
@@ -747,6 +937,7 @@ NesterovBase::init() {
   
   // update binGrid info
   bg_.initBins();
+
 }
 
 
@@ -827,10 +1018,69 @@ NesterovBase::initFillerGCells() {
   }
 }
 
+GCell*
+NesterovBase::placerToNesterov(Instance* inst) {
+  auto gcPtr = gCellMap_.find(inst);
+  return (gcPtr == gCellMap_.end())?
+    nullptr : gcPtr->second;
+}
+
+GNet*
+NesterovBase::placerToNesterov(Net* net) {
+  auto gnPtr = gNetMap_.find(net);
+  return (gnPtr == gNetMap_.end())?
+    nullptr : gnPtr->second;
+}
+
+GPin*
+NesterovBase::placerToNesterov(Pin* pin) {
+  auto gpPtr = gPinMap_.find(pin);
+  return (gpPtr == gPinMap_.end())?
+    nullptr : gpPtr->second;
+}
+
+// gcell update
+void
+NesterovBase::updateGCellLocation(
+    vector<int>& lx, vector<int>& ly) {
+}
+
+// gcell update
+void
+NesterovBase::updateGCellCenterLocation(
+    vector<int>& cx, vector<int>& cy) {
+
+}
+
+// 
+// WA force cals - wlCoeffX / wlCoeffY
+//
+// * Note that wlCoeffX and wlCoeffY is 1/gamma 
+// in ePlace paper.
+void
+NesterovBase::updateWireLengthForceWA(
+    float wlCoeffX, float wlCoeffY) {
+
+  for(auto& gNet : gNets_) {
+    gNet->updateBox();
+
+    cout << gNet->lx() << " " << gNet->ly() << " "
+      << gNet->ux() << " " << gNet->uy() << endl;
+  }
+
+}
+
+// Density force cals
+void
+NesterovBase::updateDensityForceBin() {
+
+}
+
 
 void
 NesterovBase::reset() { 
   pb_ = nullptr;
+  nbVars_.reset();
 }
 
 
@@ -857,7 +1107,7 @@ getOverlapArea(Bin* bin, GCell* cell) {
 }
 
 static int32_t 
-getDensityOverlapArea(Bin* bin, GCell* cell) {
+getOverlapDensityArea(Bin* bin, GCell* cell) {
   int rectLx = max(bin->lx(), cell->dLx()), 
       rectLy = max(bin->ly(), cell->dLy()),
       rectUx = min(bin->ux(), cell->dUx()), 

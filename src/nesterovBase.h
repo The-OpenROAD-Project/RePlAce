@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 namespace replace {
 
@@ -31,6 +32,8 @@ public:
   Instance* instance() const;
   const std::vector<Instance*> & insts() const { return insts_; }
   const std::vector<GPin*> & gPins() const { return gPins_; }
+    
+  void addGPin(GPin* gPin);
 
   void setClusteredInstance(std::vector<Instance*>& insts);
   void setInstance(Instance* inst);
@@ -106,12 +109,22 @@ class GNet {
     Net* net() const;
     const std::vector<Net*> & nets() const { return nets_; }
     const std::vector<GPin*> & gPins() const { return gPins_; }
+    
+    int lx() const { return lx_; }
+    int ly() const { return ly_; }
+    int ux() const { return ux_; }
+    int uy() const { return uy_; }
 
     void setCustomWeight( float customWeight );
     float customWeight() const { return customWeight_; }
     float netWeight() const { return weight_; }
 
     void addGPin(GPin* gPin);
+    void updateBox();
+    
+    void setDontCare();
+    bool isDontCare();
+
 
   private:
     std::vector<GPin*> gPins_;
@@ -161,6 +174,8 @@ class GNet {
     float waExpMaxSumStorY_;
     float waYExpMaxSumStorY_;
 
+    unsigned char isDontCare_:1; 
+
 };
 
 class GPin {
@@ -175,6 +190,9 @@ class GPin {
 
     GCell* gCell() const { return gCell_; }
     GNet* gNet() const { return gNet_; }
+
+    void setGCell(GCell* gCell);
+    void setGNet(GNet* gNet);
 
     int cx() const { return cx_; }
     int cy() const { return cy_; }
@@ -277,8 +295,8 @@ public:
   void setBinCntX(int binCntX);
   void setBinCntY(int binCntY);
   void setTargetDensity(float density);
-  void updateBinsArea(std::vector<GCell*>& cells);
-  void updateBinsNonplaceArea(std::vector<Instance*>& fixedCells);
+  void updateBinsGCellArea(std::vector<GCell*>& cells);
+  void updateBinsGCellDensityArea(std::vector<GCell*>& cells);
 
   void initBins();
 
@@ -301,6 +319,9 @@ public:
   std::pair<int, int> getMinMaxIdxX(GCell* gcell);
   std::pair<int, int> getMinMaxIdxY(GCell* gcell);
 
+  std::pair<int, int> getMinMaxIdxX(Instance* inst);
+  std::pair<int, int> getMinMaxIdxY(Instance* inst);
+  
   const std::vector<Bin*> & bins() const { return bins_; }
 
 private:
@@ -318,6 +339,8 @@ private:
   float targetDensity_;
   unsigned char isSetBinCntX_:1;
   unsigned char isSetBinCntY_:1;
+  
+  void updateBinsNonPlaceArea();
 };
 
 class NesterovBaseVars {
@@ -347,6 +370,38 @@ public:
   const std::vector<GNet*> & gNets() const { return gNets_; }
   const std::vector<GPin*> & gPins() const { return gPins_; }
 
+  // 
+  // placerBase To NesterovBase functions
+  //
+  GCell* placerToNesterov(Instance* inst);
+  GPin* placerToNesterov(Pin* pin);
+  GNet* placerToNesterov(Net* net);
+
+  // update gCells with lx, ly
+  void updateGCellLocation(
+      std::vector<int>& lx, 
+      std::vector<int>& ly);
+  
+  // update gCells with cx, cy
+  void updateGCellCenterLocation(
+      std::vector<int>& cx, 
+      std::vector<int>& cy);
+
+  // WL force update based on WeightedAverage model 
+  // wlCoeffX : WireLengthCoefficient for X.
+  //            equal to 1 / gamma_x
+  // wlCoeffY : WireLengthCoefficient for Y.
+  //            equal to 1 / gamma_y 
+  //
+  // Gamma is described in the ePlaceMS paper.
+  //
+  void updateWireLengthForceWA(
+      float wlCoeffX, 
+      float wlCoeffY);
+
+  // update electrostatic forces within Bin
+  void updateDensityForceBin();
+
 private:
   NesterovBaseVars nbVars_;
   std::shared_ptr<PlacerBase> pb_;
@@ -363,6 +418,10 @@ private:
 
   std::vector<GNet*> gNets_;
   std::vector<GPin*> gPins_;
+
+  std::unordered_map<Instance*, GCell*> gCellMap_;
+  std::unordered_map<Pin*, GPin*> gPinMap_;
+  std::unordered_map<Net*, GNet*> gNetMap_;
 
   void init();
   void initFillerGCells();

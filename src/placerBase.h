@@ -133,8 +133,9 @@ private:
   int cy_;
 
   // offset coordinates inside instance.
-  // origin point is lower-left corner of instance.
-  // (e.g. (0,0) )
+  // origin point is center point of instance.
+  // (e.g. (DX/2,DY/2) )
+  // This will increase efficiency for bloating
   int offsetCx_;
   int offsetCy_;
 

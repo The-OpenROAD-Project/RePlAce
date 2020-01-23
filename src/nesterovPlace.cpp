@@ -1,4 +1,7 @@
 #include "nesterovPlace.h"
+#include "nesterovBase.h"
+#include <iostream>
+using namespace std;
 
 namespace replace {
 
@@ -14,6 +17,9 @@ NesterovPlace::~NesterovPlace() {}
 
 void
 NesterovPlace::doNesterovPlace() {
+  cout << "nesterovPlace: " << endl;
+  float initCoefX = 0.1, initCoefY = 0.1;
+  nb_->updateWireLengthForceWA(initCoefX, initCoefY);
 
 }
 

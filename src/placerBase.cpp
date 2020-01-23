@@ -327,6 +327,9 @@ void Pin::updateCoordi(odb::dbITerm* iTerm) {
 
   int lx = iTerm->getInst()->getBBox()->xMin();
   int ly = iTerm->getInst()->getBBox()->yMin();
+    
+  int instCenterX = iTerm->getInst()->getBBox()->getDX()/2;
+  int instCenterY = iTerm->getInst()->getBBox()->getDY()/2;
 
   // Pin SHAPE is NOT FOUND; 
   // (may happen on OpenDB bug case)
@@ -334,18 +337,25 @@ void Pin::updateCoordi(odb::dbITerm* iTerm) {
       offsetUx == INT_MIN || offsetUy == INT_MIN ) {
     
     // offset is center of instances
-    offsetCx_ = iTerm->getInst()->getBBox()->getDX()/2;
-    offsetCy_ = iTerm->getInst()->getBBox()->getDY()/2;
+    offsetCx_ = offsetCy_ = 0;
   }
   // usual case
   else {
-    // offset is Pin BBoxs' center
-    offsetCx_ = (offsetLx + offsetUx)/2;
-    offsetCy_ = (offsetLy + offsetUy)/2;
+
+
+    // offset is Pin BBoxs' center, so
+    // subtract the Origin coordinates (e.g. instCenterX, instCenterY)
+    //
+    // Transform coordinates 
+    // from (origin: 0,0) 
+    // to (origin: instCenterX, instCenterY)
+    //
+    offsetCx_ = (offsetLx + offsetUx)/2 - instCenterX;
+    offsetCy_ = (offsetLy + offsetUy)/2 - instCenterY;
   }
 
-  cx_ = lx + offsetCx_;
-  cy_ = ly + offsetCy_;
+  cx_ = lx + instCenterX + offsetCx_;
+  cy_ = ly + instCenterY + offsetCy_;
 }
 
 // 
@@ -372,9 +382,8 @@ void Pin::updateCoordi(odb::dbBTerm* bTerm) {
     exit(1);
   }
 
-  // same with BoxSize/2 
-  offsetCx_ = (ux - lx)/2;
-  offsetCy_ = (uy - ly)/2;
+  // Just center 
+  offsetCx_ = offsetCy_ = 0;
 
   cx_ = (lx + ux)/2;
   cy_ = (ly + uy)/2;
@@ -382,8 +391,8 @@ void Pin::updateCoordi(odb::dbBTerm* bTerm) {
 
 void
 Pin::updateLocation(const Instance* inst) {
-  cx_ = inst->lx() + offsetCx_;
-  cy_ = inst->ly() + offsetCy_;
+  cx_ = inst->cx() + offsetCx_;
+  cy_ = inst->cy() + offsetCy_;
 }
 
 void 
