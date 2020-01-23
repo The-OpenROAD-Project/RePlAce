@@ -24,6 +24,9 @@ getOverlapArea(Bin* bin, Instance* inst);
 static int32_t
 getOverlapDensityArea(Bin* bin, GCell* cell);
 
+static float
+fastExp(float exp);
+
 
 ////////////////////////////////////////////////
 // GCell 
@@ -316,6 +319,47 @@ GNet::updateBox() {
   } 
 }
 
+// eight add functions
+void
+GNet::addWaExpMinSumX(float waExpMinSumX) {
+  waExpMinSumStorX_ += waExpMinSumX;
+}
+
+void
+GNet::addWaXExpMinSumX(float waXExpMinSumX) {
+  waXExpMinSumStorX_ += waXExpMinSumX;
+}
+
+void
+GNet::addWaExpMinSumY(float waExpMinSumY) {
+  waExpMinSumStorY_ += waExpMinSumY;
+}
+
+void
+GNet::addWaYExpMinSumY(float waYExpMinSumY) {
+  waYExpMinSumStorY_ += waYExpMinSumY;
+}
+
+void
+GNet::addWaExpMaxSumX(float waExpMaxSumX) {
+  waExpMaxSumStorX_ += waExpMaxSumX;
+}
+
+void
+GNet::addWaXExpMaxSumX(float waXExpMaxSumX) {
+  waXExpMaxSumStorX_ += waXExpMaxSumX;
+}
+
+void
+GNet::addWaExpMaxSumY(float waExpMaxSumY) {
+  waExpMaxSumStorY_ += waExpMaxSumY;
+}
+
+void
+GNet::addWaYExpMaxSumY(float waYExpMaxSumY) {
+  waYExpMaxSumStorY_ += waYExpMaxSumY;
+}
+
 void
 GNet::setDontCare() {
   isDontCare_ = 1;
@@ -333,8 +377,10 @@ GPin::GPin()
   : gCell_(nullptr), gNet_(nullptr),
   offsetCx_(0), offsetCy_(0),
   cx_(0), cy_(0),
-  posExpSum_(0), negExpSum_(0),
-  hasPosExpSum_(0), hasNegExpSum_(0) {}
+  maxExpSumX_(0), maxExpSumY_(0),
+  minExpSumX_(0), minExpSumY_(0),
+  hasMaxExpSumX_(0), hasMaxExpSumY_(0), 
+  hasMinExpSumX_(0), hasMinExpSumY_(0) {}
 
 GPin::GPin(Pin* pin)
   : GPin() {
@@ -375,6 +421,31 @@ GPin::setCenterLocation(int cx, int cy) {
   cx_ = cx;
   cy_ = cy;
 }
+
+void
+GPin::setMaxExpSumX(float maxExpSumX) {
+  hasMaxExpSumX_ = 1;
+  maxExpSumX_ = maxExpSumX;
+}
+
+void
+GPin::setMaxExpSumY(float maxExpSumY) {
+  hasMaxExpSumY_ = 1;
+  maxExpSumY_ = maxExpSumY;
+}
+
+void
+GPin::setMinExpSumX(float minExpSumX) {
+  hasMinExpSumX_ = 1;
+  minExpSumX_ = minExpSumX;
+}
+
+void
+GPin::setMinExpSumY(float minExpSumY) {
+  hasMinExpSumY_ = 1;
+  minExpSumY_ = minExpSumY;
+}
+
 
 void
 GPin::updateLocation(const GCell* gCell) {
@@ -799,8 +870,13 @@ BinGrid::getMinMaxIdxY(Instance* inst) {
 ////////////////////////////////////////////////
 // NesterovBaseVars
 NesterovBaseVars::NesterovBaseVars() 
-: targetDensity(1.0), minAvgCut(0.1), maxAvgCut(0.9),
-isSetBinCntX(0), isSetBinCntY(0), binCntX(0), binCntY(0) {}
+: targetDensity(1.0), 
+  minAvgCut(0.1), maxAvgCut(0.9),
+isSetBinCntX(0), isSetBinCntY(0), 
+  binCntX(0), binCntY(0),
+  minWireLengthForceBar(-300) {}
+
+
 
 void 
 NesterovBaseVars::reset() {
@@ -809,6 +885,7 @@ NesterovBaseVars::reset() {
   maxAvgCut = 0.9;
   isSetBinCntX = isSetBinCntY = 0;
   binCntX = binCntY = 0;
+  minWireLengthForceBar = -300;
 }
 
 
@@ -1064,8 +1141,46 @@ NesterovBase::updateWireLengthForceWA(
   for(auto& gNet : gNets_) {
     gNet->updateBox();
 
-    cout << gNet->lx() << " " << gNet->ly() << " "
-      << gNet->ux() << " " << gNet->uy() << endl;
+    for(auto& gPin : gNet->gPins()) {
+      float expMinX = (gNet->lx() - gPin->cx()) * wlCoeffX; 
+      float expMaxX = (gPin->cx() - gNet->ux()) * wlCoeffX;
+      float expMinY = (gNet->ly() - gPin->cy()) * wlCoeffY;
+      float expMaxY = (gPin->cy() - gNet->ly()) * wlCoeffY;
+
+      // min x
+      if(expMinX > nbVars_.minWireLengthForceBar) {
+        gPin->setMinExpSumX( fastExp(expMinX) );
+        gNet->addWaExpMinSumX( gPin->minExpSumX() );
+        gNet->addWaXExpMinSumX( gPin->cx() 
+            * gPin->minExpSumX() );
+      }
+      
+      // max x
+      if(expMaxX > nbVars_.minWireLengthForceBar) {
+        gPin->setMaxExpSumX( fastExp(expMaxX) );
+        gNet->addWaExpMaxSumX( gPin->maxExpSumX() );
+        gNet->addWaXExpMaxSumX( gPin->cx() 
+            * gPin->maxExpSumX() );
+      }
+     
+      // min y 
+      if(expMinY > nbVars_.minWireLengthForceBar) {
+        gPin->setMinExpSumY( fastExp(expMinY) );
+        gNet->addWaExpMinSumY( gPin->minExpSumY() );
+        gNet->addWaYExpMinSumY( gPin->cy() 
+            * gPin->minExpSumY() );
+      }
+      
+      // max y
+      if(expMaxY > nbVars_.minWireLengthForceBar) {
+        gPin->setMaxExpSumY( fastExp(expMaxY) );
+        gNet->addWaExpMaxSumY( gPin->maxExpSumY() );
+        gNet->addWaYExpMaxSumY( gPin->cy() 
+            * gPin->maxExpSumY() );
+      }
+    }
+    //cout << gNet->lx() << " " << gNet->ly() << " "
+    //  << gNet->ux() << " " << gNet->uy() << endl;
   }
 
 }
@@ -1137,6 +1252,22 @@ getOverlapArea(Bin* bin, Instance* inst) {
     return static_cast<int32_t>(rectUx - rectLx) 
       * static_cast<int32_t>(rectUy - rectLy);
   }
+}
+
+static float
+fastExp(float a) {
+  a = 1.0 * a / 1024.0;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  a *= a;
+  return a;
 }
 
 

@@ -109,7 +109,7 @@ class GNet {
     Net* net() const;
     const std::vector<Net*> & nets() const { return nets_; }
     const std::vector<GPin*> & gPins() const { return gPins_; }
-    
+
     int lx() const { return lx_; }
     int ly() const { return ly_; }
     int ux() const { return ux_; }
@@ -121,10 +121,21 @@ class GNet {
 
     void addGPin(GPin* gPin);
     void updateBox();
-    
+
     void setDontCare();
     bool isDontCare();
 
+    void addWaExpMinSumX(float waExpMinSumX);
+    void addWaXExpMinSumX(float waExpXMinSumX);
+
+    void addWaExpMinSumY(float waExpMinSumY);
+    void addWaYExpMinSumY(float waExpXMinSumY);
+
+    void addWaExpMaxSumX(float waExpMaxSumX);
+    void addWaXExpMaxSumX(float waExpXMaxSumX);
+
+    void addWaExpMaxSumY(float waExpMaxSumY);
+    void addWaYExpMaxSumY(float waExpXMaxSumY);
 
   private:
     std::vector<GPin*> gPins_;
@@ -174,7 +185,7 @@ class GNet {
     float waExpMaxSumStorY_;
     float waYExpMaxSumStorY_;
 
-    unsigned char isDontCare_:1; 
+    unsigned char isDontCare_:1;
 
 };
 
@@ -197,11 +208,20 @@ class GPin {
     int cx() const { return cx_; }
     int cy() const { return cy_; }
 
-    float posExpSum() const { return posExpSum_; }
-    float negExpSum() const { return negExpSum_; }
+    void setMaxExpSumX(float maxExpSumX);
+    void setMaxExpSumY(float maxExpSumY);
+    void setMinExpSumX(float minExpSumX);
+    void setMinExpSumY(float minExpSumY);
 
-    bool hasPosExpSum() const { return (hasPosExpSum_ == 1); }
-    bool hasNegExpSum() const { return (hasNegExpSum_ == 1); }
+    float maxExpSumX() const { return maxExpSumX_; }
+    float maxExpSumY() const { return maxExpSumY_; }
+    float minExpSumX() const { return minExpSumX_; }
+    float minExpSumY() const { return minExpSumY_; }
+
+    bool hasMaxExpSumX() const { return (hasMaxExpSumX_ == 1); }
+    bool hasMaxExpSumY() const { return (hasMaxExpSumY_ == 1); }
+    bool hasMinExpSumX() const { return (hasMinExpSumX_ == 1); }
+    bool hasMinExpSumY() const { return (hasMinExpSumY_ == 1); }
 
     void setCenterLocation(int cx, int cy);
     void updateLocation(const GCell* gCell);
@@ -219,19 +239,25 @@ class GPin {
     // weighted average WL vals stor for better indexing
     // Please check the equation (4) in the ePlace-MS paper.
     //
-    // posExpSum_: holds exp(x_i/gamma)
-    // negExpSum_: holds exp(-x_i/gamma)
+    // maxExpSum_: holds exp(x_i/gamma)
+    // minExpSum_: holds exp(-x_i/gamma)
     // the x_i is equal to cx_ variable.
     //
-    float posExpSum_;
-    float negExpSum_;
+    float maxExpSumX_;
+    float maxExpSumY_;
+
+    float minExpSumX_;
+    float minExpSumY_;
 
     // flag variables
     //
     // check whether
     // this pin is considered in a WA models.
-    unsigned char hasPosExpSum_:1;
-    unsigned char hasNegExpSum_:1;
+    unsigned char hasMaxExpSumX_:1;
+    unsigned char hasMaxExpSumY_:1;
+
+    unsigned char hasMinExpSumX_:1;
+    unsigned char hasMinExpSumY_:1;
 };
 
 class Bin {
@@ -339,7 +365,7 @@ private:
   float targetDensity_;
   unsigned char isSetBinCntX_:1;
   unsigned char isSetBinCntY_:1;
-  
+
   void updateBinsNonPlaceArea();
 };
 
@@ -350,6 +376,7 @@ public:
   float maxAvgCut;
   int binCntX;
   int binCntY;
+  float minWireLengthForceBar;
   unsigned char isSetBinCntX:1;
   unsigned char isSetBinCntY:1;
 

@@ -20,6 +20,7 @@ NesterovPlace::doNesterovPlace() {
   cout << "nesterovPlace: " << endl;
   float initCoefX = 0.1, initCoefY = 0.1;
   nb_->updateWireLengthForceWA(initCoefX, initCoefY);
+  cout << "WL force Done" << endl;
 
 }
 
