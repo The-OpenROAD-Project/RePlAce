@@ -1217,15 +1217,6 @@ NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoe
     float waExpMinSumX = gPin->gNet()->waExpMinSumX();
     float waXExpMinSumX = gPin->gNet()->waXExpMinSumX();
 
-    /*
-    float minDenominatorX = wlCoeffX * gPin->minExpSumX();
-    float minNumeratorX = gPin->minExpSumX() - gPin->cx() * minDenominatorX;
-
-    gradientMinX = 
-      (minNumeratorX * waExpMinSumX + minDenominatorX * waXExpMinSumX) 
-      / ( waExpMinSumX * waExpMinSumX );
-      */
-
     gradientMinX = 
       ( waExpMinSumX * ( gPin->minExpSumX() * ( 1.0 - wlCoeffX * gPin->cx()) ) 
           + wlCoeffX * gPin->minExpSumX() * waXExpMinSumX )
@@ -1234,22 +1225,44 @@ NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoe
   
   // max x
   if( gPin->hasMaxExpSumX() ) {
+    
+    float waExpMaxSumX = gPin->gNet()->waExpMaxSumX();
+    float waXExpMaxSumX = gPin->gNet()->waXExpMaxSumX();
+    
+    gradientMaxX = 
+      ( waExpMaxSumX * ( gPin->maxExpSumX() * ( 1.0 + wlCoeffX * gPin->cx()) ) 
+          - wlCoeffX * gPin->maxExpSumX() * waXExpMaxSumX )
+        / ( waExpMaxSumX * waExpMaxSumX );
 
   }
 
   // min y
   if( gPin->hasMinExpSumY() ) {
+    
+    float waExpMinSumY = gPin->gNet()->waExpMinSumY();
+    float waYExpMinSumY = gPin->gNet()->waYExpMinSumY();
 
+    gradientMinY = 
+      ( waExpMinSumY * ( gPin->minExpSumY() * ( 1.0 - wlCoeffY * gPin->cy()) ) 
+          + wlCoeffY * gPin->minExpSumY() * waYExpMinSumY )
+        / ( waExpMinSumY * waExpMinSumY );
   }
   
   // max y
-  if( gPin->hasMinExpSumY() ) {
+  if( gPin->hasMaxExpSumY() ) {
+    
+    float waExpMaxSumY = gPin->gNet()->waExpMaxSumY();
+    float waYExpMaxSumY = gPin->gNet()->waYExpMaxSumY();
+    
+    gradientMaxY = 
+      ( waExpMaxSumY * ( gPin->maxExpSumY() * ( 1.0 + wlCoeffY * gPin->cy()) ) 
+          - wlCoeffY * gPin->maxExpSumY() * waYExpMaxSumY )
+        / ( waExpMaxSumY * waExpMaxSumY );
 
   }
 
   return make_pair(gradientMaxX - gradientMinX, 
       gradientMaxY - gradientMinY);
-
 }
 
 // Density force cals
