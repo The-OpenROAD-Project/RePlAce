@@ -515,20 +515,36 @@ Bin::dy() const {
   return (uy_ - ly_);
 }
 
-
-int32_t& 
-Bin::nonPlaceArea() {
-  return nonPlaceArea_; 
-}
-int32_t&
-Bin::placedArea() {
-  return placedArea_; 
+void
+Bin::setNonPlaceArea(int64_t area) {
+  nonPlaceArea_ = area;
 }
 
-int32_t&
-Bin::fillerArea() {
-  return fillerArea_;
+void
+Bin::setPlacedArea(int64_t area) {
+  placedArea_ = area;
 }
+
+void
+Bin::setFillerArea(int64_t area) {
+  fillerArea_ = area;
+}
+
+void
+Bin::addNonPlaceArea(int64_t area) {
+  nonPlaceArea_ += area;
+}
+
+void
+Bin::addPlacedArea(int64_t area) {
+  placedArea_ += area;
+}
+
+void
+Bin::addFillerArea(int64_t area) {
+  fillerArea_ += area;
+}
+
 
 float
 Bin::phi() const {
@@ -741,8 +757,8 @@ BinGrid::initBins() {
 
 void
 BinGrid::updateBinsNonPlaceArea() {
-  for(auto& bin : binStor_) {
-    bin.nonPlaceArea_ = 0;
+  for(auto& bin : bins_) {
+    bin->setNonPlaceArea(0);
   }
 
   for(auto& inst : pb_->nonPlaceInsts()) {
@@ -751,8 +767,8 @@ BinGrid::updateBinsNonPlaceArea() {
    
     for(int i = pairX.first; i <= pairX.second; i++) {
       for(int j = pairY.first; j <= pairY.second; j++) {
-        Bin* bin = &binStor_[ j * binCntX_ + i ];
-        bin->nonPlaceArea() += getOverlapArea(bin, inst); 
+        Bin* bin = bins_[ j * binCntX_ + i ];
+        bin->addNonPlaceArea( getOverlapArea(bin, inst) );
       }
     }
   }
@@ -763,8 +779,9 @@ BinGrid::updateBinsNonPlaceArea() {
 void
 BinGrid::updateBinsGCellArea(std::vector<GCell*>& cells) {
   // clear the Bin-area info
-  for(auto& bin : binStor_) {
-    bin.placedArea_ = bin.fillerArea_ = 0;
+  for(auto& bin : bins_) {
+    bin->setPlacedArea(0);
+    bin->setFillerArea(0);
   }
 
   for(auto& cell : cells) {
@@ -774,16 +791,16 @@ BinGrid::updateBinsGCellArea(std::vector<GCell*>& cells) {
     if( cell->isInstance() ) {
       for(int i = pairX.first; i <= pairX.second; i++) {
         for(int j = pairY.first; j <= pairY.second; j++) {
-          Bin* bin = &binStor_[ j * binCntX_ + i ];
-          bin->placedArea() += getOverlapArea(bin, cell); 
+          Bin* bin = bins_[ j * binCntX_ + i ];
+          bin->addPlacedArea( getOverlapArea(bin, cell) );
         }
       }
     }
     else if( cell->isFiller() ) {
       for(int i = pairX.first; i <= pairX.second; i++) {
         for(int j = pairY.first; j <= pairY.second; j++) {
-          Bin* bin = &binStor_[ j * binCntX_ + i ];
-          bin->fillerArea() += getOverlapArea(bin, cell); 
+          Bin* bin = bins_[ j * binCntX_ + i ];
+          bin->addFillerArea( getOverlapArea(bin, cell) );
         }
       }
     }
@@ -795,8 +812,9 @@ void
 BinGrid::updateBinsGCellDensityArea(
     std::vector<GCell*>& cells) {
   // clear the Bin-area info
-  for(auto& bin : binStor_) {
-    bin.placedArea_ = bin.fillerArea_ = 0;
+  for(auto& bin : bins_) {
+    bin->setPlacedArea(0);
+    bin->setFillerArea(0);
   }
 
   for(auto& cell : cells) {
@@ -806,16 +824,16 @@ BinGrid::updateBinsGCellDensityArea(
     if( cell->isInstance() ) {
       for(int i = pairX.first; i <= pairX.second; i++) {
         for(int j = pairY.first; j <= pairY.second; j++) {
-          Bin* bin = &binStor_[ j * binCntX_ + i ];
-          bin->placedArea() += getOverlapDensityArea(bin, cell); 
+          Bin* bin = bins_[ j * binCntX_ + i ];
+          bin->addPlacedArea( getOverlapDensityArea(bin, cell) ); 
         }
       }
     }
     else if( cell->isFiller() ) {
       for(int i = pairX.first; i <= pairX.second; i++) {
         for(int j = pairY.first; j <= pairY.second; j++) {
-          Bin* bin = &binStor_[ j * binCntX_ + i ];
-          bin->fillerArea() += getOverlapDensityArea(bin, cell); 
+          Bin* bin = bins_[ j * binCntX_ + i ];
+          bin->addFillerArea( getOverlapDensityArea(bin, cell) ); 
         }
       }
     }
@@ -1268,7 +1286,10 @@ NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoe
 // Density force cals
 void
 NesterovBase::updateDensityForceBin() {
-
+  for(auto& bin : bg_.bins()) {
+  
+  
+  }
 }
 
 

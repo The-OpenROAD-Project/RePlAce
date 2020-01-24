@@ -295,10 +295,17 @@ public:
   void setDensity(float density);
   void setElectroForce(float electroForce);
 
-protected:
-  int32_t & nonPlaceArea();
-  int32_t & placedArea();
-  int32_t & fillerArea();
+  void setNonPlaceArea(int64_t area);
+  void setPlacedArea(int64_t area);
+  void setFillerArea(int64_t area);
+
+  void addNonPlaceArea(int64_t area);
+  void addPlacedArea(int64_t area);
+  void addFillerArea(int64_t area);
+
+  const int64_t nonPlaceArea() const { return nonPlaceArea_; }
+  const int64_t placedArea() const { return placedArea_; }
+  const int64_t fillerArea() const { return fillerArea_; }
 
 private:
   int lx_;
@@ -306,15 +313,13 @@ private:
   int ux_;
   int uy_;
 
-  int32_t nonPlaceArea_;
-  int32_t placedArea_;
-  int32_t fillerArea_;
+  int64_t nonPlaceArea_;
+  int64_t placedArea_;
+  int64_t fillerArea_;
 
   float phi_;
   float density_;
   float electroForce_;
-
-  friend class BinGrid;
 };
 
 //
@@ -359,7 +364,7 @@ public:
 
   std::pair<int, int> getMinMaxIdxX(Instance* inst);
   std::pair<int, int> getMinMaxIdxY(Instance* inst);
-  
+
   const std::vector<Bin*> & bins() const { return bins_; }
 
 private:
