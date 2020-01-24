@@ -1182,6 +1182,73 @@ NesterovBase::updateWireLengthForceWA(
     //cout << gNet->lx() << " " << gNet->ly() << " "
     //  << gNet->ux() << " " << gNet->uy() << endl;
   }
+}
+
+// get x,y WA Gradient values with given GCell
+std::pair<float, float>
+NesterovBase::getWireLengthGradientWA(GCell* gCell, float wlCoeffX, float wlCoeffY) {
+  std::pair<float, float> gradientPair;
+
+  for(auto& gPin : gCell->gPins()) {
+    auto tmpPair = getWireLengthGradientPinWA(gPin, wlCoeffX, wlCoeffY);
+    gradientPair.first += tmpPair.first;
+    gradientPair.second += tmpPair.second;
+  }
+
+  // return sum
+  return gradientPair;
+}
+
+// get x,y WA Gradient values from GPin
+// Please check the JingWei's Ph.D. thesis full paper, 
+// Equation (4.13)
+//
+// You can't understand the following function
+// unless you read the (4.13) formula
+std::pair<float, float>
+NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoeffY) {
+
+  float gradientMinX = 0, gradientMinY = 0;
+  float gradientMaxX = 0, gradientMaxY = 0;
+
+  // min x
+  if( gPin->hasMinExpSumX() ) {
+    // from Net.
+    float waExpMinSumX = gPin->gNet()->waExpMinSumX();
+    float waXExpMinSumX = gPin->gNet()->waXExpMinSumX();
+
+    /*
+    float minDenominatorX = wlCoeffX * gPin->minExpSumX();
+    float minNumeratorX = gPin->minExpSumX() - gPin->cx() * minDenominatorX;
+
+    gradientMinX = 
+      (minNumeratorX * waExpMinSumX + minDenominatorX * waXExpMinSumX) 
+      / ( waExpMinSumX * waExpMinSumX );
+      */
+
+    gradientMinX = 
+      ( waExpMinSumX * ( gPin->minExpSumX() * ( 1.0 - wlCoeffX * gPin->cx()) ) 
+          + wlCoeffX * gPin->minExpSumX() * waXExpMinSumX )
+        / ( waExpMinSumX * waExpMinSumX );
+  }
+  
+  // max x
+  if( gPin->hasMaxExpSumX() ) {
+
+  }
+
+  // min y
+  if( gPin->hasMinExpSumY() ) {
+
+  }
+  
+  // max y
+  if( gPin->hasMinExpSumY() ) {
+
+  }
+
+  return make_pair(gradientMaxX - gradientMinX, 
+      gradientMaxY - gradientMinY);
 
 }
 

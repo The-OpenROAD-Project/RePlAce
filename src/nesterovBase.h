@@ -137,6 +137,18 @@ class GNet {
     void addWaExpMaxSumY(float waExpMaxSumY);
     void addWaYExpMaxSumY(float waExpXMaxSumY);
 
+    float waExpMinSumX() const { return waExpMinSumStorX_; }
+    float waXExpMinSumX() const { return waXExpMinSumStorX_; }
+
+    float waExpMinSumY() const { return waExpMinSumStorY_; }
+    float waYExpMinSumY() const { return waYExpMinSumStorY_; }
+    
+    float waExpMaxSumX() const { return waExpMaxSumStorX_; }
+    float waXExpMaxSumX() const { return waXExpMaxSumStorX_; }
+
+    float waExpMaxSumY() const { return waExpMaxSumStorY_; }
+    float waYExpMaxSumY() const { return waYExpMaxSumStorY_; }
+
   private:
     std::vector<GPin*> gPins_;
     std::vector<Net*> nets_;
@@ -425,6 +437,12 @@ public:
   void updateWireLengthForceWA(
       float wlCoeffX, 
       float wlCoeffY);
+
+  std::pair<float, float>
+    getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoeffY);
+
+  std::pair<float, float>
+    getWireLengthGradientWA(GCell* gCell, float wlCoeffX, float wlCoeffY);
 
   // update electrostatic forces within Bin
   void updateDensityForceBin();
