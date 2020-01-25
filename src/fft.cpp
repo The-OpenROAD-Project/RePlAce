@@ -18,6 +18,30 @@ FFT::FFT(int binCntX, int binCntY, int binSizeX, int binSizeY)
   init();   
 }
 
+FFT::~FFT() {
+  using std::vector;
+  for(int i=0; i<binCntX_; i++) {
+    vector<float>().swap(binDensity_[i]);
+    vector<float>().swap(electroPhi_[i]);
+    vector<float>().swap(electroForceX_[i]);
+    vector<float>().swap(electroForceY_[i]);
+  }
+
+  vector<vector<float>>().swap(binDensity_);
+  vector<vector<float>>().swap(electroPhi_);
+  vector<vector<float>>().swap(electroForceX_);
+  vector<vector<float>>().swap(electroForceY_);
+
+  vector<float> ().swap(csTable_);
+  vector<float> ().swap(wx_);
+  vector<float> ().swap(wxSquare_);
+  vector<float> ().swap(wy_);
+  vector<float> ().swap(wySquare_);
+  
+  vector<int> ().swap(workArea_);
+}
+
+
 void
 FFT::init() {
   binDensity_.resize(binCntX_);
