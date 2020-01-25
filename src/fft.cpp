@@ -4,65 +4,52 @@
 
 #include "fft.h"
 
+// work area for bit reversal
 int *charge_ip_2d;
-int *charge_ip_3d;
-int charge_dft_n_2d;
-int charge_dft_n_3d;
-int charge_dft_nbin_2d;
-int charge_dft_nbin_3d;
-int charge_dft_nbit_2d;
-int charge_dft_nbit_3d;
-int charge_dft_nw_2d;
-int charge_dft_nw_3d;
-float **den_2d_st2;
-float ***den_3d_st3;
-float **phi_2d_st2;
-float ***phi_3d_st3;
-float **e_2d_st2;
-float ***e_3d_st3;
-float **ex_2d_st2;
-float ***ex_3d_st3;
-float **ey_2d_st2;
-float ***ey_3d_st3;
-float **ez_2d_st2;
-float ***ez_3d_st3;
+
+// cos/sin table
 float *w_2d;
-float *w_3d;
+
+// density
+float **den_2d_st2;
+
+// phi
+float **phi_2d_st2;
+
+// ex?
+float **ex_2d_st2;
+
+// ey?
+float **ey_2d_st2;
+
+
+// wx?
 float *wx_2d_st;
+
+// wx2? ==> wx * wx
 float *wx2_2d_st;
+
+// wy?
 float *wy_2d_st;
+
+// wy2? ==> wy * wy
 float *wy2_2d_st;
-float *wz_2d_st;
-float *wz2_2d_st;
-float *wx_3d_st;
-float *wx2_3d_st;
-float *wy_3d_st;
-float *wy2_3d_st;
-float *wz_3d_st;
-float *wz2_3d_st;
-float *wx_2d_iL;
-float *wy_2d_iL;
-float *wx2_2d_iL;
-float *wy2_2d_iL;
 
-float DFT_SCALE_2D;
-float DFT_SCALE_3D;
 struct POS dft_bin_2d;
-struct POS dft_bin_3d;
 
-void charge_fft_init(struct POS nbin, struct FPOS stp, int flg) {
-  charge_fft_init_2d(nbin, stp);
+void charge_fft_init(struct POS nbin, struct FPOS binSize, int flg) {
+  charge_fft_init_2d(nbin, binSize);
 }
 
-void charge_fft_init_2d(struct POS nbin, struct FPOS stp) {
+void charge_fft_init_2d(struct POS nbin, struct FPOS binSize) {
   // Descriptions for parameters are in fftsg2d.cpp.
   // See DCT section.  Line 200 in fftsg2d.cpp
   int x = 0;
   int y = 0;
   dft_bin_2d = nbin;
-  charge_dft_n_2d = p_max(dft_bin_2d);
-  charge_dft_nbin_2d = p_product(dft_bin_2d);
-  DFT_SCALE_2D = 1.0 / ((float)charge_dft_nbin_2d);
+  int charge_dft_n_2d = p_max(dft_bin_2d);
+  int charge_dft_nbin_2d = p_product(dft_bin_2d);
+  float DFT_SCALE_2D = 1.0 / ((float)charge_dft_nbin_2d);
 
   den_2d_st2 = (float **)malloc(sizeof(float *) * dft_bin_2d.x);
   phi_2d_st2 = (float **)malloc(sizeof(float *) * dft_bin_2d.x);
@@ -76,9 +63,9 @@ void charge_fft_init_2d(struct POS nbin, struct FPOS stp) {
     ey_2d_st2[x] = (float *)malloc(sizeof(float) * dft_bin_2d.y);
   }
 
-  charge_dft_nbit_2d = 2 + (int)sqrt((float)charge_dft_n_2d + 0.5);
+  int charge_dft_nbit_2d = 2 + (int)sqrt((float)charge_dft_n_2d + 0.5);
   charge_ip_2d = (int *)malloc(sizeof(int) * charge_dft_nbit_2d);
-  charge_dft_nw_2d = charge_dft_n_2d * 3 / 2;
+  int charge_dft_nw_2d = charge_dft_n_2d * 3 / 2;
   w_2d = (float *)malloc(sizeof(float) * charge_dft_nw_2d);
   charge_ip_2d[0] = 0;
 
@@ -90,16 +77,16 @@ void charge_fft_init_2d(struct POS nbin, struct FPOS stp) {
   for(x = 0; x < dft_bin_2d.x; x++) {
     // LW 05/04/17
     wx_2d_st[x] = PI * (float)x / ((float)dft_bin_2d.x);
-    // stp.x *= 1.0;
-    // wx_2d_st [x]= PI * (float  )x / ((float  )dft_bin_2d.x * stp.x);
+    // binSize .x *= 1.0;
+    // wx_2d_st [x]= PI * (float  )x / ((float  )dft_bin_2d.x * binSize.x);
     wx2_2d_st[x] = wx_2d_st[x] * wx_2d_st[x];
   }
 
   for(y = 0; y < dft_bin_2d.y; y++) {
     // LW 05/05/17
     // wy_2d_st [y]= PI * (float  ) y / ((float  ) dft_bin_2d.y);
-    wy_2d_st[y] = PI * (float)y / ((float)dft_bin_2d.y * stp.y / stp.x);
-    // wy_2d_st [y]= PI * (float  )y / ((float  )dft_bin_2d.y * stp.y);
+    wy_2d_st[y] = PI * (float)y / ((float)dft_bin_2d.y * binSize.y / binSize.x);
+    // wy_2d_st [y]= PI * (float  )y / ((float  )dft_bin_2d.y * binSize.y);
     wy2_2d_st[y] = wy_2d_st[y] * wy_2d_st[y];
   }
 }
@@ -189,6 +176,7 @@ void charge_fft_call_2d(void) {
   float wy = 0;
   float wy2 = 0;
 
+  // DCT
   ddct2d(n1, n2, -1, den_2d_st2, NULL, charge_ip_2d, w_2d);
 
   for(x = 0; x < n1; x++) {
@@ -242,6 +230,8 @@ void charge_fft_call_2d(void) {
       ey_2d_st2[x][y] = a_ey;
     }
   }
+
+  // Inverse DCT
   ddct2d(n1, n2, 1, phi_2d_st2, NULL, charge_ip_2d, w_2d);
   ddsct2d(n1, n2, 1, ex_2d_st2, NULL, charge_ip_2d, w_2d);
   ddcst2d(n1, n2, 1, ey_2d_st2, NULL, charge_ip_2d, w_2d);
