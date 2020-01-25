@@ -16,6 +16,7 @@ class Pin;
 class Net;
 
 class GPin;
+class FFT;
 
 class GCell {
 public:
@@ -275,8 +276,12 @@ class GPin {
 class Bin {
 public:
   Bin();
-  Bin(int lx, int ly, int ux, int uy);
+  Bin(int x, int y, int lx, int ly, int ux, int uy);
+
   ~Bin();
+
+  int x() const;
+  int y() const;
 
   int lx() const;
   int ly() const;
@@ -308,6 +313,11 @@ public:
   const int64_t fillerArea() const { return fillerArea_; }
 
 private:
+  // index
+  int x_;
+  int y_;
+
+  // coordinate
   int lx_;
   int ly_;
   int ux_;
@@ -414,7 +424,7 @@ public:
   const std::vector<GNet*> & gNets() const { return gNets_; }
   const std::vector<GPin*> & gPins() const { return gPins_; }
 
-  // 
+  //
   // placerBase To NesterovBase functions
   //
   GCell* placerToNesterov(Instance* inst);
@@ -423,24 +433,24 @@ public:
 
   // update gCells with lx, ly
   void updateGCellLocation(
-      std::vector<int>& lx, 
+      std::vector<int>& lx,
       std::vector<int>& ly);
-  
+
   // update gCells with cx, cy
   void updateGCellCenterLocation(
-      std::vector<int>& cx, 
+      std::vector<int>& cx,
       std::vector<int>& cy);
 
-  // WL force update based on WeightedAverage model 
+  // WL force update based on WeightedAverage model
   // wlCoeffX : WireLengthCoefficient for X.
   //            equal to 1 / gamma_x
   // wlCoeffY : WireLengthCoefficient for Y.
-  //            equal to 1 / gamma_y 
+  //            equal to 1 / gamma_y
   //
   // Gamma is described in the ePlaceMS paper.
   //
   void updateWireLengthForceWA(
-      float wlCoeffX, 
+      float wlCoeffX,
       float wlCoeffY);
 
   std::pair<float, float>
@@ -457,6 +467,7 @@ private:
   std::shared_ptr<PlacerBase> pb_;
 
   BinGrid bg_;
+  std::unique_ptr<FFT> fft_;
 
   std::vector<GCell> gCellStor_;
   std::vector<GNet> gNetStor_;

@@ -2,6 +2,7 @@
 
 #include "nesterovBase.h"
 #include "placerBase.h"
+#include "fft.h"
 
 #include <algorithm>
 #include <iostream>
@@ -457,14 +458,16 @@ GPin::updateLocation(const GCell* gCell) {
 // Bin
 
 Bin::Bin() 
-  : lx_(0), ly_(0),
+  : x_(0), y_(0), lx_(0), ly_(0),
   ux_(0), uy_(0), 
   nonPlaceArea_(0), placedArea_(0),
   fillerArea_(0),
   phi_(0), density_(0) {}
 
-Bin::Bin(int lx, int ly, int ux, int uy) 
+Bin::Bin(int x, int y, int lx, int ly, int ux, int uy) 
   : Bin() {
+  x_ = x;
+  y_ = y;
   lx_ = lx; 
   ly_ = ly;
   ux_ = ux;
@@ -472,9 +475,20 @@ Bin::Bin(int lx, int ly, int ux, int uy)
 }
 
 Bin::~Bin() {
+  x_ = y_ = 0;
   lx_ = ly_ = ux_ = uy_ = 0;
   nonPlaceArea_ = placedArea_ = fillerArea_ = 0;
   phi_ = density_ = electroForce_ = 0;
+}
+
+int
+Bin::x() const {
+  return x_;
+}
+
+int
+Bin::y() const { 
+  return y_;
 }
 
 int 
@@ -674,6 +688,26 @@ BinGrid::dy() const {
   return (uy_ - ly_);
 }
 
+int
+BinGrid::binCntX() const {
+  return binCntX_;
+}
+
+int
+BinGrid::binCntY() const {
+  return binCntY_;
+}
+
+int
+BinGrid::binSizeX() const {
+  return binSizeX_;
+}
+
+int
+BinGrid::binSizeY() const {
+  return binSizeY_;
+}
+
 void
 BinGrid::initBins() {
 
@@ -684,7 +718,7 @@ BinGrid::initBins() {
   int32_t averagePlaceInstArea 
     = pb_->placeInstsArea() / pb_->placeInsts().size();
 
-  int32_t idealBinArea = 
+  int64_t idealBinArea = 
     std::round(static_cast<float>(averagePlaceInstArea) / targetDensity_);
   int idealBinCnt = totalBinArea / idealBinArea; 
   
@@ -728,6 +762,7 @@ BinGrid::initBins() {
   // initialize binStor_, bins_ vector
   binStor_.resize(binCntX_ * binCntY_);
   int x = lx_, y = ly_;
+  int idxX = 0, idxY = 0;
   for(auto& bin : binStor_) {
 
     int sizeX = (x + binSizeX_ > ux_)? 
@@ -737,13 +772,18 @@ BinGrid::initBins() {
 
     //cout << x << " " << y 
     //  << " " << x+sizeX << " " << y+sizeY << endl;
-    bin = Bin(x, y, x+sizeX, y+sizeY);
+    bin = Bin(idxX, idxY, x, y, x+sizeX, y+sizeY);
     
     // move x, y coordinates.
     x += binSizeX_;
+    idxX += 1;
+
     if( x > ux_ ) {
       y += binSizeY_;
       x = lx_; 
+      
+      idxY ++;
+      idxX = 0;
     }
 
     bins_.push_back( &bin );
@@ -1033,6 +1073,10 @@ NesterovBase::init() {
   // update binGrid info
   bg_.initBins();
 
+
+  // initialize fft structrue based on bins
+  std::unique_ptr<FFT> fft(new FFT(bg_.binCntX(), bg_.binCntY(), bg_.binSizeX(), bg_.binSizeY()));
+  fft_ = std::move(fft);
 }
 
 
@@ -1287,8 +1331,8 @@ NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoe
 void
 NesterovBase::updateDensityForceBin() {
   for(auto& bin : bg_.bins()) {
-  
-  
+    fft_->updateDensity(bin->x(), bin->y(), 
+        bin->density());  
   }
 }
 
