@@ -333,6 +333,8 @@ macro definitions
         .
 */
 
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #define fft2d_alloc_error_check(p)                        \
@@ -395,6 +397,8 @@ macro definitions
     CloseHandle(th);                   \
   }
 #endif /* USE_FFT2D_WINTHREADS */
+
+namespace replace {
 
 void cdft2d(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
   void makewt(int nw, int *ip, float *w);
@@ -1305,3 +1309,4 @@ void *ddxt2d_th(void *p) {
   return (void *)0;
 }
 #endif /* USE_FFT2D_THREADS */
+}

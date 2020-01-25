@@ -281,6 +281,11 @@ Appendix :
     w[] and ip[] are compatible with all routines.
 */
 
+#include <cmath>
+
+namespace replace {
+
+
 void cdft(int n, int isgn, float *a, int *ip, float *w) {
   void makewt(int nw, int *ip, float *w);
   void cftfsub(int n, float *a, int *ip, int nw, float *w);
@@ -637,7 +642,6 @@ void dfst(int n, float *a, float *t, int *ip, float *w) {
 
 /* -------- initializing routines -------- */
 
-#include <math.h>
 
 void makewt(int nw, int *ip, float *w) {
   void makeipt(int nw, int *ip);
@@ -3260,4 +3264,6 @@ void dstsub(int n, float *a, int nc, float *c) {
     a[j] = xr;
   }
   a[m] *= c[0];
+}
+
 }

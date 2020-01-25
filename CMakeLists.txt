@@ -59,6 +59,9 @@ set (REPLACE_SRC
   src/nesterovPlace.cpp
   src/placerBase.cpp
   src/nesterovBase.cpp
+  src/fft.cpp
+  src/fftsg.cpp
+  src/fftsg2d.cpp
   )
 
 set (REPLACE_HEADER

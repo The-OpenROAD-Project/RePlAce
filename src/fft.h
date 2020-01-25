@@ -1,79 +1,63 @@
 #ifndef __REPLACE_FFT__
 #define __REPLACE_FFT__
 
+#include <vector>
 
 namespace replace {
 
-// trying to implement...
 class FFT {
   public:
     FFT();
+    FFT(int binCntX, int binCntY, int binSizeX, int binSizeY);
     ~FFT();
 
+    // input func
+    void updateDensity(int x, int y, float density);
+
+    // do FFT
+    void doFFT();
+
+    // returning func
+    std::pair<float, float> getElectroForce(int x, int y);
+    float getElectroPhi(int x, int y);
+
   private:
-    std::vector<std::vector<float>> binDensity;
-    std::vector<std::vector<float>> ex;
-    std::vector<std::vector<float>> ey;
-    int binCntX;
-    int binCntY;
+    // 2D array; width: binCntX_, height: binCntY_;
+    std::vector<std::vector<float>> binDensity_;
+    std::vector<std::vector<float>> electroPhi_;
+    std::vector<std::vector<float>> electroForceX_;
+    std::vector<std::vector<float>> electroForceY_;
+
+    // cos/sin table (prev: w_2d)
+    // length:  max(binCntX, binCntY) * 3 / 2
+    std::vector<float> csTable_;
+
+    // wx. length:  binCntX_
+    std::vector<float> wx_;
+    std::vector<float> wxSquare_;
+
+    // wy. length:  binCntY_
+    std::vector<float> wy_;
+    std::vector<float> wySquare_;
+
+    // work area for bit reversal (prev: ip)
+    // length: round(sqrt( max(binCntX_, binCntY_) )) + 2
+    std::vector<int> workArea_;
+
+    int binCntX_;
+    int binCntY_;
+    int binSizeX_;
+    int binSizeY_;
+
+    void init();
 };
 
 
-
-// following is the previous code that encrypted =(
 //
-extern float **den_2d_st2;
-extern float **phi_2d_st2;
-extern float **ex_2d_st2;
-extern float **ey_2d_st2;
-
-extern float *w_2d;
-extern float *wx_2d_st;
-extern float *wx2_2d_st;
-extern float *wy_2d_st;
-extern float *wy2_2d_st;
-
-extern float DFT_SCALE_2D;
-extern struct POS dft_bin_2d;
-
-/// Electrostatic-Based Functions /////////////////////////////////////////
-void charge_fft_init(struct POS nbin, struct FPOS stp, int flg);
-void charge_fft_init_2d(struct POS nbin, struct FPOS stp);
-
-void charge_fft_delete(int flg);
-void charge_fft_delete_2d(void);
-
-void charge_fft_call(int flg);
-void charge_fft_call_2d(void);
-
-inline void copy_e_from_fft_2D(struct FPOS *e, struct POS p) {
-  e->x = ex_2d_st2[p.x][p.y];
-  e->y = ey_2d_st2[p.x][p.y];
-}
-inline void copy_phi_from_fft_2D(float *phi, struct POS p) {
-  *phi = phi_2d_st2[p.x][p.y];
-}
-inline void copy_den_to_fft_2D(float density, struct POS p) {
-  den_2d_st2[p.x][p.y] = den;
-}
-/// Thermal-Based Functions ///////////////////////////////////////////////
-// void thermal_fft_init    (struct POS nbin, struct FPOS stp, int flg);
-// void thermal_fft_init_2d (struct POS nbin, struct FPOS stp);
-// void thermal_fft_init_3d (struct POS nbin, struct FPOS stp);
+// The following FFT library came from
+// http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html
 //
-// void thermal_fft_delete    (int flg);
-// void thermal_fft_delete_2d (void);
-// void thermal_fft_delete_3d (void);
 //
-// void thermal_fft_call (int flg);
-// void thermal_fft_call_2d (void);
-// void thermal_fft_call_3d (void);
-//
-// void copy_heatflux_from_fft   (struct FPOS *heatflux, struct POS p, int flg);
-// void copy_theta_from_fft      (float   *phi, struct POS p, int flg);
-// void copy_powerDensity_to_fft (float   powerDensity, struct POS p, int flg);
-
-// From FFT Library
 /// 1D FFT ////////////////////////////////////////////////////////////////
 void cdft(int n, int isgn, float *a, int *ip, float *w);
 void ddct(int n, int isgn, float *a, int *ip, float *w);
