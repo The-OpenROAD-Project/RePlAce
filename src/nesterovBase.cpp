@@ -8,6 +8,9 @@
 #include <iostream>
 #include <random>
 
+
+#define REPLACE_SQRT2 1.414213562373095048801L
+
 namespace replace {
 
 using namespace std;
@@ -1077,6 +1080,35 @@ NesterovBase::init() {
   // initialize fft structrue based on bins
   std::unique_ptr<FFT> fft(new FFT(bg_.binCntX(), bg_.binCntY(), bg_.binSizeX(), bg_.binSizeY()));
   fft_ = std::move(fft);
+
+
+  // update densitySize and densityScale in each gCell
+  for(auto& gCell : gCells_) {
+    float scaleX = 0, scaleY = 0;
+    float densitySizeX = 0, densitySizeY = 0;
+    if( gCell->dx() < REPLACE_SQRT2 * bg_.binSizeX() ) {
+      scaleX = static_cast<float>(gCell->dx()) / 
+        static_cast<float>( REPLACE_SQRT2 * bg_.binSizeX());
+      densitySizeX = REPLACE_SQRT2 * static_cast<float>(bg_.binSizeX()) / 2.0;
+    }
+    else {
+      scaleX = 1.0;
+      densitySizeX = gCell->dx();
+    }
+
+    if( gCell->dy() < REPLACE_SQRT2 * bg_.binSizeY() ) {
+      scaleY = static_cast<float>(gCell->dy()) / 
+        static_cast<float>( REPLACE_SQRT2 * bg_.binSizeY());
+      densitySizeY = REPLACE_SQRT2 * static_cast<float>(bg_.binSizeY()) / 2.0;
+    }
+    else {
+      scaleY = 1.0;
+      densitySizeY = gCell->dy();
+    }
+
+    gCell->setDensitySize(densitySizeX, densitySizeY);
+    gCell->setDensityScale(scaleX * scaleY);
+  } 
 }
 
 
