@@ -146,4 +146,5 @@ PRIVATE
   ${OPENDB_HOME}/include/opendb
   ${OPENDB_HOME}/include
   ${OPENROAD_HOME}/include
+  ${TCL_INCLUDE_PATH}
 )
