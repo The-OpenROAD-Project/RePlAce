@@ -1,7 +1,9 @@
 #ifndef __REPLACE_NESTEROV_PLACE__
 #define __REPLACE_NESTEROV_PLACE__
 
+#include "coordi.h"
 #include <memory>
+#include <vector>
 
 namespace replace
 {
@@ -10,18 +12,63 @@ class PlacerBase;
 class Instance;
 class NesterovBase;
 
+class NesterovPlaceVars {
+  public:
+  float initDensityPanelty;
+  int maxBackTrack;
+  NesterovPlaceVars();
+};
+
 class NesterovPlace {
 public:
   NesterovPlace();
-  NesterovPlace(std::shared_ptr<PlacerBase> pb,
+  NesterovPlace(NesterovPlaceVars npVars,
+      std::shared_ptr<PlacerBase> pb,
       std::shared_ptr<NesterovBase> nb);
   ~NesterovPlace();
 
   void doNesterovPlace();
 
+  void updateCoordi(std::vector<FloatCoordi>& coordi);
+  void updateBins();
+  void updateWireLength();
+
+  void updateGradients(std::vector<FloatCoordi>& sumGrads,
+      std::vector<FloatCoordi>& wireLengthGrads,
+      std::vector<FloatCoordi>& densityGrads );
+
+
 private:
   std::shared_ptr<PlacerBase> pb_;
   std::shared_ptr<NesterovBase> nb_;
+  NesterovPlaceVars npVars_;
+
+  // y_st, y_dst, y_wdst, w_pdst
+  std::vector<FloatCoordi> curCoordi_;
+  std::vector<FloatCoordi> curWireLengthGrads_;
+  std::vector<FloatCoordi> curDensityGrads_;
+  std::vector<FloatCoordi> curSumGrads_;
+
+  // y0_st, y0_dst, y0_wdst, y0_pdst
+  std::vector<FloatCoordi> newCoordi_;
+  std::vector<FloatCoordi> newWireLengthGrads_;
+  std::vector<FloatCoordi> newDensityGrads_;
+  std::vector<FloatCoordi> newSumGrads_;
+
+  // z_st, z_dst, z_wdst, z_pdst
+  std::vector<FloatCoordi> prevCoordi_;
+  std::vector<FloatCoordi> prevWireLengthGrads_;
+  std::vector<FloatCoordi> prevDensityGrads_;
+  std::vector<FloatCoordi> prevSumGrads_;
+
+  float wireLengthGradSum_;
+  float densityGradSum_;
+
+  // alpha
+  float backTrackStepLength_;
+
+  // opt_phi_cof
+  float curDensityPanelty_;
 
   void init();
   void reset();

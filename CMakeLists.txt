@@ -62,6 +62,7 @@ set (REPLACE_SRC
   src/fft.cpp
   src/fftsg.cpp
   src/fftsg2d.cpp
+  src/coordi.cpp
   )
 
 set (REPLACE_HEADER

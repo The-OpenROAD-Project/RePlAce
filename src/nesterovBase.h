@@ -5,6 +5,8 @@
 #include <memory>
 #include <unordered_map>
 
+#include "coordi.h"
+
 namespace replace {
 
 class Instance;
@@ -33,7 +35,7 @@ public:
   Instance* instance() const;
   const std::vector<Instance*> & insts() const { return insts_; }
   const std::vector<GPin*> & gPins() const { return gPins_; }
-    
+
   void addGPin(GPin* gPin);
 
   void setClusteredInstance(std::vector<Instance*>& insts);
@@ -433,13 +435,14 @@ public:
 
   // update gCells with lx, ly
   void updateGCellLocation(
-      std::vector<int>& lx,
-      std::vector<int>& ly);
+      std::vector<FloatCoordi>& coordis);
 
   // update gCells with cx, cy
   void updateGCellCenterLocation(
-      std::vector<int>& cx,
-      std::vector<int>& cy);
+      std::vector<FloatCoordi>& coordis);
+
+  void updateGCellDensityCenterLocation(
+      std::vector<FloatCoordi>& coordis);
 
   // WL force update based on WeightedAverage model
   // wlCoeffX : WireLengthCoefficient for X.
@@ -453,11 +456,21 @@ public:
       float wlCoeffX,
       float wlCoeffY);
 
-  std::pair<float, float>
-    getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoeffY);
+  FloatCoordi
+    getWireLengthGradientPinWA(GPin* gPin,
+        float wlCoeffX, float wlCoeffY);
 
-  std::pair<float, float>
-    getWireLengthGradientWA(GCell* gCell, float wlCoeffX, float wlCoeffY);
+  FloatCoordi
+    getWireLengthGradientWA(GCell* gCell,
+        float wlCoeffX, float wlCoeffY);
+
+  // for preconditioner
+  FloatCoordi
+    getWireLengthPreconditioner(GCell* gCell);
+
+  FloatCoordi
+    getDensityPreconditioner(GCell* gCell);
+
 
   // update electrostatic forces within Bin
   void updateDensityForceBin();
@@ -492,7 +505,5 @@ private:
 };
 
 }
-
-
 
 #endif

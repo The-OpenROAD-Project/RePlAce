@@ -86,7 +86,8 @@ void Replace::doNesterovPlace() {
 
   nb_ = std::make_shared<NesterovBase>(nbVars, pb_);
 
-  std::unique_ptr<NesterovPlace> np(new NesterovPlace(pb_, nb_));
+  NesterovPlaceVars npVars;
+  std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_));
   np_ = std::move(np);
 
   np_->doNesterovPlace();
