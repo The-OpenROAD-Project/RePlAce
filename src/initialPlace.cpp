@@ -81,7 +81,7 @@ void InitialPlace::placeInstsCenter() {
   const int centerX = pb_->die().coreCx();
   const int centerY = pb_->die().coreCy();
 
-  for(auto& inst: pb_->insts()) {
+  for(auto& inst: pb_->placeInsts()) {
     inst->setCenterLocation(centerX, centerY);
   }
 }
