@@ -74,7 +74,7 @@ void NesterovPlace::init() {
   nb_->updateDensityForceBin();
 
   baseWireLengthCoeff_ 
-    = npVars_.initWireLengthCoeff 
+    = 500 * npVars_.initWireLengthCoeff 
     / static_cast<float>(
         (nb_->binSizeX() + nb_->binSizeY())) 
     * 0.5;
@@ -130,6 +130,7 @@ NesterovPlace::updateGradients(
 
     sumGrads[i].x = wireLengthGrads[i].x + densityPanelty_ * densityGrads[i].x;
     sumGrads[i].y = wireLengthGrads[i].y + densityPanelty_ * densityGrads[i].y;
+    // cout << "w: " << wireLengthGrads[i].x << " d: " << densityGrads[i].x << endl;
   }
 }
 

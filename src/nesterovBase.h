@@ -128,6 +128,9 @@ class GNet {
     void setDontCare();
     bool isDontCare();
 
+    // clear WA(Weighted Average) variables.
+    void clearWaVars();
+
     void addWaExpMinSumX(float waExpMinSumX);
     void addWaXExpMinSumX(float waExpXMinSumX);
 
@@ -222,6 +225,9 @@ class GPin {
 
     int cx() const { return cx_; }
     int cy() const { return cy_; }
+    
+    // clear WA(Weighted Average) variables.
+    void clearWaVars();
 
     void setMaxExpSumX(float maxExpSumX);
     void setMaxExpSumY(float maxExpSumY);

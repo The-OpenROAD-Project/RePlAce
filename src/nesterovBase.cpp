@@ -328,6 +328,21 @@ GNet::updateBox() {
   } 
 }
 
+void
+GNet::clearWaVars() {
+  waExpMinSumStorX_ = 0;
+  waXExpMinSumStorX_ = 0;
+
+  waExpMaxSumStorX_ = 0;
+  waXExpMaxSumStorX_ = 0;
+    
+  waExpMinSumStorY_ = 0;
+  waYExpMinSumStorY_ = 0;
+
+  waExpMaxSumStorY_ = 0;
+  waYExpMaxSumStorY_ = 0;
+}
+
 // eight add functions
 void
 GNet::addWaExpMinSumX(float waExpMinSumX) {
@@ -429,6 +444,17 @@ void
 GPin::setCenterLocation(int cx, int cy) {
   cx_ = cx;
   cy_ = cy;
+}
+
+void
+GPin::clearWaVars() {
+  hasMaxExpSumX_ = 0;
+  hasMaxExpSumY_ = 0;
+  hasMinExpSumX_ = 0;
+  hasMinExpSumY_ = 0;
+    
+  maxExpSumX_ = maxExpSumY_ = 0;
+  minExpSumX_ = minExpSumY_ = 0;
 }
 
 void
@@ -1382,6 +1408,14 @@ void
 NesterovBase::updateWireLengthForceWA(
     float wlCoeffX, float wlCoeffY) {
 
+  // clear all WA variables.
+  for(auto& gNet : gNets_) {
+    gNet->clearWaVars();
+  }
+  for(auto& gPin : gPins_) {
+    gPin->clearWaVars();
+  }
+
   for(auto& gNet : gNets_) {
     gNet->updateBox();
 
@@ -1635,7 +1669,7 @@ getOverlapArea(Bin* bin, Instance* inst) {
 
 static float
 fastExp(float a) {
-  a = 1.0 * a / 1024.0;
+  a = 1.0 + a / 1024.0;
   a *= a;
   a *= a;
   a *= a;
