@@ -34,7 +34,6 @@ Instance::Instance(odb::dbInst* inst) : Instance() {
   ly_ = ly;
   ux_ = lx + inst_->getBBox()->getDX();
   uy_ = ly + inst_->getBBox()->getDY();
-  cout << inst->getConstName() << " " << lx_ << " " << ly_ << endl;
 
   // 
   // TODO
