@@ -22,6 +22,7 @@ NesterovPlace::NesterovPlace()
   densityGradSum_(0),
   backTrackStepLength_(0),
   densityPanelty_(0),
+  baseWireLengthCoeff_(0), 
   wireLengthCoeffX_(0), 
   wireLengthCoeffY_(0) {}
 
@@ -42,33 +43,37 @@ NesterovPlace::~NesterovPlace() {
 
 void NesterovPlace::init() {
   const int gCellSize = nb_->gCells().size();
-  curCoordi_.reserve(gCellSize);
-  curWireLengthGrads_.reserve(gCellSize);
-  curDensityGrads_.reserve(gCellSize);
-  curSumGrads_.reserve(gCellSize);
+  curCoordi_.resize(gCellSize, FloatCoordi());
+  curWireLengthGrads_.resize(gCellSize, FloatCoordi());
+  curDensityGrads_.resize(gCellSize, FloatCoordi());
+  curSumGrads_.resize(gCellSize, FloatCoordi());
 
-  newCoordi_.reserve(gCellSize);
-  newWireLengthGrads_.reserve(gCellSize);
-  newDensityGrads_.reserve(gCellSize);
-  newSumGrads_.reserve(gCellSize);
+  newCoordi_.resize(gCellSize, FloatCoordi());
+  newWireLengthGrads_.resize(gCellSize, FloatCoordi());
+  newDensityGrads_.resize(gCellSize, FloatCoordi());
+  newSumGrads_.resize(gCellSize, FloatCoordi());
   
-  prevCoordi_.reserve(gCellSize);
-  prevWireLengthGrads_.reserve(gCellSize);
-  prevDensityGrads_.reserve(gCellSize);
-  prevSumGrads_.reserve(gCellSize);
+  prevCoordi_.resize(gCellSize, FloatCoordi());
+  prevWireLengthGrads_.resize(gCellSize, FloatCoordi());
+  prevDensityGrads_.resize(gCellSize, FloatCoordi());
+  prevSumGrads_.resize(gCellSize, FloatCoordi());
 
   for(auto& gCell : nb_->gCells()) {
     nb_->updateDensityCoordiLayoutInside( gCell );
-    curCoordi_.push_back(
-        FloatCoordi(gCell->dCx(), gCell->dCy())); 
-    prevCoordi_.push_back(
-        FloatCoordi(gCell->dCx(), gCell->dCy()));
+    int idx = &gCell - &nb_->gCells()[0];
+    curCoordi_[idx] = 
+      FloatCoordi(gCell->dCx(), gCell->dCy()); 
+    prevCoordi_[idx] = 
+      FloatCoordi(gCell->dCx(), gCell->dCy());
   }
 
   // bin update
   nb_->updateGCellDensityCenterLocation(curCoordi_);
 
-  float baseWireLengthCoeff 
+  // FFT update
+  nb_->updateDensityForceBin();
+
+  baseWireLengthCoeff_ 
     = npVars_.initWireLengthCoeff 
     / static_cast<float>(
         (nb_->binSizeX() + nb_->binSizeY())) 
@@ -79,6 +84,8 @@ void NesterovPlace::init() {
         / static_cast<float>(pb_->placeInstsArea());
 
   cout << "InitSumOverflow: " << sumOverflow_ << endl;
+  updateWireLengthCoef(sumOverflow_);
+  cout << "wireLengthCoeff: " << wireLengthCoeffX_ << endl;
 
 }
 
@@ -108,7 +115,9 @@ NesterovPlace::updateGradients(
 
   for(int i=0; i<sumGrads.size(); i++) {
     GCell* gCell = nb_->gCells().at(i);
-
+    wireLengthGrads[i] = nb_->getWireLengthGradientWA(
+        gCell, wireLengthCoeffX_, wireLengthCoeffY_);
+//    densityGrads[i] = 
 
   }
 }
@@ -125,6 +134,23 @@ NesterovPlace::doNesterovPlace() {
   float initCoefX = 0.1, initCoefY = 0.1;
   nb_->updateWireLengthForceWA(initCoefX, initCoefY);
   cout << "WL force Done" << endl;
+}
+
+void
+NesterovPlace::updateWireLengthCoef(float overflow) {
+  if( overflow > 1.0 ) {
+    wireLengthCoeffX_ = wireLengthCoeffY_ = 0.1;
+  }
+  else if( overflow < 0.1 ) {
+    wireLengthCoeffX_ = wireLengthCoeffY_ = 10.0;
+  }
+  else {
+    wireLengthCoeffX_ = wireLengthCoeffY_ 
+      = 1.0 / pow(10.0, (overflow-0.1)*20 / 9.0 - 1.0);
+  }
+
+  wireLengthCoeffX_ *= baseWireLengthCoeff_;
+  wireLengthCoeffY_ *= baseWireLengthCoeff_;
 }
 
 }

@@ -42,6 +42,8 @@ public:
       std::vector<FloatCoordi>& wireLengthGrads,
       std::vector<FloatCoordi>& densityGrads );
 
+  void updateWireLengthCoef(float overflow);
+
 
 private:
   std::shared_ptr<PlacerBase> pb_;
@@ -74,6 +76,9 @@ private:
 
   // opt_phi_cof
   float densityPanelty_;
+
+  // base_wcof
+  float baseWireLengthCoeff_;
 
   // wlen_cof
   float wireLengthCoeffX_;

@@ -1516,6 +1516,7 @@ NesterovBase::updateDensityForceBin() {
     fft_->updateDensity(bin->x(), bin->y(), 
         bin->density());  
   }
+  fft_->doFFT();
 }
 
 
