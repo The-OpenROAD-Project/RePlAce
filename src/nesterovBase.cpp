@@ -4,9 +4,9 @@
 #include "placerBase.h"
 #include "fft.h"
 
-#include <algorithm>
 #include <iostream>
 #include <random>
+#include <algorithm>
 
 
 #define REPLACE_SQRT2 1.414213562373095048801L
@@ -54,10 +54,10 @@ GCell::GCell(std::vector<Instance*>& insts)
 
 GCell::GCell(int cx, int cy, int dx, int dy) 
   : GCell() {
-  lx_ = cx - dx/2;
-  ly_ = cy - dy/2;
-  ux_ = cx + dx/2;
-  uy_ = cy + dy/2; 
+  dLx_ = lx_ = cx - dx/2;
+  dLy_ = ly_ = cy - dy/2;
+  dUx_ = ux_ = cx + dx/2;
+  dUy_ = uy_ = cy + dy/2; 
   setFiller();
 }
 
@@ -68,6 +68,11 @@ GCell::~GCell() {
 void
 GCell::setInstance(Instance* inst) {
   insts_.push_back(inst);
+  // density coordi has the same center points.
+  dLx_ = lx_ = inst->lx();
+  dLy_ = ly_ = inst->ly();
+  dUx_ = ux_ = inst->ux();
+  dUy_ = uy_ = inst->uy();
 }
 
 Instance*
@@ -152,12 +157,12 @@ GCell::dUy() const {
 
 int
 GCell::dCx() const {
-  return (dUx_ - dLx_)/2;
+  return (dUx_ + dLx_)/2;
 }
 
 int
 GCell::dCy() const {
-  return (dUy_ - dLy_)/2;
+  return (dUy_ + dLy_)/2;
 }
 
 int
@@ -465,7 +470,8 @@ Bin::Bin()
   ux_(0), uy_(0), 
   nonPlaceArea_(0), placedArea_(0),
   fillerArea_(0),
-  phi_(0), density_(0) {}
+  electroPhi_(0), placedDensity_(0),
+  fillerDensity_(0) {}
 
 Bin::Bin(int x, int y, int lx, int ly, int ux, int uy) 
   : Bin() {
@@ -481,7 +487,8 @@ Bin::~Bin() {
   x_ = y_ = 0;
   lx_ = ly_ = ux_ = uy_ = 0;
   nonPlaceArea_ = placedArea_ = fillerArea_ = 0;
-  phi_ = density_ = electroForce_ = 0;
+  electroPhi_ = electroForce_ = 0;
+  placedDensity_ = fillerDensity_ = 0; 
 }
 
 int
@@ -562,15 +569,22 @@ Bin::addFillerArea(int64_t area) {
   fillerArea_ += area;
 }
 
+const int64_t 
+Bin::binArea() const { 
+  return static_cast<int64_t>( dx() ) 
+    * static_cast<int64_t>( dy() );
+}
+
+
 
 float
-Bin::phi() const {
-  return phi_;
+Bin::placedDensity() const {
+  return placedDensity_;
 }
 
 float
-Bin::density() const {
-  return density_;
+Bin::fillerDensity() const {
+  return fillerDensity_;
 }
 
 float
@@ -578,19 +592,29 @@ Bin::electroForce() const {
   return electroForce_;
 }
 
-void
-Bin::setPhi(float phi) {
-  phi_ = phi;
+float
+Bin::electroPhi() const {
+  return electroPhi_;
 }
 
 void
-Bin::setDensity(float density) {
-  density_ = density;
+Bin::setPlacedDensity(float density) {
+  placedDensity_ = density;
+}
+
+void
+Bin::setFillerDensity(float density) {
+  fillerDensity_ = density;
 }
 
 void
 Bin::setElectroForce(float electroForce) {
   electroForce_ = electroForce;
+}
+
+void
+Bin::setElectroPhi(float phi) {
+  electroPhi_ = phi;
 }
 
 ////////////////////////////////////////////////
@@ -601,6 +625,7 @@ BinGrid::BinGrid()
   binCntX_(0), binCntY_(0),
   binSizeX_(0), binSizeY_(0),
   targetDensity_(0), 
+  overflowArea_(0), 
   isSetBinCntX_(0), isSetBinCntY_(0) {}
 
 BinGrid::BinGrid(Die* die) : BinGrid() {
@@ -610,10 +635,10 @@ BinGrid::BinGrid(Die* die) : BinGrid() {
 BinGrid::~BinGrid() {
   std::vector<Bin> ().swap(binStor_);
   std::vector<Bin*> ().swap(bins_);
-  lx_ = ly_ = ux_ = uy_ = 0;
   binCntX_ = binCntY_ = 0;
   binSizeX_ = binSizeY_ = 0;
   isSetBinCntX_ = isSetBinCntY_ = 0;
+  overflowArea_ = 0;
 }
 
 void
@@ -710,6 +735,12 @@ int
 BinGrid::binSizeY() const {
   return binSizeY_;
 }
+
+int64_t 
+BinGrid::overflowArea() const {
+  return overflowArea_;
+}
+
 
 void
 BinGrid::initBins() {
@@ -808,8 +839,8 @@ BinGrid::updateBinsNonPlaceArea() {
     std::pair<int, int> pairX = getMinMaxIdxX(inst);
     std::pair<int, int> pairY = getMinMaxIdxY(inst);
    
-    for(int i = pairX.first; i <= pairX.second; i++) {
-      for(int j = pairY.first; j <= pairY.second; j++) {
+    for(int i = pairX.first; i < pairX.second; i++) {
+      for(int j = pairY.first; j < pairY.second; j++) {
         Bin* bin = bins_[ j * binCntX_ + i ];
         bin->addNonPlaceArea( getOverlapArea(bin, inst) );
       }
@@ -832,16 +863,16 @@ BinGrid::updateBinsGCellArea(std::vector<GCell*>& cells) {
     std::pair<int, int> pairY = getMinMaxIdxY(cell);
    
     if( cell->isInstance() ) {
-      for(int i = pairX.first; i <= pairX.second; i++) {
-        for(int j = pairY.first; j <= pairY.second; j++) {
+      for(int i = pairX.first; i < pairX.second; i++) {
+        for(int j = pairY.first; j < pairY.second; j++) {
           Bin* bin = bins_[ j * binCntX_ + i ];
           bin->addPlacedArea( getOverlapArea(bin, cell) );
         }
       }
     }
     else if( cell->isFiller() ) {
-      for(int i = pairX.first; i <= pairX.second; i++) {
-        for(int j = pairY.first; j <= pairY.second; j++) {
+      for(int i = pairX.first; i < pairX.second; i++) {
+        for(int j = pairY.first; j < pairY.second; j++) {
           Bin* bin = bins_[ j * binCntX_ + i ];
           bin->addFillerArea( getOverlapArea(bin, cell) );
         }
@@ -861,26 +892,43 @@ BinGrid::updateBinsGCellDensityArea(
   }
 
   for(auto& cell : cells) {
-    std::pair<int, int> pairX = getMinMaxIdxX(cell);
-    std::pair<int, int> pairY = getMinMaxIdxY(cell);
+    std::pair<int, int> pairX 
+      = getDensityMinMaxIdxX(cell);
+    std::pair<int, int> pairY 
+      = getDensityMinMaxIdxY(cell);
    
     if( cell->isInstance() ) {
-      for(int i = pairX.first; i <= pairX.second; i++) {
-        for(int j = pairY.first; j <= pairY.second; j++) {
+      for(int i = pairX.first; i < pairX.second; i++) {
+        for(int j = pairY.first; j < pairY.second; j++) {
           Bin* bin = bins_[ j * binCntX_ + i ];
           bin->addPlacedArea( getOverlapDensityArea(bin, cell) ); 
         }
       }
     }
     else if( cell->isFiller() ) {
-      for(int i = pairX.first; i <= pairX.second; i++) {
-        for(int j = pairY.first; j <= pairY.second; j++) {
+      for(int i = pairX.first; i < pairX.second; i++) {
+        for(int j = pairY.first; j < pairY.second; j++) {
           Bin* bin = bins_[ j * binCntX_ + i ];
           bin->addFillerArea( getOverlapDensityArea(bin, cell) ); 
         }
       }
     }
   }  
+
+  overflowArea_ = 0;
+  // update placedDensity and fillerDensity
+  for(auto& bin : bins_) {
+    int64_t binArea = bin->binArea(); 
+    bin->setPlacedDensity( 
+        static_cast<float> (bin->placedArea())
+        / binArea);
+    bin->setFillerDensity( 
+        static_cast<float> (bin->fillerArea())
+        / binArea);
+
+    overflowArea_  
+      += static_cast<int64_t>(std::max(0.0f, bin->fillerDensity() - targetDensity_) * binArea);
+  }
 }
 
 
@@ -895,12 +943,33 @@ BinGrid::getMinMaxIdxX(GCell* gcell) {
 }
 
 std::pair<int, int>
+BinGrid::getDensityMinMaxIdxX(GCell* gcell) {
+  int lowerIdx = (gcell->dLx() - lx())/binSizeX_;
+  int upperIdx = 
+   ( fastModulo((gcell->dUx() - lx()), binSizeX_) == 0)? 
+   (gcell->dUx() - lx()) / binSizeX_ 
+   : (gcell->dUx() - lx()) / binSizeX_ + 1;
+  return std::make_pair(lowerIdx, upperIdx);
+}
+
+std::pair<int, int>
 BinGrid::getMinMaxIdxY(GCell* gcell) {
   int lowerIdx = (gcell->ly() - ly())/binSizeY_;
   int upperIdx =
    ( fastModulo((gcell->uy() - ly()), binSizeY_) == 0)? 
    (gcell->uy() - ly()) / binSizeY_ 
    : (gcell->uy() - ly()) / binSizeY_ + 1;
+  return std::make_pair(lowerIdx, upperIdx);
+}
+
+std::pair<int, int>
+BinGrid::getDensityMinMaxIdxY(GCell* gcell) {
+  int lowerIdx = (gcell->dLy() - ly())/binSizeY_;
+  int upperIdx =
+   ( fastModulo((gcell->dUy() - ly()), binSizeY_) == 0)? 
+   (gcell->dUy() - ly()) / binSizeY_ 
+   : (gcell->dUy() - ly()) / binSizeY_ + 1;
+
   return std::make_pair(lowerIdx, upperIdx);
 }
 
@@ -1238,6 +1307,55 @@ NesterovBase::updateGCellDensityCenterLocation(
     gCells_[idx]->setDensityCenterLocation( 
         coordi.x, coordi.y );
   }
+  bg_.updateBinsGCellDensityArea( gCells_ );
+}
+
+int
+NesterovBase::binCntX() const {
+  return bg_.binCntX(); 
+}
+
+int
+NesterovBase::binCntY() const {
+  return bg_.binCntY();
+}
+
+int
+NesterovBase::binSizeX() const {
+  return bg_.binSizeX();
+}
+
+int
+NesterovBase::binSizeY() const {
+  return bg_.binSizeY();
+}
+
+
+int64_t 
+NesterovBase::overflowArea() const {
+  return bg_.overflowArea(); 
+}
+
+void 
+NesterovBase::updateDensityCoordiLayoutInside(
+    GCell* gCell) {
+  if( gCell->dLx() < bg_.lx() ) {
+    gCell->setDensityLocation(bg_.lx(), gCell->dLx());
+  }
+
+  if( gCell->dLy() < bg_.ly() ) {
+    gCell->setDensityLocation(gCell->dLx(), bg_.ly());
+  }
+
+  if( gCell->dUx() > bg_.ux() ) {
+    gCell->setDensityLocation(bg_.ux() - gCell->dDx(), 
+        gCell->dLy());
+  }
+
+  if( gCell->dUy() > bg_.uy() ) {
+    gCell->setDensityLocation(gCell->dLx(), 
+        bg_.uy() - gCell->dDy());
+  }
 }
 
 // 
@@ -1395,7 +1513,7 @@ void
 NesterovBase::updateDensityForceBin() {
   for(auto& bin : bg_.bins()) {
     fft_->updateDensity(bin->x(), bin->y(), 
-        bin->density());  
+        bin->placedDensity());  
   }
 }
 

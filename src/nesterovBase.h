@@ -294,13 +294,15 @@ public:
   int dx() const;
   int dy() const;
 
-  float phi() const;
-  float density() const;
+  float electroPhi() const;
   float electroForce() const;
+  float placedDensity() const;
+  float fillerDensity() const;
 
-  void setPhi(float phi);
-  void setDensity(float density);
+  void setPlacedDensity(float density);
+  void setFillerDensity(float density);
   void setElectroForce(float electroForce);
+  void setElectroPhi(float phi);
 
   void setNonPlaceArea(int64_t area);
   void setPlacedArea(int64_t area);
@@ -310,6 +312,7 @@ public:
   void addPlacedArea(int64_t area);
   void addFillerArea(int64_t area);
 
+  const int64_t binArea() const;
   const int64_t nonPlaceArea() const { return nonPlaceArea_; }
   const int64_t placedArea() const { return placedArea_; }
   const int64_t fillerArea() const { return fillerArea_; }
@@ -329,8 +332,9 @@ private:
   int64_t placedArea_;
   int64_t fillerArea_;
 
-  float phi_;
-  float density_;
+  float placedDensity_;
+  float fillerDensity_;
+  float electroPhi_;
   float electroForce_;
 };
 
@@ -370,9 +374,14 @@ public:
   int binSizeX() const;
   int binSizeY() const;
 
+  int64_t overflowArea() const;
+
   // return bins_ index with given gcell
   std::pair<int, int> getMinMaxIdxX(GCell* gcell);
   std::pair<int, int> getMinMaxIdxY(GCell* gcell);
+
+  std::pair<int, int> getDensityMinMaxIdxX(GCell* gcell);
+  std::pair<int, int> getDensityMinMaxIdxY(GCell* gcell);
 
   std::pair<int, int> getMinMaxIdxX(Instance* inst);
   std::pair<int, int> getMinMaxIdxY(Instance* inst);
@@ -392,6 +401,7 @@ private:
   int binSizeX_;
   int binSizeY_;
   float targetDensity_;
+  int64_t overflowArea_;
   unsigned char isSetBinCntX_:1;
   unsigned char isSetBinCntY_:1;
 
@@ -443,6 +453,15 @@ public:
 
   void updateGCellDensityCenterLocation(
       std::vector<FloatCoordi>& coordis);
+  
+  int binCntX() const;
+  int binCntY() const;
+  int binSizeX() const;
+  int binSizeY() const;
+
+  int64_t overflowArea() const;
+
+  void updateDensityCoordiLayoutInside(GCell* gcell);
 
   // WL force update based on WeightedAverage model
   // wlCoeffX : WireLengthCoefficient for X.

@@ -14,8 +14,13 @@ class NesterovBase;
 
 class NesterovPlaceVars {
   public:
-  float initDensityPanelty;
+  int maxNesterovIter;
   int maxBackTrack;
+  float initDensityPanelty;
+  float initWireLengthCoeff;
+  float targetOverflow;
+  float minBoundMuK;
+  float maxBoundMuK;
   NesterovPlaceVars();
 };
 
@@ -68,7 +73,20 @@ private:
   float backTrackStepLength_;
 
   // opt_phi_cof
-  float curDensityPanelty_;
+  float densityPanelty_;
+
+  // wlen_cof
+  float wireLengthCoeffX_;
+  float wireLengthCoeffY_;
+
+  // phi is described in ePlace paper.
+  float sumPhi_;
+  float sumOverflow_;
+
+  // half-parameter-wire-length
+  float hpwl_;
+
+  float getWireLengthCoeff(float overflow);
 
   void init();
   void reset();
