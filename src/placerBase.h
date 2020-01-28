@@ -258,8 +258,8 @@ public:
   int hpwl() const;
   void printInfo() const;
 
-  uint64_t placeInstsArea() const { return placeInstsArea_; }
-  uint64_t nonPlaceInstsArea() const { return nonPlaceInstsArea_; }
+  int64_t placeInstsArea() const { return placeInstsArea_; }
+  int64_t nonPlaceInstsArea() const { return nonPlaceInstsArea_; }
 
 private:
   odb::dbDatabase* db_;
@@ -286,8 +286,8 @@ private:
   int siteSizeX_;
   int siteSizeY_;
 
-  uint64_t placeInstsArea_;
-  uint64_t nonPlaceInstsArea_;
+  int64_t placeInstsArea_;
+  int64_t nonPlaceInstsArea_;
 
   void init();
   void initInstsForFragmentedRow();

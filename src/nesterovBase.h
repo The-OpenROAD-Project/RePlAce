@@ -296,25 +296,23 @@ public:
 
   float electroPhi() const;
   float electroForce() const;
-  float placedDensity() const;
-  float fillerDensity() const;
+  float density() const;
 
-  void setPlacedDensity(float density);
-  void setFillerDensity(float density);
+  void setDensity(float density);
   void setElectroForce(float electroForce);
   void setElectroPhi(float phi);
 
   void setNonPlaceArea(int64_t area);
-  void setPlacedArea(int64_t area);
+  void setInstPlacedArea(int64_t area);
   void setFillerArea(int64_t area);
 
   void addNonPlaceArea(int64_t area);
-  void addPlacedArea(int64_t area);
+  void addInstPlacedArea(int64_t area);
   void addFillerArea(int64_t area);
 
   const int64_t binArea() const;
   const int64_t nonPlaceArea() const { return nonPlaceArea_; }
-  const int64_t placedArea() const { return placedArea_; }
+  const int64_t instPlacedArea() const { return instPlacedArea_; }
   const int64_t fillerArea() const { return fillerArea_; }
 
 private:
@@ -329,11 +327,10 @@ private:
   int uy_;
 
   int64_t nonPlaceArea_;
-  int64_t placedArea_;
+  int64_t instPlacedArea_;
   int64_t fillerArea_;
 
-  float placedDensity_;
-  float fillerDensity_;
+  float density_;
   float electroPhi_;
   float electroForce_;
 };

@@ -73,12 +73,12 @@ void NesterovPlace::init() {
     / static_cast<float>(
         (nb_->binSizeX() + nb_->binSizeY())) 
     * 0.5;
-
-
+  
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
         / static_cast<float>(pb_->placeInstsArea());
-  cout << "sumOverflow: " << sumOverflow_ << endl;
+
+  cout << "InitSumOverflow: " << sumOverflow_ << endl;
 
 }
 

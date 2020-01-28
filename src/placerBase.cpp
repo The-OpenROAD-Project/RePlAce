@@ -34,6 +34,7 @@ Instance::Instance(odb::dbInst* inst) : Instance() {
   ly_ = ly;
   ux_ = lx + inst_->getBBox()->getDX();
   uy_ = ly + inst_->getBBox()->getDY();
+  cout << inst->getConstName() << " " << lx_ << " " << ly_ << endl;
 
   // 
   // TODO
@@ -863,9 +864,9 @@ PlacerBase::printInfo() const {
     << die_.coreUx() << " " << die_.coreUy() 
     << " ) " << endl;
 
-  uint64_t coreArea = 
-    static_cast<uint64_t>(die_.coreUx() - die_.coreLx()) * 
-    static_cast<uint64_t>(die_.coreUy() - die_.coreLy());
+  int64_t coreArea = 
+    static_cast<int64_t>(die_.coreUx() - die_.coreLx()) * 
+    static_cast<int64_t>(die_.coreUy() - die_.coreLy());
   float util = 
     static_cast<float>(placeInstsArea_) 
     / (coreArea - nonPlaceInstsArea_) * 100;
