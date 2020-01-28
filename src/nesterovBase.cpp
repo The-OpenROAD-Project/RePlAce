@@ -470,7 +470,9 @@ Bin::Bin()
   ux_(0), uy_(0), 
   nonPlaceArea_(0), instPlacedArea_(0),
   fillerArea_(0),
-  electroPhi_(0), density_ (0) {}
+  density_ (0),
+  electroPhi_(0), 
+  electroForceX_(0), electroForceY_(0) {}
 
 Bin::Bin(int x, int y, int lx, int ly, int ux, int uy) 
   : Bin() {
@@ -486,7 +488,7 @@ Bin::~Bin() {
   x_ = y_ = 0;
   lx_ = ly_ = ux_ = uy_ = 0;
   nonPlaceArea_ = instPlacedArea_ = fillerArea_ = 0;
-  electroPhi_ = electroForce_ = 0;
+  electroPhi_ = electroForceX_ = electroForceY_ = 0;
   density_ = 0;
 }
 
@@ -582,8 +584,13 @@ Bin::density() const {
 }
 
 float
-Bin::electroForce() const {
-  return electroForce_;
+Bin::electroForceX() const {
+  return electroForceX_;
+}
+
+float
+Bin::electroForceY() const {
+  return electroForceY_;
 }
 
 float
@@ -597,8 +604,9 @@ Bin::setDensity(float density) {
 }
 
 void
-Bin::setElectroForce(float electroForce) {
-  electroForce_ = electroForce;
+Bin::setElectroForce(float electroForceX, float electroForceY) {
+  electroForceX_ = electroForceX;
+  electroForceY_ = electroForceY;
 }
 
 void
@@ -614,7 +622,7 @@ BinGrid::BinGrid()
   binCntX_(0), binCntY_(0),
   binSizeX_(0), binSizeY_(0),
   targetDensity_(0), 
-  overflowArea_(0), 
+  overflowArea_(0),
   isSetBinCntX_(0), isSetBinCntY_(0) {}
 
 BinGrid::BinGrid(Die* die) : BinGrid() {
@@ -729,6 +737,7 @@ int64_t
 BinGrid::overflowArea() const {
   return overflowArea_;
 }
+
 
 
 void
@@ -909,8 +918,8 @@ BinGrid::updateBinsGCellDensityArea(
 
   overflowArea_ = 0;
 
-  int64_t totalBinPlacedArea = 0;
-  // update placedDensity and fillerDensity
+  // update density and overflowArea 
+  // for nesterov use and FFT library
   for(auto& bin : bins_) {
     int64_t binArea = bin->binArea(); 
     bin->setDensity( 
@@ -924,9 +933,9 @@ BinGrid::updateBinsGCellDensityArea(
           static_cast<float>(bin->instPlacedArea()) 
           - (binArea - bin->nonPlaceArea())*targetDensity_);
 
-    totalBinPlacedArea += bin->instPlacedArea();
   }
 }
+
 
 
 std::pair<int, int>
@@ -1020,7 +1029,7 @@ NesterovBaseVars::reset() {
 // NesterovBase 
 
 NesterovBase::NesterovBase()
-  : pb_(nullptr) {}
+  : pb_(nullptr), sumPhi_(0) {}
 
 NesterovBase::NesterovBase(
     NesterovBaseVars nbVars, 
@@ -1337,6 +1346,11 @@ NesterovBase::overflowArea() const {
   return bg_.overflowArea(); 
 }
 
+float
+NesterovBase::sumPhi() const {
+  return sumPhi_;
+}
+
 void 
 NesterovBase::updateDensityCoordiLayoutInside(
     GCell* gCell) {
@@ -1509,14 +1523,51 @@ NesterovBase::getDensityPreconditioner(GCell* gCell) {
   return FloatCoordi(areaVal, areaVal);
 }
 
+// get GCells' electroForcePair
+// i.e. get DensityGradient with given GCell
+FloatCoordi 
+NesterovBase::getDensityGradient(GCell* gCell) {
+  std::pair<int, int> pairX 
+    = bg_.getDensityMinMaxIdxX(gCell);
+  std::pair<int, int> pairY 
+    = bg_.getDensityMinMaxIdxY(gCell);
+  
+  FloatCoordi electroForce;
+
+  for(int i = pairX.first; i < pairX.second; i++) {
+    for(int j = pairY.first; j < pairY.second; j++) {
+      Bin* bin = bg_.bins()[ j * binCntX() + i ];
+      float overlapArea = getOverlapDensityArea(bin, gCell) * gCell->densityScale();
+      electroForce.x += overlapArea * bin->electroForceX();
+      electroForce.y += overlapArea * bin->electroForceY();
+    }
+  }
+  return electroForce;
+}
+
 // Density force cals
 void
 NesterovBase::updateDensityForceBin() {
+  // copy density to utilize FFT
   for(auto& bin : bg_.bins()) {
     fft_->updateDensity(bin->x(), bin->y(), 
         bin->density());  
   }
+
+  // do FFT
   fft_->doFFT();
+
+  // update electroPhi and electroForce
+  // update sumPhi_ for nesterov loop
+  for(auto& bin : bg_.bins()) {
+    auto eForcePair = fft_->getElectroForce(bin->x(), bin->y());
+    bin->setElectroForce(eForcePair.first, eForcePair.second);
+    float electroPhi = fft_->getElectroPhi(bin->x(), bin->y());
+    bin->setElectroPhi(electroPhi);
+
+    sumPhi_ += electroPhi 
+      * static_cast<float>(bin->nonPlaceArea() + bin->instPlacedArea() + bin->fillerArea());
+  }
 }
 
 

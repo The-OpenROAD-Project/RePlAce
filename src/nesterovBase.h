@@ -295,11 +295,12 @@ public:
   int dy() const;
 
   float electroPhi() const;
-  float electroForce() const;
+  float electroForceX() const;
+  float electroForceY() const;
   float density() const;
 
   void setDensity(float density);
-  void setElectroForce(float electroForce);
+  void setElectroForce(float electroForceX, float electroForceY);
   void setElectroPhi(float phi);
 
   void setNonPlaceArea(int64_t area);
@@ -332,7 +333,8 @@ private:
 
   float density_;
   float electroPhi_;
-  float electroForce_;
+  float electroForceX_;
+  float electroForceY_;
 };
 
 //
@@ -353,6 +355,7 @@ public:
   void setTargetDensity(float density);
   void updateBinsGCellArea(std::vector<GCell*>& cells);
   void updateBinsGCellDensityArea(std::vector<GCell*>& cells);
+
 
   void initBins();
 
@@ -457,6 +460,7 @@ public:
   int binSizeY() const;
 
   int64_t overflowArea() const;
+  float sumPhi() const;
 
   void updateDensityCoordiLayoutInside(GCell* gcell);
 
@@ -487,6 +491,9 @@ public:
   FloatCoordi
     getDensityPreconditioner(GCell* gCell);
 
+  FloatCoordi
+    getDensityGradient(GCell* gCell);
+
 
   // update electrostatic forces within Bin
   void updateDensityForceBin();
@@ -512,6 +519,8 @@ private:
   std::unordered_map<Instance*, GCell*> gCellMap_;
   std::unordered_map<Pin*, GPin*> gPinMap_;
   std::unordered_map<Net*, GNet*> gNetMap_;
+
+  float sumPhi_;
 
   void init();
   void initFillerGCells();

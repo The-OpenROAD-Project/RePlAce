@@ -87,6 +87,8 @@ void NesterovPlace::init() {
   updateWireLengthCoef(sumOverflow_);
   cout << "wireLengthCoeff: " << wireLengthCoeffX_ << endl;
 
+  // WL update
+  nb_->updateWireLengthForceWA(wireLengthCoeffX_, wireLengthCoeffY_);
 }
 
 // clear reset
@@ -107,32 +109,38 @@ void NesterovPlace::reset() {
   vector<FloatCoordi> ().swap(prevSumGrads_);
 }
 
+// to execute following function,
+// 
+// nb_->updateGCellDensityCenterLocation(coordi); // bin update
+// nb_->updateDensityForceBin(); // bin Force update
+//  
+// nb_->updateWireLengthForceWA(wireLengthCoeffX_, wireLengthCoeffY_); // WL update
+//
 void
 NesterovPlace::updateGradients(
     std::vector<FloatCoordi>& sumGrads,
     std::vector<FloatCoordi>& wireLengthGrads,
     std::vector<FloatCoordi>& densityGrads) {
 
-  for(int i=0; i<sumGrads.size(); i++) {
+  for(int i=0; i<nb_->gCells().size(); i++) {
     GCell* gCell = nb_->gCells().at(i);
     wireLengthGrads[i] = nb_->getWireLengthGradientWA(
         gCell, wireLengthCoeffX_, wireLengthCoeffY_);
-//    densityGrads[i] = 
+    densityGrads[i] = nb_->getDensityGradient(gCell); 
 
+    sumGrads[i].x = wireLengthGrads[i].x + densityPanelty_ * densityGrads[i].x;
+    sumGrads[i].y = wireLengthGrads[i].y + densityPanelty_ * densityGrads[i].y;
   }
 }
 
 void
 NesterovPlace::doNesterovPlace() {
   cout << "nesterovPlace: " << endl;
-
+  
   updateGradients(
       curSumGrads_, curWireLengthGrads_,
       curDensityGrads_);
 
-
-  float initCoefX = 0.1, initCoefY = 0.1;
-  nb_->updateWireLengthForceWA(initCoefX, initCoefY);
   cout << "WL force Done" << endl;
 }
 
