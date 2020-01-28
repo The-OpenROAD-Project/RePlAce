@@ -2,6 +2,8 @@
 #include <cmath>
 #include <cfloat>
 
+#include <iostream>
+
 #include "fft.h"
 
 #define REPLACE_FFT_PI 3.141592653589793238462L 
@@ -21,16 +23,16 @@ FFT::FFT(int binCntX, int binCntY, int binSizeX, int binSizeY)
 FFT::~FFT() {
   using std::vector;
   for(int i=0; i<binCntX_; i++) {
-    vector<float>().swap(binDensity_[i]);
-    vector<float>().swap(electroPhi_[i]);
-    vector<float>().swap(electroForceX_[i]);
-    vector<float>().swap(electroForceY_[i]);
+    delete(binDensity_[i]);
+    delete(electroPhi_[i]);
+    delete(electroForceX_[i]);
+    delete(electroForceY_[i]);
   }
+  delete(binDensity_);
+  delete(electroPhi_);
+  delete(electroForceX_);
+  delete(electroForceY_);
 
-  vector<vector<float>>().swap(binDensity_);
-  vector<vector<float>>().swap(electroPhi_);
-  vector<vector<float>>().swap(electroForceX_);
-  vector<vector<float>>().swap(electroForceY_);
 
   vector<float> ().swap(csTable_);
   vector<float> ().swap(wx_);
@@ -44,16 +46,24 @@ FFT::~FFT() {
 
 void
 FFT::init() {
-  binDensity_.resize(binCntX_);
-  electroPhi_.resize(binCntX_);
-  electroForceX_.resize(binCntX_);
-  electroForceY_.resize(binCntX_);
+  binDensity_ = new float*[binCntX_];
+  electroPhi_ = new float*[binCntX_];
+  electroForceX_ = new float*[binCntX_];
+  electroForceY_ = new float*[binCntX_];
 
   for(int i=0; i<binCntX_; i++) {
-    binDensity_[i].resize(binCntY_, 0);
-    electroPhi_[i].resize(binCntY_, 0);
-    electroForceX_[i].resize(binCntY_, 0);
-    electroForceY_[i].resize(binCntY_, 0);
+    binDensity_[i] = new float[binCntY_];
+    electroPhi_[i] = new float[binCntY_];
+    electroForceX_[i] = new float[binCntY_];
+    electroForceY_[i] = new float[binCntY_];
+
+    for(int j=0; j<binCntY_; j++) {
+      binDensity_[i][j] 
+        = electroPhi_[i][j] 
+        = electroForceX_[i][j] 
+        = electroForceY_[i][j] 
+        = 0.0f;  
+    }
   }
 
   csTable_.resize( std::max(binCntX_, binCntY_) * 3 / 2, 0 );
@@ -97,10 +107,11 @@ FFT::getElectroPhi(int x, int y) {
   return electroPhi_[x][y]; 
 }
 
+using namespace std;
 
 void
 FFT::doFFT() {
-  ddct2d(binCntX_, binCntY_, -1, (float**)&binDensity_[0][0], 
+  ddct2d(binCntX_, binCntY_, -1, binDensity_, 
       NULL, (int*) &workArea_[0], (float*)&csTable_[0]);
   
   for(int i = 0; i < binCntX_; i++) {
@@ -155,14 +166,14 @@ FFT::doFFT() {
   }
   // Inverse DCT
   ddct2d(binCntX_, binCntY_, 1, 
-      (float**) &electroPhi_[0][0], 
-      NULL, (int*) &workArea_[0], (float*) &csTable_[0]);
+      electroPhi_, NULL, 
+      (int*) &workArea_[0], (float*) &csTable_[0]);
   ddsct2d(binCntX_, binCntY_, 1, 
-      (float**) &electroForceX_[0][0], 
-      NULL, (int*) &workArea_[0], (float*) &csTable_[0]);
+      electroForceX_, NULL, 
+      (int*) &workArea_[0], (float*) &csTable_[0]);
   ddcst2d(binCntX_, binCntY_, 1, 
-      (float**) &electroForceY_[0][0], 
-      NULL, (int*) &workArea_[0], (float*) &csTable_[0]);
+      electroForceY_, NULL, 
+      (int*) &workArea_[0], (float*) &csTable_[0]);
 }
 
 }

@@ -282,6 +282,7 @@ Appendix :
 */
 
 #include <cmath>
+#include <iostream>
 
 namespace replace {
 
@@ -373,6 +374,7 @@ void ddct(int n, int isgn, float *a, int *ip, float *w) {
   }
   if(isgn < 0) {
     xr = a[n - 1];
+    
     for(j = n - 2; j >= 2; j -= 2) {
       a[j + 1] = a[j] - a[j - 1];
       a[j] += a[j - 1];

@@ -23,10 +23,11 @@ class FFT {
 
   private:
     // 2D array; width: binCntX_, height: binCntY_;
-    std::vector<std::vector<float>> binDensity_;
-    std::vector<std::vector<float>> electroPhi_;
-    std::vector<std::vector<float>> electroForceX_;
-    std::vector<std::vector<float>> electroForceY_;
+    // No hope to use Vector at this moment...
+    float** binDensity_;
+    float** electroPhi_;
+    float** electroForceX_;
+    float** electroForceY_;
 
     // cos/sin table (prev: w_2d)
     // length:  max(binCntX, binCntY) * 3 / 2
