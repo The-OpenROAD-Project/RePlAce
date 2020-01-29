@@ -124,6 +124,7 @@ class GNet {
 
     void addGPin(GPin* gPin);
     void updateBox();
+    int32_t hpwl();
 
     void setDontCare();
     bool isDontCare();
@@ -148,12 +149,13 @@ class GNet {
 
     float waExpMinSumY() const { return waExpMinSumStorY_; }
     float waYExpMinSumY() const { return waYExpMinSumStorY_; }
-    
+
     float waExpMaxSumX() const { return waExpMaxSumStorX_; }
     float waXExpMaxSumX() const { return waXExpMaxSumStorX_; }
 
     float waExpMaxSumY() const { return waExpMaxSumStorY_; }
     float waYExpMaxSumY() const { return waYExpMaxSumStorY_; }
+
 
   private:
     std::vector<GPin*> gPins_;
@@ -246,6 +248,7 @@ class GPin {
 
     void setCenterLocation(int cx, int cy);
     void updateLocation(const GCell* gCell);
+    void updateDensityLocation(const GCell* gCell);
 
   private:
     GCell* gCell_;
@@ -459,7 +462,7 @@ public:
 
   void updateGCellDensityCenterLocation(
       std::vector<FloatCoordi>& coordis);
-  
+
   int binCntX() const;
   int binCntY() const;
   int binSizeX() const;
@@ -503,6 +506,7 @@ public:
   FloatCoordi
     getDensityGradient(GCell* gCell);
 
+  int32_t getHpwl();
 
   // update electrostatic forces within Bin
   void updateDensityForceBin();

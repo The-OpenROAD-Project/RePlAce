@@ -21,7 +21,9 @@ class NesterovPlaceVars {
   float targetOverflow; // overflow
   float minBoundMuK; // pcof_min
   float maxBoundMuK; // pcof_max
+  float maxPreconditioner; // MIN_PRE
   float initialPrevCoordiUpdateCoeff; // z_ref_alpha
+  float referenceHpwl; // refDeltaHpwl
   NesterovPlaceVars();
 };
 
@@ -35,46 +37,58 @@ public:
 
   void doNesterovPlace();
 
-  void updateCoordi(std::vector<FloatCoordi>& coordi);
+  void updateCoordi(
+      std::vector<FloatCoordi>& coordi);
   void updateBins();
   void updateWireLength();
 
-  void updateGradients(std::vector<FloatCoordi>& sumGrads,
+  void updateGradients(
+      std::vector<FloatCoordi>& sumGrads,
       std::vector<FloatCoordi>& wireLengthGrads,
       std::vector<FloatCoordi>& densityGrads );
 
   void updateWireLengthCoef(float overflow);
 
-  void updateInitialPrevCoordi();
+  void updateInitialPrevSLPCoordi();
 
   float getStepLength(
-      std::vector<FloatCoordi>& prevCoordi_, 
+      std::vector<FloatCoordi>& prevCoordi_,
       std::vector<FloatCoordi>& prevSumGrads_,
       std::vector<FloatCoordi>& curCoordi_,
       std::vector<FloatCoordi>& curSumGrads_ );
+
+  void updateNextIter();
+
+  float getPhiCoeff(float scaledDiffHpwl);
 
 private:
   std::shared_ptr<PlacerBase> pb_;
   std::shared_ptr<NesterovBase> nb_;
   NesterovPlaceVars npVars_;
 
+  // SLP is Step Length Prediction.
+  //
   // y_st, y_dst, y_wdst, w_pdst
-  std::vector<FloatCoordi> curCoordi_;
-  std::vector<FloatCoordi> curWireLengthGrads_;
-  std::vector<FloatCoordi> curDensityGrads_;
-  std::vector<FloatCoordi> curSumGrads_;
+  std::vector<FloatCoordi> curSLPCoordi_;
+  std::vector<FloatCoordi> curSLPWireLengthGrads_;
+  std::vector<FloatCoordi> curSLPDensityGrads_;
+  std::vector<FloatCoordi> curSLPSumGrads_;
 
   // y0_st, y0_dst, y0_wdst, y0_pdst
-  std::vector<FloatCoordi> newCoordi_;
-  std::vector<FloatCoordi> newWireLengthGrads_;
-  std::vector<FloatCoordi> newDensityGrads_;
-  std::vector<FloatCoordi> newSumGrads_;
+  std::vector<FloatCoordi> nextSLPCoordi_;
+  std::vector<FloatCoordi> nextSLPWireLengthGrads_;
+  std::vector<FloatCoordi> nextSLPDensityGrads_;
+  std::vector<FloatCoordi> nextSLPSumGrads_;
 
   // z_st, z_dst, z_wdst, z_pdst
-  std::vector<FloatCoordi> prevCoordi_;
-  std::vector<FloatCoordi> prevWireLengthGrads_;
-  std::vector<FloatCoordi> prevDensityGrads_;
-  std::vector<FloatCoordi> prevSumGrads_;
+  std::vector<FloatCoordi> prevSLPCoordi_;
+  std::vector<FloatCoordi> prevSLPWireLengthGrads_;
+  std::vector<FloatCoordi> prevSLPDensityGrads_;
+  std::vector<FloatCoordi> prevSLPSumGrads_;
+
+  // x_st and x0_st
+  std::vector<FloatCoordi> curCoordi_;
+  std::vector<FloatCoordi> nextCoordi_;
 
   float wireLengthGradSum_;
   float densityGradSum_;
@@ -97,7 +111,7 @@ private:
   float sumOverflow_;
 
   // half-parameter-wire-length
-  float hpwl_;
+  int32_t prevHpwl_;
 
   float getWireLengthCoeff(float overflow);
 

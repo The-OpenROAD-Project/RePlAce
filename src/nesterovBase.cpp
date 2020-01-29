@@ -220,6 +220,11 @@ GCell::setDensityLocation(int dLx, int dLy) {
   dUy_ = dLy + (dUy_ - dLy_);
   dLx_ = dLx;
   dLy_ = dLy;
+
+  // assume that density Center change the gPin coordi
+  for(auto& gPin: gPins_) {
+    gPin->updateDensityLocation(this);
+  }
 }
 
 void
@@ -231,6 +236,11 @@ GCell::setDensityCenterLocation(int dCx, int dCy) {
   dLy_ = dCy - halfDDy;
   dUx_ = dCx + halfDDx;
   dUy_ = dCy + halfDDy;
+
+  // assume that density Center change the gPin coordi
+  for(auto& gPin: gPins_) {
+    gPin->updateDensityLocation(this);
+  }
 }
 
 // changing size and preserve center coordinates
@@ -326,6 +336,11 @@ GNet::updateBox() {
     ux_ = std::max(gPin->cx(), ux_);
     uy_ = std::max(gPin->cy(), uy_);
   } 
+}
+
+int32_t 
+GNet::hpwl() {
+  return (ux_ - lx_) + (uy_ - ly_);
 }
 
 void
@@ -486,6 +501,12 @@ void
 GPin::updateLocation(const GCell* gCell) {
   cx_ = gCell->cx() + offsetCx_;
   cy_ = gCell->cy() + offsetCy_;
+}
+
+void
+GPin::updateDensityLocation(const GCell* gCell) {
+  cx_ = gCell->dCx() + offsetCx_;
+  cy_ = gCell->dCy() + offsetCy_;
 }
 
 ////////////////////////////////////////////////////////
@@ -1624,6 +1645,7 @@ NesterovBase::updateDensityForceBin() {
 
   // update electroPhi and electroForce
   // update sumPhi_ for nesterov loop
+  sumPhi_ = 0;
   for(auto& bin : bg_.bins()) {
     auto eForcePair = fft_->getElectroForce(bin->x(), bin->y());
     bin->setElectroForce(eForcePair.first, eForcePair.second);
@@ -1635,6 +1657,15 @@ NesterovBase::updateDensityForceBin() {
   }
 }
 
+int32_t
+NesterovBase::getHpwl() {
+  int32_t hpwl = 0;
+  for(auto& gNet : gNets_) {
+    gNet->updateBox();
+    hpwl += gNet->hpwl();
+  }
+  return hpwl;
+}
 
 void
 NesterovBase::reset() { 
