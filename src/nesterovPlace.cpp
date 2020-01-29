@@ -14,9 +14,9 @@ static float
 getSecondNorm(vector<FloatCoordi>& a);
 
 NesterovPlaceVars::NesterovPlaceVars()
-  : maxNesterovIter(2500), 
+  : maxNesterovIter(2), 
   maxBackTrack(10),
-  initDensityPanelty(0.0000001),
+  initDensityPanelty(0.00001),
   initWireLengthCoeff(1.0/8.0),
   targetOverflow(0.1),
   minBoundMuK(0.95),
@@ -30,7 +30,7 @@ NesterovPlace::NesterovPlace()
   wireLengthGradSum_(0), 
   densityGradSum_(0),
   stepLength_(0),
-  densityPanelty_(npVars_.initDensityPanelty),
+  densityPanelty_(0),
   baseWireLengthCoeff_(0), 
   wireLengthCoeffX_(0), 
   wireLengthCoeffY_(0),
@@ -91,7 +91,7 @@ void NesterovPlace::init() {
   nb_->updateDensityForceBin();
 
   baseWireLengthCoeff_ 
-    = 100 * npVars_.initWireLengthCoeff 
+    =  npVars_.initWireLengthCoeff 
     / static_cast<float>(
         (nb_->binSizeX() + nb_->binSizeY())) 
     * 0.5;
@@ -128,6 +128,14 @@ void NesterovPlace::init() {
   updateGradients(
       prevSLPSumGrads_, prevSLPWireLengthGrads_,
       prevSLPDensityGrads_);
+
+  cout << "wireLengthGradSum_ : " << wireLengthGradSum_ << endl;
+  cout << "densityGradSum_ : " << densityGradSum_ << endl;
+  densityPanelty_ 
+    = wireLengthGradSum_ / densityGradSum_ 
+    * npVars_.initDensityPanelty; 
+  
+  cout << "densityPanelty_ : " << densityPanelty_ << endl;
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
@@ -176,11 +184,16 @@ NesterovPlace::updateGradients(
     std::vector<FloatCoordi>& wireLengthGrads,
     std::vector<FloatCoordi>& densityGrads) {
 
+  wireLengthGradSum_ = 0;
+  densityGradSum_ = 0;
   for(int i=0; i<nb_->gCells().size(); i++) {
     GCell* gCell = nb_->gCells().at(i);
     wireLengthGrads[i] = nb_->getWireLengthGradientWA(
         gCell, wireLengthCoeffX_, wireLengthCoeffY_);
     densityGrads[i] = nb_->getDensityGradient(gCell); 
+
+    wireLengthGradSum_ += fabs(wireLengthGrads[i].x) + fabs(wireLengthGrads[i].y);
+    densityGradSum_ += fabs(densityGrads[i].x) + fabs(densityGrads[i].y);
 
     sumGrads[i].x = wireLengthGrads[i].x + densityPanelty_ * densityGrads[i].x;
     sumGrads[i].y = wireLengthGrads[i].y + densityPanelty_ * densityGrads[i].y;
@@ -379,6 +392,7 @@ NesterovPlace::getStepLength(
 
   cout << "cDist: " << coordiDistance << endl;
   cout << "gDist: " << gradDistance << endl;
+  cout << "calVal: " << 1.0 / gradDistance / coordiDistance << endl;
 
   return 1.0 / gradDistance / coordiDistance;
 }
