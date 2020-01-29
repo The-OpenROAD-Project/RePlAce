@@ -470,6 +470,9 @@ public:
 
   void updateDensityCoordiLayoutInside(GCell* gcell);
 
+  float getDensityCoordiLayoutInsideX(GCell* gCell, float cx);
+  float getDensityCoordiLayoutInsideY(GCell* gCell, float cy);
+
   // WL force update based on WeightedAverage model
   // wlCoeffX : WireLengthCoefficient for X.
   //            equal to 1 / gamma_x

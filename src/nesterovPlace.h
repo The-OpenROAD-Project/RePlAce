@@ -16,11 +16,12 @@ class NesterovPlaceVars {
   public:
   int maxNesterovIter;
   int maxBackTrack;
-  float initDensityPanelty;
-  float initWireLengthCoeff;
-  float targetOverflow;
-  float minBoundMuK;
-  float maxBoundMuK;
+  float initDensityPanelty; // INIT_LAMBDA
+  float initWireLengthCoeff; // base_wcof
+  float targetOverflow; // overflow
+  float minBoundMuK; // pcof_min
+  float maxBoundMuK; // pcof_max
+  float initialPrevCoordiUpdateCoeff; // z_ref_alpha
   NesterovPlaceVars();
 };
 
@@ -44,6 +45,13 @@ public:
 
   void updateWireLengthCoef(float overflow);
 
+  void updateInitialPrevCoordi();
+
+  float getStepLength(
+      std::vector<FloatCoordi>& prevCoordi_, 
+      std::vector<FloatCoordi>& prevSumGrads_,
+      std::vector<FloatCoordi>& curCoordi_,
+      std::vector<FloatCoordi>& curSumGrads_ );
 
 private:
   std::shared_ptr<PlacerBase> pb_;
@@ -72,7 +80,7 @@ private:
   float densityGradSum_;
 
   // alpha
-  float backTrackStepLength_;
+  float stepLength_;
 
   // opt_phi_cof
   float densityPanelty_;

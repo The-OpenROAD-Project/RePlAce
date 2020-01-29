@@ -919,7 +919,7 @@ BinGrid::updateBinsGCellDensityArea(
       = getDensityMinMaxIdxX(cell);
     std::pair<int, int> pairY 
       = getDensityMinMaxIdxY(cell);
-   
+
     if( cell->isInstance() ) {
       for(int i = pairX.first; i < pairX.second; i++) {
         for(int j = pairY.first; j < pairY.second; j++) {
@@ -1399,6 +1399,36 @@ NesterovBase::updateDensityCoordiLayoutInside(
   }
 }
 
+float
+NesterovBase::getDensityCoordiLayoutInsideX(GCell* gCell, float cx) {
+  float adjVal = cx;
+
+  //TODO will change base on each assigned binGrids.
+  //
+  if( cx - gCell->dDx()/2 < bg_.lx() ) {
+    adjVal = bg_.lx() + gCell->dDx()/2;
+  }
+  if( cx + gCell->dDx()/2 > bg_.ux() ) {
+    adjVal = bg_.ux() - gCell->dDx()/2; 
+  }
+  return adjVal;
+}
+
+float
+NesterovBase::getDensityCoordiLayoutInsideY(GCell* gCell, float cy) {
+  float adjVal = cy;
+  //TODO will change base on each assigned binGrids.
+  //
+  if( cy - gCell->dDy()/2 < bg_.ly() ) {
+    adjVal = bg_.ly() + gCell->dDy()/2;
+  }
+  if( cy + gCell->dDy()/2 > bg_.uy() ) {
+    adjVal = bg_.uy() - gCell->dDy()/2; 
+  }
+
+  return adjVal;
+}
+
 // 
 // WA force cals - wlCoeffX / wlCoeffY
 //
@@ -1536,7 +1566,6 @@ NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoe
       ( waExpMaxSumY * ( gPin->maxExpSumY() * ( 1.0 + wlCoeffY * gPin->cy()) ) 
           - wlCoeffY * gPin->maxExpSumY() * waYExpMaxSumY )
         / ( waExpMaxSumY * waExpMaxSumY );
-
   }
 
   return FloatCoordi(gradientMaxX - gradientMinX, 
@@ -1571,7 +1600,9 @@ NesterovBase::getDensityGradient(GCell* gCell) {
   for(int i = pairX.first; i < pairX.second; i++) {
     for(int j = pairY.first; j < pairY.second; j++) {
       Bin* bin = bg_.bins()[ j * binCntX() + i ];
-      float overlapArea = getOverlapDensityArea(bin, gCell) * gCell->densityScale();
+      float overlapArea 
+        = getOverlapDensityArea(bin, gCell) * gCell->densityScale();
+
       electroForce.x += overlapArea * bin->electroForceX();
       electroForce.y += overlapArea * bin->electroForceY();
     }
@@ -1667,6 +1698,8 @@ getOverlapArea(Bin* bin, Instance* inst) {
   }
 }
 
+// 
+// https://codingforspeed.com/using-faster-exponential-approximation/
 static float
 fastExp(float a) {
   a = 1.0 + a / 1024.0;
