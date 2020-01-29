@@ -16,12 +16,12 @@ getSecondNorm(vector<FloatCoordi>& a);
 NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(20), 
   maxBackTrack(10),
-  initDensityPanelty(1e6),
+  initDensityPanelty(0.0001),
   initWireLengthCoeff(1.0/8.0),
   targetOverflow(0.1),
   minBoundMuK(0.95),
   maxBoundMuK(1.05),
-  initialPrevCoordiUpdateCoeff(100),
+  initialPrevCoordiUpdateCoeff(700),
   minPreconditioner(1.0),
   referenceHpwl(3460000) {}
 
@@ -216,10 +216,10 @@ NesterovPlace::updateGradients(
       sumPrecondi.y = npVars_.minPreconditioner; 
     }
     
-    cout << "wx: " << wireLengthGrads[i].x << " dx: " << densityGrads[i].x;
-    cout << " tx: " << sumGrads[i].x << endl;
-    cout << "wy: " << wireLengthGrads[i].y << " dy: " << densityGrads[i].y;
-    cout << " ty: " << sumGrads[i].y << endl ;
+//    cout << "wx: " << wireLengthGrads[i].x << " dx: " << densityGrads[i].x;
+//    cout << " tx: " << sumGrads[i].x << endl;
+//    cout << "wy: " << wireLengthGrads[i].y << " dy: " << densityGrads[i].y;
+//    cout << " ty: " << sumGrads[i].y << endl ;
 
     sumGrads[i].x /= sumPrecondi.x;
     sumGrads[i].y /= sumPrecondi.y; 
