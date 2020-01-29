@@ -21,7 +21,7 @@ class NesterovPlaceVars {
   float targetOverflow; // overflow
   float minBoundMuK; // pcof_min
   float maxBoundMuK; // pcof_max
-  float maxPreconditioner; // MIN_PRE
+  float minPreconditioner; // MIN_PRE
   float initialPrevCoordiUpdateCoeff; // z_ref_alpha
   float referenceHpwl; // refDeltaHpwl
   NesterovPlaceVars();

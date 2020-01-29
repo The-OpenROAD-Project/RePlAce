@@ -14,15 +14,15 @@ static float
 getSecondNorm(vector<FloatCoordi>& a);
 
 NesterovPlaceVars::NesterovPlaceVars()
-  : maxNesterovIter(2), 
+  : maxNesterovIter(20), 
   maxBackTrack(10),
-  initDensityPanelty(0.00001),
+  initDensityPanelty(1e6),
   initWireLengthCoeff(1.0/8.0),
   targetOverflow(0.1),
   minBoundMuK(0.95),
   maxBoundMuK(1.05),
-  initialPrevCoordiUpdateCoeff(0.01),
-  maxPreconditioner(1.0),
+  initialPrevCoordiUpdateCoeff(100),
+  minPreconditioner(1.0),
   referenceHpwl(3460000) {}
 
 NesterovPlace::NesterovPlace() 
@@ -91,7 +91,7 @@ void NesterovPlace::init() {
   nb_->updateDensityForceBin();
 
   baseWireLengthCoeff_ 
-    =  npVars_.initWireLengthCoeff 
+    = 100 * npVars_.initWireLengthCoeff 
     / static_cast<float>(
         (nb_->binSizeX() + nb_->binSizeY())) 
     * 0.5;
@@ -135,7 +135,7 @@ void NesterovPlace::init() {
     = wireLengthGradSum_ / densityGradSum_ 
     * npVars_.initDensityPanelty; 
   
-  cout << "densityPanelty_ : " << densityPanelty_ << endl;
+  cout << "initDensityPanelty_ : " << densityPanelty_ << endl;
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
@@ -186,6 +186,7 @@ NesterovPlace::updateGradients(
 
   wireLengthGradSum_ = 0;
   densityGradSum_ = 0;
+  cout << "densityPanelty_: " << densityPanelty_ << endl;
   for(int i=0; i<nb_->gCells().size(); i++) {
     GCell* gCell = nb_->gCells().at(i);
     wireLengthGrads[i] = nb_->getWireLengthGradientWA(
@@ -207,20 +208,23 @@ NesterovPlace::updateGradients(
         wireLengthPreCondi.x + densityPanelty_ * densityPrecondi.x,
         wireLengthPreCondi.y + densityPanelty_ * densityPrecondi.y);
 
-    if( sumPrecondi.x <= npVars_.maxPreconditioner ) {
-      sumPrecondi.x = npVars_.maxPreconditioner;
+    if( sumPrecondi.x <= npVars_.minPreconditioner ) {
+      sumPrecondi.x = npVars_.minPreconditioner;
     }
 
-    if( sumPrecondi.y <= npVars_.maxPreconditioner ) {
-      sumPrecondi.y = npVars_.maxPreconditioner; 
+    if( sumPrecondi.y <= npVars_.minPreconditioner ) {
+      sumPrecondi.y = npVars_.minPreconditioner; 
     }
+    
+    cout << "wx: " << wireLengthGrads[i].x << " dx: " << densityGrads[i].x;
+    cout << " tx: " << sumGrads[i].x << endl;
+    cout << "wy: " << wireLengthGrads[i].y << " dy: " << densityGrads[i].y;
+    cout << " ty: " << sumGrads[i].y << endl ;
 
     sumGrads[i].x /= sumPrecondi.x;
     sumGrads[i].y /= sumPrecondi.y; 
-//    cout << "wx: " << wireLengthGrads[i].x << " dx: " << densityGrads[i].x;
-//    cout << " tx: " << sumGrads[i].x << endl;
-//    cout << "wy: " << wireLengthGrads[i].y << " dy: " << densityGrads[i].y;
-//    cout << " ty: " << sumGrads[i].y << endl << endl;
+    cout << "sumPreCondi: " << sumPrecondi.x << " " << sumPrecondi.y << endl ;
+    cout << "atx: " << sumGrads[i].x << " aty: " << sumGrads[i].y << endl << endl;
   }
 }
 
@@ -329,6 +333,7 @@ NesterovPlace::updateInitialPrevSLPCoordi() {
   for(int i=0; i<nb_->gCells().size(); i++) {
     GCell* curGCell = nb_->gCells()[i];
 
+
     float prevCoordiX 
       = curSLPCoordi_[i].x + npVars_.initialPrevCoordiUpdateCoeff 
       * curSLPSumGrads_[i].x;
@@ -342,6 +347,11 @@ NesterovPlace::updateInitialPrevSLPCoordi() {
       nb_->getDensityCoordiLayoutInsideY( curGCell, prevCoordiY) );
 
     prevSLPCoordi_[i] = newCoordi;
+    
+    cout << "SLP: " << curSLPCoordi_[i].x << " " << curSLPSumGrads_[i].x ;
+    cout << " new: " << newCoordi.x << endl;
+    cout << "SLP: " << curSLPCoordi_[i].y << " " << curSLPSumGrads_[i].y ;
+    cout << " new: " << newCoordi.y << endl;
   } 
 }
 
