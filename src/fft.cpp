@@ -157,7 +157,7 @@ FFT::doFFT() {
         ///////////
         phi = density / (wx2 + wy2);
         electroX = phi * wx;
-        electroX = phi * wy;
+        electroY = phi * wy;
       }
       electroPhi_[i][j] = phi;
       electroForceX_[i][j] = electroX;
