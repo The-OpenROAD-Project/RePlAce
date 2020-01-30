@@ -16,14 +16,14 @@ getSecondNorm(vector<FloatCoordi>& a);
 NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
-  initDensityPanelty(0.1),
+  initDensityPanelty(1.0),
   initWireLengthCoeff(1.0/8.0),
   targetOverflow(0.1),
   minBoundMuK(0.95),
   maxBoundMuK(1.05),
-  initialPrevCoordiUpdateCoeff(900),
+  initialPrevCoordiUpdateCoeff(300),
   minPreconditioner(1.0),
-  referenceHpwl(3460) {}
+  referenceHpwl(34600000) {}
 
 NesterovPlace::NesterovPlace() 
   : pb_(nullptr), nb_(nullptr), npVars_(), 
@@ -254,6 +254,7 @@ NesterovPlace::doNesterovPlace() {
 
     // coeff is (a_k -1) / ( a_(k+1)) in paper.
     float coeff = (prevA - 1.0)/curA;
+    cout << "coeff: " << coeff << endl;
 
     cout << "stepLength_: " << stepLength_ << endl; 
     // Back-Tracking loop
@@ -351,10 +352,10 @@ NesterovPlace::updateInitialPrevSLPCoordi() {
 
     prevSLPCoordi_[i] = newCoordi;
     
-    cout << "SLP: " << curSLPCoordi_[i].x << " " << curSLPSumGrads_[i].x ;
-    cout << " new: " << newCoordi.x << endl;
-    cout << "SLP: " << curSLPCoordi_[i].y << " " << curSLPSumGrads_[i].y ;
-    cout << " new: " << newCoordi.y << endl;
+//    cout << "SLP: " << curSLPCoordi_[i].x << " " << curSLPSumGrads_[i].x ;
+//    cout << " new: " << newCoordi.x << endl;
+//    cout << "SLP: " << curSLPCoordi_[i].y << " " << curSLPSumGrads_[i].y ;
+//    cout << " new: " << newCoordi.y << endl;
   } 
 }
 
@@ -408,9 +409,9 @@ NesterovPlace::getStepLength(
 
   cout << "cDist: " << coordiDistance << endl;
   cout << "gDist: " << gradDistance << endl;
-  cout << "calVal: " << 1.0 / gradDistance / coordiDistance << endl;
+  cout << "calVal: " << coordiDistance / gradDistance << endl;
 
-  return 1.0 / gradDistance / (0.00000012*coordiDistance);
+  return coordiDistance / gradDistance;
 }
 
 float
@@ -440,7 +441,9 @@ static float
 getSecondNorm(vector<FloatCoordi>& a) {
   float norm = 0;
   for(auto& coordi : a) {
-    norm += coordi.x * coordi.x + coordi.y + coordi.y;
+    norm += coordi.x * coordi.x + coordi.y * coordi.y;
+//    cout << "gCell: " << &coordi - &a[0] << " accm_norm: "  
+//      << norm << " "<< coordi.x << " " << coordi.y << endl;;
   }
   return sqrt( norm / (2.0*a.size()) ); 
 }
