@@ -46,12 +46,12 @@ class Replace
 
     void setTargetDensity(float density);
     void setTargetOverflow(float overflow);
-    void setInitPenalityFactor(float penaltyFactor);
-    void setMinPCoef(float minPCoef);
-    void setMaxPCoef(float maxPCoef);
+    void setInitDensityPenalityFactor(float penaltyFactor);
+    void setMinPhiCoef(float minPhiCoef);
+    void setMaxPhiCoef(float maxPhiCoef);
 
     // HPWL: half-parameter wire length.
-    void setDeltaHpwl(float deltaHpwl);
+    void setReferenceHpwl(float deltaHpwl);
     void setVerboseLevel(int verbose);
 
   private:
@@ -74,10 +74,10 @@ class Replace
     int binGridCntY_;
     float overflow_;
     float density_;
-    float initPenalityFactor_;
-    float minPCoef_;
-    float maxPCoef_;
-    float deltaHpwl_;
+    float initDensityPenalityFactor_;
+    float minPhiCoef_;
+    float maxPhiCoef_;
+    float referenceHpwl_;
     int verbose_;
 };
 }

@@ -21,9 +21,9 @@ Replace::Replace()
   nesterovPlaceMaxIter_(2000),
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
-  initPenalityFactor_(0.00001), 
-  minPCoef_(0.95), maxPCoef_(1.05),
-  deltaHpwl_(346000),
+  initDensityPenalityFactor_(0.00001), 
+  minPhiCoef_(0.95), maxPhiCoef_(1.05),
+  referenceHpwl_(44600000),
   verbose_(0) {
 };
 
@@ -48,10 +48,10 @@ void Replace::reset() {
   binGridCntX_ = binGridCntY_ = 0;
   overflow_ = 0;
   density_ = 0;
-  initPenalityFactor_ = 0;
-  minPCoef_ = 0;
-  maxPCoef_ = 0;
-  deltaHpwl_ = 0;
+  initDensityPenalityFactor_ = 0;
+  minPhiCoef_ = 0;
+  maxPhiCoef_ = 0;
+  referenceHpwl_= 0;
   verbose_ = 0;
 }
 
@@ -87,6 +87,16 @@ void Replace::doNesterovPlace() {
   nb_ = std::make_shared<NesterovBase>(nbVars, pb_);
 
   NesterovPlaceVars npVars;
+
+  npVars.verboseLevel = verbose_;
+  npVars.minPhiCoef = minPhiCoef_;
+  npVars.maxPhiCoef = maxPhiCoef_;
+  npVars.referenceHpwl = referenceHpwl_;
+  npVars.initDensityPanelty = initDensityPenalityFactor_;
+  npVars.targetOverflow = overflow_;
+  npVars.maxNesterovIter = nesterovPlaceMaxIter_; 
+
+
   std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_));
   np_ = std::move(np);
 
@@ -140,23 +150,23 @@ Replace::setTargetDensity(float density) {
 }
 
 void
-Replace::setInitPenalityFactor(float penaltyFactor) {
-  initPenalityFactor_ = penaltyFactor;
+Replace::setInitDensityPenalityFactor(float penaltyFactor) {
+  initDensityPenalityFactor_ = penaltyFactor;
 }
 
 void
-Replace::setMinPCoef(float minPCoef) {
-  minPCoef_ = minPCoef;
+Replace::setMinPhiCoef(float minPhiCoef) {
+  minPhiCoef_ = minPhiCoef;
 }
 
 void
-Replace::setMaxPCoef(float maxPCoef) {
-  maxPCoef_ = maxPCoef;
+Replace::setMaxPhiCoef(float maxPhiCoef) {
+  maxPhiCoef_ = maxPhiCoef;
 }
 
 void
-Replace::setDeltaHpwl(float deltaHpwl) {
-  deltaHpwl_ = deltaHpwl;
+Replace::setReferenceHpwl(float refHpwl) {
+  referenceHpwl_ = refHpwl;
 }
 
 void

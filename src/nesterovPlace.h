@@ -16,13 +16,14 @@ class NesterovPlaceVars {
   public:
   int maxNesterovIter;
   int maxBackTrack;
+  int verboseLevel;
   float initDensityPanelty; // INIT_LAMBDA
-  float initWireLengthCoeff; // base_wcof
+  float initWireLengthCoef; // base_wcof
   float targetOverflow; // overflow
-  float minBoundMuK; // pcof_min
-  float maxBoundMuK; // pcof_max
+  float minPhiCoef; // pcof_min
+  float maxPhiCoef; // pcof_max
   float minPreconditioner; // MIN_PRE
-  float initialPrevCoordiUpdateCoeff; // z_ref_alpha
+  float initialPrevCoordiUpdateCoef; // z_ref_alpha
   float referenceHpwl; // refDeltaHpwl
   NesterovPlaceVars();
 };
@@ -59,7 +60,7 @@ public:
 
   void updateNextIter();
 
-  float getPhiCoeff(float scaledDiffHpwl);
+  float getPhiCoef(float scaledDiffHpwl);
 
 private:
   std::shared_ptr<PlacerBase> pb_;
@@ -100,20 +101,20 @@ private:
   float densityPanelty_;
 
   // base_wcof
-  float baseWireLengthCoeff_;
+  float baseWireLengthCoef_;
 
   // wlen_cof
-  float wireLengthCoeffX_;
-  float wireLengthCoeffY_;
+  float wireLengthCoefX_;
+  float wireLengthCoefY_;
 
   // phi is described in ePlace paper.
   float sumPhi_;
   float sumOverflow_;
 
   // half-parameter-wire-length
-  int32_t prevHpwl_;
+  int64_t prevHpwl_;
 
-  float getWireLengthCoeff(float overflow);
+  float getWireLengthCoef(float overflow);
 
   void init();
   void reset();

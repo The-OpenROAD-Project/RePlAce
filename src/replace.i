@@ -72,24 +72,24 @@ set_replace_overflow_cmd(float overflow)
 }
 
 void
-set_replace_min_pcoef_cmd(float min_pcoef)
+set_replace_min_phi_coef_cmd(float min_phi_coef)
 {
   Replace* replace = getReplace();
-  replace->setMinPCoef(min_pcoef);
+  replace->setMinPhiCoef(min_phi_coef);
 }
 
 void
-set_replace_max_pcoef_cmd(float max_pcoef) 
+set_replace_max_phi_coef_cmd(float max_phi_coef) 
 {
   Replace* replace = getReplace();
-  replace->setMaxPCoef(max_pcoef);
+  replace->setMaxPhiCoef(max_phi_coef);
 }
 
 void
 set_replace_init_penalty_factor_cmd(float penaltyFactor)
 {
   Replace* replace = getReplace();
-  replace->setInitPenalityFactor(penaltyFactor);
+  replace->setInitDensityPenalityFactor(penaltyFactor);
 }
 
 void

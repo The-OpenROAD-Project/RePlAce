@@ -124,7 +124,7 @@ class GNet {
 
     void addGPin(GPin* gPin);
     void updateBox();
-    int32_t hpwl();
+    int64_t hpwl();
 
     void setDontCare();
     bool isDontCare();
@@ -506,7 +506,7 @@ public:
   FloatCoordi
     getDensityGradient(GCell* gCell);
 
-  int32_t getHpwl();
+  int64_t getHpwl();
 
   // update electrostatic forces within Bin
   void updateDensityForceBin();

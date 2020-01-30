@@ -449,8 +449,8 @@ int Net::cy() const {
   return (ly_ + uy_)/2;
 }
 
-int Net::hpwl() const {
-  return (ux_-lx_) + (uy_-ly_);
+int64_t Net::hpwl() const {
+  return static_cast<int64_t>((ux_-lx_) + (uy_-ly_));
 }
 
 void Net::updateBox() {
@@ -791,9 +791,9 @@ PlacerBase::reset() {
   nonPlaceInsts_.clear();
 }
 
-int 
+int64_t 
 PlacerBase::hpwl() const {
-  int hpwl = 0;
+  int64_t hpwl = 0;
   for(auto& net : nets_) {
     net->updateBox();
     hpwl += net->hpwl();

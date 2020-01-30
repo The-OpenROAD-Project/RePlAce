@@ -16,14 +16,15 @@ getSecondNorm(vector<FloatCoordi>& a);
 NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
-  initDensityPanelty(1.0),
-  initWireLengthCoeff(1.0/8.0),
+  verboseLevel(1),
+  initDensityPanelty(10.0),
+  initWireLengthCoef(1.0/80.0),
   targetOverflow(0.1),
-  minBoundMuK(0.95),
-  maxBoundMuK(1.05),
-  initialPrevCoordiUpdateCoeff(300),
+  minPhiCoef(0.95),
+  maxPhiCoef(1.05),
+  initialPrevCoordiUpdateCoef(300),
   minPreconditioner(1.0),
-  referenceHpwl(34600000) {}
+  referenceHpwl(44600000) {}
 
 NesterovPlace::NesterovPlace() 
   : pb_(nullptr), nb_(nullptr), npVars_(), 
@@ -31,9 +32,9 @@ NesterovPlace::NesterovPlace()
   densityGradSum_(0),
   stepLength_(0),
   densityPanelty_(0),
-  baseWireLengthCoeff_(0), 
-  wireLengthCoeffX_(0), 
-  wireLengthCoeffY_(0),
+  baseWireLengthCoef_(0), 
+  wireLengthCoefX_(0), 
+  wireLengthCoefY_(0),
   prevHpwl_(0) {}
 
 NesterovPlace::NesterovPlace(
@@ -85,27 +86,37 @@ void NesterovPlace::init() {
   
   prevHpwl_ 
     = nb_->getHpwl();
-  cout << "prev Hpwl : " << prevHpwl_ << endl;
+
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "Initial Hpwl : " << prevHpwl_ << endl;
+  }
 
   // FFT update
   nb_->updateDensityForceBin();
 
-  baseWireLengthCoeff_ 
-    = npVars_.initWireLengthCoeff 
-    / static_cast<float>(
-        (nb_->binSizeX() + nb_->binSizeY())) 
-    * 0.5;
+  baseWireLengthCoef_ 
+    = npVars_.initWireLengthCoef 
+    / static_cast<float>(nb_->binSizeX() + nb_->binSizeY()) * 0.5;
+
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "baseWireLengthCoef_ : " << baseWireLengthCoef_ << endl;
+  }
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
         / static_cast<float>(pb_->placeInstsArea());
 
-  cout << "InitSumOverflow: " << sumOverflow_ << endl;
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "InitSumOverflow: " << sumOverflow_ << endl;
+  }
   updateWireLengthCoef(sumOverflow_);
-  cout << "wireLengthCoeff: " << wireLengthCoeffX_ << endl;
+
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "wireLengthCoef: " << wireLengthCoefX_ << endl;
+  }
 
   // WL update
-  nb_->updateWireLengthForceWA(wireLengthCoeffX_, wireLengthCoeffY_);
+  nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_);
  
   // fill in curSLPSumGrads_, curSLPWireLengthGrads_, curSLPDensityGrads_ 
   updateGradients(
@@ -119,35 +130,41 @@ void NesterovPlace::init() {
   // bin, FFT, wlen update with prevSLPCoordi.
   nb_->updateGCellDensityCenterLocation(prevSLPCoordi_);
   nb_->updateDensityForceBin();
-  nb_->updateWireLengthForceWA(wireLengthCoeffX_, wireLengthCoeffY_);
+  nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_);
   
-  int32_t tmpHpwl 
-    = nb_->getHpwl();
-  cout << "tmp Hpwl : " << tmpHpwl << endl;
   // update previSumGrads_, prevSLPWireLengthGrads_, prevSLPDensityGrads_
   updateGradients(
       prevSLPSumGrads_, prevSLPWireLengthGrads_,
       prevSLPDensityGrads_);
+  
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "wireLengthGradSum_ : " << wireLengthGradSum_ << endl;
+    cout << "densityGradSum_ : " << densityGradSum_ << endl;
+  }
 
-  cout << "wireLengthGradSum_ : " << wireLengthGradSum_ << endl;
-  cout << "densityGradSum_ : " << densityGradSum_ << endl;
   densityPanelty_ 
     = wireLengthGradSum_ / densityGradSum_ 
     * npVars_.initDensityPanelty; 
   
-  cout << "initDensityPanelty_ : " << densityPanelty_ << endl;
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "initDensityPanelty_ : " << densityPanelty_ << endl;
+  }
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
         / static_cast<float>(pb_->placeInstsArea());
   
-  cout << "PrevSumOverflow: " << sumOverflow_ << endl;
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "PrevSumOverflow: " << sumOverflow_ << endl;
+  }
   
   stepLength_  
     = getStepLength (prevSLPCoordi_, prevSLPSumGrads_, curSLPCoordi_, curSLPSumGrads_);
 
 
-  cout << "initialStepLength: " << stepLength_ << endl;
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "initialStepLength: " << stepLength_ << endl;
+  }
 }
 
 // clear reset
@@ -176,7 +193,7 @@ void NesterovPlace::reset() {
 // nb_->updateGCellDensityCenterLocation(coordi); // bin update
 // nb_->updateDensityForceBin(); // bin Force update
 //  
-// nb_->updateWireLengthForceWA(wireLengthCoeffX_, wireLengthCoeffY_); // WL update
+// nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_); // WL update
 //
 void
 NesterovPlace::updateGradients(
@@ -186,11 +203,15 @@ NesterovPlace::updateGradients(
 
   wireLengthGradSum_ = 0;
   densityGradSum_ = 0;
-  cout << "densityPanelty_: " << densityPanelty_ << endl;
+
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "densityPanelty_: " << densityPanelty_ << endl;
+  }
+
   for(int i=0; i<nb_->gCells().size(); i++) {
     GCell* gCell = nb_->gCells().at(i);
     wireLengthGrads[i] = nb_->getWireLengthGradientWA(
-        gCell, wireLengthCoeffX_, wireLengthCoeffY_);
+        gCell, wireLengthCoefX_, wireLengthCoefY_);
     densityGrads[i] = nb_->getDensityGradient(gCell); 
 
     wireLengthGradSum_ += fabs(wireLengthGrads[i].x) + fabs(wireLengthGrads[i].y);
@@ -216,30 +237,33 @@ NesterovPlace::updateGradients(
       sumPrecondi.y = npVars_.minPreconditioner; 
     }
     
-//    cout << "wx: " << wireLengthGrads[i].x << " dx: " << densityGrads[i].x;
-//    cout << " tx: " << sumGrads[i].x << endl;
-//    cout << "wy: " << wireLengthGrads[i].y << " dy: " << densityGrads[i].y;
-//    cout << " ty: " << sumGrads[i].y << endl ;
+    //    cout << "wx: " << wireLengthGrads[i].x << " dx: " << densityGrads[i].x;
+    //    cout << " tx: " << sumGrads[i].x << endl;
+    //    cout << "wy: " << wireLengthGrads[i].y << " dy: " << densityGrads[i].y;
+    //    cout << " ty: " << sumGrads[i].y << endl ;
 
     sumGrads[i].x /= sumPrecondi.x;
     sumGrads[i].y /= sumPrecondi.y; 
-//    cout << "sumPreCondi: " << sumPrecondi.x << " " << sumPrecondi.y << endl ;
-//    cout << "atx: " << sumGrads[i].x << " aty: " << sumGrads[i].y << endl << endl;
+    //    cout << "sumPreCondi: " << sumPrecondi.x << " " << sumPrecondi.y << endl ;
+    //    cout << "atx: " << sumGrads[i].x << " aty: " << sumGrads[i].y << endl << endl;
   }
-  cout << "WL GradSum: " << wireLengthGradSum_ << endl;
-  cout << "De GradSum: " << densityGradSum_ << endl;
+  
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "WL GradSum: " << wireLengthGradSum_ << endl;
+    cout << "De GradSum: " << densityGradSum_ << endl;
+  }
 }
 
 void
 NesterovPlace::doNesterovPlace() {
-  cout << "nesterovPlace: " << endl;
-  
   // backTracking variable.
   float curA = 1.0;
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
-    cout << "Iter: " << i << endl;
+    if( npVars_.verboseLevel > 3 ) {
+      cout << "Iter: " << i+1 << endl;
+    }
     
 //    updateGradients(curSLPSumGrads_, curSLPWireLengthGrads_, curSLPDensityGrads_);
 //    stepLength_  
@@ -254,9 +278,10 @@ NesterovPlace::doNesterovPlace() {
 
     // coeff is (a_k -1) / ( a_(k+1)) in paper.
     float coeff = (prevA - 1.0)/curA;
-    cout << "coeff: " << coeff << endl;
-
-    cout << "stepLength_: " << stepLength_ << endl; 
+    
+    if( npVars_.verboseLevel > 3 ) {
+      cout << "stepLength_: " << stepLength_ << endl; 
+    }
     // Back-Tracking loop
     int numBackTrak = 0;
     for(numBackTrak = 0; numBackTrak < npVars_.maxBackTrack; numBackTrak++) {
@@ -291,14 +316,17 @@ NesterovPlace::doNesterovPlace() {
 
       nb_->updateGCellDensityCenterLocation(nextSLPCoordi_);
       nb_->updateDensityForceBin();
-      nb_->updateWireLengthForceWA(wireLengthCoeffX_, wireLengthCoeffY_);
+      nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_);
 
       updateGradients(nextSLPSumGrads_, nextSLPWireLengthGrads_, nextSLPDensityGrads_ );
   
       float newStepLength  
         = getStepLength (curSLPCoordi_, curSLPSumGrads_, nextSLPCoordi_, nextSLPSumGrads_);
      
-      cout << "newStepLength: " << newStepLength << endl; 
+      if( npVars_.verboseLevel > 3 ) {
+        cout << "newStepLength: " << newStepLength << endl; 
+      }
+
       if( newStepLength > stepLength_ * 0.95) {
         stepLength_ = newStepLength;
         break;
@@ -308,28 +336,42 @@ NesterovPlace::doNesterovPlace() {
       } 
     }
 
-    cout << "numBackTrak: " << numBackTrak << endl;   
-    updateNextIter(); 
-  }
+    if( npVars_.verboseLevel > 3 ) {
+      cout << "numBackTrak: " << numBackTrak << endl;   
+    }
 
-  cout << "WL force Done" << endl;
+    updateNextIter(); 
+
+    if( i == 0 || (i+1) % 10 == 0 ) {
+      cout << "[NesterovSolve] Iter: " << i+1 
+        << " overflow: " << sumOverflow_ << " HPWL: " << prevHpwl_ << endl; 
+    }
+
+    if( i > 50 && sumOverflow_ <= npVars_.targetOverflow) {
+      cout << "[NesterovSolve] Finished with Overflow: " << sumOverflow_ << endl;
+      break;
+    }
+  }
 }
 
 void
 NesterovPlace::updateWireLengthCoef(float overflow) {
   if( overflow > 1.0 ) {
-    wireLengthCoeffX_ = wireLengthCoeffY_ = 0.1;
+    wireLengthCoefX_ = wireLengthCoefY_ = 0.1;
   }
   else if( overflow < 0.1 ) {
-    wireLengthCoeffX_ = wireLengthCoeffY_ = 10.0;
+    wireLengthCoefX_ = wireLengthCoefY_ = 10.0;
   }
   else {
-    wireLengthCoeffX_ = wireLengthCoeffY_ 
+    wireLengthCoefX_ = wireLengthCoefY_ 
       = 1.0 / pow(10.0, (overflow-0.1)*20 / 9.0 - 1.0);
   }
 
-  wireLengthCoeffX_ *= baseWireLengthCoeff_;
-  wireLengthCoeffY_ *= baseWireLengthCoeff_;
+  wireLengthCoefX_ *= baseWireLengthCoef_;
+  wireLengthCoefY_ *= baseWireLengthCoef_;
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "newWireLengthCoef: " << wireLengthCoefX_ << endl;
+  }
 }
 
 void
@@ -339,11 +381,11 @@ NesterovPlace::updateInitialPrevSLPCoordi() {
 
 
     float prevCoordiX 
-      = curSLPCoordi_[i].x + npVars_.initialPrevCoordiUpdateCoeff 
+      = curSLPCoordi_[i].x + npVars_.initialPrevCoordiUpdateCoef 
       * curSLPSumGrads_[i].x;
   
     float prevCoordiY
-      = curSLPCoordi_[i].y + npVars_.initialPrevCoordiUpdateCoeff
+      = curSLPCoordi_[i].y + npVars_.initialPrevCoordiUpdateCoef
       * curSLPSumGrads_[i].y;
     
     FloatCoordi newCoordi( 
@@ -378,22 +420,31 @@ NesterovPlace::updateNextIter() {
       static_cast<float>(nb_->overflowArea()) 
           / static_cast<float>(pb_->placeInstsArea());
 
-  cout << "gradient: " << getSecondNorm(curSLPSumGrads_) << endl;
-  cout << "phi     : " << nb_->sumPhi() << endl;
-  cout << "overflow: " << sumOverflow_ << endl;
-  updateWireLengthCoef(sumOverflow_);
-  int32_t hpwl = nb_->getHpwl();
-  cout << "prevHpwl: " << prevHpwl_ << endl; 
-  cout << "hpwl    : " << hpwl << endl; 
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "gradient: " << getSecondNorm(curSLPSumGrads_) << endl;
+    cout << "phi     : " << nb_->sumPhi() << endl;
+    cout << "overflow: " << sumOverflow_ << endl;
+  }
 
-  float phiCoeff = getPhiCoeff( 
+  updateWireLengthCoef(sumOverflow_);
+  int64_t hpwl = nb_->getHpwl();
+  
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "prevHpwl: " << prevHpwl_ << endl; 
+    cout << "hpwl    : " << hpwl << endl; 
+  }
+  
+  prevHpwl_ = hpwl;
+
+  float phiCoef = getPhiCoef( 
       static_cast<float>(prevHpwl_ - hpwl) 
       / npVars_.referenceHpwl );
-  densityPanelty_ *= phiCoeff;
-  cout << "phiCoeff: " << phiCoeff << endl;
-
-  prevHpwl_ = hpwl;
-  cout << endl << endl;
+  densityPanelty_ *= phiCoef;
+  
+  if( npVars_.verboseLevel > 3 ) {
+    cout << "phiCoef: " << phiCoef << endl;
+    cout << endl << endl;
+  }
 }
 
 float
@@ -407,21 +458,26 @@ NesterovPlace::getStepLength(
   float gradDistance 
     = getDistance(prevSLPSumGrads_, curSLPSumGrads_);
 
-  cout << "cDist: " << coordiDistance << endl;
-  cout << "gDist: " << gradDistance << endl;
-  cout << "calVal: " << coordiDistance / gradDistance << endl;
+  if( npVars_.verboseLevel > 3) {
+    cout << "cDist: " << coordiDistance << endl;
+    cout << "gDist: " << gradDistance << endl;
+    cout << "calVal: " << coordiDistance / gradDistance << endl;
+  }
 
   return coordiDistance / gradDistance;
 }
 
 float
-NesterovPlace::getPhiCoeff(float scaledDiffHpwl) {
-  cout << "input scaleDiffHpwl: " << scaledDiffHpwl << endl;
+NesterovPlace::getPhiCoef(float scaledDiffHpwl) {
+  if( npVars_.verboseLevel > 3) {
+    cout << "input scaleDiffHpwl: " << scaledDiffHpwl << endl;
+  }
+
   float retCoef 
     = (scaledDiffHpwl < 0)? 
-    npVars_.maxBoundMuK : 
-    npVars_.maxBoundMuK * pow( npVars_.maxBoundMuK, scaledDiffHpwl * -1.0 );
-  retCoef = std::max(npVars_.minBoundMuK, retCoef);
+    npVars_.maxPhiCoef: 
+    npVars_.maxPhiCoef * pow( npVars_.maxPhiCoef, scaledDiffHpwl * -1.0 );
+  retCoef = std::max(npVars_.minPhiCoef, retCoef);
   return retCoef;
 }
 
@@ -442,8 +498,6 @@ getSecondNorm(vector<FloatCoordi>& a) {
   float norm = 0;
   for(auto& coordi : a) {
     norm += coordi.x * coordi.x + coordi.y * coordi.y;
-//    cout << "gCell: " << &coordi - &a[0] << " accm_norm: "  
-//      << norm << " "<< coordi.x << " " << coordi.y << endl;;
   }
   return sqrt( norm / (2.0*a.size()) ); 
 }

@@ -164,7 +164,7 @@ public:
   int cy() const;
 
   // HPWL: half-parameter-wire-length
-  int hpwl() const;
+  int64_t hpwl() const;
 
   void updateBox();
 
@@ -255,7 +255,7 @@ public:
   int siteSizeX() const { return siteSizeX_; }
   int siteSizeY() const { return siteSizeY_; }
 
-  int hpwl() const;
+  int64_t hpwl() const;
   void printInfo() const;
 
   int64_t placeInstsArea() const { return placeInstsArea_; }

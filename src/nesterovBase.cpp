@@ -338,9 +338,9 @@ GNet::updateBox() {
   } 
 }
 
-int32_t 
+int64_t
 GNet::hpwl() {
-  return (ux_ - lx_) + (uy_ - ly_);
+  return static_cast<int64_t>((ux_ - lx_) + (uy_ - ly_));
 }
 
 void
@@ -1657,9 +1657,9 @@ NesterovBase::updateDensityForceBin() {
   }
 }
 
-int32_t
+int64_t
 NesterovBase::getHpwl() {
-  int32_t hpwl = 0;
+  int64_t hpwl = 0;
   for(auto& gNet : gNets_) {
     gNet->updateBox();
     hpwl += gNet->hpwl();
