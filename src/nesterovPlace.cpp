@@ -14,16 +14,16 @@ static float
 getSecondNorm(vector<FloatCoordi>& a);
 
 NesterovPlaceVars::NesterovPlaceVars()
-  : maxNesterovIter(20), 
+  : maxNesterovIter(2000), 
   maxBackTrack(10),
-  initDensityPanelty(0.0001),
+  initDensityPanelty(0.1),
   initWireLengthCoeff(1.0/8.0),
   targetOverflow(0.1),
   minBoundMuK(0.95),
   maxBoundMuK(1.05),
-  initialPrevCoordiUpdateCoeff(700),
+  initialPrevCoordiUpdateCoeff(900),
   minPreconditioner(1.0),
-  referenceHpwl(3460000) {}
+  referenceHpwl(3460) {}
 
 NesterovPlace::NesterovPlace() 
   : pb_(nullptr), nb_(nullptr), npVars_(), 
@@ -91,7 +91,7 @@ void NesterovPlace::init() {
   nb_->updateDensityForceBin();
 
   baseWireLengthCoeff_ 
-    = 100 * npVars_.initWireLengthCoeff 
+    = npVars_.initWireLengthCoeff 
     / static_cast<float>(
         (nb_->binSizeX() + nb_->binSizeY())) 
     * 0.5;
@@ -223,9 +223,11 @@ NesterovPlace::updateGradients(
 
     sumGrads[i].x /= sumPrecondi.x;
     sumGrads[i].y /= sumPrecondi.y; 
-    cout << "sumPreCondi: " << sumPrecondi.x << " " << sumPrecondi.y << endl ;
-    cout << "atx: " << sumGrads[i].x << " aty: " << sumGrads[i].y << endl << endl;
+//    cout << "sumPreCondi: " << sumPrecondi.x << " " << sumPrecondi.y << endl ;
+//    cout << "atx: " << sumGrads[i].x << " aty: " << sumGrads[i].y << endl << endl;
   }
+  cout << "WL GradSum: " << wireLengthGradSum_ << endl;
+  cout << "De GradSum: " << densityGradSum_ << endl;
 }
 
 void
@@ -237,6 +239,7 @@ NesterovPlace::doNesterovPlace() {
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
+    cout << "Iter: " << i << endl;
     
 //    updateGradients(curSLPSumGrads_, curSLPWireLengthGrads_, curSLPDensityGrads_);
 //    stepLength_  
@@ -387,6 +390,9 @@ NesterovPlace::updateNextIter() {
       / npVars_.referenceHpwl );
   densityPanelty_ *= phiCoeff;
   cout << "phiCoeff: " << phiCoeff << endl;
+
+  prevHpwl_ = hpwl;
+  cout << endl << endl;
 }
 
 float
@@ -404,11 +410,12 @@ NesterovPlace::getStepLength(
   cout << "gDist: " << gradDistance << endl;
   cout << "calVal: " << 1.0 / gradDistance / coordiDistance << endl;
 
-  return 1.0 / gradDistance / coordiDistance;
+  return 1.0 / gradDistance / (0.00000012*coordiDistance);
 }
 
 float
 NesterovPlace::getPhiCoeff(float scaledDiffHpwl) {
+  cout << "input scaleDiffHpwl: " << scaledDiffHpwl << endl;
   float retCoef 
     = (scaledDiffHpwl < 0)? 
     npVars_.maxBoundMuK : 
