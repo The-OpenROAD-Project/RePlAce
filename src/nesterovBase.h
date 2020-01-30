@@ -467,6 +467,8 @@ public:
   int binCntY() const;
   int binSizeX() const;
   int binSizeY() const;
+  
+  const std::vector<Bin*> & bins() const { return bg_.bins(); }
 
   int64_t overflowArea() const;
   float sumPhi() const;

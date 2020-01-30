@@ -1,11 +1,24 @@
 #ifndef __REPLACE_CIMG_PLOT__
 #define __REPLACE_CIMG_PLOT__
 
-#include <cstring>
 #include <vector>
-#include "nesterovBase.h"
+#include <memory>
+#include "coordi.h"
 
+// 
+// The following structure/header will be removed.
+//
+// This is temporal implementation with CImg
+//
 namespace replace {
+
+void SaveCellPlotAsJPEG(std::string imgName, bool isGCell, std::string imgPosition);
+void SaveBinPlotAsJPEG(std::string imgName, std::string imgPosition);
+void SaveArrowPlotAsJPEG(std::string imgName, std::string imgPosition);
+void SavePlot(std::string imgName = "", bool isGCell = false);
+//void ShowPlot(std::string circuitName = "");
+
+class NesterovBase;
 
 enum { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE };
 
@@ -44,12 +57,16 @@ class PlotEnv {
   float dispHeight;
 
   bool hasCellColor;
+
   // color information for each cells.
   // Needed for cell coloring
   std::vector<PlotColor> colors;
 
   // constructor
-  PlotEnv();
+  PlotEnv(
+      std::shared_ptr<PlacerBase> pb, 
+      std::shared_ptr<NesterovBase> nb);
+
   void Init();
   void InitCellColors(std::string colorFile);
   int GetTotalImageWidth();
@@ -58,6 +75,10 @@ class PlotEnv {
   int GetX(float coord);
   int GetY(FloatCoordi &coord);
   int GetY(float coord);
+
+ private:
+  std::shared_ptr<PlacerBase> pb_;
+  std::shared_ptr<NesterovBase> nb_;
 };
 
 }
