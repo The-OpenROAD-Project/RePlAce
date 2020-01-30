@@ -17,12 +17,12 @@ NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
   verboseLevel(1),
-  initDensityPanelty(10.0),
-  initWireLengthCoef(1.0/80.0),
+  initDensityPanelty(1000),
+  initWireLengthCoef(1.0/8.0),
   targetOverflow(0.1),
   minPhiCoef(0.95),
   maxPhiCoef(1.05),
-  initialPrevCoordiUpdateCoef(300),
+  initialPrevCoordiUpdateCoef(10),
   minPreconditioner(1.0),
   referenceHpwl(44600000) {}
 
