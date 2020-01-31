@@ -4,6 +4,7 @@
 #include "placerBase.h"
 #include "nesterovBase.h"
 #include <unordered_map>
+#include <iostream>
 
 
 
@@ -34,6 +35,17 @@ static bool isPlotEnvInit = false;
 //
 // below is for the CImg drawing
 //
+
+PlotEnv::PlotEnv()
+: pb_(nullptr), nb_(nullptr),
+  minLength(0), 
+  imageWidth(0), imageHeight(0), 
+  xMargin(0), yMargin(0), 
+  origWidth(0), 
+  origHeight(0),
+  unitX(0), unitY(0), 
+  dispWidth(0), dispHeight(0), 
+  hasCellColor(false) {}
 
 PlotEnv::PlotEnv(
     std::shared_ptr<PlacerBase> pb,
@@ -78,46 +90,58 @@ void PlotEnv::Init() {
   dispWidth = imageWidth * 0.2;
   dispHeight = imageHeight * 0.2;
 
-  if( plotColorFile != "" ) {
-    hasCellColor = true;
-    InitCellColors(plotColorFile);
-  }
+//  if( plotColorFile != "" ) {
+//    hasCellColor = true;
+//    InitCellColors(plotColorFile) nb_ = nb;;
+//  }
 }
+
+void
+PlotEnv::setPlacerBase(std::shared_ptr<PlacerBase> pb){
+  pb_ = pb;
+}
+
+void
+PlotEnv::setNesterovBase(std::shared_ptr<NesterovBase> nb) {
+  nb_ = nb;
+}
+
+
 
 // Resize and initialize the vectors
 // takes colorSet files
 void PlotEnv::InitCellColors(string cFileName) {
-  colors.resize(moduleCNT);
+//  colors.resize(moduleCNT);
 
-  std::unordered_map<string, int> colorMap;
-  for(int i=0; i<moduleCNT; i++) {
-    new (&colors[i]) PlotColor();
+//  std::unordered_map<string, int> colorMap;
+//  for(int i=0; i<moduleCNT; i++) {
+//    new (&colors[i]) PlotColor();
 
 //    MODULE* curModule = &moduleInstance[i]; 
 
     // Fill in the colorMap
 //    colorMap[curModule ->Name()] = i;
-  }
+//  }
   
-  std::ifstream cFile(cFileName);
-  if( !cFile.good() ) {
-    cout << "** ERROR : Cannot Open Colorset File : " << cFileName << endl;
-    exit(1);
-  }
+//  std::ifstream cFile(cFileName);
+//  if( !cFile.good() ) {
+//    cout << "** ERROR : Cannot Open Colorset File : " << cFileName << endl;
+//    exit(1);
+//  }
   
-  string cellName = "";
-  int r = 0, g = 0, b = 0;
+//  string cellName = "";
+//  int r = 0, g = 0, b = 0;
 
   // keep fill in the cellName/r/g/b variable in the colorset file
-  while( cFile >> cellName >> r >> g >> b ) {
-    auto gPtr = colorMap.find(cellName);
-    if( gPtr == colorMap.end() ) {
-      cout << "ERROR: Cannot find cell : " << cellName << endl;
-    } 
+//  while( cFile >> cellName >> r >> g >> b ) {
+//    auto gPtr = colorMap.find(cellName);
+//    if( gPtr == colorMap.end() ) {
+//      cout << "ERROR: Cannot find cell : " << cellName << endl;
+//    } 
 
     // save into colors vectors    
-    colors[gPtr->second] = PlotColor(r, g, b);
-  }
+//    colors[gPtr->second] = PlotColor(r, g, b);
+//  }
 }
 
 int PlotEnv::GetTotalImageWidth() {
@@ -144,20 +168,20 @@ int PlotEnv::GetY(float coord) {
   return (origHeight - (coord - pb_->die().dieLy())) * unitY + yMargin;
 }
 
-typedef CImg< unsigned char > CImgObj;
 
-void DrawTerminal(CImgObj &img, 
+void 
+PlotEnv::DrawTerminal(CImgObj *img, 
     const unsigned char termColor[],
     const unsigned char pinColor[], float opacity) {
   int pinWidth = 30;
 
   // FIXED CELL
-  for(auto& npInst : pb_.nonPlaceInsts()) {
-    int x1 = pe.GetX(curTerminal->pmin);
-    int x3 = pe.GetX(curTerminal->pmax);
-    int y1 = pe.GetY(curTerminal->pmin);
-    int y3 = pe.GetY(curTerminal->pmax);
-    img.draw_rectangle(x1, y1, x3, y3, termColor, opacity);
+  for(auto& npInst : pb_->nonPlaceInsts()) {
+    int x1 = pe.GetX(npInst->lx());
+    int x3 = pe.GetX(npInst->ux());
+    int y1 = pe.GetY(npInst->ly());
+    int y3 = pe.GetY(npInst->uy());
+    img->draw_rectangle(x1, y1, x3, y3, termColor, opacity);
 
 //    for(auto& npPin : npInst->pins()) {
 //      int x1 = pe.GetX((curTerminal->center.x + curTerminal->pof[j].x) - pinWidth / 2.0);
@@ -171,13 +195,14 @@ void DrawTerminal(CImgObj &img,
   }
 }
 
-void DrawGcell(CImgObj &img, const unsigned char fillerColor[],
+void 
+PlotEnv::DrawGcell(CImgObj *img, const unsigned char fillerColor[],
                const unsigned char cellColor[],
                const unsigned char macroColor[], float opacity) {
   for(auto& gCell : nb_->gCells()) {
 
     // skip drawing for FillerCell
-    if(gCell.isFiller()) {
+    if(gCell->isFiller()) {
       continue;
     }
 
@@ -196,9 +221,9 @@ void DrawGcell(CImgObj &img, const unsigned char fillerColor[],
 //    }
       
     if( pe.hasCellColor ) {
-      color[0] = pe.colors[i].r();
-      color[1] = pe.colors[i].g();
-      color[2] = pe.colors[i].b();
+//      color[0] = pe.colors[i].r();
+//      color[1] = pe.colors[i].g();
+//      color[2] = pe.colors[i].b();
     }
     else {
       for(int j=0; j<3; j++) {
@@ -207,7 +232,7 @@ void DrawGcell(CImgObj &img, const unsigned char fillerColor[],
     } 
 
 //    cout << "color: " << (int)color[0] << " " << (int)color[1] << " " << (int)color[2] << endl;
-    img.draw_rectangle(x1, y1, x3, y3, color, opacity);
+    img->draw_rectangle(x1, y1, x3, y3, color, opacity);
 
     // drawing boundary for Macro cells
 //    if(curGCell->flg == Macro) {
@@ -218,7 +243,7 @@ void DrawGcell(CImgObj &img, const unsigned char fillerColor[],
   }
 }
 
-void DrawModule(CImgObj &img, const unsigned char color[], float opacity) {
+void PlotEnv::DrawModule(CImgObj *img, const unsigned char color[], float opacity) {
 //  for(int i = 0; i < moduleCNT; i++) {
 //    MODULE *curModule = &moduleInstance[i];
 //
@@ -249,7 +274,7 @@ void DrawModule(CImgObj &img, const unsigned char color[], float opacity) {
 //  }
 }
 
-void DrawBinDensity(CImgObj &img, float opacity) {
+void PlotEnv::DrawBinDensity(CImgObj *img, float opacity) {
   for(auto& bin : nb_->bins()) {
     int x1 = pe.GetX(bin->lx());
     int x3 = pe.GetX(bin->ly());
@@ -262,13 +287,14 @@ void DrawBinDensity(CImgObj &img, float opacity) {
     color = 255 - color;
 
     char denColor[3] = {(char)color, (char)color, (char)color};
-    img.draw_rectangle(x1, y1, x3, y3, denColor, opacity);
+    img->draw_rectangle(x1, y1, x3, y3, denColor, opacity);
     //        img.draw_text((x1+x3)/2-5, (y1+y3)/2,
     //        to_string(curBin->den).c_str(), black, NULL, 1, 15);
   }
 }
 
-void CimgDrawArrow(CImgObj &img, int x1, int y1, int x3, int y3, int thick,
+void 
+PlotEnv::CimgDrawArrow(CImgObj *img, int x1, int y1, int x3, int y3, int thick,
                    const unsigned char color[], float opacity) {
   // ARROW HEAD DRAWING
   float arrowHeadSize = thick;
@@ -296,7 +322,7 @@ void CimgDrawArrow(CImgObj &img, int x1, int y1, int x3, int y3, int thick,
   rectPoints(3, 0) = luX;
   rectPoints(3, 1) = luY;
 
-  img.draw_polygon(rectPoints, color);
+  img->draw_polygon(rectPoints, color);
 
   cimg_library::CImg< int > headPoints(3, 2);
   int lPointX = x3 - 1.0 * thick / 2 * cos(invTheta);
@@ -324,16 +350,14 @@ void CimgDrawArrow(CImgObj &img, int x1, int y1, int x3, int y3, int thick,
   //    cout << rPointX << " " << rPointY << endl;
   //    cout << uPointX << " " << uPointY << endl << endl;
 
-  img.draw_polygon(headPoints, color);
+  img->draw_polygon(headPoints, color);
   //    img.draw_arrow( x1, y1, x3, y3, color, opacity );
 }
 
-void DrawArrowDensity(CImgObj &img, float opacity) {
-  int binMaxX = (STAGE == cGP2D) ? dim_bin_cGP2D.x
-                                 : (STAGE == mGP2D) ? dim_bin_mGP2D.x : INT_MIN;
-  int binMaxY = (STAGE == cGP2D) ? dim_bin_cGP2D.y
-                                 : (STAGE == mGP2D) ? dim_bin_mGP2D.y : INT_MIN;
-
+void 
+PlotEnv::DrawArrowDensity(CImgObj *img, float opacity) {
+  int binMaxX = nb_->binCntX();
+  int binMaxY = nb_->binCntY();
   int arrowSpacing = (binMaxX / 16 <= 0) ? 1 : binMaxX / 16;
 
   // below is essential for extracting e?Max
@@ -387,7 +411,7 @@ void DrawArrowDensity(CImgObj &img, float opacity) {
   //    cout << "theta: " << theta << endl;
 }
 
-void SaveCellPlot(CImgObj &img, bool isGCell) {
+void PlotEnv::SaveCellPlot(CImgObj *img, bool isGCell) {
   float opacity = 0.7;
   // FIXED CELL
   DrawTerminal(img, blue, black, opacity);
@@ -401,12 +425,12 @@ void SaveCellPlot(CImgObj &img, bool isGCell) {
   }
 }
 
-void SaveBinPlot(CImgObj &img) {
+void PlotEnv::SaveBinPlot(CImgObj *img) {
   float opacity = 1;
   DrawBinDensity(img, opacity);
 }
 
-void SaveArrowPlot(CImgObj &img) {
+void PlotEnv::SaveArrowPlot(CImgObj *img) {
   float opacity = 1;
   DrawBinDensity(img, opacity);
   DrawArrowDensity(img, opacity);
@@ -416,7 +440,7 @@ void SaveArrowPlot(CImgObj &img) {
 // using X11
 // isGCell : GCell drawing mode. true->gcell_st, false->moduleInstance
 //
-void SavePlot(string imgName, bool isGCell) {
+void PlotEnv::SavePlot(string imgName, bool isGCell) {
   // if gcell is exist, then update module's information
   // before drawing
   //    if( gcell_st ) {
@@ -430,7 +454,7 @@ void SavePlot(string imgName, bool isGCell) {
   CImg< unsigned char > img(pe.GetTotalImageWidth(), pe.GetTotalImageHeight(),
                             1, 3, 255);
 
-  SaveCellPlot(img, isGCell);
+  SaveCellPlot(&img, isGCell);
   //    SaveBinPlot(img);
 
   // Finally draw image info
@@ -442,7 +466,7 @@ void SavePlot(string imgName, bool isGCell) {
 // save current circuit's as BMP file in imgPosition & iternumber
 // isGCell : GCell drawing mode. true->gcell_st, false->moduleInstance
 //
-void SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition) {
+void PlotEnv::SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition) {
   // if gcell is exist, then update module's information
   // before drawing
   //    if( gcell_st ) {
@@ -470,7 +494,7 @@ void SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPosition) {
       img.draw_rectangle( x1, y1, x3, y3, black, 0.025 );
   }*/
 
-  SaveCellPlot(img, isGCell);
+  SaveCellPlot(&img, isGCell);
 
   /*
   for(int i=0; i<tier_st[0].tot_bin_cnt; i++) {
@@ -503,7 +527,7 @@ to_string(int(100*curBin->den2)).c_str(), black, NULL, 1, 25);
 
 //
 // save current circuit's as BMP file in imgPosition & iternumber
-void SaveBinPlotAsJPEG(string imgName, string imgPosition) {
+void PlotEnv::SaveBinPlotAsJPEG(string imgName, string imgPosition) {
   if(!isPlotEnvInit) {
     pe.Init();
     isPlotEnvInit = true;
@@ -512,7 +536,7 @@ void SaveBinPlotAsJPEG(string imgName, string imgPosition) {
   CImg< unsigned char > img(pe.GetTotalImageWidth(), pe.GetTotalImageHeight(),
                             1, 3, 255);
 
-  SaveBinPlot(img);
+  SaveBinPlot(&img);
 
   //    cout << "current imgName: " << imgName << endl;
   // Finally draw image info
@@ -525,7 +549,7 @@ void SaveBinPlotAsJPEG(string imgName, string imgPosition) {
 }
 //
 // save current circuit's as BMP file in imgPosition & iternumber
-void SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
+void PlotEnv::SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
   if(!isPlotEnvInit) {
     pe.Init();
     isPlotEnvInit = true;
@@ -534,7 +558,7 @@ void SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
   CImg< unsigned char > img(pe.GetTotalImageWidth(), pe.GetTotalImageHeight(),
                             1, 3, 255);
 
-  SaveArrowPlot(img);
+  SaveArrowPlot(&img);
 
   //    cout << "current imgName: " << imgName << endl;
   // Finally draw image info

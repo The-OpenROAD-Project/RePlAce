@@ -10,6 +10,13 @@
 //
 // This is temporal implementation with CImg
 //
+
+
+namespace cimg_library {
+template<typename T1>
+class CImg;
+}
+
 namespace replace {
 
 void SaveCellPlotAsJPEG(std::string imgName, bool isGCell, std::string imgPosition);
@@ -19,6 +26,7 @@ void SavePlot(std::string imgName = "", bool isGCell = false);
 //void ShowPlot(std::string circuitName = "");
 
 class NesterovBase;
+class PlacerBase;
 
 enum { BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, YELLOW, WHITE };
 
@@ -38,6 +46,8 @@ struct PlotColor {
   int b() { return b_; };
 };
 
+
+typedef cimg_library::CImg< unsigned char > CImgObj;
 
 // for X11 drawing
 class PlotEnv {
@@ -63,9 +73,13 @@ class PlotEnv {
   std::vector<PlotColor> colors;
 
   // constructor
+  PlotEnv();
   PlotEnv(
       std::shared_ptr<PlacerBase> pb, 
       std::shared_ptr<NesterovBase> nb);
+
+  void setPlacerBase(std::shared_ptr<PlacerBase> pb);
+  void setNesterovBase(std::shared_ptr<NesterovBase> nb);
 
   void Init();
   void InitCellColors(std::string colorFile);
@@ -79,6 +93,29 @@ class PlotEnv {
  private:
   std::shared_ptr<PlacerBase> pb_;
   std::shared_ptr<NesterovBase> nb_;
+
+  void DrawModule(CImgObj *img, const unsigned char color[], float opacity);
+  void DrawTerminal(CImgObj* img, 
+    const unsigned char termColor[],
+    const unsigned char pinColor[], float opacity);
+  void DrawBinDensity(CImgObj *img, float opacity);
+  void CimgDrawArrow(CImgObj *img, int x1, int y1, int x3, int y3, int thick,
+                   const unsigned char color[], float opacity); 
+  void DrawGcell(CImgObj *img, const unsigned char fillerColor[],
+               const unsigned char cellColor[],
+               const unsigned char macroColor[], float opacity); 
+  void DrawArrowDensity(CImgObj *img, float opacity);
+
+  void SaveCellPlot(CImgObj *img, bool isGCell);
+  void SaveBinPlot(CImgObj *img);
+  void SaveArrowPlot(CImgObj *img);
+  void SavePlot(std::string imgName, bool isGCell);
+  void SaveCellPlotAsJPEG(std::string imgName, bool isGCell, std::string imgPosition);
+  void SaveBinPlotAsJPEG(std::string imgName, std::string imgPosition);
+  void SaveArrowPlotAsJPEG(std::string imgName, std::string imgPosition);
+
+
+ 
 };
 
 }
