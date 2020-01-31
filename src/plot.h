@@ -89,11 +89,7 @@ class PlotEnv {
   int GetX(float coord);
   int GetY(FloatCoordi &coord);
   int GetY(float coord);
-
- private:
-  std::shared_ptr<PlacerBase> pb_;
-  std::shared_ptr<NesterovBase> nb_;
-
+  
   void DrawModule(CImgObj *img, const unsigned char color[], float opacity);
   void DrawTerminal(CImgObj* img, 
     const unsigned char termColor[],
@@ -113,6 +109,11 @@ class PlotEnv {
   void SaveCellPlotAsJPEG(std::string imgName, bool isGCell, std::string imgPosition);
   void SaveBinPlotAsJPEG(std::string imgName, std::string imgPosition);
   void SaveArrowPlotAsJPEG(std::string imgName, std::string imgPosition);
+
+ private:
+  std::shared_ptr<PlacerBase> pb_;
+  std::shared_ptr<NesterovBase> nb_;
+
 
 
  

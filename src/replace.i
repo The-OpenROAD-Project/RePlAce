@@ -86,7 +86,7 @@ set_replace_max_phi_coef_cmd(float max_phi_coef)
 }
 
 void
-set_replace_init_penalty_factor_cmd(float penaltyFactor)
+set_replace_init_density_penalty_factor_cmd(float penaltyFactor)
 {
   Replace* replace = getReplace();
   replace->setInitDensityPenalityFactor(penaltyFactor);

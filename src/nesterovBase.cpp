@@ -236,6 +236,7 @@ GCell::setDensityCenterLocation(int dCx, int dCy) {
   dLy_ = dCy - halfDDy;
   dUx_ = dCx + halfDDx;
   dUy_ = dCy + halfDDy;
+  
 
   // assume that density Center change the gPin coordi
   for(auto& gPin: gPins_) {
@@ -570,12 +571,12 @@ Bin::uy() const {
 
 int
 Bin::cx() const { 
-  return (ux_ - lx_)/2;
+  return (ux_ + lx_)/2;
 }
 
 int
 Bin::cy() const { 
-  return (uy_ - ly_)/2;
+  return (uy_ + ly_)/2;
 }
 
 int
@@ -1589,8 +1590,8 @@ NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoe
         / ( waExpMaxSumY * waExpMaxSumY );
   }
 
-  return FloatCoordi(gradientMaxX - gradientMinX, 
-      gradientMaxY - gradientMinY);
+  return FloatCoordi(gradientMinX - gradientMaxX, 
+      gradientMinY - gradientMaxY);
 }
 
 FloatCoordi

@@ -88,6 +88,13 @@ add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
 ############################################################
 add_library( replace
   ${REPLACE_SRC}
+
+)
+
+target_link_libraries( replace
+  PRIVATE
+  ${X11_LIBRARIES} 
+  ${JPEG_LIBRARIES} 
 )
 
 ############################################################
@@ -98,7 +105,10 @@ PUBLIC
   ${REPLACE_HOME}/include
 PRIVATE
   ${REPLACE_HOME}/src
+
+  # For CImg
   ${REPLACE_HOME}/module/CImg
+
   ${EIGEN_HOME}
   ${FLUTE_HOME}
  

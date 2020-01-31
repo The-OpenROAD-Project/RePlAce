@@ -5,6 +5,8 @@
 #include <iostream>
 using namespace std;
 
+#include "plot.h"
+
 namespace replace {
 
 static float
@@ -17,12 +19,12 @@ NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
   verboseLevel(1),
-  initDensityPanelty(1000),
-  initWireLengthCoef(1.0/8.0),
+  initDensityPanelty(1e1),
+  initWireLengthCoef(1.0/24.0),
   targetOverflow(0.1),
   minPhiCoef(0.95),
   maxPhiCoef(1.05),
-  initialPrevCoordiUpdateCoef(10),
+  initialPrevCoordiUpdateCoef(100),
   minPreconditioner(1.0),
   referenceHpwl(44600000) {}
 
@@ -51,6 +53,8 @@ NesterovPlace::NesterovPlace(
 NesterovPlace::~NesterovPlace() {
   reset();
 }
+
+static PlotEnv pe;
 
 void NesterovPlace::init() {
   const int gCellSize = nb_->gCells().size();
@@ -256,6 +260,13 @@ NesterovPlace::updateGradients(
 
 void
 NesterovPlace::doNesterovPlace() {
+  cout << "pb_ " << pb_ << endl;
+  cout << "pb_ die: " << &(pb_->die()) << endl;
+  pe.setPlacerBase(pb_);
+  pe.setNesterovBase(nb_);
+  pe.Init();
+
+
   // backTracking variable.
   float curA = 1.0;
 
@@ -342,9 +353,22 @@ NesterovPlace::doNesterovPlace() {
 
     updateNextIter(); 
 
+
+    // For JPEG Saving
+    // debug
+
     if( i == 0 || (i+1) % 10 == 0 ) {
       cout << "[NesterovSolve] Iter: " << i+1 
         << " overflow: " << sumOverflow_ << " HPWL: " << prevHpwl_ << endl; 
+      pe.SaveCellPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(i+1)), true,
+          string("./plot/cell/cell_") +
+          std::to_string (i+1));
+      pe.SaveBinPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(i+1)),
+          string("./plot/bin/bin_") +
+          std::to_string(i+1));
+      pe.SaveArrowPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(i+1)),
+          string("./plot/arrow/arrow_") +
+          std::to_string(i+1));
     }
 
     if( i > 50 && sumOverflow_ <= npVars_.targetOverflow) {

@@ -7,7 +7,7 @@ sta::define_cmd_args "global_placement" {
 proc global_placement { args } {
   sta::parse_key_args "global_placement" args \
     keys {-bin_grid_count -wire_res -wire_cap -density \
-      -lambda -min_pcoef -max_pcoef -overflow -verbose_level} \
+      -init_density_penalty -min_pcoef -max_pcoef -overflow -verbose_level} \
       flags {-skip_initial_place -timing_driven}
     
   set target_density 0.7
@@ -51,10 +51,10 @@ proc global_placement { args } {
     set_replace_max_pcoef_cmd $max_pcoef  
   }
 
-  if { [info exists keys(-lambda)] } {
-    set lambda $keys(-lambda)
-    sta::check_positive_float "-lambda" $lambda
-    set_replace_lambda_cmd $lambda
+  if { [info exists keys(-init_density_penalty)] } {
+    set density_penalty $keys(-init_density_penalty)
+    sta::check_positive_float "-init_density_penalty" $density_penalty
+    set_replace_init_density_penalty_factor_cmd $density_penalty
   }
   
   if { [info exists keys(-overflow)] } {

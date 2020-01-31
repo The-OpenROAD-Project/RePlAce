@@ -28,9 +28,6 @@ static const unsigned char yellow[] = {255, 255, 0}, white[] = {255, 255, 255},
                            purple[] = {255, 100, 255}, black[] = {0, 0, 0},
                            red[] = {255, 0, 0};
 
-static PlotEnv pe;
-static bool isPlotEnvInit = false;
-
 ////////////////////////////////////////////////////////////////////////
 //
 // below is for the CImg drawing
@@ -64,6 +61,16 @@ PlotEnv::PlotEnv(
 }
 
 void PlotEnv::Init() {
+  minLength = 1000;
+  xMargin = yMargin = 30;
+  origWidth 
+    = pb_->die().dieUx()-pb_->die().dieLx();
+
+  origHeight
+    = pb_->die().dieUy()-pb_->die().dieLy();
+
+  hasCellColor = false;
+
   // imageWidth & height setting
   // Set minimum length of picture as minLength
   if(origWidth < origHeight) {
@@ -177,10 +184,10 @@ PlotEnv::DrawTerminal(CImgObj *img,
 
   // FIXED CELL
   for(auto& npInst : pb_->nonPlaceInsts()) {
-    int x1 = pe.GetX(npInst->lx());
-    int x3 = pe.GetX(npInst->ux());
-    int y1 = pe.GetY(npInst->ly());
-    int y3 = pe.GetY(npInst->uy());
+    int x1 = GetX(npInst->lx());
+    int y1 = GetY(npInst->ly());
+    int x3 = GetX(npInst->ux());
+    int y3 = GetY(npInst->uy());
     img->draw_rectangle(x1, y1, x3, y3, termColor, opacity);
 
 //    for(auto& npPin : npInst->pins()) {
@@ -206,10 +213,10 @@ PlotEnv::DrawGcell(CImgObj *img, const unsigned char fillerColor[],
       continue;
     }
 
-    int x1 = pe.GetX(gCell->lx());
-    int x3 = pe.GetX(gCell->ly());
-    int y1 = pe.GetY(gCell->ux());
-    int y3 = pe.GetY(gCell->uy());
+    int x1 = GetX(gCell->dLx());
+    int y1 = GetY(gCell->dLy());
+    int x3 = GetX(gCell->dUx());
+    int y3 = GetY(gCell->dUy());
 
 
     // Color settings for Macro / StdCells
@@ -220,10 +227,10 @@ PlotEnv::DrawGcell(CImgObj *img, const unsigned char fillerColor[],
 //      }
 //    }
       
-    if( pe.hasCellColor ) {
-//      color[0] = pe.colors[i].r();
-//      color[1] = pe.colors[i].g();
-//      color[2] = pe.colors[i].b();
+    if( hasCellColor ) {
+//      color[0] = colors[i].r();
+//      color[1] = colors[i].g();
+//      color[2] = colors[i].b();
     }
     else {
       for(int j=0; j<3; j++) {
@@ -276,10 +283,10 @@ void PlotEnv::DrawModule(CImgObj *img, const unsigned char color[], float opacit
 
 void PlotEnv::DrawBinDensity(CImgObj *img, float opacity) {
   for(auto& bin : nb_->bins()) {
-    int x1 = pe.GetX(bin->lx());
-    int x3 = pe.GetX(bin->ly());
-    int y1 = pe.GetY(bin->ux());
-    int y3 = pe.GetY(bin->uy());
+    int x1 = GetX(bin->lx());
+    int y1 = GetY(bin->ly());
+    int x3 = GetX(bin->ux());
+    int y3 = GetY(bin->uy());
     
     int color = bin->density()* 50 + 20;
 
@@ -362,51 +369,58 @@ PlotEnv::DrawArrowDensity(CImgObj *img, float opacity) {
 
   // below is essential for extracting e?Max
   float exMax = -1e30, eyMax = -1e30, ezMax = -1e30;
-  for(auto& bin : nb_->bins()) {
-    float newEx = fabs(bin->electroForceX());
-    float newEy = fabs(bin->electroForceY());
+  for(int i = 0; i < binMaxX; i += arrowSpacing) {
+    for(int j = 0; j < binMaxY; j += arrowSpacing) {
+      Bin* bin = nb_->bins()[binMaxX * j + i];
+      float newEx = fabs(bin->electroForceX());
+      float newEy = fabs(bin->electroForceY());
 
-    exMax = (exMax < newEx) ? newEx : exMax;
-    eyMax = (eyMax < newEy) ? newEy : eyMax;
+      exMax = (exMax < newEx) ? newEx : exMax;
+      eyMax = (eyMax < newEy) ? newEy : eyMax;
+    }
   }
 
-  for(auto& bin : nb_->bins()) {
-    int signX = (bin->electroForceX() > 0) ? 1 : -1;
-    int signY = (bin->electroForceY() > 0) ? 1 : -1;
+  for(int i = 0; i < binMaxX; i += arrowSpacing) {
+    for(int j = 0; j < binMaxY; j += arrowSpacing) {
+      Bin* bin = nb_->bins()[binMaxX * j + i];
+      int signX = (bin->electroForceX() > 0) ? 1 : -1;
+      int signY = (bin->electroForceY() > 0) ? 1 : -1;
 
-    float newVx = fabs(bin->electroForceX());
-    float newVy = fabs(bin->electroForceY());
+      float newVx = fabs(bin->electroForceX());
+      float newVy = fabs(bin->electroForceY());
 
-    int x1 = bin->cx();
-    int y1 = bin->cy();
+      int x1 = bin->cx();
+      int y1 = bin->cy();
 
-    float dx = signX * newVx / exMax;
-    float dy = signY * newVy / eyMax;
+      float dx = signX * newVx / exMax;
+      float dy = signY * newVy / eyMax;
 
-    //        float theta = atan(dy / dx);
-    float length = sqrt(pow(nb_->binSizeX(), 2.0) +
-                       pow(nb_->binSizeY(), 2.0)) *
-                  5;
+      //        float theta = atan(dy / dx);
+      float length = sqrt(pow(nb_->binSizeX(), 2.0) +
+                         pow(nb_->binSizeY(), 2.0)) *
+                    5;
 
-    int x3 = x1 + dx * length;
-    int y3 = y1 + dy * length;
+      int x3 = x1 + dx * length;
+      int y3 = y1 + dy * length;
 
-    int drawX1 = pe.GetX(x1);
-    int drawY1 = pe.GetY(y1);
-    int drawX3 = pe.GetX(x3);
-    int drawY3 = pe.GetY(y3);
+      int drawX1 = GetX(x1);
+      int drawY1 = GetY(y1);
 
-    //            img.draw_arrow( drawX1, drawY1, drawX3, drawY3, black,
-    //            opacity );
-    CimgDrawArrow(img, drawX1, drawY1, drawX3, drawY3, 20, red, opacity);
-    //        cout << "sign: " <<signX << endl;
-    //        cout << "newVx: " << newVx << endl;
-    //        cout << "exMax: " << exMax << endl;
-    //        cout << "bin_stp: " << bin_stp.x << endl;
-    //        cout << binCoordi.x << " " << binCoordi.y << " "
-    //            << curBin->center.x << " " << curBin->center.y << " "
-    //            << signX*newVx/exMax * bin_stp.x * 10 << " "
-    //            << signY*newVy/eyMax * bin_stp.y * 10 << endl;
+      int drawX3 = GetX(x3);
+      int drawY3 = GetY(y3);
+
+      //            img.draw_arrow( drawX1, drawY1, drawX3, drawY3, black,
+      //            opacity );
+      CimgDrawArrow(img, drawX1, drawY1, drawX3, drawY3, 20, red, opacity);
+      //        cout << "sign: " <<signX << endl;
+      //        cout << "newVx: " << newVx << endl;
+      //        cout << "exMax: " << exMax << endl;
+      //        cout << "bin_stp: " << bin_stp.x << endl;
+      //        cout << binCoordi.x << " " << binCoordi.y << " "
+      //            << curBin->center.x << " " << curBin->center.y << " "
+      //            << signX*newVx/exMax * bin_stp.x * 10 << " "
+      //            << signY*newVy/eyMax * bin_stp.y * 10 << endl;
+    }
   }
   //    cout << "theta: " << theta << endl;
 }
@@ -446,12 +460,7 @@ void PlotEnv::SavePlot(string imgName, bool isGCell) {
   //    if( gcell_st ) {
   //        GCellPinCoordiUpdate();
   //    }
-  if(!isPlotEnvInit) {
-    pe.Init();
-    isPlotEnvInit = true;
-  }
-
-  CImg< unsigned char > img(pe.GetTotalImageWidth(), pe.GetTotalImageHeight(),
+  CImg< unsigned char > img(GetTotalImageWidth(), GetTotalImageHeight(),
                             1, 3, 255);
 
   SaveCellPlot(&img, isGCell);
@@ -473,13 +482,8 @@ void PlotEnv::SaveCellPlotAsJPEG(string imgName, bool isGCell, string imgPositio
   //        GCellPinCoordiUpdate();
   //    }
 
-  if(!isPlotEnvInit) {
-    pe.Init();
-    isPlotEnvInit = true;
-  }
-
   float opacity = 0.7;
-  CImg< unsigned char > img(pe.GetTotalImageWidth(), pe.GetTotalImageHeight(),
+  CImg< unsigned char > img(GetTotalImageWidth(), GetTotalImageHeight(),
                             1, 3, 255);
 
   //    int cnt = (lab == 0)? moduleCNT : gcell_cnt;
@@ -528,12 +532,7 @@ to_string(int(100*curBin->den2)).c_str(), black, NULL, 1, 25);
 //
 // save current circuit's as BMP file in imgPosition & iternumber
 void PlotEnv::SaveBinPlotAsJPEG(string imgName, string imgPosition) {
-  if(!isPlotEnvInit) {
-    pe.Init();
-    isPlotEnvInit = true;
-  }
-
-  CImg< unsigned char > img(pe.GetTotalImageWidth(), pe.GetTotalImageHeight(),
+  CImg< unsigned char > img(GetTotalImageWidth(), GetTotalImageHeight(),
                             1, 3, 255);
 
   SaveBinPlot(&img);
@@ -550,12 +549,7 @@ void PlotEnv::SaveBinPlotAsJPEG(string imgName, string imgPosition) {
 //
 // save current circuit's as BMP file in imgPosition & iternumber
 void PlotEnv::SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
-  if(!isPlotEnvInit) {
-    pe.Init();
-    isPlotEnvInit = true;
-  }
-
-  CImg< unsigned char > img(pe.GetTotalImageWidth(), pe.GetTotalImageHeight(),
+  CImg< unsigned char > img(GetTotalImageWidth(), GetTotalImageHeight(),
                             1, 3, 255);
 
   SaveArrowPlot(&img);
