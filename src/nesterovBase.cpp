@@ -519,10 +519,11 @@ Bin::Bin()
   nonPlaceArea_(0), instPlacedArea_(0),
   fillerArea_(0),
   density_ (0),
+  targetDensity_(0),
   electroPhi_(0), 
   electroForceX_(0), electroForceY_(0) {}
 
-Bin::Bin(int x, int y, int lx, int ly, int ux, int uy) 
+Bin::Bin(int x, int y, int lx, int ly, int ux, int uy, float targetDensity) 
   : Bin() {
   x_ = x;
   y_ = y;
@@ -530,6 +531,7 @@ Bin::Bin(int x, int y, int lx, int ly, int ux, int uy)
   ly_ = ly;
   ux_ = ux;
   uy_ = uy;
+  targetDensity_ = targetDensity;
 }
 
 Bin::~Bin() {
@@ -537,7 +539,7 @@ Bin::~Bin() {
   lx_ = ly_ = ux_ = uy_ = 0;
   nonPlaceArea_ = instPlacedArea_ = fillerArea_ = 0;
   electroPhi_ = electroForceX_ = electroForceY_ = 0;
-  density_ = 0;
+  density_ = targetDensity_ = 0;
 }
 
 int
@@ -625,10 +627,14 @@ Bin::binArea() const {
 }
 
 
-
 float
 Bin::density() const {
   return density_;
+}
+
+float
+Bin::targetDensity() const {
+  return targetDensity_;
 }
 
 float
@@ -649,6 +655,11 @@ Bin::electroPhi() const {
 void
 Bin::setDensity(float density) {
   density_ = density;
+}
+
+void
+Bin::setTargetDensity(float density) {
+  targetDensity_ = density;
 }
 
 void
@@ -841,6 +852,7 @@ BinGrid::initBins() {
 
   // initialize binStor_, bins_ vector
   binStor_.resize(binCntX_ * binCntY_);
+  bins_.reserve(binCntX_ * binCntY_);
   int x = lx_, y = ly_;
   int idxX = 0, idxY = 0;
   for(auto& bin : binStor_) {
@@ -852,7 +864,7 @@ BinGrid::initBins() {
 
     //cout << x << " " << y 
     //  << " " << x+sizeX << " " << y+sizeY << endl;
-    bin = Bin(idxX, idxY, x, y, x+sizeX, y+sizeY);
+    bin = Bin(idxX, idxY, x, y, x+sizeX, y+sizeY, targetDensity_);
     
     // move x, y coordinates.
     x += binSizeX_;
@@ -974,7 +986,7 @@ BinGrid::updateBinsGCellDensityArea(
         ( static_cast<float> (bin->instPlacedArea())
           + static_cast<float> (bin->fillerArea()) 
           + static_cast<float> (bin->nonPlaceArea()) )
-        / static_cast<float>(binArea));
+        / static_cast<float>(binArea * bin->targetDensity()));
 
     overflowArea_ 
       += std::max(0.0f, 
@@ -1280,6 +1292,7 @@ NesterovBase::initFillerGCells() {
   int64_t whiteSpaceArea = coreArea - 
     static_cast<int64_t>(pb_->nonPlaceInstsArea());
 
+  // TODO density screening
   int64_t movableArea = whiteSpaceArea 
     * nbVars_.targetDensity;
   

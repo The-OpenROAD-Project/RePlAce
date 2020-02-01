@@ -287,7 +287,7 @@ class GPin {
 class Bin {
 public:
   Bin();
-  Bin(int x, int y, int lx, int ly, int ux, int uy);
+  Bin(int x, int y, int lx, int ly, int ux, int uy, float targetDensity);
 
   ~Bin();
 
@@ -306,9 +306,11 @@ public:
   float electroPhi() const;
   float electroForceX() const;
   float electroForceY() const;
+  float targetDensity() const;
   float density() const;
 
   void setDensity(float density);
+  void setTargetDensity(float density);
   void setElectroForce(float electroForceX, float electroForceY);
   void setElectroPhi(float phi);
 
@@ -341,6 +343,7 @@ private:
   int64_t fillerArea_;
 
   float density_;
+  float targetDensity_;  // will enable bin-wise density screening
   float electroPhi_;
   float electroForceX_;
   float electroForceY_;

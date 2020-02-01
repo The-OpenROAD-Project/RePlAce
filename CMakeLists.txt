@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(USE_CIMG_LIB "Use CImg drawing library for image drawing" OFF)
 if( USE_CIMG_LIB )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0nnnn")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
   set(CIMG_HOME ${REPLACE_HOME}/module/CImg)
 else()
   add_definitions(-DDISABLE_CIMG_LIB=1)
