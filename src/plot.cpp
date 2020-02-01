@@ -209,14 +209,17 @@ PlotEnv::DrawGcell(CImgObj *img, const unsigned char fillerColor[],
   for(auto& gCell : nb_->gCells()) {
 
     // skip drawing for FillerCell
-    if(gCell->isFiller()) {
-      continue;
-    }
+//    if(gCell->isFiller()) {
+//      continue;
+//    }
 
-    int x1 = GetX(gCell->dLx());
-    int y1 = GetY(gCell->dLy());
-    int x3 = GetX(gCell->dUx());
-    int y3 = GetY(gCell->dUy());
+    const int gcx = gCell->dCx();
+    const int gcy = gCell->dCy();
+
+    int x1 = GetX(gcx - gCell->dx()/2);
+    int y1 = GetY(gcy - gCell->dy()/2);
+    int x3 = GetX(gcx + gCell->dx()/2);
+    int y3 = GetY(gcy + gCell->dy()/2);
 
 
     // Color settings for Macro / StdCells
@@ -233,11 +236,17 @@ PlotEnv::DrawGcell(CImgObj *img, const unsigned char fillerColor[],
 //      color[2] = colors[i].b();
     }
     else {
-      for(int j=0; j<3; j++) {
-        color[j] = cellColor[j];
+      if( gCell->isInstance() ) {
+        for(int j=0; j<3; j++) {
+          color[j] = cellColor[j];
+        }
+      }
+      else if( gCell->isFiller()) {
+        for(int j=0; j<3; j++) {
+          color[j] = fillerColor[j];
+        }
       }
     } 
-
 //    cout << "color: " << (int)color[0] << " " << (int)color[1] << " " << (int)color[2] << endl;
     img->draw_rectangle(x1, y1, x3, y3, color, opacity);
 

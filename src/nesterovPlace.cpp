@@ -376,6 +376,7 @@ NesterovPlace::doNesterovPlace() {
       break;
     }
   }
+  updateDb();
 }
 
 void
@@ -503,6 +504,17 @@ NesterovPlace::getPhiCoef(float scaledDiffHpwl) {
     npVars_.maxPhiCoef * pow( npVars_.maxPhiCoef, scaledDiffHpwl * -1.0 );
   retCoef = std::max(npVars_.minPhiCoef, retCoef);
   return retCoef;
+}
+
+void
+NesterovPlace::updateDb() {
+  for(auto& gCell : nb_->gCells()) {
+    if( gCell->isInstance() ) {
+      gCell->instance()->dbInst()
+        ->setLocation( gCell->dCx()-gCell->dx()/2,
+           gCell->dCy()-gCell->dy()/2 ); 
+    }
+  }
 }
 
 

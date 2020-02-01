@@ -59,8 +59,9 @@ public:
       std::vector<FloatCoordi>& curSumGrads_ );
 
   void updateNextIter();
-
   float getPhiCoef(float scaledDiffHpwl);
+
+  void updateDb();
 
 private:
   std::shared_ptr<PlacerBase> pb_;
