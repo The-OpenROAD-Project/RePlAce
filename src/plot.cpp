@@ -247,15 +247,9 @@ PlotEnv::DrawGcell(CImgObj *img, const unsigned char fillerColor[],
         }
       }
     } 
-//    cout << "color: " << (int)color[0] << " " << (int)color[1] << " " << (int)color[2] << endl;
     img->draw_rectangle(x1, y1, x3, y3, color, opacity);
-
-    // drawing boundary for Macro cells
-//    if(curGCell->flg == Macro) {
-//      img.draw_rectangle(x1, y1, x3, y3, black, opacity, ~0U);
-      // img.draw_text((x1+x3)/2, (y1+y3)/2, curGCell->name, black, NULL, 1,
-      // 20);
-//    }
+//    img->draw_text((x1+x3)/2, (y1+y3)/2, 
+//        string(to_string(gCell->dCx()) + " " + to_string(gCell->dCy())).c_str(), black, NULL, 1, 20);
   }
 }
 

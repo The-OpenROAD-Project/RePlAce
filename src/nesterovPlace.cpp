@@ -440,7 +440,7 @@ NesterovPlace::updateNextIter() {
   std::swap(curSLPSumGrads_, nextSLPSumGrads_);
 
   std::swap(curCoordi_, nextCoordi_);
-    
+
   sumOverflow_ = 
       static_cast<float>(nb_->overflowArea()) 
           / static_cast<float>(pb_->placeInstsArea());
@@ -459,11 +459,12 @@ NesterovPlace::updateNextIter() {
     cout << "hpwl    : " << hpwl << endl; 
   }
   
-  prevHpwl_ = hpwl;
 
   float phiCoef = getPhiCoef( 
       static_cast<float>(prevHpwl_ - hpwl) 
       / npVars_.referenceHpwl );
+  
+  prevHpwl_ = hpwl;
   densityPanelty_ *= phiCoef;
   
   if( npVars_.verboseLevel > 3 ) {

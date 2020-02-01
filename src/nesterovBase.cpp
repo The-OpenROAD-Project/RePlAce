@@ -1415,29 +1415,31 @@ NesterovBase::sumPhi() const {
 void 
 NesterovBase::updateDensityCoordiLayoutInside(
     GCell* gCell) {
-  if( gCell->dLx() < bg_.lx() ) {
-    gCell->setDensityLocation(bg_.lx(), gCell->dLx());
+
+  float targetLx = gCell->dLx();
+  float targetLy = gCell->dLy();
+
+  if( targetLx < bg_.lx() ) {
+    targetLx = bg_.lx();
   }
 
-  if( gCell->dLy() < bg_.ly() ) {
-    gCell->setDensityLocation(gCell->dLx(), bg_.ly());
+  if( targetLy < bg_.ly() ) {
+    targetLy = bg_.ly();
   }
 
-  if( gCell->dUx() > bg_.ux() ) {
-    gCell->setDensityLocation(bg_.ux() - gCell->dDx(), 
-        gCell->dLy());
+  if( targetLx + gCell->dDx() > bg_.ux() ) {
+    targetLx = bg_.ux() - gCell->dDx();
   }
 
-  if( gCell->dUy() > bg_.uy() ) {
-    gCell->setDensityLocation(gCell->dLx(), 
-        bg_.uy() - gCell->dDy());
+  if( targetLy + gCell->dDy() > bg_.uy() ) {
+    targetLy = bg_.uy() - gCell->dDy();
   }
+  gCell->setDensityLocation(targetLx, targetLy);
 }
 
 float
 NesterovBase::getDensityCoordiLayoutInsideX(GCell* gCell, float cx) {
   float adjVal = cx;
-
   //TODO will change base on each assigned binGrids.
   //
   if( cx - gCell->dDx()/2 < bg_.lx() ) {
