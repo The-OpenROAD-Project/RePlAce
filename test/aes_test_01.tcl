@@ -13,6 +13,7 @@ read_def ${design_dir}/${design}.def
 read_liberty ${lib_dir}/NangateOpenCellLibrary_typical.lib
 read_sdc ${design_dir}/${design}.sdc
 
-global_placement -verbose 3 -density 1.0 -init_density_penalty 0.0001 -skip_initial_place -timing_driven -wire_res 16 -wire_cap 0.23e-15
+global_placement -verbose 5 -density 1.0 -init_density_penalty 0.0001 
 
+write_def ${design}_output_mac.def
 
