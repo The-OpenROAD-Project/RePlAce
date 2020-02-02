@@ -108,6 +108,8 @@ PRIVATE
 
   # For CImg
   ${REPLACE_HOME}/module/CImg
+  ${X11_INCLUDE_DIR}
+  ${JPEG_INCLUDE_DIR}
 
   ${EIGEN_HOME}
   ${FLUTE_HOME}
