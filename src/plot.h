@@ -22,7 +22,7 @@ namespace replace {
 void SaveCellPlotAsJPEG(std::string imgName, bool isGCell, std::string imgPosition);
 void SaveBinPlotAsJPEG(std::string imgName, std::string imgPosition);
 void SaveArrowPlotAsJPEG(std::string imgName, std::string imgPosition);
-void SavePlot(std::string imgName = "", bool isGCell = false);
+void SavePlot(std::string imgName, bool isGCell);
 //void ShowPlot(std::string circuitName = "");
 
 class NesterovBase;
