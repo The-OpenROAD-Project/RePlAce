@@ -1318,11 +1318,16 @@ NesterovBase::initFillerGCells() {
   //
   mt19937 randVal(0);
   for(int i=0; i<fillerCnt; i++) {
+
+    // instability problem between g++ and clang++!
+    auto randX = randVal();
+    auto randY = randVal();
+
     // place filler cells on random coordi and
     // set size as avgDx and avgDy
     GCell myGCell(
-        randVal() % pb_->die().coreDx() + pb_->die().coreLx(), 
-        randVal() % pb_->die().coreDy() + pb_->die().coreLy(),
+        randX % pb_->die().coreDx() + pb_->die().coreLx(), 
+        randY % pb_->die().coreDy() + pb_->die().coreLy(),
         avgDx, avgDy );
 
     gCellStor_.push_back(myGCell);
