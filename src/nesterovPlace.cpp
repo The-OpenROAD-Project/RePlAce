@@ -260,8 +260,6 @@ NesterovPlace::updateGradients(
 
 void
 NesterovPlace::doNesterovPlace() {
-  cout << "pb_ " << pb_ << endl;
-  cout << "pb_ die: " << &(pb_->die()) << endl;
   pe.setPlacerBase(pb_);
   pe.setNesterovBase(nb_);
   pe.Init();
