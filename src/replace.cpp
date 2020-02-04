@@ -83,6 +83,16 @@ void Replace::doNesterovPlace() {
 
   NesterovBaseVars nbVars;
   nbVars.targetDensity = density_;
+  
+  if( binGridCntX_ != 0 ) {
+    nbVars.isSetBinCntX = 1;
+    nbVars.binCntX = binGridCntX_;
+  }
+
+  if( binGridCntY_ != 0 ) {
+    nbVars.isSetBinCntY = 1;
+    nbVars.binCntY = binGridCntY_;
+  }
 
   nb_ = std::make_shared<NesterovBase>(nbVars, pb_);
 
@@ -95,7 +105,6 @@ void Replace::doNesterovPlace() {
   npVars.initDensityPanelty = initDensityPenalityFactor_;
   npVars.targetOverflow = overflow_;
   npVars.maxNesterovIter = nesterovPlaceMaxIter_; 
-
 
   std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_));
   np_ = std::move(np);
