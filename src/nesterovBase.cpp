@@ -991,7 +991,7 @@ BinGrid::updateBinsGCellDensityArea(
     overflowArea_ 
       += std::max(0.0f, 
           static_cast<float>(bin->instPlacedArea()) 
-          - (binArea - bin->nonPlaceArea())*targetDensity_);
+          - (binArea - bin->nonPlaceArea())*bin->targetDensity());
 
   }
 }
@@ -1213,7 +1213,9 @@ NesterovBase::init() {
 
 
   // initialize fft structrue based on bins
-  std::unique_ptr<FFT> fft(new FFT(bg_.binCntX(), bg_.binCntY(), bg_.binSizeX(), bg_.binSizeY()));
+  std::unique_ptr<FFT> fft(new FFT(bg_.binCntX(), bg_.binCntY(), 
+        bg_.binSizeX(), bg_.binSizeY()));
+
   fft_ = std::move(fft);
 
 
