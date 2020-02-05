@@ -54,7 +54,9 @@ NesterovPlace::~NesterovPlace() {
   reset();
 }
 
+#ifdef ENABLE_CIMG_LIB
 static PlotEnv pe;
+#endif
 
 void NesterovPlace::init() {
   const int gCellSize = nb_->gCells().size();
@@ -260,9 +262,12 @@ NesterovPlace::updateGradients(
 
 void
 NesterovPlace::doNesterovPlace() {
+
+#ifdef ENABLE_CIMG_LIB  
   pe.setPlacerBase(pb_);
   pe.setNesterovBase(nb_);
   pe.Init();
+#endif
 
 
   // backTracking variable.
@@ -358,6 +363,7 @@ NesterovPlace::doNesterovPlace() {
     if( i == 0 || (i+1) % 10 == 0 ) {
       cout << "[NesterovSolve] Iter: " << i+1 
         << " overflow: " << sumOverflow_ << " HPWL: " << prevHpwl_ << endl; 
+#ifdef ENABLE_CIMG_LIB
       pe.SaveCellPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(i+1)), true,
           string("./plot/cell/cell_") +
           std::to_string (i+1));
@@ -367,6 +373,7 @@ NesterovPlace::doNesterovPlace() {
       pe.SaveArrowPlotAsJPEG(string("Nesterov - Iter: " + std::to_string(i+1)),
           string("./plot/arrow/arrow_") +
           std::to_string(i+1));
+#endif
     }
 
     if( i > 50 && sumOverflow_ <= npVars_.targetOverflow) {

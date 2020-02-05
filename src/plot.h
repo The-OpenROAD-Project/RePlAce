@@ -1,5 +1,7 @@
+#ifdef ENABLE_CIMG_LIB
 #ifndef __REPLACE_CIMG_PLOT__
 #define __REPLACE_CIMG_PLOT__
+
 
 #include <vector>
 #include <memory>
@@ -120,4 +122,5 @@ class PlotEnv {
 };
 
 }
+#endif
 #endif

@@ -84,9 +84,6 @@ phiCoef: 1.04999
 
 
 [NesterovSolve] Iter: 1 overflow: 0.96303 HPWL: 3001333
-INFO: ./plot/cell/cell_1.jpg image has been saved
-INFO: ./plot/bin/bin_1.jpg image has been saved
-INFO: ./plot/arrow/arrow_1.jpg image has been saved
 Iter: 2
 stepLength_: 3.05777e+06
 densityPanelty_: 2.63093e-08
@@ -317,9 +314,6 @@ phiCoef: 1.04999
 
 
 [NesterovSolve] Iter: 10 overflow: 0.728682 HPWL: 4278230
-INFO: ./plot/cell/cell_10.jpg image has been saved
-INFO: ./plot/bin/bin_10.jpg image has been saved
-INFO: ./plot/arrow/arrow_10.jpg image has been saved
 Iter: 11
 stepLength_: 1.47907e+06
 densityPanelty_: 4.0812e-08
@@ -535,9 +529,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 20 overflow: 0.730498 HPWL: 4264585
-INFO: ./plot/cell/cell_20.jpg image has been saved
-INFO: ./plot/bin/bin_20.jpg image has been saved
-INFO: ./plot/arrow/arrow_20.jpg image has been saved
 Iter: 21
 stepLength_: 1.31882e+06
 densityPanelty_: 6.64768e-08
@@ -739,9 +730,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 30 overflow: 0.722469 HPWL: 4292638
-INFO: ./plot/cell/cell_30.jpg image has been saved
-INFO: ./plot/bin/bin_30.jpg image has been saved
-INFO: ./plot/arrow/arrow_30.jpg image has been saved
 Iter: 31
 stepLength_: 1.26286e+06
 densityPanelty_: 1.08284e-07
@@ -943,9 +931,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 40 overflow: 0.70802 HPWL: 4328920
-INFO: ./plot/cell/cell_40.jpg image has been saved
-INFO: ./plot/bin/bin_40.jpg image has been saved
-INFO: ./plot/arrow/arrow_40.jpg image has been saved
 Iter: 41
 stepLength_: 1.19368e+06
 densityPanelty_: 1.76383e-07
@@ -1147,9 +1132,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 50 overflow: 0.68887 HPWL: 4378025
-INFO: ./plot/cell/cell_50.jpg image has been saved
-INFO: ./plot/bin/bin_50.jpg image has been saved
-INFO: ./plot/arrow/arrow_50.jpg image has been saved
 Iter: 51
 stepLength_: 1.0816e+06
 densityPanelty_: 2.87308e-07
@@ -1351,9 +1333,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 60 overflow: 0.667842 HPWL: 4444477
-INFO: ./plot/cell/cell_60.jpg image has been saved
-INFO: ./plot/bin/bin_60.jpg image has been saved
-INFO: ./plot/arrow/arrow_60.jpg image has been saved
 Iter: 61
 stepLength_: 958139
 densityPanelty_: 4.67995e-07
@@ -1555,9 +1534,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 70 overflow: 0.642678 HPWL: 4532694
-INFO: ./plot/cell/cell_70.jpg image has been saved
-INFO: ./plot/bin/bin_70.jpg image has been saved
-INFO: ./plot/arrow/arrow_70.jpg image has been saved
 Iter: 71
 stepLength_: 876165
 densityPanelty_: 7.62314e-07
@@ -1759,9 +1735,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 80 overflow: 0.604905 HPWL: 4615306
-INFO: ./plot/cell/cell_80.jpg image has been saved
-INFO: ./plot/bin/bin_80.jpg image has been saved
-INFO: ./plot/arrow/arrow_80.jpg image has been saved
 Iter: 81
 stepLength_: 705578
 densityPanelty_: 1.24173e-06
@@ -1991,9 +1964,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 90 overflow: 0.568305 HPWL: 4721057
-INFO: ./plot/cell/cell_90.jpg image has been saved
-INFO: ./plot/bin/bin_90.jpg image has been saved
-INFO: ./plot/arrow/arrow_90.jpg image has been saved
 Iter: 91
 stepLength_: 602039
 densityPanelty_: 2.02264e-06
@@ -2230,9 +2200,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 100 overflow: 0.527985 HPWL: 4835193
-INFO: ./plot/cell/cell_100.jpg image has been saved
-INFO: ./plot/bin/bin_100.jpg image has been saved
-INFO: ./plot/arrow/arrow_100.jpg image has been saved
 Iter: 101
 stepLength_: 494825
 densityPanelty_: 3.29467e-06
@@ -2462,9 +2429,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 110 overflow: 0.482881 HPWL: 4940949
-INFO: ./plot/cell/cell_110.jpg image has been saved
-INFO: ./plot/bin/bin_110.jpg image has been saved
-INFO: ./plot/arrow/arrow_110.jpg image has been saved
 Iter: 111
 stepLength_: 386307
 densityPanelty_: 5.36667e-06
@@ -2680,9 +2644,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 120 overflow: 0.438583 HPWL: 5050070
-INFO: ./plot/cell/cell_120.jpg image has been saved
-INFO: ./plot/bin/bin_120.jpg image has been saved
-INFO: ./plot/arrow/arrow_120.jpg image has been saved
 Iter: 121
 stepLength_: 307776
 densityPanelty_: 8.74174e-06
@@ -2884,9 +2845,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 130 overflow: 0.394459 HPWL: 5160733
-INFO: ./plot/cell/cell_130.jpg image has been saved
-INFO: ./plot/bin/bin_130.jpg image has been saved
-INFO: ./plot/arrow/arrow_130.jpg image has been saved
 Iter: 131
 stepLength_: 236204
 densityPanelty_: 1.42394e-05
@@ -3116,9 +3074,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 140 overflow: 0.351265 HPWL: 5270853
-INFO: ./plot/cell/cell_140.jpg image has been saved
-INFO: ./plot/bin/bin_140.jpg image has been saved
-INFO: ./plot/arrow/arrow_140.jpg image has been saved
 Iter: 141
 stepLength_: 195045
 densityPanelty_: 2.31944e-05
@@ -3369,9 +3324,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 150 overflow: 0.308752 HPWL: 5378700
-INFO: ./plot/cell/cell_150.jpg image has been saved
-INFO: ./plot/bin/bin_150.jpg image has been saved
-INFO: ./plot/arrow/arrow_150.jpg image has been saved
 Iter: 151
 stepLength_: 138547
 densityPanelty_: 3.77812e-05
@@ -3615,9 +3567,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 160 overflow: 0.267215 HPWL: 5478767
-INFO: ./plot/cell/cell_160.jpg image has been saved
-INFO: ./plot/bin/bin_160.jpg image has been saved
-INFO: ./plot/arrow/arrow_160.jpg image has been saved
 Iter: 161
 stepLength_: 115021
 densityPanelty_: 6.15416e-05
@@ -3875,9 +3824,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 170 overflow: 0.229419 HPWL: 5585175
-INFO: ./plot/cell/cell_170.jpg image has been saved
-INFO: ./plot/bin/bin_170.jpg image has been saved
-INFO: ./plot/arrow/arrow_170.jpg image has been saved
 Iter: 171
 stepLength_: 77265.7
 densityPanelty_: 0.000100245
@@ -4128,9 +4074,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 180 overflow: 0.196144 HPWL: 5683630
-INFO: ./plot/cell/cell_180.jpg image has been saved
-INFO: ./plot/bin/bin_180.jpg image has been saved
-INFO: ./plot/arrow/arrow_180.jpg image has been saved
 Iter: 181
 stepLength_: 49362.2
 densityPanelty_: 0.000163288
@@ -4367,9 +4310,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 190 overflow: 0.166658 HPWL: 5770851
-INFO: ./plot/cell/cell_190.jpg image has been saved
-INFO: ./plot/bin/bin_190.jpg image has been saved
-INFO: ./plot/arrow/arrow_190.jpg image has been saved
 Iter: 191
 stepLength_: 33559.9
 densityPanelty_: 0.000265979
@@ -4606,9 +4546,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 200 overflow: 0.137257 HPWL: 5847233
-INFO: ./plot/cell/cell_200.jpg image has been saved
-INFO: ./plot/bin/bin_200.jpg image has been saved
-INFO: ./plot/arrow/arrow_200.jpg image has been saved
 Iter: 201
 stepLength_: 21697.6
 densityPanelty_: 0.000433252
@@ -4873,9 +4810,6 @@ phiCoef: 1.05
 
 
 [NesterovSolve] Iter: 210 overflow: 0.113785 HPWL: 5910771
-INFO: ./plot/cell/cell_210.jpg image has been saved
-INFO: ./plot/bin/bin_210.jpg image has been saved
-INFO: ./plot/arrow/arrow_210.jpg image has been saved
 Iter: 211
 stepLength_: 12651.4
 densityPanelty_: 0.000705721

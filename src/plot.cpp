@@ -1,3 +1,4 @@
+#ifdef ENABLE_CIMG_LIB 
 #include "CImg.h"
 
 #include "plot.h"
@@ -569,3 +570,4 @@ void PlotEnv::SaveArrowPlotAsJPEG(string imgName, string imgPosition) {
 
 
 }
+#endif

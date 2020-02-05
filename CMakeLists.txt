@@ -7,12 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(USE_CIMG_LIB "Use CImg drawing library for image drawing" OFF)
+
 if( USE_CIMG_LIB )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -D_GLIBCXX_USE_CXX11_ABI=0")
   set(CIMG_HOME ${REPLACE_HOME}/module/CImg)
+  add_definitions(-DENABLE_CIMG_LIB=1)
 else()
-  add_definitions(-DDISABLE_CIMG_LIB=1)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
 endif()
 
 # For Multithread
@@ -42,8 +43,6 @@ if( USE_CIMG_LIB )
   find_package(JPEG REQUIRED)
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${X11_LIBRARIES} ${JPEG_LIBRARIES}")
 else()
-#  find_package(X11)
-#  find_package(JPEG)
 endif()
 
 
@@ -88,43 +87,67 @@ add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
 ############################################################
 add_library( replace
   ${REPLACE_SRC}
-
 )
 
-target_link_libraries( replace
+# CIMG_USE case
+if( USE_CIMG_LIB )
+  target_link_libraries( replace
+    PRIVATE
+    ${X11_LIBRARIES} 
+    ${JPEG_LIBRARIES} 
+  )
+  target_include_directories( replace
+  PUBLIC
+    ${REPLACE_HOME}/include
   PRIVATE
-  ${X11_LIBRARIES} 
-  ${JPEG_LIBRARIES} 
-)
+    ${REPLACE_HOME}/src
 
-############################################################
-# include directories 
-############################################################
-target_include_directories( replace
-PUBLIC
-  ${REPLACE_HOME}/include
-PRIVATE
-  ${REPLACE_HOME}/src
+    # For CImg
+    ${REPLACE_HOME}/module/CImg
+    ${X11_INCLUDE_DIR}
+    ${JPEG_INCLUDE_DIR}
 
-  # For CImg
-  ${REPLACE_HOME}/module/CImg
-  ${X11_INCLUDE_DIR}
-  ${JPEG_INCLUDE_DIR}
-
-  ${EIGEN_HOME}
-  ${FLUTE_HOME}
+    ${EIGEN_HOME}
+    ${FLUTE_HOME}
  
-  ${OPENSTA_HOME}/util
-  ${OPENSTA_HOME}/liberty
-  ${OPENSTA_HOME}/network
-  ${OPENSTA_HOME}/graph
-  ${OPENSTA_HOME}/sdc
-  ${OPENSTA_HOME}/parasitics
-  ${OPENSTA_HOME}/search
-  ${OPENSTA_HOME}/app
+    ${OPENSTA_HOME}/util
+    ${OPENSTA_HOME}/liberty
+    ${OPENSTA_HOME}/network
+    ${OPENSTA_HOME}/graph
+    ${OPENSTA_HOME}/sdc
+    ${OPENSTA_HOME}/parasitics
+    ${OPENSTA_HOME}/search
+    ${OPENSTA_HOME}/app
 
-  ${OPENDB_HOME}/include
-  ${OPENROAD_HOME}/include
+    ${OPENDB_HOME}/include
+    ${OPENROAD_HOME}/include
   SYSTEM
-  ${TCL_INCLUDE_PATH}
-)
+    ${TCL_INCLUDE_PATH}
+  )
+# Normal case
+else()
+  target_include_directories( replace
+  PUBLIC
+    ${REPLACE_HOME}/include
+  PRIVATE
+    ${REPLACE_HOME}/src
+
+    ${EIGEN_HOME}
+    ${FLUTE_HOME}
+ 
+    ${OPENSTA_HOME}/util
+    ${OPENSTA_HOME}/liberty
+    ${OPENSTA_HOME}/network
+    ${OPENSTA_HOME}/graph
+    ${OPENSTA_HOME}/sdc
+    ${OPENSTA_HOME}/parasitics
+    ${OPENSTA_HOME}/search
+    ${OPENSTA_HOME}/app
+
+    ${OPENDB_HOME}/include
+    ${OPENROAD_HOME}/include
+  SYSTEM
+    ${TCL_INCLUDE_PATH}
+  )
+endif()
+
