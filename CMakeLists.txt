@@ -7,12 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(USE_CIMG_LIB "Use CImg drawing library for image drawing" OFF)
+
 if( USE_CIMG_LIB )
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -O3 -D_GLIBCXX_USE_CXX11_ABI=0nnnn")
-  set(CIMG_HOME ${PROJECT_SOURCE_DIR}/module/CImg)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -D_GLIBCXX_USE_CXX11_ABI=0")
+  set(CIMG_HOME ${REPLACE_HOME}/module/CImg)
+  add_definitions(-DENABLE_CIMG_LIB=1)
 else()
-  add_definitions(-DDISABLE_CIMG_LIB=1)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -D_GLIBCXX_USE_CXX11_ABI=0")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0")
 endif()
 
 # For Multithread
@@ -42,8 +43,6 @@ if( USE_CIMG_LIB )
   find_package(JPEG REQUIRED)
   set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${X11_LIBRARIES} ${JPEG_LIBRARIES}")
 else()
-#  find_package(X11)
-#  find_package(JPEG)
 endif()
 
 
@@ -51,61 +50,30 @@ set(REPLACE_WRAP ${CMAKE_CURRENT_BINARY_DIR}/replace_wrap.cpp)
 set(REPLACE_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/ReplaceTclInitVar.cc)
 
 set (REPLACE_SRC 
-  src/argument.cpp
-  src/bin.cpp
-  src/charge.cpp
-  src/fft.cpp
-  src/fftsg2d.cpp
-  src/fftsg3d.cpp
-  src/fftsg.cpp
-  src/gcell.cpp
-  src/initPlacement.cpp
-  src/macro.cpp
-  src/main.cpp
-  src/util.cpp
-  src/ns.cpp
-  src/opt.cpp
-  src/plot.cpp
-  src/routeOpt.cpp
-  src/tier.cpp
-  src/timing.cpp
-  src/timingSta.cpp
-  src/trial.cpp
-  src/wlen.cpp
-  src/replace_external.cpp
-  src/replace_private.cpp
-  src/replace_private.cpp
-  src/dbLefDefIO.cpp
   src/MakeReplace.cpp
   ${REPLACE_WRAP}
   ${REPLACE_TCL_INIT}
+  src/replace.cpp
+  src/initialPlace.cpp
+  src/nesterovPlace.cpp
+  src/placerBase.cpp
+  src/nesterovBase.cpp
+  src/fft.cpp
+  src/fftsg.cpp
+  src/fftsg2d.cpp
+  src/coordi.cpp
+  src/plot.cpp
   )
 
 set (REPLACE_HEADER
-  src/bin.h
-  src/charge.h
-  src/fft.h
-  src/gcell.h
-  src/replace_private.h
-  src/replace_external.h
-  src/initPlacement.h
-  src/macro.h
-  src/ns.h
-  src/opt.h
-  src/plot.h
-  src/routeOpt.h
-  src/timing.h
-  src/timingSta.h
-  src/wlen.h
-  src/util.h
-  src/dbLefDefIO.h
-  src/MakeReplace.h
+  include/replace/Replace.h
+  include/replace/MakeReplace.h
 )
 
 add_custom_command(OUTPUT ${REPLACE_WRAP}
   COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${REPLACE_WRAP} ${REPLACE_HOME}/src/replace.i
   WORKING_DIRECTORY ${REPLACE_HOME}
-  DEPENDS ${REPLACE_HOME}/src/replace.i "src/replace_external.h"
+  DEPENDS ${REPLACE_HOME}/src/replace.i 
 )
 
 add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
@@ -121,30 +89,64 @@ add_library( replace
   ${REPLACE_SRC}
 )
 
-############################################################
-# include directories 
-############################################################
-target_include_directories( replace
-PUBLIC
-  ${REPLACE_HOME}/src
-PRIVATE
-  ${EIGEN_HOME}
-  ${FLUTE_HOME}
- 
-  ${OPENSTA_HOME}/util
-  ${OPENSTA_HOME}/liberty
-  ${OPENSTA_HOME}/network
-  ${OPENSTA_HOME}/graph
-  ${OPENSTA_HOME}/sdc
-  ${OPENSTA_HOME}/parasitics
-  ${OPENSTA_HOME}/search
-  ${OPENSTA_HOME}/app
+# CIMG_USE case
+if( USE_CIMG_LIB )
+  target_link_libraries( replace
+    PRIVATE
+    ${X11_LIBRARIES} 
+    ${JPEG_LIBRARIES} 
+  )
+  target_include_directories( replace
+  PUBLIC
+    ${REPLACE_HOME}/include
+  PRIVATE
+    ${REPLACE_HOME}/src
 
-  ${OPENDB_HOME}/include/opendb
-  # This SHOULD be ${OPENDB_HOME}/include but all library references are wrong
-  # in replace -cherry
-  ${OPENDB_HOME}/include/opendb
-  ${OPENDB_HOME}/include
-  ${OPENROAD_HOME}/include
-  ${TCL_INCLUDE_PATH}
-)
+    # For CImg
+    ${REPLACE_HOME}/module/CImg
+    ${X11_INCLUDE_DIR}
+    ${JPEG_INCLUDE_DIR}
+
+    ${EIGEN_HOME}
+    ${FLUTE_HOME}
+ 
+    ${OPENSTA_HOME}/util
+    ${OPENSTA_HOME}/liberty
+    ${OPENSTA_HOME}/network
+    ${OPENSTA_HOME}/graph
+    ${OPENSTA_HOME}/sdc
+    ${OPENSTA_HOME}/parasitics
+    ${OPENSTA_HOME}/search
+    ${OPENSTA_HOME}/app
+
+    ${OPENDB_HOME}/include
+    ${OPENROAD_HOME}/include
+  SYSTEM
+    ${TCL_INCLUDE_PATH}
+  )
+# Normal case
+else()
+  target_include_directories( replace
+  PUBLIC
+    ${REPLACE_HOME}/include
+  PRIVATE
+    ${REPLACE_HOME}/src
+
+    ${EIGEN_HOME}
+    ${FLUTE_HOME}
+ 
+    ${OPENSTA_HOME}/util
+    ${OPENSTA_HOME}/liberty
+    ${OPENSTA_HOME}/network
+    ${OPENSTA_HOME}/graph
+    ${OPENSTA_HOME}/sdc
+    ${OPENSTA_HOME}/parasitics
+    ${OPENSTA_HOME}/search
+    ${OPENSTA_HOME}/app
+
+    ${OPENDB_HOME}/include
+    ${OPENROAD_HOME}/include
+  SYSTEM
+    ${TCL_INCLUDE_PATH}
+  )
+endif()
