@@ -15,7 +15,6 @@ output/*
 logdir/*
 evaluation/*
 test/output/*
-test/*.def
 test/*.dat
 test/*/*.dat
 test/*/output
