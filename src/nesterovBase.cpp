@@ -862,7 +862,8 @@ BinGrid::initBins() {
     int sizeY = (y + binSizeY_ > uy_)? 
       uy_ - y : binSizeY_;
 
-    //cout << x << " " << y 
+    //cout << "idxX: " << idxX << " idxY: " << idxY 
+    //  << " x:" << x << " y:" << y 
     //  << " " << x+sizeX << " " << y+sizeY << endl;
     bin = Bin(idxX, idxY, x, y, x+sizeX, y+sizeY, targetDensity_);
     
@@ -870,7 +871,7 @@ BinGrid::initBins() {
     x += binSizeX_;
     idxX += 1;
 
-    if( x > ux_ ) {
+    if( x >= ux_ ) {
       y += binSizeY_;
       x = lx_; 
       
