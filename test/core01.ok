@@ -1,0 +1,4886 @@
+Notice 0: Reading LEF file:  ./nangate45.lef
+Notice 0:     Created 22 technology layers
+Notice 0:     Created 27 technology vias
+Notice 0:     Created 134 library cells
+Notice 0: Finished LEF file:  ./nangate45.lef
+Notice 0: 
+Reading DEF file: ./core01.def
+Notice 0: Design: gcd
+Notice 0:     Created 54 pins.
+Notice 0:     Created 294 components and 1656 component-terminals.
+Notice 0:     Created 364 nets and 1068 connections.
+Notice 0: Finished DEF file: ./core01.def
+Design Info
+Instances      : 294
+PlaceInstances : 294
+FixedInstances : 0
+DummyInstances : 0
+Nets           : 364
+Pins           : 1710
+MaxFanout      : 35
+MaxFanoutNet   : clk
+AvgFanout      : 3.08242
+
+DieBox         : ( -140 -140 ) - ( 72580 71680 ) 
+CoreBox        : ( 2280 2240 ) - ( 70300 69440 ) 
+coreArea       : 4570944000
+placeInstsArea : 2279088000
+nonPlaceInstsArea : 0
+utilization    : 49.8603
+
+Begin InitialPlace ...
+End InitialPlace
+InstGCells     : 294
+FillerSize     : ( 2432, 2800 )
+FillerGCells   : 68
+GCells         : 362
+GNets          : 364
+GPins          : 1710
+TargetDensity  : 0.6
+AveragePlaceInstArea: : 7752000
+IdealBinArea   : 12919999
+IdealBinCnt    : 353
+TotalBinArea   : 4570944000
+BinCnt         : ( 16, 16 )
+BinSize        : ( 4252, 4200 )
+TotalBinCnt    : 256
+Initial Hpwl : 3438605
+baseWireLengthCoef_ : 2.4649e-06
+InitSumOverflow: 0.961975
+newWireLengthCoef: 2.99433e-07
+wireLengthCoef: 2.99433e-07
+densityPanelty_: 0
+WL GradSum: 0.821554
+De GradSum: 356575
+densityPanelty_: 0
+WL GradSum: 0.821464
+De GradSum: 356555
+wireLengthGradSum_ : 0.821464
+densityGradSum_ : 356555
+initDensityPanelty_ : 2.30389e-08
+PrevSumOverflow: 0.961975
+cDist: 0.0485135
+gDist: 2.33268e-07
+calVal: 207973
+initialStepLength: 207973
+Iter: 1
+stepLength_: 207973
+densityPanelty_: 2.30389e-08
+WL GradSum: 0.799969
+De GradSum: 454228
+cDist: 100.912
+gDist: 3.67517e-05
+calVal: 2.74577e+06
+newStepLength: 2.74577e+06
+numBackTrak: 0
+gradient: 0.000473307
+phi     : 1.3155e+11
+overflow: 0.961975
+newWireLengthCoef: 2.99433e-07
+prevHpwl: 3438605
+hpwl    : 3430514
+input scaleDiffHpwl: 0.000181413
+phiCoef: 1.04999
+
+
+[NesterovSolve] Iter: 1 overflow: 0.961975 HPWL: 3430514
+Iter: 2
+stepLength_: 2.74577e+06
+densityPanelty_: 2.41906e-08
+WL GradSum: 0.563753
+De GradSum: 1.32661e+06
+cDist: 1665.75
+gDist: 0.000245255
+calVal: 6.79191e+06
+newStepLength: 6.79191e+06
+numBackTrak: 0
+gradient: 0.000264729
+phi     : 1.14675e+11
+overflow: 0.903797
+newWireLengthCoef: 4.03258e-07
+prevHpwl: 3430514
+hpwl    : 3883747
+input scaleDiffHpwl: -0.0101622
+phiCoef: 1.05
+
+
+Iter: 3
+stepLength_: 6.79191e+06
+densityPanelty_: 2.54002e-08
+WL GradSum: 0.562234
+De GradSum: 1.64224e+06
+cDist: 2727.36
+gDist: 0.000366899
+calVal: 7.43354e+06
+newStepLength: 7.43354e+06
+numBackTrak: 0
+gradient: 0.000202072
+phi     : 8.93724e+10
+overflow: 0.767916
+newWireLengthCoef: 8.08244e-07
+prevHpwl: 3883747
+hpwl    : 4901670
+input scaleDiffHpwl: -0.0228234
+phiCoef: 1.05
+
+
+Iter: 4
+stepLength_: 7.43354e+06
+densityPanelty_: 2.66702e-08
+WL GradSum: 1.52268
+De GradSum: 2.36118e+06
+cDist: 2215.96
+gDist: 0.000699249
+calVal: 3.16905e+06
+newStepLength: 3.16905e+06
+densityPanelty_: 2.66702e-08
+WL GradSum: 0.642619
+De GradSum: 2.10197e+06
+cDist: 969.537
+gDist: 0.000193668
+calVal: 5.00619e+06
+newStepLength: 5.00619e+06
+numBackTrak: 1
+gradient: 0.000235764
+phi     : 8.04757e+10
+overflow: 0.751129
+newWireLengthCoef: 8.80735e-07
+prevHpwl: 4901670
+hpwl    : 5015852
+input scaleDiffHpwl: -0.00256013
+phiCoef: 1.05
+
+
+Iter: 5
+stepLength_: 5.00619e+06
+densityPanelty_: 2.80037e-08
+WL GradSum: 1.04571
+De GradSum: 2.30595e+06
+cDist: 1951.68
+gDist: 0.000528031
+calVal: 3.69615e+06
+newStepLength: 3.69615e+06
+densityPanelty_: 2.80037e-08
+WL GradSum: 0.623287
+De GradSum: 2.38966e+06
+cDist: 1466.11
+gDist: 0.000372364
+calVal: 3.93731e+06
+newStepLength: 3.93731e+06
+numBackTrak: 1
+gradient: 0.000213486
+phi     : 6.4744e+10
+overflow: 0.748029
+newWireLengthCoef: 8.94818e-07
+prevHpwl: 5015852
+hpwl    : 4816181
+input scaleDiffHpwl: 0.00447693
+phiCoef: 1.04977
+
+
+Iter: 6
+stepLength_: 3.93731e+06
+densityPanelty_: 2.93974e-08
+WL GradSum: 1.14307
+De GradSum: 2.15542e+06
+cDist: 1407.82
+gDist: 0.000630649
+calVal: 2.23234e+06
+newStepLength: 2.23234e+06
+densityPanelty_: 2.93974e-08
+WL GradSum: 0.457095
+De GradSum: 2.21965e+06
+cDist: 852.599
+gDist: 0.000331039
+calVal: 2.57553e+06
+newStepLength: 2.57553e+06
+numBackTrak: 1
+gradient: 0.000180348
+phi     : 5.74212e+10
+overflow: 0.725226
+newWireLengthCoef: 1.00556e-06
+prevHpwl: 4816181
+hpwl    : 4984543
+input scaleDiffHpwl: -0.00377493
+phiCoef: 1.05
+
+
+Iter: 7
+stepLength_: 2.57553e+06
+densityPanelty_: 3.08673e-08
+WL GradSum: 0.921979
+De GradSum: 2.0957e+06
+cDist: 824.797
+gDist: 0.000532554
+calVal: 1.54876e+06
+newStepLength: 1.54876e+06
+densityPanelty_: 3.08673e-08
+WL GradSum: 0.392346
+De GradSum: 2.11372e+06
+cDist: 554.696
+gDist: 0.000285196
+calVal: 1.94497e+06
+newStepLength: 1.94497e+06
+numBackTrak: 1
+gradient: 0.000139643
+phi     : 5.2891e+10
+overflow: 0.709047
+newWireLengthCoef: 1.09235e-06
+prevHpwl: 4984543
+hpwl    : 4997886
+input scaleDiffHpwl: -0.00029917
+phiCoef: 1.05
+
+
+Iter: 8
+stepLength_: 1.94497e+06
+densityPanelty_: 3.24107e-08
+WL GradSum: 0.466187
+De GradSum: 2.05184e+06
+cDist: 504.926
+gDist: 0.000316454
+calVal: 1.59558e+06
+newStepLength: 1.59558e+06
+densityPanelty_: 3.24107e-08
+WL GradSum: 0.355249
+De GradSum: 2.04972e+06
+cDist: 435.925
+gDist: 0.000246829
+calVal: 1.7661e+06
+newStepLength: 1.7661e+06
+numBackTrak: 1
+gradient: 0.000141777
+phi     : 5.08524e+10
+overflow: 0.708227
+newWireLengthCoef: 1.09694e-06
+prevHpwl: 4997886
+hpwl    : 5004884
+input scaleDiffHpwl: -0.000156906
+phiCoef: 1.05
+
+
+Iter: 9
+stepLength_: 1.7661e+06
+densityPanelty_: 3.40312e-08
+WL GradSum: 0.486248
+De GradSum: 2.0047e+06
+cDist: 459.777
+gDist: 0.000331826
+calVal: 1.3856e+06
+newStepLength: 1.3856e+06
+densityPanelty_: 3.40312e-08
+WL GradSum: 0.352677
+De GradSum: 2.00374e+06
+cDist: 379.291
+gDist: 0.00024913
+calVal: 1.52246e+06
+newStepLength: 1.52246e+06
+numBackTrak: 1
+gradient: 0.000133949
+phi     : 4.94827e+10
+overflow: 0.703521
+newWireLengthCoef: 1.12368e-06
+prevHpwl: 5004884
+hpwl    : 4986697
+input scaleDiffHpwl: 0.00040778
+phiCoef: 1.04998
+
+
+Iter: 10
+stepLength_: 1.52246e+06
+densityPanelty_: 3.57321e-08
+WL GradSum: 0.34073
+De GradSum: 1.98155e+06
+cDist: 376.331
+gDist: 0.000272746
+calVal: 1.37979e+06
+newStepLength: 1.37979e+06
+densityPanelty_: 3.57321e-08
+WL GradSum: 0.294434
+De GradSum: 1.98021e+06
+cDist: 347.329
+gDist: 0.000241272
+calVal: 1.43958e+06
+newStepLength: 1.43958e+06
+numBackTrak: 1
+gradient: 0.000126808
+phi     : 4.91286e+10
+overflow: 0.706055
+newWireLengthCoef: 1.1092e-06
+prevHpwl: 4986697
+hpwl    : 4981122
+input scaleDiffHpwl: 0.000125
+phiCoef: 1.04999
+
+
+[NesterovSolve] Iter: 10 overflow: 0.706055 HPWL: 4981122
+Iter: 11
+stepLength_: 1.43958e+06
+densityPanelty_: 3.75184e-08
+WL GradSum: 0.308738
+De GradSum: 1.96037e+06
+cDist: 339.235
+gDist: 0.000254784
+calVal: 1.33146e+06
+newStepLength: 1.33146e+06
+densityPanelty_: 3.75184e-08
+WL GradSum: 0.274004
+De GradSum: 1.96006e+06
+cDist: 318.12
+gDist: 0.000231916
+calVal: 1.3717e+06
+newStepLength: 1.3717e+06
+numBackTrak: 1
+gradient: 0.000119189
+phi     : 4.87129e+10
+overflow: 0.704552
+newWireLengthCoef: 1.11777e-06
+prevHpwl: 4981122
+hpwl    : 4964813
+input scaleDiffHpwl: 0.000365673
+phiCoef: 1.04998
+
+
+Iter: 12
+stepLength_: 1.3717e+06
+densityPanelty_: 3.93936e-08
+WL GradSum: 0.248299
+De GradSum: 1.94965e+06
+cDist: 306.201
+gDist: 0.000229401
+calVal: 1.33479e+06
+newStepLength: 1.33479e+06
+numBackTrak: 0
+gradient: 0.000120853
+phi     : 4.86651e+10
+overflow: 0.708512
+newWireLengthCoef: 1.09534e-06
+prevHpwl: 4964813
+hpwl    : 4960826
+input scaleDiffHpwl: 8.93946e-05
+phiCoef: 1.05
+
+
+Iter: 13
+stepLength_: 1.33479e+06
+densityPanelty_: 4.13631e-08
+WL GradSum: 0.239028
+De GradSum: 1.94267e+06
+cDist: 295.999
+gDist: 0.000230172
+calVal: 1.28599e+06
+newStepLength: 1.28599e+06
+numBackTrak: 0
+gradient: 0.000118039
+phi     : 4.83851e+10
+overflow: 0.707827
+newWireLengthCoef: 1.09919e-06
+prevHpwl: 4960826
+hpwl    : 4950551
+input scaleDiffHpwl: 0.000230381
+phiCoef: 1.04999
+
+
+Iter: 14
+stepLength_: 1.28599e+06
+densityPanelty_: 4.34308e-08
+WL GradSum: 0.202442
+De GradSum: 1.93536e+06
+cDist: 278.894
+gDist: 0.000213531
+calVal: 1.3061e+06
+newStepLength: 1.3061e+06
+numBackTrak: 0
+gradient: 0.000103758
+phi     : 4.8225e+10
+overflow: 0.710928
+newWireLengthCoef: 1.08189e-06
+prevHpwl: 4950551
+hpwl    : 4947550
+input scaleDiffHpwl: 6.7287e-05
+phiCoef: 1.05
+
+
+Iter: 15
+stepLength_: 1.3061e+06
+densityPanelty_: 4.56022e-08
+WL GradSum: 0.184265
+De GradSum: 1.92978e+06
+cDist: 257.848
+gDist: 0.000188825
+calVal: 1.36554e+06
+newStepLength: 1.36554e+06
+numBackTrak: 0
+gradient: 9.34155e-05
+phi     : 4.78961e+10
+overflow: 0.709828
+newWireLengthCoef: 1.08799e-06
+prevHpwl: 4947550
+hpwl    : 4944362
+input scaleDiffHpwl: 7.14798e-05
+phiCoef: 1.05
+
+
+Iter: 16
+stepLength_: 1.36554e+06
+densityPanelty_: 4.78821e-08
+WL GradSum: 0.177292
+De GradSum: 1.92245e+06
+cDist: 253.651
+gDist: 0.000180439
+calVal: 1.40575e+06
+newStepLength: 1.40575e+06
+numBackTrak: 0
+gradient: 9.4785e-05
+phi     : 4.76232e+10
+overflow: 0.711585
+newWireLengthCoef: 1.07826e-06
+prevHpwl: 4944362
+hpwl    : 4942810
+input scaleDiffHpwl: 3.47982e-05
+phiCoef: 1.05
+
+
+Iter: 17
+stepLength_: 1.40575e+06
+densityPanelty_: 5.02761e-08
+WL GradSum: 0.190511
+De GradSum: 1.91452e+06
+cDist: 263.509
+gDist: 0.000192206
+calVal: 1.37097e+06
+newStepLength: 1.37097e+06
+numBackTrak: 0
+gradient: 0.000103924
+phi     : 4.72305e+10
+overflow: 0.709487
+newWireLengthCoef: 1.0899e-06
+prevHpwl: 4942810
+hpwl    : 4945152
+input scaleDiffHpwl: -5.25112e-05
+phiCoef: 1.05
+
+
+Iter: 18
+stepLength_: 1.37097e+06
+densityPanelty_: 5.279e-08
+WL GradSum: 0.193701
+De GradSum: 1.90526e+06
+cDist: 275.013
+gDist: 0.000208239
+calVal: 1.32066e+06
+newStepLength: 1.32066e+06
+numBackTrak: 0
+gradient: 0.000109668
+phi     : 4.69079e+10
+overflow: 0.71068
+newWireLengthCoef: 1.08326e-06
+prevHpwl: 4945152
+hpwl    : 4944356
+input scaleDiffHpwl: 1.78475e-05
+phiCoef: 1.05
+
+
+Iter: 19
+stepLength_: 1.32066e+06
+densityPanelty_: 5.54294e-08
+WL GradSum: 0.193382
+De GradSum: 1.89568e+06
+cDist: 275.859
+gDist: 0.000211299
+calVal: 1.30554e+06
+newStepLength: 1.30554e+06
+numBackTrak: 0
+gradient: 0.000106412
+phi     : 4.6529e+10
+overflow: 0.708166
+newWireLengthCoef: 1.09728e-06
+prevHpwl: 4944356
+hpwl    : 4948924
+input scaleDiffHpwl: -0.000102422
+phiCoef: 1.05
+
+
+Iter: 20
+stepLength_: 1.30554e+06
+densityPanelty_: 5.82009e-08
+WL GradSum: 0.185704
+De GradSum: 1.88581e+06
+cDist: 268.812
+gDist: 0.000203031
+calVal: 1.32399e+06
+newStepLength: 1.32399e+06
+numBackTrak: 0
+gradient: 0.000101152
+phi     : 4.62283e+10
+overflow: 0.708937
+newWireLengthCoef: 1.09296e-06
+prevHpwl: 4948924
+hpwl    : 4947399
+input scaleDiffHpwl: 3.41928e-05
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 20 overflow: 0.708937 HPWL: 4947399
+Iter: 21
+stepLength_: 1.32399e+06
+densityPanelty_: 6.11108e-08
+WL GradSum: 0.188678
+De GradSum: 1.87522e+06
+cDist: 264.996
+gDist: 0.000197719
+calVal: 1.34027e+06
+newStepLength: 1.34027e+06
+numBackTrak: 0
+gradient: 0.000100831
+phi     : 4.58716e+10
+overflow: 0.706701
+newWireLengthCoef: 1.10554e-06
+prevHpwl: 4947399
+hpwl    : 4952531
+input scaleDiffHpwl: -0.000115067
+phiCoef: 1.05
+
+
+Iter: 22
+stepLength_: 1.34027e+06
+densityPanelty_: 6.41663e-08
+WL GradSum: 0.193603
+De GradSum: 1.86411e+06
+cDist: 268.279
+gDist: 0.000202966
+calVal: 1.32179e+06
+newStepLength: 1.32179e+06
+numBackTrak: 0
+gradient: 0.000105928
+phi     : 4.55621e+10
+overflow: 0.707496
+newWireLengthCoef: 1.10105e-06
+prevHpwl: 4952531
+hpwl    : 4951513
+input scaleDiffHpwl: 2.28251e-05
+phiCoef: 1.05
+
+
+Iter: 23
+stepLength_: 1.32179e+06
+densityPanelty_: 6.73746e-08
+WL GradSum: 0.199798
+De GradSum: 1.85292e+06
+cDist: 273.895
+gDist: 0.000212345
+calVal: 1.28986e+06
+newStepLength: 1.28986e+06
+numBackTrak: 0
+gradient: 0.000109694
+phi     : 4.52065e+10
+overflow: 0.705337
+newWireLengthCoef: 1.11329e-06
+prevHpwl: 4951513
+hpwl    : 4957267
+input scaleDiffHpwl: -0.000129013
+phiCoef: 1.05
+
+
+Iter: 24
+stepLength_: 1.28986e+06
+densityPanelty_: 7.07433e-08
+WL GradSum: 0.198584
+De GradSum: 1.8409e+06
+cDist: 273.583
+gDist: 0.0002147
+calVal: 1.27426e+06
+newStepLength: 1.27426e+06
+numBackTrak: 0
+gradient: 0.000107954
+phi     : 4.48869e+10
+overflow: 0.705978
+newWireLengthCoef: 1.10964e-06
+prevHpwl: 4957267
+hpwl    : 4955843
+input scaleDiffHpwl: 3.19283e-05
+phiCoef: 1.05
+
+
+Iter: 25
+stepLength_: 1.27426e+06
+densityPanelty_: 7.42804e-08
+WL GradSum: 0.197833
+De GradSum: 1.83006e+06
+cDist: 266.605
+gDist: 0.000209269
+calVal: 1.27398e+06
+newStepLength: 1.27398e+06
+numBackTrak: 0
+gradient: 0.000104102
+phi     : 4.45382e+10
+overflow: 0.70413
+newWireLengthCoef: 1.12018e-06
+prevHpwl: 4955843
+hpwl    : 4962105
+input scaleDiffHpwl: -0.000140404
+phiCoef: 1.05
+
+
+Iter: 26
+stepLength_: 1.27398e+06
+densityPanelty_: 7.79944e-08
+WL GradSum: 0.198478
+De GradSum: 1.81863e+06
+cDist: 256.028
+gDist: 0.000202999
+calVal: 1.26123e+06
+newStepLength: 1.26123e+06
+numBackTrak: 0
+gradient: 0.000101601
+phi     : 4.42265e+10
+overflow: 0.704394
+newWireLengthCoef: 1.11867e-06
+prevHpwl: 4962105
+hpwl    : 4960226
+input scaleDiffHpwl: 4.213e-05
+phiCoef: 1.05
+
+
+Iter: 27
+stepLength_: 1.26123e+06
+densityPanelty_: 8.18939e-08
+WL GradSum: 0.200068
+De GradSum: 1.80845e+06
+cDist: 248.66
+gDist: 0.000197171
+calVal: 1.26114e+06
+newStepLength: 1.26114e+06
+numBackTrak: 0
+gradient: 9.82143e-05
+phi     : 4.38717e+10
+overflow: 0.702825
+newWireLengthCoef: 1.12769e-06
+prevHpwl: 4960226
+hpwl    : 4966688
+input scaleDiffHpwl: -0.000144888
+phiCoef: 1.05
+
+
+Iter: 28
+stepLength_: 1.26114e+06
+densityPanelty_: 8.59886e-08
+WL GradSum: 0.204061
+De GradSum: 1.79685e+06
+cDist: 240.524
+gDist: 0.000191129
+calVal: 1.25844e+06
+newStepLength: 1.25844e+06
+numBackTrak: 0
+gradient: 9.55027e-05
+phi     : 4.35388e+10
+overflow: 0.702916
+newWireLengthCoef: 1.12716e-06
+prevHpwl: 4966688
+hpwl    : 4964746
+input scaleDiffHpwl: 4.35426e-05
+phiCoef: 1.05
+
+
+Iter: 29
+stepLength_: 1.25844e+06
+densityPanelty_: 9.02878e-08
+WL GradSum: 0.206749
+De GradSum: 1.78601e+06
+cDist: 235.133
+gDist: 0.000186611
+calVal: 1.26001e+06
+newStepLength: 1.26001e+06
+numBackTrak: 0
+gradient: 9.3611e-05
+phi     : 4.31537e+10
+overflow: 0.701325
+newWireLengthCoef: 1.13637e-06
+prevHpwl: 4964746
+hpwl    : 4971125
+input scaleDiffHpwl: -0.000143027
+phiCoef: 1.05
+
+
+Iter: 30
+stepLength_: 1.26001e+06
+densityPanelty_: 9.48022e-08
+WL GradSum: 0.214957
+De GradSum: 1.7741e+06
+cDist: 230.439
+gDist: 0.000184311
+calVal: 1.25027e+06
+newStepLength: 1.25027e+06
+numBackTrak: 0
+gradient: 9.30999e-05
+phi     : 4.27929e+10
+overflow: 0.70117
+newWireLengthCoef: 1.13728e-06
+prevHpwl: 4971125
+hpwl    : 4970123
+input scaleDiffHpwl: 2.24664e-05
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 30 overflow: 0.70117 HPWL: 4970123
+Iter: 31
+stepLength_: 1.25027e+06
+densityPanelty_: 9.95422e-08
+WL GradSum: 0.218359
+De GradSum: 1.7631e+06
+cDist: 226.587
+gDist: 0.000183023
+calVal: 1.23802e+06
+newStepLength: 1.23802e+06
+numBackTrak: 0
+gradient: 9.22307e-05
+phi     : 4.24005e+10
+overflow: 0.699676
+newWireLengthCoef: 1.146e-06
+prevHpwl: 4970123
+hpwl    : 4976581
+input scaleDiffHpwl: -0.000144798
+phiCoef: 1.05
+
+
+Iter: 32
+stepLength_: 1.23802e+06
+densityPanelty_: 1.04519e-07
+WL GradSum: 0.225754
+De GradSum: 1.75175e+06
+cDist: 222.963
+gDist: 0.000179608
+calVal: 1.24139e+06
+newStepLength: 1.24139e+06
+numBackTrak: 0
+gradient: 8.96307e-05
+phi     : 4.20368e+10
+overflow: 0.699354
+newWireLengthCoef: 1.1479e-06
+prevHpwl: 4976581
+hpwl    : 4975240
+input scaleDiffHpwl: 3.00673e-05
+phiCoef: 1.05
+
+
+Iter: 33
+stepLength_: 1.24139e+06
+densityPanelty_: 1.09745e-07
+WL GradSum: 0.22975
+De GradSum: 1.741e+06
+cDist: 217.84
+gDist: 0.000176017
+calVal: 1.23761e+06
+newStepLength: 1.23761e+06
+numBackTrak: 0
+gradient: 8.85962e-05
+phi     : 4.16408e+10
+overflow: 0.697779
+newWireLengthCoef: 1.15718e-06
+prevHpwl: 4975240
+hpwl    : 4981618
+input scaleDiffHpwl: -0.000143004
+phiCoef: 1.05
+
+
+Iter: 34
+stepLength_: 1.23761e+06
+densityPanelty_: 1.15232e-07
+WL GradSum: 0.240029
+De GradSum: 1.72967e+06
+cDist: 215.702
+gDist: 0.000174998
+calVal: 1.2326e+06
+newStepLength: 1.2326e+06
+numBackTrak: 0
+gradient: 8.85462e-05
+phi     : 4.12666e+10
+overflow: 0.697362
+newWireLengthCoef: 1.15965e-06
+prevHpwl: 4981618
+hpwl    : 4981112
+input scaleDiffHpwl: 1.13453e-05
+phiCoef: 1.05
+
+
+Iter: 35
+stepLength_: 1.2326e+06
+densityPanelty_: 1.20994e-07
+WL GradSum: 0.245242
+De GradSum: 1.71878e+06
+cDist: 212.772
+gDist: 0.000175604
+calVal: 1.21166e+06
+newStepLength: 1.21166e+06
+numBackTrak: 0
+gradient: 8.91418e-05
+phi     : 4.08638e+10
+overflow: 0.695718
+newWireLengthCoef: 1.16945e-06
+prevHpwl: 4981112
+hpwl    : 4987922
+input scaleDiffHpwl: -0.000152691
+phiCoef: 1.05
+
+
+Iter: 36
+stepLength_: 1.21166e+06
+densityPanelty_: 1.27044e-07
+WL GradSum: 0.255901
+De GradSum: 1.7079e+06
+cDist: 209.177
+gDist: 0.000174259
+calVal: 1.20038e+06
+newStepLength: 1.20038e+06
+numBackTrak: 0
+gradient: 8.71894e-05
+phi     : 4.04858e+10
+overflow: 0.695408
+newWireLengthCoef: 1.17131e-06
+prevHpwl: 4987922
+hpwl    : 4987221
+input scaleDiffHpwl: 1.57175e-05
+phiCoef: 1.05
+
+
+Iter: 37
+stepLength_: 1.20038e+06
+densityPanelty_: 1.33396e-07
+WL GradSum: 0.258559
+De GradSum: 1.69712e+06
+cDist: 202.034
+gDist: 0.000169261
+calVal: 1.19362e+06
+newStepLength: 1.19362e+06
+numBackTrak: 0
+gradient: 8.42233e-05
+phi     : 4.00906e+10
+overflow: 0.693794
+newWireLengthCoef: 1.18102e-06
+prevHpwl: 4987221
+hpwl    : 4993813
+input scaleDiffHpwl: -0.000147803
+phiCoef: 1.05
+
+
+Iter: 38
+stepLength_: 1.19362e+06
+densityPanelty_: 1.40065e-07
+WL GradSum: 0.269515
+De GradSum: 1.68712e+06
+cDist: 195.926
+gDist: 0.000163196
+calVal: 1.20056e+06
+newStepLength: 1.20056e+06
+numBackTrak: 0
+gradient: 8.12727e-05
+phi     : 3.97183e+10
+overflow: 0.69339
+newWireLengthCoef: 1.18347e-06
+prevHpwl: 4993813
+hpwl    : 4994025
+input scaleDiffHpwl: -4.75336e-06
+phiCoef: 1.05
+
+
+Iter: 39
+stepLength_: 1.20056e+06
+densityPanelty_: 1.47069e-07
+WL GradSum: 0.274799
+De GradSum: 1.67673e+06
+cDist: 190.55
+gDist: 0.000159238
+calVal: 1.19663e+06
+newStepLength: 1.19663e+06
+numBackTrak: 0
+gradient: 8.0438e-05
+phi     : 3.93151e+10
+overflow: 0.69161
+newWireLengthCoef: 1.19429e-06
+prevHpwl: 4994025
+hpwl    : 5000875
+input scaleDiffHpwl: -0.000153587
+phiCoef: 1.05
+
+
+Iter: 40
+stepLength_: 1.19663e+06
+densityPanelty_: 1.54422e-07
+WL GradSum: 0.288467
+De GradSum: 1.66682e+06
+cDist: 188.064
+gDist: 0.000158331
+calVal: 1.1878e+06
+newStepLength: 1.1878e+06
+numBackTrak: 0
+gradient: 8.05045e-05
+phi     : 3.89349e+10
+overflow: 0.691154
+newWireLengthCoef: 1.19708e-06
+prevHpwl: 5000875
+hpwl    : 5001456
+input scaleDiffHpwl: -1.30269e-05
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 40 overflow: 0.691154 HPWL: 5001456
+Iter: 41
+stepLength_: 1.1878e+06
+densityPanelty_: 1.62143e-07
+WL GradSum: 0.294562
+De GradSum: 1.65593e+06
+cDist: 185.651
+gDist: 0.000158007
+calVal: 1.17495e+06
+newStepLength: 1.17495e+06
+numBackTrak: 0
+gradient: 8.02796e-05
+phi     : 3.85154e+10
+overflow: 0.689315
+newWireLengthCoef: 1.2084e-06
+prevHpwl: 5001456
+hpwl    : 5008265
+input scaleDiffHpwl: -0.000152668
+phiCoef: 1.05
+
+
+Iter: 42
+stepLength_: 1.17495e+06
+densityPanelty_: 1.7025e-07
+WL GradSum: 0.307718
+De GradSum: 1.64503e+06
+cDist: 182.289
+gDist: 0.000156154
+calVal: 1.16737e+06
+newStepLength: 1.16737e+06
+numBackTrak: 0
+gradient: 7.88587e-05
+phi     : 3.81139e+10
+overflow: 0.688605
+newWireLengthCoef: 1.21279e-06
+prevHpwl: 5008265
+hpwl    : 5009337
+input scaleDiffHpwl: -2.40359e-05
+phiCoef: 1.05
+
+
+Iter: 43
+stepLength_: 1.16737e+06
+densityPanelty_: 1.78763e-07
+WL GradSum: 0.314485
+De GradSum: 1.63322e+06
+cDist: 178.177
+gDist: 0.00015331
+calVal: 1.1622e+06
+newStepLength: 1.1622e+06
+numBackTrak: 0
+gradient: 7.76915e-05
+phi     : 3.76806e+10
+overflow: 0.686785
+newWireLengthCoef: 1.22415e-06
+prevHpwl: 5009337
+hpwl    : 5016065
+input scaleDiffHpwl: -0.000150852
+phiCoef: 1.05
+
+
+Iter: 44
+stepLength_: 1.1622e+06
+densityPanelty_: 1.87701e-07
+WL GradSum: 0.32886
+De GradSum: 1.62149e+06
+cDist: 176.36
+gDist: 0.000151277
+calVal: 1.16581e+06
+newStepLength: 1.16581e+06
+numBackTrak: 0
+gradient: 7.70763e-05
+phi     : 3.72717e+10
+overflow: 0.686234
+newWireLengthCoef: 1.2276e-06
+prevHpwl: 5016065
+hpwl    : 5018023
+input scaleDiffHpwl: -4.39013e-05
+phiCoef: 1.05
+
+
+Iter: 45
+stepLength_: 1.16581e+06
+densityPanelty_: 1.97086e-07
+WL GradSum: 0.338084
+De GradSum: 1.609e+06
+cDist: 176.097
+gDist: 0.000151657
+calVal: 1.16115e+06
+newStepLength: 1.16115e+06
+numBackTrak: 0
+gradient: 7.82796e-05
+phi     : 3.68267e+10
+overflow: 0.68449
+newWireLengthCoef: 1.2386e-06
+prevHpwl: 5018023
+hpwl    : 5024939
+input scaleDiffHpwl: -0.000155067
+phiCoef: 1.05
+
+
+Iter: 46
+stepLength_: 1.16115e+06
+densityPanelty_: 2.0694e-07
+WL GradSum: 0.354661
+De GradSum: 1.59646e+06
+cDist: 178.55
+gDist: 0.0001545
+calVal: 1.15566e+06
+newStepLength: 1.15566e+06
+numBackTrak: 0
+gradient: 8.00351e-05
+phi     : 3.63995e+10
+overflow: 0.684193
+newWireLengthCoef: 1.24049e-06
+prevHpwl: 5024939
+hpwl    : 5027358
+input scaleDiffHpwl: -5.42377e-05
+phiCoef: 1.05
+
+
+Iter: 47
+stepLength_: 1.15566e+06
+densityPanelty_: 2.17287e-07
+WL GradSum: 0.364354
+De GradSum: 1.5828e+06
+cDist: 180.926
+gDist: 0.000158352
+calVal: 1.14256e+06
+newStepLength: 1.14256e+06
+numBackTrak: 0
+gradient: 8.21828e-05
+phi     : 3.59354e+10
+overflow: 0.682582
+newWireLengthCoef: 1.25076e-06
+prevHpwl: 5027358
+hpwl    : 5034923
+input scaleDiffHpwl: -0.000169619
+phiCoef: 1.05
+
+
+Iter: 48
+stepLength_: 1.14256e+06
+densityPanelty_: 2.28152e-07
+WL GradSum: 0.381996
+De GradSum: 1.56859e+06
+cDist: 183.86
+gDist: 0.000161347
+calVal: 1.13953e+06
+newStepLength: 1.13953e+06
+numBackTrak: 0
+gradient: 8.30755e-05
+phi     : 3.54936e+10
+overflow: 0.68215
+newWireLengthCoef: 1.25352e-06
+prevHpwl: 5034923
+hpwl    : 5037341
+input scaleDiffHpwl: -5.42152e-05
+phiCoef: 1.05
+
+
+Iter: 49
+stepLength_: 1.13953e+06
+densityPanelty_: 2.39559e-07
+WL GradSum: 0.392202
+De GradSum: 1.55242e+06
+cDist: 185.591
+gDist: 0.000163802
+calVal: 1.13302e+06
+newStepLength: 1.13302e+06
+numBackTrak: 0
+gradient: 8.46435e-05
+phi     : 3.4999e+10
+overflow: 0.68015
+newWireLengthCoef: 1.26642e-06
+prevHpwl: 5037341
+hpwl    : 5045557
+input scaleDiffHpwl: -0.000184215
+phiCoef: 1.05
+
+
+Iter: 50
+stepLength_: 1.13302e+06
+densityPanelty_: 2.51537e-07
+WL GradSum: 0.411441
+De GradSum: 1.53658e+06
+cDist: 188.742
+gDist: 0.000167172
+calVal: 1.12903e+06
+newStepLength: 1.12903e+06
+numBackTrak: 0
+gradient: 8.64167e-05
+phi     : 3.45328e+10
+overflow: 0.679462
+newWireLengthCoef: 1.27089e-06
+prevHpwl: 5045557
+hpwl    : 5048187
+input scaleDiffHpwl: -5.89686e-05
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 50 overflow: 0.679462 HPWL: 5048187
+Iter: 51
+stepLength_: 1.12903e+06
+densityPanelty_: 2.64114e-07
+WL GradSum: 0.423889
+De GradSum: 1.52069e+06
+cDist: 191.041
+gDist: 0.000171513
+calVal: 1.11386e+06
+newStepLength: 1.11386e+06
+numBackTrak: 0
+gradient: 8.89781e-05
+phi     : 3.40374e+10
+overflow: 0.677184
+newWireLengthCoef: 1.28578e-06
+prevHpwl: 5048187
+hpwl    : 5056750
+input scaleDiffHpwl: -0.000191996
+phiCoef: 1.05
+
+
+Iter: 52
+stepLength_: 1.11386e+06
+densityPanelty_: 2.7732e-07
+WL GradSum: 0.445044
+De GradSum: 1.50588e+06
+cDist: 194.092
+gDist: 0.000175432
+calVal: 1.10637e+06
+newStepLength: 1.10637e+06
+numBackTrak: 0
+gradient: 9.03822e-05
+phi     : 3.35755e+10
+overflow: 0.676418
+newWireLengthCoef: 1.29084e-06
+prevHpwl: 5056750
+hpwl    : 5060048
+input scaleDiffHpwl: -7.39462e-05
+phiCoef: 1.05
+
+
+Iter: 53
+stepLength_: 1.10637e+06
+densityPanelty_: 2.91186e-07
+WL GradSum: 0.456818
+De GradSum: 1.49027e+06
+cDist: 195.325
+gDist: 0.000177944
+calVal: 1.09768e+06
+newStepLength: 1.09768e+06
+numBackTrak: 0
+gradient: 9.16015e-05
+phi     : 3.30714e+10
+overflow: 0.673938
+newWireLengthCoef: 1.30732e-06
+prevHpwl: 5060048
+hpwl    : 5068818
+input scaleDiffHpwl: -0.000196637
+phiCoef: 1.05
+
+
+Iter: 54
+stepLength_: 1.09768e+06
+densityPanelty_: 3.05745e-07
+WL GradSum: 0.479866
+De GradSum: 1.47534e+06
+cDist: 197.473
+gDist: 0.000180336
+calVal: 1.09503e+06
+newStepLength: 1.09503e+06
+numBackTrak: 0
+gradient: 9.29203e-05
+phi     : 3.259e+10
+overflow: 0.672928
+newWireLengthCoef: 1.31409e-06
+prevHpwl: 5068818
+hpwl    : 5072212
+input scaleDiffHpwl: -7.60987e-05
+phiCoef: 1.05
+
+
+Iter: 55
+stepLength_: 1.09503e+06
+densityPanelty_: 3.21032e-07
+WL GradSum: 0.493908
+De GradSum: 1.45925e+06
+cDist: 199.985
+gDist: 0.000184787
+calVal: 1.08225e+06
+newStepLength: 1.08225e+06
+numBackTrak: 0
+gradient: 9.61299e-05
+phi     : 3.20728e+10
+overflow: 0.670223
+newWireLengthCoef: 1.33241e-06
+prevHpwl: 5072212
+hpwl    : 5081268
+input scaleDiffHpwl: -0.000203049
+phiCoef: 1.05
+
+
+Iter: 56
+stepLength_: 1.08225e+06
+densityPanelty_: 3.37084e-07
+WL GradSum: 0.519019
+De GradSum: 1.44323e+06
+cDist: 204.499
+gDist: 0.000190901
+calVal: 1.07123e+06
+newStepLength: 1.07123e+06
+numBackTrak: 0
+gradient: 9.90106e-05
+phi     : 3.15707e+10
+overflow: 0.668641
+newWireLengthCoef: 1.34323e-06
+prevHpwl: 5081268
+hpwl    : 5084908
+input scaleDiffHpwl: -8.16144e-05
+phiCoef: 1.05
+
+
+Iter: 57
+stepLength_: 1.07123e+06
+densityPanelty_: 3.53938e-07
+WL GradSum: 0.534419
+De GradSum: 1.42685e+06
+cDist: 207.234
+gDist: 0.000196826
+calVal: 1.05288e+06
+newStepLength: 1.05288e+06
+numBackTrak: 0
+gradient: 0.00010197
+phi     : 3.10585e+10
+overflow: 0.665886
+newWireLengthCoef: 1.36231e-06
+prevHpwl: 5084908
+hpwl    : 5094217
+input scaleDiffHpwl: -0.000208722
+phiCoef: 1.05
+
+
+Iter: 58
+stepLength_: 1.05288e+06
+densityPanelty_: 3.71635e-07
+WL GradSum: 0.559139
+De GradSum: 1.41082e+06
+cDist: 209.955
+gDist: 0.000201779
+calVal: 1.04052e+06
+newStepLength: 1.04052e+06
+numBackTrak: 0
+gradient: 0.00010387
+phi     : 3.0577e+10
+overflow: 0.664299
+newWireLengthCoef: 1.37341e-06
+prevHpwl: 5094217
+hpwl    : 5097764
+input scaleDiffHpwl: -7.95291e-05
+phiCoef: 1.05
+
+
+Iter: 59
+stepLength_: 1.04052e+06
+densityPanelty_: 3.90217e-07
+WL GradSum: 0.573197
+De GradSum: 1.39488e+06
+cDist: 209.591
+gDist: 0.000205396
+calVal: 1.02043e+06
+newStepLength: 1.02043e+06
+numBackTrak: 0
+gradient: 0.000105476
+phi     : 3.01008e+10
+overflow: 0.661593
+newWireLengthCoef: 1.39256e-06
+prevHpwl: 5097764
+hpwl    : 5106772
+input scaleDiffHpwl: -0.000201973
+phiCoef: 1.05
+
+
+Iter: 60
+stepLength_: 1.02043e+06
+densityPanelty_: 4.09728e-07
+WL GradSum: 0.598015
+De GradSum: 1.3791e+06
+cDist: 208.261
+gDist: 0.000205709
+calVal: 1.01241e+06
+newStepLength: 1.01241e+06
+numBackTrak: 0
+gradient: 0.000104137
+phi     : 2.96306e+10
+overflow: 0.659568
+newWireLengthCoef: 1.40706e-06
+prevHpwl: 5106772
+hpwl    : 5110617
+input scaleDiffHpwl: -8.62108e-05
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 60 overflow: 0.659568 HPWL: 5110617
+Iter: 61
+stepLength_: 1.01241e+06
+densityPanelty_: 4.30214e-07
+WL GradSum: 0.612603
+De GradSum: 1.36291e+06
+cDist: 203.628
+gDist: 0.000203382
+calVal: 1.00121e+06
+newStepLength: 1.00121e+06
+numBackTrak: 0
+gradient: 0.000103172
+phi     : 2.91524e+10
+overflow: 0.656634
+newWireLengthCoef: 1.42835e-06
+prevHpwl: 5110617
+hpwl    : 5120102
+input scaleDiffHpwl: -0.000212668
+phiCoef: 1.05
+
+
+Iter: 62
+stepLength_: 1.00121e+06
+densityPanelty_: 4.51725e-07
+WL GradSum: 0.640226
+De GradSum: 1.34722e+06
+cDist: 199.795
+gDist: 0.000202285
+calVal: 987694
+newStepLength: 987694
+numBackTrak: 0
+gradient: 0.000103185
+phi     : 2.86923e+10
+overflow: 0.654388
+newWireLengthCoef: 1.44486e-06
+prevHpwl: 5120102
+hpwl    : 5123859
+input scaleDiffHpwl: -8.42377e-05
+phiCoef: 1.05
+
+
+Iter: 63
+stepLength_: 987694
+densityPanelty_: 4.74311e-07
+WL GradSum: 0.655861
+De GradSum: 1.33095e+06
+cDist: 195.594
+gDist: 0.000201821
+calVal: 969145
+newStepLength: 969145
+numBackTrak: 0
+gradient: 0.000102982
+phi     : 2.82218e+10
+overflow: 0.651221
+newWireLengthCoef: 1.46847e-06
+prevHpwl: 5123859
+hpwl    : 5133622
+input scaleDiffHpwl: -0.000218901
+phiCoef: 1.05
+
+
+Iter: 64
+stepLength_: 969145
+densityPanelty_: 4.98026e-07
+WL GradSum: 0.684894
+De GradSum: 1.31519e+06
+cDist: 191.557
+gDist: 0.000199778
+calVal: 958850
+newStepLength: 958850
+numBackTrak: 0
+gradient: 0.000101467
+phi     : 2.77687e+10
+overflow: 0.649064
+newWireLengthCoef: 1.48476e-06
+prevHpwl: 5133622
+hpwl    : 5137435
+input scaleDiffHpwl: -8.54933e-05
+phiCoef: 1.05
+
+
+Iter: 65
+stepLength_: 958850
+densityPanelty_: 5.22928e-07
+WL GradSum: 0.701946
+De GradSum: 1.29934e+06
+cDist: 186.658
+gDist: 0.000197296
+calVal: 946083
+newStepLength: 946083
+numBackTrak: 0
+gradient: 0.000100905
+phi     : 2.73201e+10
+overflow: 0.645928
+newWireLengthCoef: 1.50878e-06
+prevHpwl: 5137435
+hpwl    : 5147011
+input scaleDiffHpwl: -0.000214709
+phiCoef: 1.05
+
+
+Iter: 66
+stepLength_: 946083
+densityPanelty_: 5.49074e-07
+WL GradSum: 0.731364
+De GradSum: 1.28377e+06
+cDist: 179.955
+gDist: 0.000196111
+calVal: 917616
+newStepLength: 917616
+numBackTrak: 0
+gradient: 0.000100737
+phi     : 2.68794e+10
+overflow: 0.643477
+newWireLengthCoef: 1.52782e-06
+prevHpwl: 5147011
+hpwl    : 5151466
+input scaleDiffHpwl: -9.98879e-05
+phiCoef: 1.05
+
+
+Iter: 67
+stepLength_: 917616
+densityPanelty_: 5.76528e-07
+WL GradSum: 0.747978
+De GradSum: 1.2683e+06
+cDist: 173.571
+gDist: 0.000191175
+calVal: 907917
+newStepLength: 907917
+numBackTrak: 0
+gradient: 9.65623e-05
+phi     : 2.64422e+10
+overflow: 0.640169
+newWireLengthCoef: 1.5539e-06
+prevHpwl: 5151466
+hpwl    : 5161293
+input scaleDiffHpwl: -0.000220336
+phiCoef: 1.05
+
+
+Iter: 68
+stepLength_: 907917
+densityPanelty_: 6.05354e-07
+WL GradSum: 0.779378
+De GradSum: 1.25277e+06
+cDist: 166.197
+gDist: 0.000182654
+calVal: 909903
+newStepLength: 909903
+numBackTrak: 0
+gradient: 9.30037e-05
+phi     : 2.59999e+10
+overflow: 0.637791
+newWireLengthCoef: 1.57293e-06
+prevHpwl: 5161293
+hpwl    : 5165998
+input scaleDiffHpwl: -0.000105493
+phiCoef: 1.05
+
+
+Iter: 69
+stepLength_: 909903
+densityPanelty_: 6.35622e-07
+WL GradSum: 0.799487
+De GradSum: 1.23788e+06
+cDist: 156.083
+gDist: 0.000179207
+calVal: 870965
+newStepLength: 870965
+numBackTrak: 0
+gradient: 9.39046e-05
+phi     : 2.55789e+10
+overflow: 0.635325
+newWireLengthCoef: 1.5929e-06
+prevHpwl: 5165998
+hpwl    : 5176169
+input scaleDiffHpwl: -0.000228049
+phiCoef: 1.05
+
+
+Iter: 70
+stepLength_: 870965
+densityPanelty_: 6.67403e-07
+WL GradSum: 0.826671
+De GradSum: 1.22248e+06
+cDist: 152.917
+gDist: 0.000173141
+calVal: 883191
+newStepLength: 883191
+numBackTrak: 0
+gradient: 8.80416e-05
+phi     : 2.51415e+10
+overflow: 0.633137
+newWireLengthCoef: 1.61083e-06
+prevHpwl: 5176169
+hpwl    : 5181267
+input scaleDiffHpwl: -0.000114305
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 70 overflow: 0.633137 HPWL: 5181267
+Iter: 71
+stepLength_: 883191
+densityPanelty_: 7.00773e-07
+WL GradSum: 0.849612
+De GradSum: 1.2072e+06
+cDist: 148.667
+gDist: 0.000164275
+calVal: 904991
+newStepLength: 904991
+numBackTrak: 0
+gradient: 8.63613e-05
+phi     : 2.47009e+10
+overflow: 0.630805
+newWireLengthCoef: 1.63017e-06
+prevHpwl: 5181267
+hpwl    : 5191921
+input scaleDiffHpwl: -0.000238879
+phiCoef: 1.05
+
+
+Iter: 72
+stepLength_: 904991
+densityPanelty_: 7.35812e-07
+WL GradSum: 0.885751
+De GradSum: 1.19073e+06
+cDist: 151.634
+gDist: 0.000169154
+calVal: 896424
+newStepLength: 896424
+numBackTrak: 0
+gradient: 9.35278e-05
+phi     : 2.42261e+10
+overflow: 0.628418
+newWireLengthCoef: 1.6502e-06
+prevHpwl: 5191921
+hpwl    : 5198447
+input scaleDiffHpwl: -0.000146323
+phiCoef: 1.05
+
+
+Iter: 73
+stepLength_: 896424
+densityPanelty_: 7.72602e-07
+WL GradSum: 0.917121
+De GradSum: 1.17431e+06
+cDist: 159.397
+gDist: 0.0001855
+calVal: 859286
+newStepLength: 859286
+numBackTrak: 0
+gradient: 0.000102668
+phi     : 2.37512e+10
+overflow: 0.625445
+newWireLengthCoef: 1.6755e-06
+prevHpwl: 5198447
+hpwl    : 5210172
+input scaleDiffHpwl: -0.000262892
+phiCoef: 1.05
+
+
+Iter: 74
+stepLength_: 859286
+densityPanelty_: 8.11232e-07
+WL GradSum: 0.956296
+De GradSum: 1.15688e+06
+cDist: 165.114
+gDist: 0.000196968
+calVal: 838278
+newStepLength: 838278
+numBackTrak: 0
+gradient: 0.000105145
+phi     : 2.32576e+10
+overflow: 0.622702
+newWireLengthCoef: 1.69918e-06
+prevHpwl: 5210172
+hpwl    : 5216495
+input scaleDiffHpwl: -0.000141771
+phiCoef: 1.05
+
+
+Iter: 75
+stepLength_: 838278
+densityPanelty_: 8.51794e-07
+WL GradSum: 0.985151
+De GradSum: 1.14032e+06
+cDist: 164.409
+gDist: 0.000198048
+calVal: 830149
+newStepLength: 830149
+numBackTrak: 0
+gradient: 0.000104366
+phi     : 2.27891e+10
+overflow: 0.619674
+newWireLengthCoef: 1.72571e-06
+prevHpwl: 5216495
+hpwl    : 5228047
+input scaleDiffHpwl: -0.000259013
+phiCoef: 1.05
+
+
+Iter: 76
+stepLength_: 830149
+densityPanelty_: 8.94383e-07
+WL GradSum: 1.02431
+De GradSum: 1.12334e+06
+cDist: 163.947
+gDist: 0.0001972
+calVal: 831373
+newStepLength: 831373
+numBackTrak: 0
+gradient: 0.000104978
+phi     : 2.23166e+10
+overflow: 0.616703
+newWireLengthCoef: 1.75215e-06
+prevHpwl: 5228047
+hpwl    : 5234500
+input scaleDiffHpwl: -0.000144686
+phiCoef: 1.05
+
+
+Iter: 77
+stepLength_: 831373
+densityPanelty_: 9.39103e-07
+WL GradSum: 1.05746
+De GradSum: 1.10731e+06
+cDist: 165.935
+gDist: 0.000202841
+calVal: 818055
+newStepLength: 818055
+numBackTrak: 0
+gradient: 0.00011027
+phi     : 2.18652e+10
+overflow: 0.613187
+newWireLengthCoef: 1.78395e-06
+prevHpwl: 5234500
+hpwl    : 5245988
+input scaleDiffHpwl: -0.000257578
+phiCoef: 1.05
+
+
+Iter: 78
+stepLength_: 818055
+densityPanelty_: 9.86058e-07
+WL GradSum: 1.10365
+De GradSum: 1.09136e+06
+cDist: 170.877
+gDist: 0.000214332
+calVal: 797251
+newStepLength: 797251
+numBackTrak: 0
+gradient: 0.000116405
+phi     : 2.14233e+10
+overflow: 0.609903
+newWireLengthCoef: 1.81418e-06
+prevHpwl: 5245988
+hpwl    : 5251940
+input scaleDiffHpwl: -0.000133453
+phiCoef: 1.05
+
+
+Iter: 79
+stepLength_: 797251
+densityPanelty_: 1.03536e-06
+WL GradSum: 1.13694
+De GradSum: 1.07628e+06
+cDist: 173.733
+gDist: 0.000224381
+calVal: 774278
+newStepLength: 774278
+numBackTrak: 0
+gradient: 0.000120201
+phi     : 2.10007e+10
+overflow: 0.60594
+newWireLengthCoef: 1.85135e-06
+prevHpwl: 5251940
+hpwl    : 5263400
+input scaleDiffHpwl: -0.000256951
+phiCoef: 1.05
+
+
+Iter: 80
+stepLength_: 774278
+densityPanelty_: 1.08713e-06
+WL GradSum: 1.18501
+De GradSum: 1.06111e+06
+cDist: 174.531
+gDist: 0.000228475
+calVal: 763897
+newStepLength: 763897
+numBackTrak: 0
+gradient: 0.000120469
+phi     : 2.05895e+10
+overflow: 0.602937
+newWireLengthCoef: 1.88002e-06
+prevHpwl: 5263400
+hpwl    : 5268658
+input scaleDiffHpwl: -0.000117892
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 80 overflow: 0.602937 HPWL: 5268658
+Iter: 81
+stepLength_: 763897
+densityPanelty_: 1.14148e-06
+WL GradSum: 1.21515
+De GradSum: 1.04734e+06
+cDist: 171.99
+gDist: 0.000230062
+calVal: 747581
+newStepLength: 747581
+numBackTrak: 0
+gradient: 0.000121841
+phi     : 2.02054e+10
+overflow: 0.599534
+newWireLengthCoef: 1.91304e-06
+prevHpwl: 5268658
+hpwl    : 5279916
+input scaleDiffHpwl: -0.000252422
+phiCoef: 1.05
+
+
+Iter: 82
+stepLength_: 747581
+densityPanelty_: 1.19856e-06
+WL GradSum: 1.26177
+De GradSum: 1.03306e+06
+cDist: 170.61
+gDist: 0.000231852
+calVal: 735860
+newStepLength: 735860
+numBackTrak: 0
+gradient: 0.000122072
+phi     : 1.98139e+10
+overflow: 0.596451
+newWireLengthCoef: 1.94346e-06
+prevHpwl: 5279916
+hpwl    : 5285330
+input scaleDiffHpwl: -0.00012139
+phiCoef: 1.05
+
+
+Iter: 83
+stepLength_: 735860
+densityPanelty_: 1.25849e-06
+WL GradSum: 1.29678
+De GradSum: 1.01908e+06
+cDist: 166.701
+gDist: 0.000232639
+calVal: 716564
+newStepLength: 716564
+numBackTrak: 0
+gradient: 0.000122748
+phi     : 1.94203e+10
+overflow: 0.592193
+newWireLengthCoef: 1.98626e-06
+prevHpwl: 5285330
+hpwl    : 5297337
+input scaleDiffHpwl: -0.000269215
+phiCoef: 1.05
+
+
+Iter: 84
+stepLength_: 716564
+densityPanelty_: 1.32141e-06
+WL GradSum: 1.3508
+De GradSum: 1.00574e+06
+cDist: 163.102
+gDist: 0.000230763
+calVal: 706794
+newStepLength: 706794
+numBackTrak: 0
+gradient: 0.00012082
+phi     : 1.90469e+10
+overflow: 0.58899
+newWireLengthCoef: 2.01909e-06
+prevHpwl: 5297337
+hpwl    : 5303773
+input scaleDiffHpwl: -0.000144305
+phiCoef: 1.05
+
+
+Iter: 85
+stepLength_: 706794
+densityPanelty_: 1.38748e-06
+WL GradSum: 1.38843
+De GradSum: 993128
+cDist: 156.633
+gDist: 0.000227454
+calVal: 688636
+newStepLength: 688636
+numBackTrak: 0
+gradient: 0.00012046
+phi     : 1.86873e+10
+overflow: 0.58479
+newWireLengthCoef: 2.06295e-06
+prevHpwl: 5303773
+hpwl    : 5315459
+input scaleDiffHpwl: -0.000262018
+phiCoef: 1.05
+
+
+Iter: 86
+stepLength_: 688636
+densityPanelty_: 1.45686e-06
+WL GradSum: 1.44418
+De GradSum: 980105
+cDist: 152.278
+gDist: 0.000224366
+calVal: 678706
+newStepLength: 678706
+numBackTrak: 0
+gradient: 0.000119368
+phi     : 1.83186e+10
+overflow: 0.581429
+newWireLengthCoef: 2.09874e-06
+prevHpwl: 5315459
+hpwl    : 5322326
+input scaleDiffHpwl: -0.000153969
+phiCoef: 1.05
+
+
+Iter: 87
+stepLength_: 678706
+densityPanelty_: 1.5297e-06
+WL GradSum: 1.48787
+De GradSum: 967674
+cDist: 147.199
+gDist: 0.000221554
+calVal: 664394
+newStepLength: 664394
+numBackTrak: 0
+gradient: 0.000119631
+phi     : 1.79629e+10
+overflow: 0.576974
+newWireLengthCoef: 2.14713e-06
+prevHpwl: 5322326
+hpwl    : 5334284
+input scaleDiffHpwl: -0.000268117
+phiCoef: 1.05
+
+
+Iter: 88
+stepLength_: 664394
+densityPanelty_: 1.60618e-06
+WL GradSum: 1.54604
+De GradSum: 955184
+cDist: 145.18
+gDist: 0.000219786
+calVal: 660554
+newStepLength: 660554
+numBackTrak: 0
+gradient: 0.000119731
+phi     : 1.76126e+10
+overflow: 0.57379
+newWireLengthCoef: 2.18239e-06
+prevHpwl: 5334284
+hpwl    : 5341642
+input scaleDiffHpwl: -0.000164978
+phiCoef: 1.05
+
+
+Iter: 89
+stepLength_: 660554
+densityPanelty_: 1.68649e-06
+WL GradSum: 1.59404
+De GradSum: 942999
+cDist: 143.475
+gDist: 0.000221735
+calVal: 647057
+newStepLength: 647057
+numBackTrak: 0
+gradient: 0.00012364
+phi     : 1.72691e+10
+overflow: 0.569542
+newWireLengthCoef: 2.23034e-06
+prevHpwl: 5341642
+hpwl    : 5353708
+input scaleDiffHpwl: -0.000270538
+phiCoef: 1.05
+
+
+Iter: 90
+stepLength_: 647057
+densityPanelty_: 1.77082e-06
+WL GradSum: 1.65586
+De GradSum: 930352
+cDist: 146.197
+gDist: 0.000228061
+calVal: 641045
+newStepLength: 641045
+numBackTrak: 0
+gradient: 0.000127854
+phi     : 1.69214e+10
+overflow: 0.566158
+newWireLengthCoef: 2.2693e-06
+prevHpwl: 5353708
+hpwl    : 5361592
+input scaleDiffHpwl: -0.000176771
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 90 overflow: 0.566158 HPWL: 5361592
+Iter: 91
+stepLength_: 641045
+densityPanelty_: 1.85936e-06
+WL GradSum: 1.70956
+De GradSum: 917772
+cDist: 147.791
+gDist: 0.000237956
+calVal: 621085
+newStepLength: 621085
+numBackTrak: 0
+gradient: 0.000135104
+phi     : 1.65653e+10
+overflow: 0.561436
+newWireLengthCoef: 2.3248e-06
+prevHpwl: 5361592
+hpwl    : 5374147
+input scaleDiffHpwl: -0.000281502
+phiCoef: 1.05
+
+
+Iter: 92
+stepLength_: 621085
+densityPanelty_: 1.95233e-06
+WL GradSum: 1.78202
+De GradSum: 905940
+cDist: 150.112
+gDist: 0.000248462
+calVal: 604164
+newStepLength: 604164
+numBackTrak: 0
+gradient: 0.000140217
+phi     : 1.62226e+10
+overflow: 0.557795
+newWireLengthCoef: 2.36851e-06
+prevHpwl: 5374147
+hpwl    : 5381965
+input scaleDiffHpwl: -0.000175291
+phiCoef: 1.05
+
+
+Iter: 93
+stepLength_: 604164
+densityPanelty_: 2.04994e-06
+WL GradSum: 1.83927
+De GradSum: 894745
+cDist: 147.213
+gDist: 0.000253451
+calVal: 580835
+newStepLength: 580835
+numBackTrak: 0
+gradient: 0.000143195
+phi     : 1.58867e+10
+overflow: 0.553257
+newWireLengthCoef: 2.42416e-06
+prevHpwl: 5381965
+hpwl    : 5394210
+input scaleDiffHpwl: -0.000274552
+phiCoef: 1.05
+
+
+Iter: 94
+stepLength_: 580835
+densityPanelty_: 2.15244e-06
+WL GradSum: 1.90811
+De GradSum: 883878
+cDist: 142.809
+gDist: 0.000248751
+calVal: 574104
+newStepLength: 574104
+numBackTrak: 0
+gradient: 0.00014049
+phi     : 1.55698e+10
+overflow: 0.550318
+newWireLengthCoef: 2.46089e-06
+prevHpwl: 5394210
+hpwl    : 5401946
+input scaleDiffHpwl: -0.000173453
+phiCoef: 1.05
+
+
+Iter: 95
+stepLength_: 574104
+densityPanelty_: 2.26006e-06
+WL GradSum: 1.96304
+De GradSum: 872868
+cDist: 135.39
+gDist: 0.000239136
+calVal: 566163
+newStepLength: 566163
+numBackTrak: 0
+gradient: 0.000139842
+phi     : 1.52472e+10
+overflow: 0.546662
+newWireLengthCoef: 2.50736e-06
+prevHpwl: 5401946
+hpwl    : 5414192
+input scaleDiffHpwl: -0.000274574
+phiCoef: 1.05
+
+
+Iter: 96
+stepLength_: 566163
+densityPanelty_: 2.37306e-06
+WL GradSum: 2.02788
+De GradSum: 861291
+cDist: 133.3
+gDist: 0.000232976
+calVal: 572160
+newStepLength: 572160
+numBackTrak: 0
+gradient: 0.000140632
+phi     : 1.49173e+10
+overflow: 0.543621
+newWireLengthCoef: 2.54668e-06
+prevHpwl: 5414192
+hpwl    : 5423777
+input scaleDiffHpwl: -0.00021491
+phiCoef: 1.05
+
+
+Iter: 97
+stepLength_: 572160
+densityPanelty_: 2.49172e-06
+WL GradSum: 2.09648
+De GradSum: 847993
+cDist: 134.066
+gDist: 0.000237115
+calVal: 565404
+newStepLength: 565404
+numBackTrak: 0
+gradient: 0.000148207
+phi     : 1.45515e+10
+overflow: 0.539372
+newWireLengthCoef: 2.60266e-06
+prevHpwl: 5423777
+hpwl    : 5438080
+input scaleDiffHpwl: -0.000320695
+phiCoef: 1.05
+
+
+Iter: 98
+stepLength_: 565404
+densityPanelty_: 2.6163e-06
+WL GradSum: 2.17889
+De GradSum: 834336
+cDist: 140.298
+gDist: 0.000253538
+calVal: 553361
+newStepLength: 553361
+numBackTrak: 0
+gradient: 0.000158579
+phi     : 1.41835e+10
+overflow: 0.535005
+newWireLengthCoef: 2.66146e-06
+prevHpwl: 5438080
+hpwl    : 5448689
+input scaleDiffHpwl: -0.00023787
+phiCoef: 1.05
+
+
+Iter: 99
+stepLength_: 553361
+densityPanelty_: 2.74712e-06
+WL GradSum: 2.26441
+De GradSum: 820789
+cDist: 144.402
+gDist: 0.000274239
+calVal: 526556
+newStepLength: 526556
+numBackTrak: 0
+gradient: 0.000169548
+phi     : 1.3822e+10
+overflow: 0.53009
+newWireLengthCoef: 2.72925e-06
+prevHpwl: 5448689
+hpwl    : 5462895
+input scaleDiffHpwl: -0.00031852
+phiCoef: 1.05
+
+
+Iter: 100
+stepLength_: 526556
+densityPanelty_: 2.88447e-06
+WL GradSum: 2.35331
+De GradSum: 808662
+cDist: 145.348
+gDist: 0.000285836
+calVal: 508503
+newStepLength: 508503
+numBackTrak: 0
+gradient: 0.000172774
+phi     : 1.3505e+10
+overflow: 0.525935
+newWireLengthCoef: 2.7879e-06
+prevHpwl: 5462895
+hpwl    : 5470961
+input scaleDiffHpwl: -0.000180852
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 100 overflow: 0.525935 HPWL: 5470961
+Iter: 101
+stepLength_: 508503
+densityPanelty_: 3.0287e-06
+WL GradSum: 2.43003
+De GradSum: 797189
+cDist: 140.004
+gDist: 0.000281881
+calVal: 496680
+newStepLength: 496680
+numBackTrak: 0
+gradient: 0.000171233
+phi     : 1.321e+10
+overflow: 0.521529
+newWireLengthCoef: 2.85146e-06
+prevHpwl: 5470961
+hpwl    : 5483181
+input scaleDiffHpwl: -0.000273991
+phiCoef: 1.05
+
+
+Iter: 102
+stepLength_: 496680
+densityPanelty_: 3.18013e-06
+WL GradSum: 2.50884
+De GradSum: 786295
+cDist: 134.029
+gDist: 0.000271551
+calVal: 493568
+newStepLength: 493568
+numBackTrak: 0
+gradient: 0.000170152
+phi     : 1.29314e+10
+overflow: 0.517714
+newWireLengthCoef: 2.90768e-06
+prevHpwl: 5483181
+hpwl    : 5491036
+input scaleDiffHpwl: -0.000176121
+phiCoef: 1.05
+
+
+Iter: 103
+stepLength_: 493568
+densityPanelty_: 3.33914e-06
+WL GradSum: 2.59128
+De GradSum: 775347
+cDist: 129.004
+gDist: 0.000266424
+calVal: 484205
+newStepLength: 484205
+numBackTrak: 0
+gradient: 0.000173705
+phi     : 1.26547e+10
+overflow: 0.51371
+newWireLengthCoef: 2.96786e-06
+prevHpwl: 5491036
+hpwl    : 5503808
+input scaleDiffHpwl: -0.000286368
+phiCoef: 1.05
+
+
+Iter: 104
+stepLength_: 484205
+densityPanelty_: 3.50609e-06
+WL GradSum: 2.67048
+De GradSum: 764584
+cDist: 128.032
+gDist: 0.000267816
+calVal: 478061
+newStepLength: 478061
+numBackTrak: 0
+gradient: 0.000178049
+phi     : 1.23758e+10
+overflow: 0.509754
+newWireLengthCoef: 3.02855e-06
+prevHpwl: 5503808
+hpwl    : 5512567
+input scaleDiffHpwl: -0.00019639
+phiCoef: 1.05
+
+
+Iter: 105
+stepLength_: 478061
+densityPanelty_: 3.6814e-06
+WL GradSum: 2.76608
+De GradSum: 753088
+cDist: 127.199
+gDist: 0.000272559
+calVal: 466686
+newStepLength: 466686
+numBackTrak: 0
+gradient: 0.000184372
+phi     : 1.20851e+10
+overflow: 0.50526
+newWireLengthCoef: 3.09901e-06
+prevHpwl: 5512567
+hpwl    : 5526998
+input scaleDiffHpwl: -0.000323565
+phiCoef: 1.05
+
+
+Iter: 106
+stepLength_: 466686
+densityPanelty_: 3.86547e-06
+WL GradSum: 2.85859
+De GradSum: 742002
+cDist: 127.451
+gDist: 0.000279006
+calVal: 456802
+newStepLength: 456802
+numBackTrak: 0
+gradient: 0.000190288
+phi     : 1.17981e+10
+overflow: 0.500652
+newWireLengthCoef: 3.17294e-06
+prevHpwl: 5526998
+hpwl    : 5536756
+input scaleDiffHpwl: -0.000218789
+phiCoef: 1.05
+
+
+Iter: 107
+stepLength_: 456802
+densityPanelty_: 4.05874e-06
+WL GradSum: 2.97091
+De GradSum: 730884
+cDist: 125.386
+gDist: 0.000284897
+calVal: 440110
+newStepLength: 440110
+numBackTrak: 0
+gradient: 0.000196726
+phi     : 1.15248e+10
+overflow: 0.496596
+newWireLengthCoef: 3.23947e-06
+prevHpwl: 5536756
+hpwl    : 5550498
+input scaleDiffHpwl: -0.000308117
+phiCoef: 1.05
+
+
+Iter: 108
+stepLength_: 440110
+densityPanelty_: 4.26168e-06
+WL GradSum: 3.0563
+De GradSum: 720560
+cDist: 122.556
+gDist: 0.000285442
+calVal: 429356
+newStepLength: 429356
+numBackTrak: 0
+gradient: 0.000199564
+phi     : 1.12641e+10
+overflow: 0.492873
+newWireLengthCoef: 3.30178e-06
+prevHpwl: 5550498
+hpwl    : 5558787
+input scaleDiffHpwl: -0.000185852
+phiCoef: 1.05
+
+
+Iter: 109
+stepLength_: 429356
+densityPanelty_: 4.47476e-06
+WL GradSum: 3.16058
+De GradSum: 709796
+cDist: 118.351
+gDist: 0.000277891
+calVal: 425890
+newStepLength: 425890
+numBackTrak: 0
+gradient: 0.000201409
+phi     : 1.09974e+10
+overflow: 0.488479
+newWireLengthCoef: 3.37686e-06
+prevHpwl: 5558787
+hpwl    : 5572080
+input scaleDiffHpwl: -0.000298049
+phiCoef: 1.05
+
+
+Iter: 110
+stepLength_: 425890
+densityPanelty_: 4.6985e-06
+WL GradSum: 3.25958
+De GradSum: 698469
+cDist: 116.268
+gDist: 0.000272688
+calVal: 426378
+newStepLength: 426378
+numBackTrak: 0
+gradient: 0.00020709
+phi     : 1.0709e+10
+overflow: 0.483519
+newWireLengthCoef: 3.46366e-06
+prevHpwl: 5572080
+hpwl    : 5582394
+input scaleDiffHpwl: -0.000231256
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 110 overflow: 0.483519 HPWL: 5582394
+Iter: 111
+stepLength_: 426378
+densityPanelty_: 4.93342e-06
+WL GradSum: 3.39768
+De GradSum: 687820
+cDist: 115.167
+gDist: 0.00028216
+calVal: 408161
+newStepLength: 408161
+numBackTrak: 0
+gradient: 0.00021994
+phi     : 1.04477e+10
+overflow: 0.478986
+newWireLengthCoef: 3.54493e-06
+prevHpwl: 5582394
+hpwl    : 5595323
+input scaleDiffHpwl: -0.000289888
+phiCoef: 1.05
+
+
+Iter: 112
+stepLength_: 408161
+densityPanelty_: 5.1801e-06
+WL GradSum: 3.50041
+De GradSum: 677931
+cDist: 114.76
+gDist: 0.000295574
+calVal: 388262
+newStepLength: 388262
+numBackTrak: 0
+gradient: 0.000229271
+phi     : 1.02039e+10
+overflow: 0.474638
+newWireLengthCoef: 3.62468e-06
+prevHpwl: 5595323
+hpwl    : 5603258
+input scaleDiffHpwl: -0.000177915
+phiCoef: 1.05
+
+
+Iter: 113
+stepLength_: 388262
+densityPanelty_: 5.4391e-06
+WL GradSum: 3.62607
+De GradSum: 668129
+cDist: 110.927
+gDist: 0.000291207
+calVal: 380922
+newStepLength: 380922
+numBackTrak: 0
+gradient: 0.000231699
+phi     : 9.96963e+09
+overflow: 0.470548
+newWireLengthCoef: 3.70133e-06
+prevHpwl: 5603258
+hpwl    : 5615204
+input scaleDiffHpwl: -0.000267848
+phiCoef: 1.05
+
+
+Iter: 114
+stepLength_: 380922
+densityPanelty_: 5.71105e-06
+WL GradSum: 3.72128
+De GradSum: 658040
+cDist: 106.068
+gDist: 0.00027473
+calVal: 386080
+newStepLength: 386080
+numBackTrak: 0
+gradient: 0.000235054
+phi     : 9.72539e+09
+overflow: 0.465962
+newWireLengthCoef: 3.78922e-06
+prevHpwl: 5615204
+hpwl    : 5623941
+input scaleDiffHpwl: -0.000195897
+phiCoef: 1.05
+
+
+Iter: 115
+stepLength_: 386080
+densityPanelty_: 5.99661e-06
+WL GradSum: 3.86785
+De GradSum: 647687
+cDist: 104.54
+gDist: 0.00027164
+calVal: 384847
+newStepLength: 384847
+numBackTrak: 0
+gradient: 0.000246606
+phi     : 9.48025e+09
+overflow: 0.461226
+newWireLengthCoef: 3.88217e-06
+prevHpwl: 5623941
+hpwl    : 5637119
+input scaleDiffHpwl: -0.000295471
+phiCoef: 1.05
+
+
+Iter: 116
+stepLength_: 384847
+densityPanelty_: 6.29644e-06
+WL GradSum: 3.98866
+De GradSum: 637789
+cDist: 107.316
+gDist: 0.000291574
+calVal: 368058
+newStepLength: 368058
+numBackTrak: 0
+gradient: 0.000263863
+phi     : 9.24336e+09
+overflow: 0.456821
+newWireLengthCoef: 3.97066e-06
+prevHpwl: 5637119
+hpwl    : 5646129
+input scaleDiffHpwl: -0.000202018
+phiCoef: 1.05
+
+
+Iter: 117
+stepLength_: 368058
+densityPanelty_: 6.61126e-06
+WL GradSum: 4.13914
+De GradSum: 628434
+cDist: 109.358
+gDist: 0.000314676
+calVal: 347525
+newStepLength: 347525
+densityPanelty_: 6.61126e-06
+WL GradSum: 4.1332
+De GradSum: 628430
+cDist: 104.51
+gDist: 0.000291655
+calVal: 358334
+newStepLength: 358334
+numBackTrak: 1
+gradient: 0.000265322
+phi     : 9.02277e+09
+overflow: 0.453123
+newWireLengthCoef: 4.04652e-06
+prevHpwl: 5646129
+hpwl    : 5658133
+input scaleDiffHpwl: -0.000269148
+phiCoef: 1.05
+
+
+Iter: 118
+stepLength_: 358334
+densityPanelty_: 6.94182e-06
+WL GradSum: 4.23773
+De GradSum: 618992
+cDist: 101.388
+gDist: 0.000278048
+calVal: 364642
+newStepLength: 364642
+numBackTrak: 0
+gradient: 0.000275863
+phi     : 8.79963e+09
+overflow: 0.449243
+newWireLengthCoef: 4.12766e-06
+prevHpwl: 5658133
+hpwl    : 5667274
+input scaleDiffHpwl: -0.000204955
+phiCoef: 1.05
+
+
+Iter: 119
+stepLength_: 364642
+densityPanelty_: 7.28891e-06
+WL GradSum: 4.39289
+De GradSum: 608511
+cDist: 106.669
+gDist: 0.000299382
+calVal: 356296
+newStepLength: 356296
+numBackTrak: 0
+gradient: 0.000296707
+phi     : 8.54875e+09
+overflow: 0.445248
+newWireLengthCoef: 4.2129e-06
+prevHpwl: 5667274
+hpwl    : 5681670
+input scaleDiffHpwl: -0.00032278
+phiCoef: 1.05
+
+
+Iter: 120
+stepLength_: 356296
+densityPanelty_: 7.65336e-06
+WL GradSum: 4.52328
+De GradSum: 598021
+cDist: 115.117
+gDist: 0.000341913
+calVal: 336684
+newStepLength: 336684
+densityPanelty_: 7.65336e-06
+WL GradSum: 4.51635
+De GradSum: 598089
+cDist: 110.192
+gDist: 0.000317094
+calVal: 347505
+newStepLength: 347505
+numBackTrak: 1
+gradient: 0.000305635
+phi     : 8.30002e+09
+overflow: 0.441167
+newWireLengthCoef: 4.3018e-06
+prevHpwl: 5681670
+hpwl    : 5692033
+input scaleDiffHpwl: -0.000232354
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 120 overflow: 0.441167 HPWL: 5692033
+Iter: 121
+stepLength_: 347505
+densityPanelty_: 8.03603e-06
+WL GradSum: 4.68791
+De GradSum: 587629
+cDist: 111.93
+gDist: 0.000330856
+calVal: 338304
+newStepLength: 338304
+numBackTrak: 0
+gradient: 0.000324935
+phi     : 8.05305e+09
+overflow: 0.436912
+newWireLengthCoef: 4.39648e-06
+prevHpwl: 5692033
+hpwl    : 5706514
+input scaleDiffHpwl: -0.000324686
+phiCoef: 1.05
+
+
+Iter: 122
+stepLength_: 338304
+densityPanelty_: 8.43783e-06
+WL GradSum: 4.83091
+De GradSum: 577416
+cDist: 117.972
+gDist: 0.000368131
+calVal: 320463
+newStepLength: 320463
+densityPanelty_: 8.43783e-06
+WL GradSum: 4.82367
+De GradSum: 577450
+cDist: 113.161
+gDist: 0.000342672
+calVal: 330230
+newStepLength: 330230
+numBackTrak: 1
+gradient: 0.000333791
+phi     : 7.81594e+09
+overflow: 0.432684
+newWireLengthCoef: 4.49264e-06
+prevHpwl: 5706514
+hpwl    : 5716452
+input scaleDiffHpwl: -0.000222825
+phiCoef: 1.05
+
+
+Iter: 123
+stepLength_: 330230
+densityPanelty_: 8.85972e-06
+WL GradSum: 5.00531
+De GradSum: 567675
+cDist: 112.647
+gDist: 0.000351394
+calVal: 320572
+newStepLength: 320572
+numBackTrak: 0
+gradient: 0.000352292
+phi     : 7.59064e+09
+overflow: 0.428535
+newWireLengthCoef: 4.58905e-06
+prevHpwl: 5716452
+hpwl    : 5730279
+input scaleDiffHpwl: -0.000310022
+phiCoef: 1.05
+
+
+Iter: 124
+stepLength_: 320572
+densityPanelty_: 9.3027e-06
+WL GradSum: 5.14809
+De GradSum: 558026
+cDist: 116.664
+gDist: 0.000381206
+calVal: 306038
+newStepLength: 306038
+numBackTrak: 0
+gradient: 0.000373167
+phi     : 7.37118e+09
+overflow: 0.424286
+newWireLengthCoef: 4.6899e-06
+prevHpwl: 5730279
+hpwl    : 5739792
+input scaleDiffHpwl: -0.000213296
+phiCoef: 1.05
+
+
+Iter: 125
+stepLength_: 306038
+densityPanelty_: 9.76784e-06
+WL GradSum: 5.33643
+De GradSum: 548330
+cDist: 117.904
+gDist: 0.000400075
+calVal: 294705
+newStepLength: 294705
+numBackTrak: 0
+gradient: 0.000387388
+phi     : 7.15208e+09
+overflow: 0.419812
+newWireLengthCoef: 4.7985e-06
+prevHpwl: 5739792
+hpwl    : 5753738
+input scaleDiffHpwl: -0.000312691
+phiCoef: 1.05
+
+
+Iter: 126
+stepLength_: 294705
+densityPanelty_: 1.02562e-05
+WL GradSum: 5.4875
+De GradSum: 539162
+cDist: 115.585
+gDist: 0.000395424
+calVal: 292306
+newStepLength: 292306
+numBackTrak: 0
+gradient: 0.000398271
+phi     : 6.94902e+09
+overflow: 0.415926
+newWireLengthCoef: 4.89487e-06
+prevHpwl: 5753738
+hpwl    : 5762671
+input scaleDiffHpwl: -0.000200291
+phiCoef: 1.05
+
+
+Iter: 127
+stepLength_: 292306
+densityPanelty_: 1.0769e-05
+WL GradSum: 5.67242
+De GradSum: 530104
+cDist: 111.736
+gDist: 0.000387256
+calVal: 288532
+newStepLength: 288532
+numBackTrak: 0
+gradient: 0.000413396
+phi     : 6.74933e+09
+overflow: 0.411589
+newWireLengthCoef: 5.00471e-06
+prevHpwl: 5762671
+hpwl    : 5775636
+input scaleDiffHpwl: -0.000290695
+phiCoef: 1.05
+
+
+Iter: 128
+stepLength_: 288532
+densityPanelty_: 1.13075e-05
+WL GradSum: 5.83327
+De GradSum: 521113
+cDist: 112.189
+gDist: 0.000390653
+calVal: 287183
+newStepLength: 287183
+numBackTrak: 0
+gradient: 0.000432602
+phi     : 6.55444e+09
+overflow: 0.406807
+newWireLengthCoef: 5.12869e-06
+prevHpwl: 5775636
+hpwl    : 5785029
+input scaleDiffHpwl: -0.000210605
+phiCoef: 1.05
+
+
+Iter: 129
+stepLength_: 287183
+densityPanelty_: 1.18729e-05
+WL GradSum: 6.06134
+De GradSum: 512190
+cDist: 113.125
+gDist: 0.000410924
+calVal: 275295
+newStepLength: 275295
+numBackTrak: 0
+gradient: 0.000457741
+phi     : 6.36073e+09
+overflow: 0.401809
+newWireLengthCoef: 5.26154e-06
+prevHpwl: 5785029
+hpwl    : 5798962
+input scaleDiffHpwl: -0.000312399
+phiCoef: 1.05
+
+
+Iter: 130
+stepLength_: 275295
+densityPanelty_: 1.24665e-05
+WL GradSum: 6.24636
+De GradSum: 504359
+cDist: 113.966
+gDist: 0.0004349
+calVal: 262051
+newStepLength: 262051
+numBackTrak: 0
+gradient: 0.000480749
+phi     : 6.19371e+09
+overflow: 0.397828
+newWireLengthCoef: 5.36982e-06
+prevHpwl: 5798962
+hpwl    : 5807149
+input scaleDiffHpwl: -0.000183565
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 130 overflow: 0.397828 HPWL: 5807149
+Iter: 131
+stepLength_: 262051
+densityPanelty_: 1.30898e-05
+WL GradSum: 6.45087
+De GradSum: 496344
+cDist: 110.876
+gDist: 0.000434347
+calVal: 255271
+newStepLength: 255271
+numBackTrak: 0
+gradient: 0.000496754
+phi     : 6.02198e+09
+overflow: 0.392969
+newWireLengthCoef: 5.50499e-06
+prevHpwl: 5807149
+hpwl    : 5819487
+input scaleDiffHpwl: -0.000276637
+phiCoef: 1.05
+
+
+Iter: 132
+stepLength_: 255271
+densityPanelty_: 1.37443e-05
+WL GradSum: 6.64694
+De GradSum: 488090
+cDist: 108.061
+gDist: 0.00041193
+calVal: 262330
+newStepLength: 262330
+numBackTrak: 0
+gradient: 0.000512698
+phi     : 5.84785e+09
+overflow: 0.387896
+newWireLengthCoef: 5.64975e-06
+prevHpwl: 5819487
+hpwl    : 5829034
+input scaleDiffHpwl: -0.000214058
+phiCoef: 1.05
+
+
+Iter: 133
+stepLength_: 262330
+densityPanelty_: 1.44315e-05
+WL GradSum: 6.90415
+De GradSum: 479876
+cDist: 105.658
+gDist: 0.000413964
+calVal: 255235
+newStepLength: 255235
+numBackTrak: 0
+gradient: 0.000541304
+phi     : 5.67464e+09
+overflow: 0.383014
+newWireLengthCoef: 5.79267e-06
+prevHpwl: 5829034
+hpwl    : 5841549
+input scaleDiffHpwl: -0.000280605
+phiCoef: 1.05
+
+
+Iter: 134
+stepLength_: 255235
+densityPanelty_: 1.51531e-05
+WL GradSum: 7.10609
+De GradSum: 473106
+cDist: 107.954
+gDist: 0.000449977
+calVal: 239909
+newStepLength: 239909
+densityPanelty_: 1.51531e-05
+WL GradSum: 7.10605
+De GradSum: 473043
+cDist: 102.966
+gDist: 0.000414371
+calVal: 248487
+newStepLength: 248487
+numBackTrak: 1
+gradient: 0.000559771
+phi     : 5.53445e+09
+overflow: 0.379706
+newWireLengthCoef: 5.89155e-06
+prevHpwl: 5841549
+hpwl    : 5848847
+input scaleDiffHpwl: -0.000163632
+phiCoef: 1.05
+
+
+Iter: 135
+stepLength_: 248487
+densityPanelty_: 1.59108e-05
+WL GradSum: 7.30285
+De GradSum: 465641
+cDist: 101.004
+gDist: 0.000408641
+calVal: 247169
+newStepLength: 247169
+numBackTrak: 0
+gradient: 0.000588398
+phi     : 5.38153e+09
+overflow: 0.375593
+newWireLengthCoef: 6.01685e-06
+prevHpwl: 5848847
+hpwl    : 5860294
+input scaleDiffHpwl: -0.000256659
+phiCoef: 1.05
+
+
+Iter: 136
+stepLength_: 247169
+densityPanelty_: 1.67063e-05
+WL GradSum: 7.51006
+De GradSum: 457093
+cDist: 109.759
+gDist: 0.000441314
+calVal: 248710
+newStepLength: 248710
+numBackTrak: 0
+gradient: 0.000622896
+phi     : 5.20728e+09
+overflow: 0.370816
+newWireLengthCoef: 6.16574e-06
+prevHpwl: 5860294
+hpwl    : 5871958
+input scaleDiffHpwl: -0.000261525
+phiCoef: 1.05
+
+
+Iter: 137
+stepLength_: 248710
+densityPanelty_: 1.75416e-05
+WL GradSum: 7.80887
+De GradSum: 448262
+cDist: 118.257
+gDist: 0.000509665
+calVal: 232028
+newStepLength: 232028
+densityPanelty_: 1.75416e-05
+WL GradSum: 7.79674
+De GradSum: 448368
+cDist: 112.179
+gDist: 0.000464997
+calVal: 241246
+newStepLength: 241246
+numBackTrak: 1
+gradient: 0.000648721
+phi     : 5.03e+09
+overflow: 0.365911
+newWireLengthCoef: 6.32246e-06
+prevHpwl: 5871958
+hpwl    : 5886379
+input scaleDiffHpwl: -0.000323341
+phiCoef: 1.05
+
+
+Iter: 138
+stepLength_: 241246
+densityPanelty_: 1.84187e-05
+WL GradSum: 8.03948
+De GradSum: 440995
+cDist: 114.365
+gDist: 0.000499997
+calVal: 228731
+newStepLength: 228731
+densityPanelty_: 1.84187e-05
+WL GradSum: 8.03804
+De GradSum: 440994
+cDist: 109.964
+gDist: 0.000465871
+calVal: 236040
+newStepLength: 236040
+numBackTrak: 1
+gradient: 0.000676246
+phi     : 4.88273e+09
+overflow: 0.361952
+newWireLengthCoef: 6.45185e-06
+prevHpwl: 5886379
+hpwl    : 5895590
+input scaleDiffHpwl: -0.000206525
+phiCoef: 1.05
+
+
+Iter: 139
+stepLength_: 236040
+densityPanelty_: 1.93396e-05
+WL GradSum: 8.30503
+De GradSum: 433713
+cDist: 112.443
+gDist: 0.000507486
+calVal: 221569
+newStepLength: 221569
+densityPanelty_: 1.93396e-05
+WL GradSum: 8.29477
+De GradSum: 433719
+cDist: 107.388
+gDist: 0.000466746
+calVal: 230077
+newStepLength: 230077
+numBackTrak: 1
+gradient: 0.000703239
+phi     : 4.74001e+09
+overflow: 0.357933
+newWireLengthCoef: 6.58589e-06
+prevHpwl: 5895590
+hpwl    : 5906937
+input scaleDiffHpwl: -0.000254417
+phiCoef: 1.05
+
+
+Iter: 140
+stepLength_: 230077
+densityPanelty_: 2.03066e-05
+WL GradSum: 8.52155
+De GradSum: 425860
+cDist: 112.375
+gDist: 0.000498815
+calVal: 225284
+newStepLength: 225284
+numBackTrak: 0
+gradient: 0.000741726
+phi     : 4.58708e+09
+overflow: 0.35306
+newWireLengthCoef: 6.75219e-06
+prevHpwl: 5906937
+hpwl    : 5917910
+input scaleDiffHpwl: -0.000246031
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 140 overflow: 0.35306 HPWL: 5917910
+Iter: 141
+stepLength_: 225284
+densityPanelty_: 2.1322e-05
+WL GradSum: 8.86472
+De GradSum: 417692
+cDist: 121.03
+gDist: 0.000579737
+calVal: 208768
+newStepLength: 208768
+densityPanelty_: 2.1322e-05
+WL GradSum: 8.84949
+De GradSum: 417735
+cDist: 114.218
+gDist: 0.000524693
+calVal: 217685
+newStepLength: 217685
+numBackTrak: 1
+gradient: 0.000767374
+phi     : 4.43244e+09
+overflow: 0.348703
+newWireLengthCoef: 6.90439e-06
+prevHpwl: 5917910
+hpwl    : 5931447
+input scaleDiffHpwl: -0.00030352
+phiCoef: 1.05
+
+
+Iter: 142
+stepLength_: 217685
+densityPanelty_: 2.2388e-05
+WL GradSum: 9.0937
+De GradSum: 410451
+cDist: 112.746
+gDist: 0.000544468
+calVal: 207075
+newStepLength: 207075
+numBackTrak: 0
+gradient: 0.000807425
+phi     : 4.29318e+09
+overflow: 0.344148
+newWireLengthCoef: 7.06722e-06
+prevHpwl: 5931447
+hpwl    : 5941672
+input scaleDiffHpwl: -0.00022926
+phiCoef: 1.05
+
+
+Iter: 143
+stepLength_: 207075
+densityPanelty_: 2.35074e-05
+WL GradSum: 9.42498
+De GradSum: 403848
+cDist: 116.284
+gDist: 0.000600958
+calVal: 193498
+newStepLength: 193498
+densityPanelty_: 2.35074e-05
+WL GradSum: 9.4112
+De GradSum: 403813
+cDist: 110.308
+gDist: 0.00054921
+calVal: 200849
+newStepLength: 200849
+numBackTrak: 1
+gradient: 0.000835051
+phi     : 4.17192e+09
+overflow: 0.340652
+newWireLengthCoef: 7.19479e-06
+prevHpwl: 5941672
+hpwl    : 5953323
+input scaleDiffHpwl: -0.000261233
+phiCoef: 1.05
+
+
+Iter: 144
+stepLength_: 200849
+densityPanelty_: 2.46828e-05
+WL GradSum: 9.63012
+De GradSum: 395964
+cDist: 108.9
+gDist: 0.000534022
+calVal: 203923
+newStepLength: 203923
+numBackTrak: 0
+gradient: 0.000872831
+phi     : 4.02536e+09
+overflow: 0.335031
+newWireLengthCoef: 7.40472e-06
+prevHpwl: 5953323
+hpwl    : 5965444
+input scaleDiffHpwl: -0.000271771
+phiCoef: 1.05
+
+
+Iter: 145
+stepLength_: 203923
+densityPanelty_: 2.5917e-05
+WL GradSum: 10.0395
+De GradSum: 389207
+cDist: 115.591
+gDist: 0.000600317
+calVal: 192550
+newStepLength: 192550
+densityPanelty_: 2.5917e-05
+WL GradSum: 10.0281
+De GradSum: 389167
+cDist: 110.828
+gDist: 0.000556154
+calVal: 199276
+newStepLength: 199276
+numBackTrak: 1
+gradient: 0.000919017
+phi     : 3.90456e+09
+overflow: 0.331585
+newWireLengthCoef: 7.53644e-06
+prevHpwl: 5965444
+hpwl    : 5977910
+input scaleDiffHpwl: -0.000279507
+phiCoef: 1.05
+
+
+Iter: 146
+stepLength_: 199276
+densityPanelty_: 2.72128e-05
+WL GradSum: 10.25
+De GradSum: 381554
+cDist: 117.137
+gDist: 0.000623939
+calVal: 187738
+newStepLength: 187738
+densityPanelty_: 2.72128e-05
+WL GradSum: 10.2497
+De GradSum: 381544
+cDist: 112.07
+gDist: 0.000578441
+calVal: 193744
+newStepLength: 193744
+numBackTrak: 1
+gradient: 0.000962502
+phi     : 3.76677e+09
+overflow: 0.325802
+newWireLengthCoef: 7.76279e-06
+prevHpwl: 5977910
+hpwl    : 5989006
+input scaleDiffHpwl: -0.000248789
+phiCoef: 1.05
+
+
+Iter: 147
+stepLength_: 193744
+densityPanelty_: 2.85734e-05
+WL GradSum: 10.6728
+De GradSum: 375087
+cDist: 117.514
+gDist: 0.000645148
+calVal: 182150
+newStepLength: 182150
+densityPanelty_: 2.85734e-05
+WL GradSum: 10.662
+De GradSum: 374983
+cDist: 112.335
+gDist: 0.000592762
+calVal: 189511
+newStepLength: 189511
+numBackTrak: 1
+gradient: 0.00101286
+phi     : 3.65653e+09
+overflow: 0.32325
+newWireLengthCoef: 7.8648e-06
+prevHpwl: 5989006
+hpwl    : 5999886
+input scaleDiffHpwl: -0.000243946
+phiCoef: 1.05
+
+
+Iter: 148
+stepLength_: 189511
+densityPanelty_: 3.00021e-05
+WL GradSum: 10.8372
+De GradSum: 368179
+cDist: 114.456
+gDist: 0.000650265
+calVal: 176014
+newStepLength: 176014
+densityPanelty_: 3.00021e-05
+WL GradSum: 10.8391
+De GradSum: 368130
+cDist: 108.433
+gDist: 0.000591491
+calVal: 183321
+newStepLength: 183321
+numBackTrak: 1
+gradient: 0.00105637
+phi     : 3.53734e+09
+overflow: 0.31794
+newWireLengthCoef: 8.08142e-06
+prevHpwl: 5999886
+hpwl    : 6009860
+input scaleDiffHpwl: -0.000223632
+phiCoef: 1.05
+
+
+Iter: 149
+stepLength_: 183321
+densityPanelty_: 3.15022e-05
+WL GradSum: 11.2524
+De GradSum: 360342
+cDist: 114.723
+gDist: 0.000626355
+calVal: 183160
+newStepLength: 183160
+numBackTrak: 0
+gradient: 0.00111777
+phi     : 3.40731e+09
+overflow: 0.315094
+newWireLengthCoef: 8.19997e-06
+prevHpwl: 6009860
+hpwl    : 6022364
+input scaleDiffHpwl: -0.000280359
+phiCoef: 1.05
+
+
+Iter: 150
+stepLength_: 183160
+densityPanelty_: 3.30773e-05
+WL GradSum: 11.4659
+De GradSum: 353323
+cDist: 122.276
+gDist: 0.000736082
+calVal: 166117
+newStepLength: 166117
+densityPanelty_: 3.30773e-05
+WL GradSum: 11.4658
+De GradSum: 353215
+cDist: 113.567
+gDist: 0.000649143
+calVal: 174949
+newStepLength: 174949
+numBackTrak: 1
+gradient: 0.00115921
+phi     : 3.29522e+09
+overflow: 0.310414
+newWireLengthCoef: 8.3987e-06
+prevHpwl: 6022364
+hpwl    : 6031826
+input scaleDiffHpwl: -0.000212152
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 150 overflow: 0.310414 HPWL: 6031826
+Iter: 151
+stepLength_: 174949
+densityPanelty_: 3.47312e-05
+WL GradSum: 11.845
+De GradSum: 344925
+cDist: 123.469
+gDist: 0.000674376
+calVal: 183086
+newStepLength: 183086
+numBackTrak: 0
+gradient: 0.00122875
+phi     : 3.1526e+09
+overflow: 0.308589
+newWireLengthCoef: 8.47749e-06
+prevHpwl: 6031826
+hpwl    : 6044321
+input scaleDiffHpwl: -0.000280157
+phiCoef: 1.05
+
+
+Iter: 152
+stepLength_: 183086
+densityPanelty_: 3.64678e-05
+WL GradSum: 12.0415
+De GradSum: 339704
+cDist: 154.407
+gDist: 0.000838153
+calVal: 184223
+newStepLength: 184223
+numBackTrak: 0
+gradient: 0.00131965
+phi     : 3.05602e+09
+overflow: 0.304015
+newWireLengthCoef: 8.67826e-06
+prevHpwl: 6044321
+hpwl    : 6052497
+input scaleDiffHpwl: -0.000183318
+phiCoef: 1.05
+
+
+Iter: 153
+stepLength_: 184223
+densityPanelty_: 3.82911e-05
+WL GradSum: 12.5162
+De GradSum: 327024
+cDist: 211.019
+gDist: 0.00123395
+calVal: 171010
+newStepLength: 171010
+densityPanelty_: 3.82911e-05
+WL GradSum: 12.4973
+De GradSum: 327299
+cDist: 199.154
+gDist: 0.00112664
+calVal: 176767
+newStepLength: 176767
+numBackTrak: 1
+gradient: 0.00143278
+phi     : 2.85387e+09
+overflow: 0.299927
+newWireLengthCoef: 8.8617e-06
+prevHpwl: 6052497
+hpwl    : 6070534
+input scaleDiffHpwl: -0.000404417
+phiCoef: 1.05
+
+
+Iter: 154
+stepLength_: 176767
+densityPanelty_: 4.02057e-05
+WL GradSum: 12.8016
+De GradSum: 322299
+cDist: 240.569
+gDist: 0.00154347
+calVal: 155863
+newStepLength: 155863
+densityPanelty_: 4.02057e-05
+WL GradSum: 12.8019
+De GradSum: 321871
+cDist: 217.488
+gDist: 0.00131184
+calVal: 165788
+newStepLength: 165788
+numBackTrak: 1
+gradient: 0.00150452
+phi     : 2.77962e+09
+overflow: 0.296131
+newWireLengthCoef: 9.03551e-06
+prevHpwl: 6070534
+hpwl    : 6075401
+input scaleDiffHpwl: -0.000109126
+phiCoef: 1.05
+
+
+Iter: 155
+stepLength_: 165788
+densityPanelty_: 4.2216e-05
+WL GradSum: 13.088
+De GradSum: 311120
+cDist: 258.388
+gDist: 0.00155363
+calVal: 166312
+newStepLength: 166312
+numBackTrak: 0
+gradient: 0.00165704
+phi     : 2.60925e+09
+overflow: 0.294169
+newWireLengthCoef: 9.12668e-06
+prevHpwl: 6075401
+hpwl    : 6083843
+input scaleDiffHpwl: -0.000189283
+phiCoef: 1.05
+
+
+Iter: 156
+stepLength_: 166312
+densityPanelty_: 4.43268e-05
+WL GradSum: 13.2503
+De GradSum: 305928
+cDist: 313.606
+gDist: 0.00226805
+calVal: 138271
+newStepLength: 138271
+densityPanelty_: 4.43268e-05
+WL GradSum: 13.241
+De GradSum: 305486
+cDist: 271.365
+gDist: 0.00177733
+calVal: 152681
+newStepLength: 152681
+numBackTrak: 1
+gradient: 0.00172206
+phi     : 2.50707e+09
+overflow: 0.286891
+newWireLengthCoef: 9.47298e-06
+prevHpwl: 6083843
+hpwl    : 6093378
+input scaleDiffHpwl: -0.000213789
+phiCoef: 1.05
+
+
+Iter: 157
+stepLength_: 152681
+densityPanelty_: 4.65431e-05
+WL GradSum: 13.8022
+De GradSum: 296962
+cDist: 314.188
+gDist: 0.00206857
+calVal: 151886
+newStepLength: 151886
+numBackTrak: 0
+gradient: 0.00194385
+phi     : 2.37343e+09
+overflow: 0.289685
+newWireLengthCoef: 9.33852e-06
+prevHpwl: 6093378
+hpwl    : 6106942
+input scaleDiffHpwl: -0.000304126
+phiCoef: 1.05
+
+
+Iter: 158
+stepLength_: 151886
+densityPanelty_: 4.88703e-05
+WL GradSum: 13.6984
+De GradSum: 292185
+cDist: 356.092
+gDist: 0.0028858
+calVal: 123395
+newStepLength: 123395
+densityPanelty_: 4.88703e-05
+WL GradSum: 13.6566
+De GradSum: 291487
+cDist: 301.672
+gDist: 0.00216318
+calVal: 139458
+newStepLength: 139458
+numBackTrak: 1
+gradient: 0.00193609
+phi     : 2.28682e+09
+overflow: 0.281646
+newWireLengthCoef: 9.73065e-06
+prevHpwl: 6106942
+hpwl    : 6118975
+input scaleDiffHpwl: -0.000269798
+phiCoef: 1.05
+
+
+Iter: 159
+stepLength_: 139458
+densityPanelty_: 5.13138e-05
+WL GradSum: 14.4053
+De GradSum: 281512
+cDist: 303.342
+gDist: 0.00233744
+calVal: 129775
+newStepLength: 129775
+densityPanelty_: 5.13138e-05
+WL GradSum: 14.3957
+De GradSum: 281285
+cDist: 287.325
+gDist: 0.00211251
+calVal: 136011
+newStepLength: 136011
+numBackTrak: 1
+gradient: 0.00203593
+phi     : 2.14667e+09
+overflow: 0.278819
+newWireLengthCoef: 9.87243e-06
+prevHpwl: 6118975
+hpwl    : 6136053
+input scaleDiffHpwl: -0.000382915
+phiCoef: 1.05
+
+
+Iter: 160
+stepLength_: 136011
+densityPanelty_: 5.38795e-05
+WL GradSum: 14.668
+De GradSum: 274270
+cDist: 296.832
+gDist: 0.00252021
+calVal: 117781
+newStepLength: 117781
+densityPanelty_: 5.38795e-05
+WL GradSum: 14.6627
+De GradSum: 273668
+cDist: 266.688
+gDist: 0.00209881
+calVal: 127066
+newStepLength: 127066
+numBackTrak: 1
+gradient: 0.00207719
+phi     : 2.04618e+09
+overflow: 0.267286
+newWireLengthCoef: 1.04726e-05
+prevHpwl: 6136053
+hpwl    : 6149550
+input scaleDiffHpwl: -0.000302623
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 160 overflow: 0.267286 HPWL: 6149550
+Iter: 161
+stepLength_: 127066
+densityPanelty_: 5.65734e-05
+WL GradSum: 15.5939
+De GradSum: 272135
+cDist: 258.265
+gDist: 0.00240061
+calVal: 107583
+newStepLength: 107583
+densityPanelty_: 5.65734e-05
+WL GradSum: 15.6001
+De GradSum: 270482
+cDist: 227.413
+gDist: 0.00190587
+calVal: 119323
+newStepLength: 119323
+numBackTrak: 1
+gradient: 0.0020825
+phi     : 2.00529e+09
+overflow: 0.269202
+newWireLengthCoef: 1.03704e-05
+prevHpwl: 6149550
+hpwl    : 6151647
+input scaleDiffHpwl: -4.70179e-05
+phiCoef: 1.05
+
+
+Iter: 162
+stepLength_: 119323
+densityPanelty_: 5.94021e-05
+WL GradSum: 15.3861
+De GradSum: 268812
+cDist: 206.534
+gDist: 0.0020149
+calVal: 102503
+newStepLength: 102503
+densityPanelty_: 5.94021e-05
+WL GradSum: 15.408
+De GradSum: 267949
+cDist: 185.917
+gDist: 0.00167105
+calVal: 111258
+newStepLength: 111258
+numBackTrak: 1
+gradient: 0.00213042
+phi     : 1.97408e+09
+overflow: 0.265343
+newWireLengthCoef: 1.05772e-05
+prevHpwl: 6151647
+hpwl    : 6156099
+input scaleDiffHpwl: -9.98206e-05
+phiCoef: 1.05
+
+
+Iter: 163
+stepLength_: 111258
+densityPanelty_: 6.23722e-05
+WL GradSum: 15.8449
+De GradSum: 262691
+cDist: 192.472
+gDist: 0.00181747
+calVal: 105901
+newStepLength: 105901
+numBackTrak: 0
+gradient: 0.00230599
+phi     : 1.901e+09
+overflow: 0.26485
+newWireLengthCoef: 1.06039e-05
+prevHpwl: 6156099
+hpwl    : 6168624
+input scaleDiffHpwl: -0.00028083
+phiCoef: 1.05
+
+
+Iter: 164
+stepLength_: 105901
+densityPanelty_: 6.54908e-05
+WL GradSum: 16.0338
+De GradSum: 252263
+cDist: 200.129
+gDist: 0.0021378
+calVal: 93614.6
+newStepLength: 93614.6
+densityPanelty_: 6.54908e-05
+WL GradSum: 16.0265
+De GradSum: 252505
+cDist: 180.306
+gDist: 0.00184523
+calVal: 97714.6
+newStepLength: 97714.6
+numBackTrak: 1
+gradient: 0.0023122
+phi     : 1.76279e+09
+overflow: 0.255299
+newWireLengthCoef: 1.1135e-05
+prevHpwl: 6168624
+hpwl    : 6191681
+input scaleDiffHpwl: -0.000516973
+phiCoef: 1.05
+
+
+Iter: 165
+stepLength_: 97714.6
+densityPanelty_: 6.87653e-05
+WL GradSum: 17.0071
+De GradSum: 248890
+cDist: 177.502
+gDist: 0.00181085
+calVal: 98021.7
+newStepLength: 98021.7
+numBackTrak: 0
+gradient: 0.00245472
+phi     : 1.7238e+09
+overflow: 0.254373
+newWireLengthCoef: 1.11879e-05
+prevHpwl: 6191681
+hpwl    : 6200307
+input scaleDiffHpwl: -0.000193408
+phiCoef: 1.05
+
+
+Iter: 166
+stepLength_: 98021.7
+densityPanelty_: 7.22036e-05
+WL GradSum: 17.1408
+De GradSum: 241503
+cDist: 177.751
+gDist: 0.00208677
+calVal: 85179.9
+newStepLength: 85179.9
+densityPanelty_: 7.22036e-05
+WL GradSum: 17.1542
+De GradSum: 241298
+cDist: 158.616
+gDist: 0.00178207
+calVal: 89006.4
+newStepLength: 89006.4
+numBackTrak: 1
+gradient: 0.00247505
+phi     : 1.62522e+09
+overflow: 0.247588
+newWireLengthCoef: 1.15831e-05
+prevHpwl: 6200307
+hpwl    : 6214920
+input scaleDiffHpwl: -0.000327646
+phiCoef: 1.05
+
+
+Iter: 167
+stepLength_: 89006.4
+densityPanelty_: 7.58138e-05
+WL GradSum: 17.8708
+De GradSum: 239728
+cDist: 165.294
+gDist: 0.00181473
+calVal: 91084.9
+newStepLength: 91084.9
+numBackTrak: 0
+gradient: 0.00262573
+phi     : 1.60908e+09
+overflow: 0.248346
+newWireLengthCoef: 1.15383e-05
+prevHpwl: 6214920
+hpwl    : 6217836
+input scaleDiffHpwl: -6.53812e-05
+phiCoef: 1.05
+
+
+Iter: 168
+stepLength_: 91084.9
+densityPanelty_: 7.96045e-05
+WL GradSum: 17.8803
+De GradSum: 231971
+cDist: 174.187
+gDist: 0.0021095
+calVal: 82572.9
+newStepLength: 82572.9
+densityPanelty_: 7.96045e-05
+WL GradSum: 17.8844
+De GradSum: 232072
+cDist: 161.108
+gDist: 0.00189141
+calVal: 85178.9
+newStepLength: 85178.9
+numBackTrak: 1
+gradient: 0.00265185
+phi     : 1.51259e+09
+overflow: 0.24229
+newWireLengthCoef: 1.19014e-05
+prevHpwl: 6217836
+hpwl    : 6233697
+input scaleDiffHpwl: -0.000355628
+phiCoef: 1.05
+
+
+Iter: 169
+stepLength_: 85178.9
+densityPanelty_: 8.35847e-05
+WL GradSum: 18.6087
+De GradSum: 228361
+cDist: 173.9
+gDist: 0.00202305
+calVal: 85959.4
+newStepLength: 85959.4
+numBackTrak: 0
+gradient: 0.00283402
+phi     : 1.4734e+09
+overflow: 0.240597
+newWireLengthCoef: 1.2005e-05
+prevHpwl: 6233697
+hpwl    : 6241085
+input scaleDiffHpwl: -0.00016565
+phiCoef: 1.05
+
+
+Iter: 170
+stepLength_: 85959.4
+densityPanelty_: 8.77639e-05
+WL GradSum: 18.8888
+De GradSum: 218977
+cDist: 185.055
+gDist: 0.0024159
+calVal: 76598.8
+newStepLength: 76598.8
+densityPanelty_: 8.77639e-05
+WL GradSum: 18.8907
+De GradSum: 219264
+cDist: 169.015
+gDist: 0.00209499
+calVal: 80675.7
+newStepLength: 80675.7
+numBackTrak: 1
+gradient: 0.00283801
+phi     : 1.36809e+09
+overflow: 0.235649
+newWireLengthCoef: 1.23128e-05
+prevHpwl: 6241085
+hpwl    : 6259935
+input scaleDiffHpwl: -0.000422646
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 170 overflow: 0.235649 HPWL: 6259935
+Iter: 171
+stepLength_: 80675.7
+densityPanelty_: 9.21521e-05
+WL GradSum: 19.498
+De GradSum: 217680
+cDist: 174.288
+gDist: 0.00225059
+calVal: 77441.2
+newStepLength: 77441.2
+numBackTrak: 0
+gradient: 0.00307977
+phi     : 1.35178e+09
+overflow: 0.235332
+newWireLengthCoef: 1.23328e-05
+prevHpwl: 6259935
+hpwl    : 6261392
+input scaleDiffHpwl: -3.26682e-05
+phiCoef: 1.05
+
+
+Iter: 172
+stepLength_: 77441.2
+densityPanelty_: 9.67597e-05
+WL GradSum: 19.6471
+De GradSum: 207930
+cDist: 186.009
+gDist: 0.00270988
+calVal: 68641.1
+newStepLength: 68641.1
+densityPanelty_: 9.67597e-05
+WL GradSum: 19.6482
+De GradSum: 208322
+cDist: 169.14
+gDist: 0.00233557
+calVal: 72418.9
+newStepLength: 72418.9
+numBackTrak: 1
+gradient: 0.00307623
+phi     : 1.2433e+09
+overflow: 0.22867
+newWireLengthCoef: 1.27605e-05
+prevHpwl: 6261392
+hpwl    : 6281023
+input scaleDiffHpwl: -0.000440157
+phiCoef: 1.05
+
+
+Iter: 173
+stepLength_: 72418.9
+densityPanelty_: 0.000101598
+WL GradSum: 20.4864
+De GradSum: 205846
+cDist: 174.552
+gDist: 0.00240425
+calVal: 72601.6
+newStepLength: 72601.6
+numBackTrak: 0
+gradient: 0.00331361
+phi     : 1.217e+09
+overflow: 0.227769
+newWireLengthCoef: 1.28194e-05
+prevHpwl: 6281023
+hpwl    : 6284247
+input scaleDiffHpwl: -7.2287e-05
+phiCoef: 1.05
+
+
+Iter: 174
+stepLength_: 72601.6
+densityPanelty_: 0.000106678
+WL GradSum: 20.6735
+De GradSum: 196962
+cDist: 181.687
+gDist: 0.00291361
+calVal: 62357.9
+newStepLength: 62357.9
+densityPanelty_: 0.000106678
+WL GradSum: 20.6813
+De GradSum: 197263
+cDist: 161.99
+gDist: 0.00239662
+calVal: 67591
+newStepLength: 67591
+numBackTrak: 1
+gradient: 0.00323696
+phi     : 1.12067e+09
+overflow: 0.219729
+newWireLengthCoef: 1.33578e-05
+prevHpwl: 6284247
+hpwl    : 6300869
+input scaleDiffHpwl: -0.000372691
+phiCoef: 1.05
+
+
+Iter: 175
+stepLength_: 67591
+densityPanelty_: 0.000112011
+WL GradSum: 21.6755
+De GradSum: 196307
+cDist: 170.244
+gDist: 0.00263127
+calVal: 64700.3
+newStepLength: 64700.3
+numBackTrak: 0
+gradient: 0.00352057
+phi     : 1.10864e+09
+overflow: 0.218508
+newWireLengthCoef: 1.34415e-05
+prevHpwl: 6300869
+hpwl    : 6300741
+input scaleDiffHpwl: 2.86996e-06
+phiCoef: 1.05
+
+
+Iter: 176
+stepLength_: 64700.3
+densityPanelty_: 0.000117612
+WL GradSum: 21.8662
+De GradSum: 188310
+cDist: 183.705
+gDist: 0.00343052
+calVal: 53550.1
+newStepLength: 53550.1
+densityPanelty_: 0.000117612
+WL GradSum: 21.8798
+De GradSum: 188909
+cDist: 158.366
+gDist: 0.00261002
+calVal: 60676.2
+newStepLength: 60676.2
+numBackTrak: 1
+gradient: 0.00338349
+phi     : 1.031e+09
+overflow: 0.213501
+newWireLengthCoef: 1.37904e-05
+prevHpwl: 6300741
+hpwl    : 6313279
+input scaleDiffHpwl: -0.000281121
+phiCoef: 1.05
+
+
+Iter: 177
+stepLength_: 60676.2
+densityPanelty_: 0.000123493
+WL GradSum: 22.5524
+De GradSum: 188386
+cDist: 154.524
+gDist: 0.00265078
+calVal: 58293.6
+newStepLength: 58293.6
+numBackTrak: 0
+gradient: 0.00367921
+phi     : 1.02706e+09
+overflow: 0.213042
+newWireLengthCoef: 1.38227e-05
+prevHpwl: 6313279
+hpwl    : 6311891
+input scaleDiffHpwl: 3.11211e-05
+phiCoef: 1.05
+
+
+Iter: 178
+stepLength_: 58293.6
+densityPanelty_: 0.000129667
+WL GradSum: 22.703
+De GradSum: 178324
+cDist: 173.081
+gDist: 0.00360463
+calVal: 48016.4
+newStepLength: 48016.4
+densityPanelty_: 0.000129667
+WL GradSum: 22.7056
+De GradSum: 179232
+cDist: 149.621
+gDist: 0.00286721
+calVal: 52183.4
+newStepLength: 52183.4
+numBackTrak: 1
+gradient: 0.00353531
+phi     : 9.38221e+08
+overflow: 0.207346
+newWireLengthCoef: 1.42316e-05
+prevHpwl: 6311891
+hpwl    : 6327668
+input scaleDiffHpwl: -0.000353744
+phiCoef: 1.05
+
+
+Iter: 179
+stepLength_: 52183.4
+densityPanelty_: 0.00013615
+WL GradSum: 23.5183
+De GradSum: 178640
+cDist: 147.251
+gDist: 0.00308982
+calVal: 47657
+newStepLength: 47657
+densityPanelty_: 0.00013615
+WL GradSum: 23.5152
+De GradSum: 178242
+cDist: 138.342
+gDist: 0.00279433
+calVal: 49508.2
+newStepLength: 49508.2
+numBackTrak: 1
+gradient: 0.00374268
+phi     : 9.27754e+08
+overflow: 0.206456
+newWireLengthCoef: 1.42965e-05
+prevHpwl: 6327668
+hpwl    : 6329712
+input scaleDiffHpwl: -4.58296e-05
+phiCoef: 1.05
+
+
+Iter: 180
+stepLength_: 49508.2
+densityPanelty_: 0.000142958
+WL GradSum: 23.7393
+De GradSum: 168618
+cDist: 142.101
+gDist: 0.00322233
+calVal: 44099
+newStepLength: 44099
+densityPanelty_: 0.000142958
+WL GradSum: 23.7398
+De GradSum: 169095
+cDist: 130.86
+gDist: 0.00282636
+calVal: 46300.1
+newStepLength: 46300.1
+numBackTrak: 1
+gradient: 0.00371635
+phi     : 8.40501e+08
+overflow: 0.200107
+newWireLengthCoef: 1.47686e-05
+prevHpwl: 6329712
+hpwl    : 6346356
+input scaleDiffHpwl: -0.000373184
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 180 overflow: 0.200107 HPWL: 6346356
+Iter: 181
+stepLength_: 46300.1
+densityPanelty_: 0.000150106
+WL GradSum: 24.6643
+De GradSum: 168785
+cDist: 132.876
+gDist: 0.00308998
+calVal: 43002.2
+newStepLength: 43002.2
+densityPanelty_: 0.000150106
+WL GradSum: 24.6625
+De GradSum: 168347
+cDist: 125.921
+gDist: 0.00280477
+calVal: 44895.2
+newStepLength: 44895.2
+numBackTrak: 1
+gradient: 0.00395324
+phi     : 8.33906e+08
+overflow: 0.199874
+newWireLengthCoef: 1.47862e-05
+prevHpwl: 6346356
+hpwl    : 6348628
+input scaleDiffHpwl: -5.09417e-05
+phiCoef: 1.05
+
+
+Iter: 182
+stepLength_: 44895.2
+densityPanelty_: 0.000157611
+WL GradSum: 24.7932
+De GradSum: 159757
+cDist: 125.103
+gDist: 0.00303689
+calVal: 41194.6
+newStepLength: 41194.6
+densityPanelty_: 0.000157611
+WL GradSum: 24.7958
+De GradSum: 160038
+cDist: 117.567
+gDist: 0.00275272
+calVal: 42709.3
+newStepLength: 42709.3
+numBackTrak: 1
+gradient: 0.00394519
+phi     : 7.58607e+08
+overflow: 0.194414
+newWireLengthCoef: 1.52052e-05
+prevHpwl: 6348628
+hpwl    : 6363728
+input scaleDiffHpwl: -0.000338565
+phiCoef: 1.05
+
+
+Iter: 183
+stepLength_: 42709.3
+densityPanelty_: 0.000165492
+WL GradSum: 25.6245
+De GradSum: 159627
+cDist: 123.518
+gDist: 0.00307814
+calVal: 40127.7
+newStepLength: 40127.7
+densityPanelty_: 0.000165492
+WL GradSum: 25.6235
+De GradSum: 159248
+cDist: 118.031
+gDist: 0.002829
+calVal: 41721.7
+newStepLength: 41721.7
+numBackTrak: 1
+gradient: 0.00425346
+phi     : 7.51775e+08
+overflow: 0.193353
+newWireLengthCoef: 1.52879e-05
+prevHpwl: 6363728
+hpwl    : 6366264
+input scaleDiffHpwl: -5.6861e-05
+phiCoef: 1.05
+
+
+Iter: 184
+stepLength_: 41721.7
+densityPanelty_: 0.000173766
+WL GradSum: 25.8706
+De GradSum: 150737
+cDist: 123.511
+gDist: 0.00316922
+calVal: 38971.9
+newStepLength: 38971.9
+densityPanelty_: 0.000173766
+WL GradSum: 25.8722
+De GradSum: 150980
+cDist: 117.416
+gDist: 0.00293094
+calVal: 40060.8
+newStepLength: 40060.8
+numBackTrak: 1
+gradient: 0.00430127
+phi     : 6.80474e+08
+overflow: 0.187861
+newWireLengthCoef: 1.57236e-05
+prevHpwl: 6366264
+hpwl    : 6381946
+input scaleDiffHpwl: -0.000351614
+phiCoef: 1.05
+
+
+Iter: 185
+stepLength_: 40060.8
+densityPanelty_: 0.000182454
+WL GradSum: 26.7277
+De GradSum: 151303
+cDist: 124.462
+gDist: 0.00341621
+calVal: 36432.9
+newStepLength: 36432.9
+densityPanelty_: 0.000182454
+WL GradSum: 26.7275
+De GradSum: 150692
+cDist: 116.038
+gDist: 0.00300551
+calVal: 38608.2
+newStepLength: 38608.2
+numBackTrak: 1
+gradient: 0.00464426
+phi     : 6.77435e+08
+overflow: 0.186077
+newWireLengthCoef: 1.58678e-05
+prevHpwl: 6381946
+hpwl    : 6383756
+input scaleDiffHpwl: -4.0583e-05
+phiCoef: 1.05
+
+
+Iter: 186
+stepLength_: 38608.2
+densityPanelty_: 0.000191577
+WL GradSum: 27.0717
+De GradSum: 142820
+cDist: 121.443
+gDist: 0.00325151
+calVal: 37349.8
+newStepLength: 37349.8
+numBackTrak: 0
+gradient: 0.00476144
+phi     : 6.13634e+08
+overflow: 0.180828
+newWireLengthCoef: 1.62998e-05
+prevHpwl: 6383756
+hpwl    : 6399187
+input scaleDiffHpwl: -0.000345987
+phiCoef: 1.05
+
+
+Iter: 187
+stepLength_: 37349.8
+densityPanelty_: 0.000201156
+WL GradSum: 27.9094
+De GradSum: 144275
+cDist: 130.661
+gDist: 0.00402626
+calVal: 32452.3
+newStepLength: 32452.3
+densityPanelty_: 0.000201156
+WL GradSum: 27.9095
+De GradSum: 143233
+cDist: 117.212
+gDist: 0.00332062
+calVal: 35298.1
+newStepLength: 35298.1
+numBackTrak: 1
+gradient: 0.00506327
+phi     : 6.15977e+08
+overflow: 0.180224
+newWireLengthCoef: 1.63502e-05
+prevHpwl: 6399187
+hpwl    : 6399810
+input scaleDiffHpwl: -1.39686e-05
+phiCoef: 1.05
+
+
+Iter: 188
+stepLength_: 35298.1
+densityPanelty_: 0.000211214
+WL GradSum: 28.1021
+De GradSum: 135846
+cDist: 115.456
+gDist: 0.00320338
+calVal: 36041.9
+newStepLength: 36041.9
+numBackTrak: 0
+gradient: 0.00510066
+phi     : 5.58703e+08
+overflow: 0.176068
+newWireLengthCoef: 1.67017e-05
+prevHpwl: 6399810
+hpwl    : 6415078
+input scaleDiffHpwl: -0.000342332
+phiCoef: 1.05
+
+
+Iter: 189
+stepLength_: 36041.9
+densityPanelty_: 0.000221774
+WL GradSum: 28.8494
+De GradSum: 136491
+cDist: 123.597
+gDist: 0.00409164
+calVal: 30207.3
+newStepLength: 30207.3
+densityPanelty_: 0.000221774
+WL GradSum: 28.8445
+De GradSum: 135439
+cDist: 108.943
+gDist: 0.00323725
+calVal: 33652.8
+newStepLength: 33652.8
+numBackTrak: 1
+gradient: 0.00539384
+phi     : 5.54094e+08
+overflow: 0.175851
+newWireLengthCoef: 1.67202e-05
+prevHpwl: 6415078
+hpwl    : 6417762
+input scaleDiffHpwl: -6.01794e-05
+phiCoef: 1.05
+
+
+Iter: 190
+stepLength_: 33652.8
+densityPanelty_: 0.000232863
+WL GradSum: 29.0337
+De GradSum: 127868
+cDist: 116.476
+gDist: 0.00325305
+calVal: 35805.2
+newStepLength: 35805.2
+numBackTrak: 0
+gradient: 0.00540748
+phi     : 4.9913e+08
+overflow: 0.17091
+newWireLengthCoef: 1.71483e-05
+prevHpwl: 6417762
+hpwl    : 6433722
+input scaleDiffHpwl: -0.000357848
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 190 overflow: 0.17091 HPWL: 6433722
+Iter: 191
+stepLength_: 35805.2
+densityPanelty_: 0.000244506
+WL GradSum: 29.9524
+De GradSum: 128256
+cDist: 124.42
+gDist: 0.0043501
+calVal: 28601.6
+newStepLength: 28601.6
+densityPanelty_: 0.000244506
+WL GradSum: 29.9447
+De GradSum: 126934
+cDist: 106.052
+gDist: 0.00321257
+calVal: 33011.4
+newStepLength: 33011.4
+numBackTrak: 1
+gradient: 0.00569439
+phi     : 4.90089e+08
+overflow: 0.170303
+newWireLengthCoef: 1.72016e-05
+prevHpwl: 6433722
+hpwl    : 6437703
+input scaleDiffHpwl: -8.92601e-05
+phiCoef: 1.05
+
+
+Iter: 192
+stepLength_: 33011.4
+densityPanelty_: 0.000256732
+WL GradSum: 30.19
+De GradSum: 120285
+cDist: 115.739
+gDist: 0.00324531
+calVal: 35663.6
+newStepLength: 35663.6
+numBackTrak: 0
+gradient: 0.00572415
+phi     : 4.45126e+08
+overflow: 0.164689
+newWireLengthCoef: 1.7703e-05
+prevHpwl: 6437703
+hpwl    : 6451745
+input scaleDiffHpwl: -0.000314843
+phiCoef: 1.05
+
+
+Iter: 193
+stepLength_: 35663.6
+densityPanelty_: 0.000269568
+WL GradSum: 31.2172
+De GradSum: 120653
+cDist: 128.308
+gDist: 0.00456671
+calVal: 28096.4
+newStepLength: 28096.4
+densityPanelty_: 0.000269568
+WL GradSum: 31.2173
+De GradSum: 119306
+cDist: 108.252
+gDist: 0.00336577
+calVal: 32162.6
+newStepLength: 32162.6
+numBackTrak: 1
+gradient: 0.00602433
+phi     : 4.36388e+08
+overflow: 0.164209
+newWireLengthCoef: 1.77465e-05
+prevHpwl: 6451745
+hpwl    : 6454800
+input scaleDiffHpwl: -6.84978e-05
+phiCoef: 1.05
+
+
+Iter: 194
+stepLength_: 32162.6
+densityPanelty_: 0.000283047
+WL GradSum: 31.3974
+De GradSum: 113578
+cDist: 121.729
+gDist: 0.00368119
+calVal: 33067.7
+newStepLength: 33067.7
+numBackTrak: 0
+gradient: 0.00611424
+phi     : 3.99786e+08
+overflow: 0.15861
+newWireLengthCoef: 1.82623e-05
+prevHpwl: 6454800
+hpwl    : 6466437
+input scaleDiffHpwl: -0.000260919
+phiCoef: 1.05
+
+
+Iter: 195
+stepLength_: 33067.7
+densityPanelty_: 0.000297199
+WL GradSum: 32.4275
+De GradSum: 114270
+cDist: 133.851
+gDist: 0.00513363
+calVal: 26073.5
+newStepLength: 26073.5
+densityPanelty_: 0.000297199
+WL GradSum: 32.4278
+De GradSum: 112896
+cDist: 112.05
+gDist: 0.00380334
+calVal: 29460.9
+newStepLength: 29460.9
+numBackTrak: 1
+gradient: 0.00639598
+phi     : 3.93002e+08
+overflow: 0.158534
+newWireLengthCoef: 1.82694e-05
+prevHpwl: 6466437
+hpwl    : 6467628
+input scaleDiffHpwl: -2.6704e-05
+phiCoef: 1.05
+
+
+Iter: 196
+stepLength_: 29460.9
+densityPanelty_: 0.000312059
+WL GradSum: 32.5365
+De GradSum: 107503
+cDist: 111.552
+gDist: 0.00369876
+calVal: 30159.2
+newStepLength: 30159.2
+numBackTrak: 0
+gradient: 0.00645934
+phi     : 3.60372e+08
+overflow: 0.153125
+newWireLengthCoef: 1.87821e-05
+prevHpwl: 6467628
+hpwl    : 6478317
+input scaleDiffHpwl: -0.000239664
+phiCoef: 1.05
+
+
+Iter: 197
+stepLength_: 30159.2
+densityPanelty_: 0.000327662
+WL GradSum: 33.5751
+De GradSum: 107191
+cDist: 125.023
+gDist: 0.00477315
+calVal: 26192.9
+newStepLength: 26192.9
+densityPanelty_: 0.000327662
+WL GradSum: 33.5723
+De GradSum: 106478
+cDist: 112.43
+gDist: 0.00393205
+calVal: 28593.2
+newStepLength: 28593.2
+numBackTrak: 1
+gradient: 0.00686093
+phi     : 3.5224e+08
+overflow: 0.153247
+newWireLengthCoef: 1.87704e-05
+prevHpwl: 6478317
+hpwl    : 6480257
+input scaleDiffHpwl: -4.34978e-05
+phiCoef: 1.05
+
+
+Iter: 198
+stepLength_: 28593.2
+densityPanelty_: 0.000344045
+WL GradSum: 33.6564
+De GradSum: 100935
+cDist: 119.896
+gDist: 0.00424505
+calVal: 28243.7
+newStepLength: 28243.7
+numBackTrak: 0
+gradient: 0.00697705
+phi     : 3.20612e+08
+overflow: 0.147397
+newWireLengthCoef: 1.93408e-05
+prevHpwl: 6480257
+hpwl    : 6491728
+input scaleDiffHpwl: -0.000257197
+phiCoef: 1.05
+
+
+Iter: 199
+stepLength_: 28243.7
+densityPanelty_: 0.000361247
+WL GradSum: 34.8087
+De GradSum: 100735
+cDist: 127.133
+gDist: 0.00524938
+calVal: 24218.6
+newStepLength: 24218.6
+densityPanelty_: 0.000361247
+WL GradSum: 34.8026
+De GradSum: 100004
+cDist: 113.038
+gDist: 0.00429154
+calVal: 26339.8
+newStepLength: 26339.8
+numBackTrak: 1
+gradient: 0.00743039
+phi     : 3.12324e+08
+overflow: 0.147056
+newWireLengthCoef: 1.93744e-05
+prevHpwl: 6491728
+hpwl    : 6493521
+input scaleDiffHpwl: -4.02018e-05
+phiCoef: 1.05
+
+
+Iter: 200
+stepLength_: 26339.8
+densityPanelty_: 0.000379309
+WL GradSum: 34.9632
+De GradSum: 95121
+cDist: 108.227
+gDist: 0.00406078
+calVal: 26651.7
+newStepLength: 26651.7
+numBackTrak: 0
+gradient: 0.00749785
+phi     : 2.86556e+08
+overflow: 0.141867
+newWireLengthCoef: 1.98958e-05
+prevHpwl: 6493521
+hpwl    : 6503345
+input scaleDiffHpwl: -0.000220269
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 200 overflow: 0.141867 HPWL: 6503345
+Iter: 201
+stepLength_: 26651.7
+densityPanelty_: 0.000398275
+WL GradSum: 36.0217
+De GradSum: 94882.8
+cDist: 114.162
+gDist: 0.0049017
+calVal: 23290.3
+newStepLength: 23290.3
+densityPanelty_: 0.000398275
+WL GradSum: 36.0183
+De GradSum: 94325.2
+cDist: 103.499
+gDist: 0.00411767
+calVal: 25135.5
+newStepLength: 25135.5
+numBackTrak: 1
+gradient: 0.00801904
+phi     : 2.80069e+08
+overflow: 0.140781
+newWireLengthCoef: 2.00067e-05
+prevHpwl: 6503345
+hpwl    : 6505427
+input scaleDiffHpwl: -4.66816e-05
+phiCoef: 1.05
+
+
+Iter: 202
+stepLength_: 25135.5
+densityPanelty_: 0.000418189
+WL GradSum: 36.3248
+De GradSum: 89571.5
+cDist: 105.166
+gDist: 0.00431162
+calVal: 24391.3
+newStepLength: 24391.3
+numBackTrak: 0
+gradient: 0.00812756
+phi     : 2.55673e+08
+overflow: 0.135792
+newWireLengthCoef: 2.0524e-05
+prevHpwl: 6505427
+hpwl    : 6515747
+input scaleDiffHpwl: -0.00023139
+phiCoef: 1.05
+
+
+Iter: 203
+stepLength_: 24391.3
+densityPanelty_: 0.000439098
+WL GradSum: 37.3754
+De GradSum: 89629.7
+cDist: 111.627
+gDist: 0.00512901
+calVal: 21763.9
+newStepLength: 21763.9
+densityPanelty_: 0.000439098
+WL GradSum: 37.3744
+De GradSum: 89108.9
+cDist: 102.154
+gDist: 0.00439556
+calVal: 23240.3
+newStepLength: 23240.3
+numBackTrak: 1
+gradient: 0.00859787
+phi     : 2.51442e+08
+overflow: 0.135251
+newWireLengthCoef: 2.05809e-05
+prevHpwl: 6515747
+hpwl    : 6516773
+input scaleDiffHpwl: -2.30045e-05
+phiCoef: 1.05
+
+
+Iter: 204
+stepLength_: 23240.3
+densityPanelty_: 0.000461053
+WL GradSum: 37.5796
+De GradSum: 84421.2
+cDist: 101.195
+gDist: 0.0043455
+calVal: 23287.4
+newStepLength: 23287.4
+numBackTrak: 0
+gradient: 0.0085725
+phi     : 2.2964e+08
+overflow: 0.131006
+newWireLengthCoef: 2.10328e-05
+prevHpwl: 6516773
+hpwl    : 6526160
+input scaleDiffHpwl: -0.000210471
+phiCoef: 1.05
+
+
+Iter: 205
+stepLength_: 23287.4
+densityPanelty_: 0.000484106
+WL GradSum: 38.5232
+De GradSum: 83985.5
+cDist: 108.566
+gDist: 0.00524103
+calVal: 20714.7
+newStepLength: 20714.7
+densityPanelty_: 0.000484106
+WL GradSum: 38.5202
+De GradSum: 83537
+cDist: 99.5001
+gDist: 0.0044867
+calVal: 22176.7
+newStepLength: 22176.7
+numBackTrak: 1
+gradient: 0.00904306
+phi     : 2.24117e+08
+overflow: 0.130347
+newWireLengthCoef: 2.11038e-05
+prevHpwl: 6526160
+hpwl    : 6527916
+input scaleDiffHpwl: -3.93722e-05
+phiCoef: 1.05
+
+
+Iter: 206
+stepLength_: 22176.7
+densityPanelty_: 0.000508311
+WL GradSum: 38.7694
+De GradSum: 78790
+cDist: 98.2233
+gDist: 0.00470238
+calVal: 20888
+newStepLength: 20888
+densityPanelty_: 0.000508311
+WL GradSum: 38.7695
+De GradSum: 78856.4
+cDist: 94.1917
+gDist: 0.00438465
+calVal: 21482.1
+newStepLength: 21482.1
+numBackTrak: 1
+gradient: 0.00901234
+phi     : 2.03525e+08
+overflow: 0.126039
+newWireLengthCoef: 2.15742e-05
+prevHpwl: 6527916
+hpwl    : 6537363
+input scaleDiffHpwl: -0.000211816
+phiCoef: 1.05
+
+
+Iter: 207
+stepLength_: 21482.1
+densityPanelty_: 0.000533726
+WL GradSum: 39.7493
+De GradSum: 78277.3
+cDist: 98.2161
+gDist: 0.00496997
+calVal: 19761.9
+newStepLength: 19761.9
+densityPanelty_: 0.000533726
+WL GradSum: 39.7482
+De GradSum: 77964.3
+cDist: 92.4748
+gDist: 0.00443363
+calVal: 20857.6
+newStepLength: 20857.6
+numBackTrak: 1
+gradient: 0.00957555
+phi     : 1.9774e+08
+overflow: 0.125212
+newWireLengthCoef: 2.16657e-05
+prevHpwl: 6537363
+hpwl    : 6539738
+input scaleDiffHpwl: -5.32511e-05
+phiCoef: 1.05
+
+
+Iter: 208
+stepLength_: 20857.6
+densityPanelty_: 0.000560413
+WL GradSum: 40.0328
+De GradSum: 73696.8
+cDist: 91.003
+gDist: 0.00477807
+calVal: 19046
+newStepLength: 19046
+densityPanelty_: 0.000560413
+WL GradSum: 40.0345
+De GradSum: 73762.6
+cDist: 85.1736
+gDist: 0.00429228
+calVal: 19843.4
+newStepLength: 19843.4
+numBackTrak: 1
+gradient: 0.00968894
+phi     : 1.80187e+08
+overflow: 0.121138
+newWireLengthCoef: 2.2122e-05
+prevHpwl: 6539738
+hpwl    : 6548511
+input scaleDiffHpwl: -0.000196704
+phiCoef: 1.05
+
+
+Iter: 209
+stepLength_: 19843.4
+densityPanelty_: 0.000588433
+WL GradSum: 40.972
+De GradSum: 73117.2
+cDist: 90.8827
+gDist: 0.00472962
+calVal: 19215.7
+newStepLength: 19215.7
+numBackTrak: 0
+gradient: 0.0104592
+phi     : 1.74951e+08
+overflow: 0.120303
+newWireLengthCoef: 2.22169e-05
+prevHpwl: 6548511
+hpwl    : 6551108
+input scaleDiffHpwl: -5.82287e-05
+phiCoef: 1.05
+
+
+Iter: 210
+stepLength_: 19215.7
+densityPanelty_: 0.000617855
+WL GradSum: 41.2444
+De GradSum: 68875.6
+cDist: 97.7811
+gDist: 0.00554877
+calVal: 17622.1
+newStepLength: 17622.1
+densityPanelty_: 0.000617855
+WL GradSum: 41.2463
+De GradSum: 68924.5
+cDist: 91.4663
+gDist: 0.00499298
+calVal: 18319
+newStepLength: 18319
+numBackTrak: 1
+gradient: 0.0106083
+phi     : 1.59316e+08
+overflow: 0.116294
+newWireLengthCoef: 2.26772e-05
+prevHpwl: 6551108
+hpwl    : 6559483
+input scaleDiffHpwl: -0.00018778
+phiCoef: 1.05
+
+
+[NesterovSolve] Iter: 210 overflow: 0.116294 HPWL: 6559483
+Iter: 211
+stepLength_: 18319
+densityPanelty_: 0.000648748
+WL GradSum: 42.1708
+De GradSum: 68345.4
+cDist: 93.2149
+gDist: 0.0050479
+calVal: 18466.1
+newStepLength: 18466.1
+numBackTrak: 0
+gradient: 0.011394
+phi     : 1.54448e+08
+overflow: 0.115636
+newWireLengthCoef: 2.27538e-05
+prevHpwl: 6559483
+hpwl    : 6561742
+input scaleDiffHpwl: -5.06502e-05
+phiCoef: 1.05
+
+
+Iter: 212
+stepLength_: 18466.1
+densityPanelty_: 0.000681185
+WL GradSum: 42.3962
+De GradSum: 64586.5
+cDist: 95.0738
+gDist: 0.00559169
+calVal: 17002.7
+newStepLength: 17002.7
+densityPanelty_: 0.000681185
+WL GradSum: 42.3973
+De GradSum: 64617.3
+cDist: 89.5446
+gDist: 0.00505281
+calVal: 17721.7
+newStepLength: 17721.7
+numBackTrak: 1
+gradient: 0.0116077
+phi     : 1.41527e+08
+overflow: 0.112035
+newWireLengthCoef: 2.31768e-05
+prevHpwl: 6561742
+hpwl    : 6568834
+input scaleDiffHpwl: -0.000159013
+phiCoef: 1.05
+
+
+Iter: 213
+stepLength_: 17721.7
+densityPanelty_: 0.000715244
+WL GradSum: 43.262
+De GradSum: 63984.2
+cDist: 92.0662
+gDist: 0.00547524
+calVal: 16815
+newStepLength: 16815
+densityPanelty_: 0.000715244
+WL GradSum: 43.2618
+De GradSum: 63809.1
+cDist: 88.7478
+gDist: 0.00510122
+calVal: 17397.3
+newStepLength: 17397.3
+numBackTrak: 1
+gradient: 0.0124368
+phi     : 1.36149e+08
+overflow: 0.110658
+newWireLengthCoef: 2.33407e-05
+prevHpwl: 6568834
+hpwl    : 6571055
+input scaleDiffHpwl: -4.97982e-05
+phiCoef: 1.05
+
+
+Iter: 214
+stepLength_: 17397.3
+densityPanelty_: 0.000751006
+WL GradSum: 43.6524
+De GradSum: 60563.3
+cDist: 90.1619
+gDist: 0.00567727
+calVal: 15881.2
+newStepLength: 15881.2
+densityPanelty_: 0.000751006
+WL GradSum: 43.6531
+De GradSum: 60555.3
+cDist: 84.6504
+gDist: 0.00504903
+calVal: 16765.7
+newStepLength: 16765.7
+numBackTrak: 1
+gradient: 0.0127202
+phi     : 1.25071e+08
+overflow: 0.107075
+newWireLengthCoef: 2.37727e-05
+prevHpwl: 6571055
+hpwl    : 6577315
+input scaleDiffHpwl: -0.000140359
+phiCoef: 1.05
+
+
+Iter: 215
+stepLength_: 16765.7
+densityPanelty_: 0.000788557
+WL GradSum: 44.5166
+De GradSum: 59790.2
+cDist: 89.3487
+gDist: 0.00596352
+calVal: 14982.5
+newStepLength: 14982.5
+densityPanelty_: 0.000788557
+WL GradSum: 44.5177
+De GradSum: 59467.4
+cDist: 82.6958
+gDist: 0.00514395
+calVal: 16076.3
+newStepLength: 16076.3
+numBackTrak: 1
+gradient: 0.0135738
+phi     : 1.19703e+08
+overflow: 0.105223
+newWireLengthCoef: 2.39989e-05
+prevHpwl: 6577315
+hpwl    : 6579738
+input scaleDiffHpwl: -5.43274e-05
+phiCoef: 1.05
+
+
+Iter: 216
+stepLength_: 16076.3
+densityPanelty_: 0.000827984
+WL GradSum: 45.0075
+De GradSum: 56914.3
+cDist: 86.5894
+gDist: 0.00639787
+calVal: 13534.1
+newStepLength: 13534.1
+densityPanelty_: 0.000827984
+WL GradSum: 45.0112
+De GradSum: 56830.9
+cDist: 77.5129
+gDist: 0.00511971
+calVal: 15140.1
+newStepLength: 15140.1
+numBackTrak: 1
+gradient: 0.0134428
+phi     : 1.1106e+08
+overflow: 0.101952
+newWireLengthCoef: 2.44041e-05
+prevHpwl: 6579738
+hpwl    : 6584343
+input scaleDiffHpwl: -0.000103251
+phiCoef: 1.05
+
+
+Iter: 217
+stepLength_: 15140.1
+densityPanelty_: 0.000869383
+WL GradSum: 45.8147
+De GradSum: 55745
+cDist: 85.0189
+gDist: 0.00648263
+calVal: 13114.9
+newStepLength: 13114.9
+densityPanelty_: 0.000869383
+WL GradSum: 45.8174
+De GradSum: 55431.3
+cDist: 77.4124
+gDist: 0.00539508
+calVal: 14348.7
+newStepLength: 14348.7
+numBackTrak: 1
+gradient: 0.0140559
+phi     : 1.0538e+08
+overflow: 0.0993005
+newWireLengthCoef: 2.4649e-05
+prevHpwl: 6584343
+hpwl    : 6587132
+input scaleDiffHpwl: -6.25336e-05
+phiCoef: 1.05
+
+
+[NesterovSolve] Finished with Overflow: 0.0993005
+Worst slack: 1.00e+30
+Total negative slack: 0.00e+00
+No differences found.

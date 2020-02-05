@@ -118,6 +118,10 @@ proc list_delete { list delete } {
 # Record tests in resizer/test
 record_resizer_tests {
   simple01
+  simple02
+  core01 
+  ar01 
+  ar02 
 }
 
 # Record tests in $STAX/designs
