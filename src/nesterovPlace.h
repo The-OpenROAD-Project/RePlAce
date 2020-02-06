@@ -17,7 +17,7 @@ class NesterovPlaceVars {
   int maxNesterovIter;
   int maxBackTrack;
   int verboseLevel;
-  float initDensityPanelty; // INIT_LAMBDA
+  float initDensityPenalty; // INIT_LAMBDA
   float initWireLengthCoef; // base_wcof
   float targetOverflow; // overflow
   float minPhiCoef; // pcof_min
@@ -99,7 +99,7 @@ private:
   float stepLength_;
 
   // opt_phi_cof
-  float densityPanelty_;
+  float densityPenalty_;
 
   // base_wcof
   float baseWireLengthCoef_;

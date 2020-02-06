@@ -102,7 +102,7 @@ void Replace::doNesterovPlace() {
   npVars.minPhiCoef = minPhiCoef_;
   npVars.maxPhiCoef = maxPhiCoef_;
   npVars.referenceHpwl = referenceHpwl_;
-  npVars.initDensityPanelty = initDensityPenalityFactor_;
+  npVars.initDensityPenalty = initDensityPenalityFactor_;
   npVars.targetOverflow = overflow_;
   npVars.maxNesterovIter = nesterovPlaceMaxIter_; 
 

@@ -19,7 +19,7 @@ NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
   verboseLevel(1),
-  initDensityPanelty(1e1),
+  initDensityPenalty(1e1),
   initWireLengthCoef(1.0/24.0),
   targetOverflow(0.1),
   minPhiCoef(0.95),
@@ -33,7 +33,7 @@ NesterovPlace::NesterovPlace()
   wireLengthGradSum_(0), 
   densityGradSum_(0),
   stepLength_(0),
-  densityPanelty_(0),
+  densityPenalty_(0),
   baseWireLengthCoef_(0), 
   wireLengthCoefX_(0), 
   wireLengthCoefY_(0),
@@ -148,12 +148,12 @@ void NesterovPlace::init() {
     cout << "densityGradSum_ : " << densityGradSum_ << endl;
   }
 
-  densityPanelty_ 
+  densityPenalty_ 
     = wireLengthGradSum_ / densityGradSum_ 
-    * npVars_.initDensityPanelty; 
+    * npVars_.initDensityPenalty; 
   
   if( npVars_.verboseLevel > 3 ) {
-    cout << "initDensityPanelty_ : " << densityPanelty_ << endl;
+    cout << "initDensityPenalty_ : " << densityPenalty_ << endl;
   }
   
   sumOverflow_ = 
@@ -211,7 +211,7 @@ NesterovPlace::updateGradients(
   densityGradSum_ = 0;
 
   if( npVars_.verboseLevel > 3 ) {
-    cout << "densityPanelty_: " << densityPanelty_ << endl;
+    cout << "densityPenalty_: " << densityPenalty_ << endl;
   }
 
   for(int i=0; i<nb_->gCells().size(); i++) {
@@ -223,8 +223,8 @@ NesterovPlace::updateGradients(
     wireLengthGradSum_ += fabs(wireLengthGrads[i].x) + fabs(wireLengthGrads[i].y);
     densityGradSum_ += fabs(densityGrads[i].x) + fabs(densityGrads[i].y);
 
-    sumGrads[i].x = wireLengthGrads[i].x + densityPanelty_ * densityGrads[i].x;
-    sumGrads[i].y = wireLengthGrads[i].y + densityPanelty_ * densityGrads[i].y;
+    sumGrads[i].x = wireLengthGrads[i].x + densityPenalty_ * densityGrads[i].x;
+    sumGrads[i].y = wireLengthGrads[i].y + densityPenalty_ * densityGrads[i].y;
 
     FloatCoordi wireLengthPreCondi 
       = nb_->getWireLengthPreconditioner(gCell);
@@ -232,8 +232,8 @@ NesterovPlace::updateGradients(
       = nb_->getDensityPreconditioner(gCell);
 
     FloatCoordi sumPrecondi(
-        wireLengthPreCondi.x + densityPanelty_ * densityPrecondi.x,
-        wireLengthPreCondi.y + densityPanelty_ * densityPrecondi.y);
+        wireLengthPreCondi.x + densityPenalty_ * densityPrecondi.x,
+        wireLengthPreCondi.y + densityPenalty_ * densityPrecondi.y);
 
     if( sumPrecondi.x <= npVars_.minPreconditioner ) {
       sumPrecondi.x = npVars_.minPreconditioner;
@@ -470,7 +470,7 @@ NesterovPlace::updateNextIter() {
       / npVars_.referenceHpwl );
   
   prevHpwl_ = hpwl;
-  densityPanelty_ *= phiCoef;
+  densityPenalty_ *= phiCoef;
   
   if( npVars_.verboseLevel > 3 ) {
     cout << "phiCoef: " << phiCoef << endl;
