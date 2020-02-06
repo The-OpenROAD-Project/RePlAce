@@ -88,6 +88,29 @@ add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
 add_library( replace
   ${REPLACE_SRC}
 )
+  
+target_include_directories( replace
+  PUBLIC
+  ${REPLACE_HOME}/include
+  PRIVATE
+  ${REPLACE_HOME}/src
+
+  ${EIGEN_HOME}
+  ${FLUTE_HOME}
+
+  ${OPENSTA_HOME}/util
+  ${OPENSTA_HOME}/liberty
+  ${OPENSTA_HOME}/network
+  ${OPENSTA_HOME}/graph
+  ${OPENSTA_HOME}/sdc
+  ${OPENSTA_HOME}/parasitics
+  ${OPENSTA_HOME}/search
+  ${OPENSTA_HOME}/app
+
+  ${OPENDB_HOME}/include
+  ${OPENROAD_HOME}/include
+  ${TCL_INCLUDE_PATH}
+)
 
 # CIMG_USE case
 if( USE_CIMG_LIB )
@@ -97,56 +120,10 @@ if( USE_CIMG_LIB )
     ${JPEG_LIBRARIES} 
   )
   target_include_directories( replace
-  PUBLIC
-    ${REPLACE_HOME}/include
-  PRIVATE
-    ${REPLACE_HOME}/src
-
+    PUBLIC
     # For CImg
     ${REPLACE_HOME}/module/CImg
     ${X11_INCLUDE_DIR}
     ${JPEG_INCLUDE_DIR}
-
-    ${EIGEN_HOME}
-    ${FLUTE_HOME}
- 
-    ${OPENSTA_HOME}/util
-    ${OPENSTA_HOME}/liberty
-    ${OPENSTA_HOME}/network
-    ${OPENSTA_HOME}/graph
-    ${OPENSTA_HOME}/sdc
-    ${OPENSTA_HOME}/parasitics
-    ${OPENSTA_HOME}/search
-    ${OPENSTA_HOME}/app
-
-    ${OPENDB_HOME}/include
-    ${OPENROAD_HOME}/include
-  SYSTEM
-    ${TCL_INCLUDE_PATH}
-  )
-# Normal case
-else()
-  target_include_directories( replace
-  PUBLIC
-    ${REPLACE_HOME}/include
-  PRIVATE
-    ${REPLACE_HOME}/src
-
-    ${EIGEN_HOME}
-    ${FLUTE_HOME}
- 
-    ${OPENSTA_HOME}/util
-    ${OPENSTA_HOME}/liberty
-    ${OPENSTA_HOME}/network
-    ${OPENSTA_HOME}/graph
-    ${OPENSTA_HOME}/sdc
-    ${OPENSTA_HOME}/parasitics
-    ${OPENSTA_HOME}/search
-    ${OPENSTA_HOME}/app
-
-    ${OPENDB_HOME}/include
-    ${OPENROAD_HOME}/include
-  SYSTEM
-    ${TCL_INCLUDE_PATH}
   )
 endif()
