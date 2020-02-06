@@ -56,6 +56,8 @@ public:
   void set_min_net_weight(double net_weight_min);
   void set_max_net_weight(double net_weight_max);
   void set_net_weight_scale(double net_weight_scale);
+
+  void set_routability_driven(bool mode);
   
   bool init_replace();
   bool place_cell_init_place();
@@ -78,11 +80,6 @@ public:
   size_t get_pin_size();
   size_t get_row_size();
 
-
-//  float get_nesterov_overflow();
-//  int get_nesterov_iter_count();
-//  float get_nesterov_potential();
-  
   void import_custom_net_weights(const char* net_weight);
 
   bool save_jpeg(const char* jpeg);
@@ -101,6 +98,7 @@ private:
   std::string sdc_file;
   std::string output_loc;
   bool timing_driven_mode;
+  bool routability_driven_mode;
   bool write_bookshelf_mode;
   double unit_r;
   double unit_c;

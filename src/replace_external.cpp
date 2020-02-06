@@ -9,6 +9,7 @@ replace_external::
 replace_external() : 
   ckt(&Replace::__ckt), 
   timing_driven_mode(false), 
+  routability_driven_mode(false),
   write_bookshelf_mode(false),
   unit_r(0.0f), unit_c(0.0f) {
   initGlobalVars();
@@ -203,6 +204,11 @@ replace_external::set_output_experiment_name(const char* output) {
 void
 replace_external::set_timing_driven(bool is_true) {
   timing_driven_mode = is_true;
+}
+
+void
+replace_external::set_routability_driven(bool is_true) {
+  routability_driven_mode = isRoutability = is_true;
 }
 
 void 

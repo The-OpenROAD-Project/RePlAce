@@ -178,7 +178,7 @@ include_directories(
 add_custom_command(OUTPUT ${REPLACE_HOME}/src/replace_wrap.cpp
   COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${REPLACE_HOME}/src/replace_wrap.cpp ${REPLACE_HOME}/src/replace.i   
   WORKING_DIRECTORY ${REPLACE_HOME}
-  DEPENDS ${REPLACE_SWIG_FILES}
+  DEPENDS ${REPLACE_SWIG_FILES} src/replace_external.h src/replace_external.cpp
 )
 
 add_executable( replace
