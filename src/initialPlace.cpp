@@ -26,10 +26,10 @@ void InitialPlaceVars::reset() {
 }
 
 InitialPlace::InitialPlace()
-: pb_(nullptr), ipVars_() {};
+: ipVars_(), pb_(nullptr) {} 
 
 InitialPlace::InitialPlace(InitialPlaceVars ipVars, std::shared_ptr<PlacerBase> pb)
-: pb_(pb), ipVars_(ipVars) {};
+: ipVars_(ipVars), pb_(pb) {}
 
 InitialPlace::~InitialPlace() {
   reset();
@@ -354,7 +354,6 @@ void InitialPlace::createSparseMatrix() {
 }
 
 void InitialPlace::updateCoordi() {
-  const int placeCnt = pb_->placeInsts().size();
   for(auto& inst : pb_->placeInsts()) {
     int idx = inst->extId();
     //cout << "extId: " << idx << endl;

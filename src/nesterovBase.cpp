@@ -1069,9 +1069,9 @@ BinGrid::getMinMaxIdxY(Instance* inst) {
 NesterovBaseVars::NesterovBaseVars() 
 : targetDensity(1.0), 
   minAvgCut(0.1), maxAvgCut(0.9),
-isSetBinCntX(0), isSetBinCntY(0), 
   binCntX(0), binCntY(0),
-  minWireLengthForceBar(-300) {}
+  minWireLengthForceBar(-300),
+  isSetBinCntX(0), isSetBinCntY(0) {}
 
 
 

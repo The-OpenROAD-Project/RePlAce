@@ -24,8 +24,8 @@ NesterovPlaceVars::NesterovPlaceVars()
   targetOverflow(0.1),
   minPhiCoef(0.95),
   maxPhiCoef(1.05),
-  initialPrevCoordiUpdateCoef(100),
   minPreconditioner(1.0),
+  initialPrevCoordiUpdateCoef(100),
   referenceHpwl(44600000) {}
 
 NesterovPlace::NesterovPlace() 

@@ -205,8 +205,8 @@ Instance::setExtId(int extId) {
 
 Pin::Pin()
   : term_(nullptr), inst_(nullptr), net_(nullptr), 
-    offsetCx_(0), offsetCy_(0),
     cx_(0), cy_(0),
+    offsetCx_(0), offsetCy_(0),
     iTermField_(0), bTermField_(0),
     minPinXField_(0), minPinYField_(0),
     maxPinXField_(0), maxPinYField_(0) {}
