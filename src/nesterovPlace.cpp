@@ -518,8 +518,8 @@ NesterovPlace::updateDb() {
     if( gCell->isInstance() ) {
       odb::dbInst* inst = gCell->instance()->dbInst();
       inst->setPlacementStatus(odb::dbPlacementStatus::PLACED); 
-      inst->setLocation( gCell->dCx()-gCell->dx()/2,
-           gCell->dCy()-gCell->dy()/2 ); 
+      inst->setLocation( gCell->dCx()-gCell->dDx()/2,
+           gCell->dCy()-gCell->dDy()/2 ); 
     }
   }
 }
