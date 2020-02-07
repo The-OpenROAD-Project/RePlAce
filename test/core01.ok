@@ -49,15 +49,15 @@ baseWireLengthCoef_ : 2.4649e-06
 InitSumOverflow: 0.961975
 newWireLengthCoef: 2.99433e-07
 wireLengthCoef: 2.99433e-07
-densityPanelty_: 0
+densityPenalty_: 0
 WL GradSum: 0.821554
 De GradSum: 356575
-densityPanelty_: 0
+densityPenalty_: 0
 WL GradSum: 0.821464
 De GradSum: 356555
 wireLengthGradSum_ : 0.821464
 densityGradSum_ : 356555
-initDensityPanelty_ : 2.30389e-08
+initDensityPenalty_ : 2.30389e-08
 PrevSumOverflow: 0.961975
 cDist: 0.0485135
 gDist: 2.33268e-07
@@ -65,7 +65,7 @@ calVal: 207973
 initialStepLength: 207973
 Iter: 1
 stepLength_: 207973
-densityPanelty_: 2.30389e-08
+densityPenalty_: 2.30389e-08
 WL GradSum: 0.799969
 De GradSum: 454228
 cDist: 100.912
@@ -86,7 +86,7 @@ phiCoef: 1.04999
 [NesterovSolve] Iter: 1 overflow: 0.961975 HPWL: 3430514
 Iter: 2
 stepLength_: 2.74577e+06
-densityPanelty_: 2.41906e-08
+densityPenalty_: 2.41906e-08
 WL GradSum: 0.563753
 De GradSum: 1.32661e+06
 cDist: 1665.75
@@ -106,7 +106,7 @@ phiCoef: 1.05
 
 Iter: 3
 stepLength_: 6.79191e+06
-densityPanelty_: 2.54002e-08
+densityPenalty_: 2.54002e-08
 WL GradSum: 0.562234
 De GradSum: 1.64224e+06
 cDist: 2727.36
@@ -126,14 +126,14 @@ phiCoef: 1.05
 
 Iter: 4
 stepLength_: 7.43354e+06
-densityPanelty_: 2.66702e-08
+densityPenalty_: 2.66702e-08
 WL GradSum: 1.52268
 De GradSum: 2.36118e+06
 cDist: 2215.96
 gDist: 0.000699249
 calVal: 3.16905e+06
 newStepLength: 3.16905e+06
-densityPanelty_: 2.66702e-08
+densityPenalty_: 2.66702e-08
 WL GradSum: 0.642619
 De GradSum: 2.10197e+06
 cDist: 969.537
@@ -153,14 +153,14 @@ phiCoef: 1.05
 
 Iter: 5
 stepLength_: 5.00619e+06
-densityPanelty_: 2.80037e-08
+densityPenalty_: 2.80037e-08
 WL GradSum: 1.04571
 De GradSum: 2.30595e+06
 cDist: 1951.68
 gDist: 0.000528031
 calVal: 3.69615e+06
 newStepLength: 3.69615e+06
-densityPanelty_: 2.80037e-08
+densityPenalty_: 2.80037e-08
 WL GradSum: 0.623287
 De GradSum: 2.38966e+06
 cDist: 1466.11
@@ -180,14 +180,14 @@ phiCoef: 1.04977
 
 Iter: 6
 stepLength_: 3.93731e+06
-densityPanelty_: 2.93974e-08
+densityPenalty_: 2.93974e-08
 WL GradSum: 1.14307
 De GradSum: 2.15542e+06
 cDist: 1407.82
 gDist: 0.000630649
 calVal: 2.23234e+06
 newStepLength: 2.23234e+06
-densityPanelty_: 2.93974e-08
+densityPenalty_: 2.93974e-08
 WL GradSum: 0.457095
 De GradSum: 2.21965e+06
 cDist: 852.599
@@ -207,14 +207,14 @@ phiCoef: 1.05
 
 Iter: 7
 stepLength_: 2.57553e+06
-densityPanelty_: 3.08673e-08
+densityPenalty_: 3.08673e-08
 WL GradSum: 0.921979
 De GradSum: 2.0957e+06
 cDist: 824.797
 gDist: 0.000532554
 calVal: 1.54876e+06
 newStepLength: 1.54876e+06
-densityPanelty_: 3.08673e-08
+densityPenalty_: 3.08673e-08
 WL GradSum: 0.392346
 De GradSum: 2.11372e+06
 cDist: 554.696
@@ -234,14 +234,14 @@ phiCoef: 1.05
 
 Iter: 8
 stepLength_: 1.94497e+06
-densityPanelty_: 3.24107e-08
+densityPenalty_: 3.24107e-08
 WL GradSum: 0.466187
 De GradSum: 2.05184e+06
 cDist: 504.926
 gDist: 0.000316454
 calVal: 1.59558e+06
 newStepLength: 1.59558e+06
-densityPanelty_: 3.24107e-08
+densityPenalty_: 3.24107e-08
 WL GradSum: 0.355249
 De GradSum: 2.04972e+06
 cDist: 435.925
@@ -261,14 +261,14 @@ phiCoef: 1.05
 
 Iter: 9
 stepLength_: 1.7661e+06
-densityPanelty_: 3.40312e-08
+densityPenalty_: 3.40312e-08
 WL GradSum: 0.486248
 De GradSum: 2.0047e+06
 cDist: 459.777
 gDist: 0.000331826
 calVal: 1.3856e+06
 newStepLength: 1.3856e+06
-densityPanelty_: 3.40312e-08
+densityPenalty_: 3.40312e-08
 WL GradSum: 0.352677
 De GradSum: 2.00374e+06
 cDist: 379.291
@@ -288,14 +288,14 @@ phiCoef: 1.04998
 
 Iter: 10
 stepLength_: 1.52246e+06
-densityPanelty_: 3.57321e-08
+densityPenalty_: 3.57321e-08
 WL GradSum: 0.34073
 De GradSum: 1.98155e+06
 cDist: 376.331
 gDist: 0.000272746
 calVal: 1.37979e+06
 newStepLength: 1.37979e+06
-densityPanelty_: 3.57321e-08
+densityPenalty_: 3.57321e-08
 WL GradSum: 0.294434
 De GradSum: 1.98021e+06
 cDist: 347.329
@@ -316,14 +316,14 @@ phiCoef: 1.04999
 [NesterovSolve] Iter: 10 overflow: 0.706055 HPWL: 4981122
 Iter: 11
 stepLength_: 1.43958e+06
-densityPanelty_: 3.75184e-08
+densityPenalty_: 3.75184e-08
 WL GradSum: 0.308738
 De GradSum: 1.96037e+06
 cDist: 339.235
 gDist: 0.000254784
 calVal: 1.33146e+06
 newStepLength: 1.33146e+06
-densityPanelty_: 3.75184e-08
+densityPenalty_: 3.75184e-08
 WL GradSum: 0.274004
 De GradSum: 1.96006e+06
 cDist: 318.12
@@ -343,7 +343,7 @@ phiCoef: 1.04998
 
 Iter: 12
 stepLength_: 1.3717e+06
-densityPanelty_: 3.93936e-08
+densityPenalty_: 3.93936e-08
 WL GradSum: 0.248299
 De GradSum: 1.94965e+06
 cDist: 306.201
@@ -363,7 +363,7 @@ phiCoef: 1.05
 
 Iter: 13
 stepLength_: 1.33479e+06
-densityPanelty_: 4.13631e-08
+densityPenalty_: 4.13631e-08
 WL GradSum: 0.239028
 De GradSum: 1.94267e+06
 cDist: 295.999
@@ -383,7 +383,7 @@ phiCoef: 1.04999
 
 Iter: 14
 stepLength_: 1.28599e+06
-densityPanelty_: 4.34308e-08
+densityPenalty_: 4.34308e-08
 WL GradSum: 0.202442
 De GradSum: 1.93536e+06
 cDist: 278.894
@@ -403,7 +403,7 @@ phiCoef: 1.05
 
 Iter: 15
 stepLength_: 1.3061e+06
-densityPanelty_: 4.56022e-08
+densityPenalty_: 4.56022e-08
 WL GradSum: 0.184265
 De GradSum: 1.92978e+06
 cDist: 257.848
@@ -423,7 +423,7 @@ phiCoef: 1.05
 
 Iter: 16
 stepLength_: 1.36554e+06
-densityPanelty_: 4.78821e-08
+densityPenalty_: 4.78821e-08
 WL GradSum: 0.177292
 De GradSum: 1.92245e+06
 cDist: 253.651
@@ -443,7 +443,7 @@ phiCoef: 1.05
 
 Iter: 17
 stepLength_: 1.40575e+06
-densityPanelty_: 5.02761e-08
+densityPenalty_: 5.02761e-08
 WL GradSum: 0.190511
 De GradSum: 1.91452e+06
 cDist: 263.509
@@ -463,7 +463,7 @@ phiCoef: 1.05
 
 Iter: 18
 stepLength_: 1.37097e+06
-densityPanelty_: 5.279e-08
+densityPenalty_: 5.279e-08
 WL GradSum: 0.193701
 De GradSum: 1.90526e+06
 cDist: 275.013
@@ -483,7 +483,7 @@ phiCoef: 1.05
 
 Iter: 19
 stepLength_: 1.32066e+06
-densityPanelty_: 5.54294e-08
+densityPenalty_: 5.54294e-08
 WL GradSum: 0.193382
 De GradSum: 1.89568e+06
 cDist: 275.859
@@ -503,7 +503,7 @@ phiCoef: 1.05
 
 Iter: 20
 stepLength_: 1.30554e+06
-densityPanelty_: 5.82009e-08
+densityPenalty_: 5.82009e-08
 WL GradSum: 0.185704
 De GradSum: 1.88581e+06
 cDist: 268.812
@@ -524,7 +524,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 20 overflow: 0.708937 HPWL: 4947399
 Iter: 21
 stepLength_: 1.32399e+06
-densityPanelty_: 6.11108e-08
+densityPenalty_: 6.11108e-08
 WL GradSum: 0.188678
 De GradSum: 1.87522e+06
 cDist: 264.996
@@ -544,7 +544,7 @@ phiCoef: 1.05
 
 Iter: 22
 stepLength_: 1.34027e+06
-densityPanelty_: 6.41663e-08
+densityPenalty_: 6.41663e-08
 WL GradSum: 0.193603
 De GradSum: 1.86411e+06
 cDist: 268.279
@@ -564,7 +564,7 @@ phiCoef: 1.05
 
 Iter: 23
 stepLength_: 1.32179e+06
-densityPanelty_: 6.73746e-08
+densityPenalty_: 6.73746e-08
 WL GradSum: 0.199798
 De GradSum: 1.85292e+06
 cDist: 273.895
@@ -584,7 +584,7 @@ phiCoef: 1.05
 
 Iter: 24
 stepLength_: 1.28986e+06
-densityPanelty_: 7.07433e-08
+densityPenalty_: 7.07433e-08
 WL GradSum: 0.198584
 De GradSum: 1.8409e+06
 cDist: 273.583
@@ -604,7 +604,7 @@ phiCoef: 1.05
 
 Iter: 25
 stepLength_: 1.27426e+06
-densityPanelty_: 7.42804e-08
+densityPenalty_: 7.42804e-08
 WL GradSum: 0.197833
 De GradSum: 1.83006e+06
 cDist: 266.605
@@ -624,7 +624,7 @@ phiCoef: 1.05
 
 Iter: 26
 stepLength_: 1.27398e+06
-densityPanelty_: 7.79944e-08
+densityPenalty_: 7.79944e-08
 WL GradSum: 0.198478
 De GradSum: 1.81863e+06
 cDist: 256.028
@@ -644,7 +644,7 @@ phiCoef: 1.05
 
 Iter: 27
 stepLength_: 1.26123e+06
-densityPanelty_: 8.18939e-08
+densityPenalty_: 8.18939e-08
 WL GradSum: 0.200068
 De GradSum: 1.80845e+06
 cDist: 248.66
@@ -664,7 +664,7 @@ phiCoef: 1.05
 
 Iter: 28
 stepLength_: 1.26114e+06
-densityPanelty_: 8.59886e-08
+densityPenalty_: 8.59886e-08
 WL GradSum: 0.204061
 De GradSum: 1.79685e+06
 cDist: 240.524
@@ -684,7 +684,7 @@ phiCoef: 1.05
 
 Iter: 29
 stepLength_: 1.25844e+06
-densityPanelty_: 9.02878e-08
+densityPenalty_: 9.02878e-08
 WL GradSum: 0.206749
 De GradSum: 1.78601e+06
 cDist: 235.133
@@ -704,7 +704,7 @@ phiCoef: 1.05
 
 Iter: 30
 stepLength_: 1.26001e+06
-densityPanelty_: 9.48022e-08
+densityPenalty_: 9.48022e-08
 WL GradSum: 0.214957
 De GradSum: 1.7741e+06
 cDist: 230.439
@@ -725,7 +725,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 30 overflow: 0.70117 HPWL: 4970123
 Iter: 31
 stepLength_: 1.25027e+06
-densityPanelty_: 9.95422e-08
+densityPenalty_: 9.95422e-08
 WL GradSum: 0.218359
 De GradSum: 1.7631e+06
 cDist: 226.587
@@ -745,7 +745,7 @@ phiCoef: 1.05
 
 Iter: 32
 stepLength_: 1.23802e+06
-densityPanelty_: 1.04519e-07
+densityPenalty_: 1.04519e-07
 WL GradSum: 0.225754
 De GradSum: 1.75175e+06
 cDist: 222.963
@@ -765,7 +765,7 @@ phiCoef: 1.05
 
 Iter: 33
 stepLength_: 1.24139e+06
-densityPanelty_: 1.09745e-07
+densityPenalty_: 1.09745e-07
 WL GradSum: 0.22975
 De GradSum: 1.741e+06
 cDist: 217.84
@@ -785,7 +785,7 @@ phiCoef: 1.05
 
 Iter: 34
 stepLength_: 1.23761e+06
-densityPanelty_: 1.15232e-07
+densityPenalty_: 1.15232e-07
 WL GradSum: 0.240029
 De GradSum: 1.72967e+06
 cDist: 215.702
@@ -805,7 +805,7 @@ phiCoef: 1.05
 
 Iter: 35
 stepLength_: 1.2326e+06
-densityPanelty_: 1.20994e-07
+densityPenalty_: 1.20994e-07
 WL GradSum: 0.245242
 De GradSum: 1.71878e+06
 cDist: 212.772
@@ -825,7 +825,7 @@ phiCoef: 1.05
 
 Iter: 36
 stepLength_: 1.21166e+06
-densityPanelty_: 1.27044e-07
+densityPenalty_: 1.27044e-07
 WL GradSum: 0.255901
 De GradSum: 1.7079e+06
 cDist: 209.177
@@ -845,7 +845,7 @@ phiCoef: 1.05
 
 Iter: 37
 stepLength_: 1.20038e+06
-densityPanelty_: 1.33396e-07
+densityPenalty_: 1.33396e-07
 WL GradSum: 0.258559
 De GradSum: 1.69712e+06
 cDist: 202.034
@@ -865,7 +865,7 @@ phiCoef: 1.05
 
 Iter: 38
 stepLength_: 1.19362e+06
-densityPanelty_: 1.40065e-07
+densityPenalty_: 1.40065e-07
 WL GradSum: 0.269515
 De GradSum: 1.68712e+06
 cDist: 195.926
@@ -885,7 +885,7 @@ phiCoef: 1.05
 
 Iter: 39
 stepLength_: 1.20056e+06
-densityPanelty_: 1.47069e-07
+densityPenalty_: 1.47069e-07
 WL GradSum: 0.274799
 De GradSum: 1.67673e+06
 cDist: 190.55
@@ -905,7 +905,7 @@ phiCoef: 1.05
 
 Iter: 40
 stepLength_: 1.19663e+06
-densityPanelty_: 1.54422e-07
+densityPenalty_: 1.54422e-07
 WL GradSum: 0.288467
 De GradSum: 1.66682e+06
 cDist: 188.064
@@ -926,7 +926,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 40 overflow: 0.691154 HPWL: 5001456
 Iter: 41
 stepLength_: 1.1878e+06
-densityPanelty_: 1.62143e-07
+densityPenalty_: 1.62143e-07
 WL GradSum: 0.294562
 De GradSum: 1.65593e+06
 cDist: 185.651
@@ -946,7 +946,7 @@ phiCoef: 1.05
 
 Iter: 42
 stepLength_: 1.17495e+06
-densityPanelty_: 1.7025e-07
+densityPenalty_: 1.7025e-07
 WL GradSum: 0.307718
 De GradSum: 1.64503e+06
 cDist: 182.289
@@ -966,7 +966,7 @@ phiCoef: 1.05
 
 Iter: 43
 stepLength_: 1.16737e+06
-densityPanelty_: 1.78763e-07
+densityPenalty_: 1.78763e-07
 WL GradSum: 0.314485
 De GradSum: 1.63322e+06
 cDist: 178.177
@@ -986,7 +986,7 @@ phiCoef: 1.05
 
 Iter: 44
 stepLength_: 1.1622e+06
-densityPanelty_: 1.87701e-07
+densityPenalty_: 1.87701e-07
 WL GradSum: 0.32886
 De GradSum: 1.62149e+06
 cDist: 176.36
@@ -1006,7 +1006,7 @@ phiCoef: 1.05
 
 Iter: 45
 stepLength_: 1.16581e+06
-densityPanelty_: 1.97086e-07
+densityPenalty_: 1.97086e-07
 WL GradSum: 0.338084
 De GradSum: 1.609e+06
 cDist: 176.097
@@ -1026,7 +1026,7 @@ phiCoef: 1.05
 
 Iter: 46
 stepLength_: 1.16115e+06
-densityPanelty_: 2.0694e-07
+densityPenalty_: 2.0694e-07
 WL GradSum: 0.354661
 De GradSum: 1.59646e+06
 cDist: 178.55
@@ -1046,7 +1046,7 @@ phiCoef: 1.05
 
 Iter: 47
 stepLength_: 1.15566e+06
-densityPanelty_: 2.17287e-07
+densityPenalty_: 2.17287e-07
 WL GradSum: 0.364354
 De GradSum: 1.5828e+06
 cDist: 180.926
@@ -1066,7 +1066,7 @@ phiCoef: 1.05
 
 Iter: 48
 stepLength_: 1.14256e+06
-densityPanelty_: 2.28152e-07
+densityPenalty_: 2.28152e-07
 WL GradSum: 0.381996
 De GradSum: 1.56859e+06
 cDist: 183.86
@@ -1086,7 +1086,7 @@ phiCoef: 1.05
 
 Iter: 49
 stepLength_: 1.13953e+06
-densityPanelty_: 2.39559e-07
+densityPenalty_: 2.39559e-07
 WL GradSum: 0.392202
 De GradSum: 1.55242e+06
 cDist: 185.591
@@ -1106,7 +1106,7 @@ phiCoef: 1.05
 
 Iter: 50
 stepLength_: 1.13302e+06
-densityPanelty_: 2.51537e-07
+densityPenalty_: 2.51537e-07
 WL GradSum: 0.411441
 De GradSum: 1.53658e+06
 cDist: 188.742
@@ -1127,7 +1127,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 50 overflow: 0.679462 HPWL: 5048187
 Iter: 51
 stepLength_: 1.12903e+06
-densityPanelty_: 2.64114e-07
+densityPenalty_: 2.64114e-07
 WL GradSum: 0.423889
 De GradSum: 1.52069e+06
 cDist: 191.041
@@ -1147,7 +1147,7 @@ phiCoef: 1.05
 
 Iter: 52
 stepLength_: 1.11386e+06
-densityPanelty_: 2.7732e-07
+densityPenalty_: 2.7732e-07
 WL GradSum: 0.445044
 De GradSum: 1.50588e+06
 cDist: 194.092
@@ -1167,7 +1167,7 @@ phiCoef: 1.05
 
 Iter: 53
 stepLength_: 1.10637e+06
-densityPanelty_: 2.91186e-07
+densityPenalty_: 2.91186e-07
 WL GradSum: 0.456818
 De GradSum: 1.49027e+06
 cDist: 195.325
@@ -1187,7 +1187,7 @@ phiCoef: 1.05
 
 Iter: 54
 stepLength_: 1.09768e+06
-densityPanelty_: 3.05745e-07
+densityPenalty_: 3.05745e-07
 WL GradSum: 0.479866
 De GradSum: 1.47534e+06
 cDist: 197.473
@@ -1207,7 +1207,7 @@ phiCoef: 1.05
 
 Iter: 55
 stepLength_: 1.09503e+06
-densityPanelty_: 3.21032e-07
+densityPenalty_: 3.21032e-07
 WL GradSum: 0.493908
 De GradSum: 1.45925e+06
 cDist: 199.985
@@ -1227,7 +1227,7 @@ phiCoef: 1.05
 
 Iter: 56
 stepLength_: 1.08225e+06
-densityPanelty_: 3.37084e-07
+densityPenalty_: 3.37084e-07
 WL GradSum: 0.519019
 De GradSum: 1.44323e+06
 cDist: 204.499
@@ -1247,7 +1247,7 @@ phiCoef: 1.05
 
 Iter: 57
 stepLength_: 1.07123e+06
-densityPanelty_: 3.53938e-07
+densityPenalty_: 3.53938e-07
 WL GradSum: 0.534419
 De GradSum: 1.42685e+06
 cDist: 207.234
@@ -1267,7 +1267,7 @@ phiCoef: 1.05
 
 Iter: 58
 stepLength_: 1.05288e+06
-densityPanelty_: 3.71635e-07
+densityPenalty_: 3.71635e-07
 WL GradSum: 0.559139
 De GradSum: 1.41082e+06
 cDist: 209.955
@@ -1287,7 +1287,7 @@ phiCoef: 1.05
 
 Iter: 59
 stepLength_: 1.04052e+06
-densityPanelty_: 3.90217e-07
+densityPenalty_: 3.90217e-07
 WL GradSum: 0.573197
 De GradSum: 1.39488e+06
 cDist: 209.591
@@ -1307,7 +1307,7 @@ phiCoef: 1.05
 
 Iter: 60
 stepLength_: 1.02043e+06
-densityPanelty_: 4.09728e-07
+densityPenalty_: 4.09728e-07
 WL GradSum: 0.598015
 De GradSum: 1.3791e+06
 cDist: 208.261
@@ -1328,7 +1328,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 60 overflow: 0.659568 HPWL: 5110617
 Iter: 61
 stepLength_: 1.01241e+06
-densityPanelty_: 4.30214e-07
+densityPenalty_: 4.30214e-07
 WL GradSum: 0.612603
 De GradSum: 1.36291e+06
 cDist: 203.628
@@ -1348,7 +1348,7 @@ phiCoef: 1.05
 
 Iter: 62
 stepLength_: 1.00121e+06
-densityPanelty_: 4.51725e-07
+densityPenalty_: 4.51725e-07
 WL GradSum: 0.640226
 De GradSum: 1.34722e+06
 cDist: 199.795
@@ -1368,7 +1368,7 @@ phiCoef: 1.05
 
 Iter: 63
 stepLength_: 987694
-densityPanelty_: 4.74311e-07
+densityPenalty_: 4.74311e-07
 WL GradSum: 0.655861
 De GradSum: 1.33095e+06
 cDist: 195.594
@@ -1388,7 +1388,7 @@ phiCoef: 1.05
 
 Iter: 64
 stepLength_: 969145
-densityPanelty_: 4.98026e-07
+densityPenalty_: 4.98026e-07
 WL GradSum: 0.684894
 De GradSum: 1.31519e+06
 cDist: 191.557
@@ -1408,7 +1408,7 @@ phiCoef: 1.05
 
 Iter: 65
 stepLength_: 958850
-densityPanelty_: 5.22928e-07
+densityPenalty_: 5.22928e-07
 WL GradSum: 0.701946
 De GradSum: 1.29934e+06
 cDist: 186.658
@@ -1428,7 +1428,7 @@ phiCoef: 1.05
 
 Iter: 66
 stepLength_: 946083
-densityPanelty_: 5.49074e-07
+densityPenalty_: 5.49074e-07
 WL GradSum: 0.731364
 De GradSum: 1.28377e+06
 cDist: 179.955
@@ -1448,7 +1448,7 @@ phiCoef: 1.05
 
 Iter: 67
 stepLength_: 917616
-densityPanelty_: 5.76528e-07
+densityPenalty_: 5.76528e-07
 WL GradSum: 0.747978
 De GradSum: 1.2683e+06
 cDist: 173.571
@@ -1468,7 +1468,7 @@ phiCoef: 1.05
 
 Iter: 68
 stepLength_: 907917
-densityPanelty_: 6.05354e-07
+densityPenalty_: 6.05354e-07
 WL GradSum: 0.779378
 De GradSum: 1.25277e+06
 cDist: 166.197
@@ -1488,7 +1488,7 @@ phiCoef: 1.05
 
 Iter: 69
 stepLength_: 909903
-densityPanelty_: 6.35622e-07
+densityPenalty_: 6.35622e-07
 WL GradSum: 0.799487
 De GradSum: 1.23788e+06
 cDist: 156.083
@@ -1508,7 +1508,7 @@ phiCoef: 1.05
 
 Iter: 70
 stepLength_: 870965
-densityPanelty_: 6.67403e-07
+densityPenalty_: 6.67403e-07
 WL GradSum: 0.826671
 De GradSum: 1.22248e+06
 cDist: 152.917
@@ -1529,7 +1529,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 70 overflow: 0.633137 HPWL: 5181267
 Iter: 71
 stepLength_: 883191
-densityPanelty_: 7.00773e-07
+densityPenalty_: 7.00773e-07
 WL GradSum: 0.849612
 De GradSum: 1.2072e+06
 cDist: 148.667
@@ -1549,7 +1549,7 @@ phiCoef: 1.05
 
 Iter: 72
 stepLength_: 904991
-densityPanelty_: 7.35812e-07
+densityPenalty_: 7.35812e-07
 WL GradSum: 0.885751
 De GradSum: 1.19073e+06
 cDist: 151.634
@@ -1569,7 +1569,7 @@ phiCoef: 1.05
 
 Iter: 73
 stepLength_: 896424
-densityPanelty_: 7.72602e-07
+densityPenalty_: 7.72602e-07
 WL GradSum: 0.917121
 De GradSum: 1.17431e+06
 cDist: 159.397
@@ -1589,7 +1589,7 @@ phiCoef: 1.05
 
 Iter: 74
 stepLength_: 859286
-densityPanelty_: 8.11232e-07
+densityPenalty_: 8.11232e-07
 WL GradSum: 0.956296
 De GradSum: 1.15688e+06
 cDist: 165.114
@@ -1609,7 +1609,7 @@ phiCoef: 1.05
 
 Iter: 75
 stepLength_: 838278
-densityPanelty_: 8.51794e-07
+densityPenalty_: 8.51794e-07
 WL GradSum: 0.985151
 De GradSum: 1.14032e+06
 cDist: 164.409
@@ -1629,7 +1629,7 @@ phiCoef: 1.05
 
 Iter: 76
 stepLength_: 830149
-densityPanelty_: 8.94383e-07
+densityPenalty_: 8.94383e-07
 WL GradSum: 1.02431
 De GradSum: 1.12334e+06
 cDist: 163.947
@@ -1649,7 +1649,7 @@ phiCoef: 1.05
 
 Iter: 77
 stepLength_: 831373
-densityPanelty_: 9.39103e-07
+densityPenalty_: 9.39103e-07
 WL GradSum: 1.05746
 De GradSum: 1.10731e+06
 cDist: 165.935
@@ -1669,7 +1669,7 @@ phiCoef: 1.05
 
 Iter: 78
 stepLength_: 818055
-densityPanelty_: 9.86058e-07
+densityPenalty_: 9.86058e-07
 WL GradSum: 1.10365
 De GradSum: 1.09136e+06
 cDist: 170.877
@@ -1689,7 +1689,7 @@ phiCoef: 1.05
 
 Iter: 79
 stepLength_: 797251
-densityPanelty_: 1.03536e-06
+densityPenalty_: 1.03536e-06
 WL GradSum: 1.13694
 De GradSum: 1.07628e+06
 cDist: 173.733
@@ -1709,7 +1709,7 @@ phiCoef: 1.05
 
 Iter: 80
 stepLength_: 774278
-densityPanelty_: 1.08713e-06
+densityPenalty_: 1.08713e-06
 WL GradSum: 1.18501
 De GradSum: 1.06111e+06
 cDist: 174.531
@@ -1730,7 +1730,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 80 overflow: 0.602937 HPWL: 5268658
 Iter: 81
 stepLength_: 763897
-densityPanelty_: 1.14148e-06
+densityPenalty_: 1.14148e-06
 WL GradSum: 1.21515
 De GradSum: 1.04734e+06
 cDist: 171.99
@@ -1750,7 +1750,7 @@ phiCoef: 1.05
 
 Iter: 82
 stepLength_: 747581
-densityPanelty_: 1.19856e-06
+densityPenalty_: 1.19856e-06
 WL GradSum: 1.26177
 De GradSum: 1.03306e+06
 cDist: 170.61
@@ -1770,7 +1770,7 @@ phiCoef: 1.05
 
 Iter: 83
 stepLength_: 735860
-densityPanelty_: 1.25849e-06
+densityPenalty_: 1.25849e-06
 WL GradSum: 1.29678
 De GradSum: 1.01908e+06
 cDist: 166.701
@@ -1790,7 +1790,7 @@ phiCoef: 1.05
 
 Iter: 84
 stepLength_: 716564
-densityPanelty_: 1.32141e-06
+densityPenalty_: 1.32141e-06
 WL GradSum: 1.3508
 De GradSum: 1.00574e+06
 cDist: 163.102
@@ -1810,7 +1810,7 @@ phiCoef: 1.05
 
 Iter: 85
 stepLength_: 706794
-densityPanelty_: 1.38748e-06
+densityPenalty_: 1.38748e-06
 WL GradSum: 1.38843
 De GradSum: 993128
 cDist: 156.633
@@ -1830,7 +1830,7 @@ phiCoef: 1.05
 
 Iter: 86
 stepLength_: 688636
-densityPanelty_: 1.45686e-06
+densityPenalty_: 1.45686e-06
 WL GradSum: 1.44418
 De GradSum: 980105
 cDist: 152.278
@@ -1850,7 +1850,7 @@ phiCoef: 1.05
 
 Iter: 87
 stepLength_: 678706
-densityPanelty_: 1.5297e-06
+densityPenalty_: 1.5297e-06
 WL GradSum: 1.48787
 De GradSum: 967674
 cDist: 147.199
@@ -1870,7 +1870,7 @@ phiCoef: 1.05
 
 Iter: 88
 stepLength_: 664394
-densityPanelty_: 1.60618e-06
+densityPenalty_: 1.60618e-06
 WL GradSum: 1.54604
 De GradSum: 955184
 cDist: 145.18
@@ -1890,7 +1890,7 @@ phiCoef: 1.05
 
 Iter: 89
 stepLength_: 660554
-densityPanelty_: 1.68649e-06
+densityPenalty_: 1.68649e-06
 WL GradSum: 1.59404
 De GradSum: 942999
 cDist: 143.475
@@ -1910,7 +1910,7 @@ phiCoef: 1.05
 
 Iter: 90
 stepLength_: 647057
-densityPanelty_: 1.77082e-06
+densityPenalty_: 1.77082e-06
 WL GradSum: 1.65586
 De GradSum: 930352
 cDist: 146.197
@@ -1931,7 +1931,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 90 overflow: 0.566158 HPWL: 5361592
 Iter: 91
 stepLength_: 641045
-densityPanelty_: 1.85936e-06
+densityPenalty_: 1.85936e-06
 WL GradSum: 1.70956
 De GradSum: 917772
 cDist: 147.791
@@ -1951,7 +1951,7 @@ phiCoef: 1.05
 
 Iter: 92
 stepLength_: 621085
-densityPanelty_: 1.95233e-06
+densityPenalty_: 1.95233e-06
 WL GradSum: 1.78202
 De GradSum: 905940
 cDist: 150.112
@@ -1971,7 +1971,7 @@ phiCoef: 1.05
 
 Iter: 93
 stepLength_: 604164
-densityPanelty_: 2.04994e-06
+densityPenalty_: 2.04994e-06
 WL GradSum: 1.83927
 De GradSum: 894745
 cDist: 147.213
@@ -1991,7 +1991,7 @@ phiCoef: 1.05
 
 Iter: 94
 stepLength_: 580835
-densityPanelty_: 2.15244e-06
+densityPenalty_: 2.15244e-06
 WL GradSum: 1.90811
 De GradSum: 883878
 cDist: 142.809
@@ -2011,7 +2011,7 @@ phiCoef: 1.05
 
 Iter: 95
 stepLength_: 574104
-densityPanelty_: 2.26006e-06
+densityPenalty_: 2.26006e-06
 WL GradSum: 1.96304
 De GradSum: 872868
 cDist: 135.39
@@ -2031,7 +2031,7 @@ phiCoef: 1.05
 
 Iter: 96
 stepLength_: 566163
-densityPanelty_: 2.37306e-06
+densityPenalty_: 2.37306e-06
 WL GradSum: 2.02788
 De GradSum: 861291
 cDist: 133.3
@@ -2051,7 +2051,7 @@ phiCoef: 1.05
 
 Iter: 97
 stepLength_: 572160
-densityPanelty_: 2.49172e-06
+densityPenalty_: 2.49172e-06
 WL GradSum: 2.09648
 De GradSum: 847993
 cDist: 134.066
@@ -2071,7 +2071,7 @@ phiCoef: 1.05
 
 Iter: 98
 stepLength_: 565404
-densityPanelty_: 2.6163e-06
+densityPenalty_: 2.6163e-06
 WL GradSum: 2.17889
 De GradSum: 834336
 cDist: 140.298
@@ -2091,7 +2091,7 @@ phiCoef: 1.05
 
 Iter: 99
 stepLength_: 553361
-densityPanelty_: 2.74712e-06
+densityPenalty_: 2.74712e-06
 WL GradSum: 2.26441
 De GradSum: 820789
 cDist: 144.402
@@ -2111,7 +2111,7 @@ phiCoef: 1.05
 
 Iter: 100
 stepLength_: 526556
-densityPanelty_: 2.88447e-06
+densityPenalty_: 2.88447e-06
 WL GradSum: 2.35331
 De GradSum: 808662
 cDist: 145.348
@@ -2132,7 +2132,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 100 overflow: 0.525935 HPWL: 5470961
 Iter: 101
 stepLength_: 508503
-densityPanelty_: 3.0287e-06
+densityPenalty_: 3.0287e-06
 WL GradSum: 2.43003
 De GradSum: 797189
 cDist: 140.004
@@ -2152,7 +2152,7 @@ phiCoef: 1.05
 
 Iter: 102
 stepLength_: 496680
-densityPanelty_: 3.18013e-06
+densityPenalty_: 3.18013e-06
 WL GradSum: 2.50884
 De GradSum: 786295
 cDist: 134.029
@@ -2172,7 +2172,7 @@ phiCoef: 1.05
 
 Iter: 103
 stepLength_: 493568
-densityPanelty_: 3.33914e-06
+densityPenalty_: 3.33914e-06
 WL GradSum: 2.59128
 De GradSum: 775347
 cDist: 129.004
@@ -2192,7 +2192,7 @@ phiCoef: 1.05
 
 Iter: 104
 stepLength_: 484205
-densityPanelty_: 3.50609e-06
+densityPenalty_: 3.50609e-06
 WL GradSum: 2.67048
 De GradSum: 764584
 cDist: 128.032
@@ -2212,7 +2212,7 @@ phiCoef: 1.05
 
 Iter: 105
 stepLength_: 478061
-densityPanelty_: 3.6814e-06
+densityPenalty_: 3.6814e-06
 WL GradSum: 2.76608
 De GradSum: 753088
 cDist: 127.199
@@ -2232,7 +2232,7 @@ phiCoef: 1.05
 
 Iter: 106
 stepLength_: 466686
-densityPanelty_: 3.86547e-06
+densityPenalty_: 3.86547e-06
 WL GradSum: 2.85859
 De GradSum: 742002
 cDist: 127.451
@@ -2252,7 +2252,7 @@ phiCoef: 1.05
 
 Iter: 107
 stepLength_: 456802
-densityPanelty_: 4.05874e-06
+densityPenalty_: 4.05874e-06
 WL GradSum: 2.97091
 De GradSum: 730884
 cDist: 125.386
@@ -2272,7 +2272,7 @@ phiCoef: 1.05
 
 Iter: 108
 stepLength_: 440110
-densityPanelty_: 4.26168e-06
+densityPenalty_: 4.26168e-06
 WL GradSum: 3.0563
 De GradSum: 720560
 cDist: 122.556
@@ -2292,7 +2292,7 @@ phiCoef: 1.05
 
 Iter: 109
 stepLength_: 429356
-densityPanelty_: 4.47476e-06
+densityPenalty_: 4.47476e-06
 WL GradSum: 3.16058
 De GradSum: 709796
 cDist: 118.351
@@ -2312,7 +2312,7 @@ phiCoef: 1.05
 
 Iter: 110
 stepLength_: 425890
-densityPanelty_: 4.6985e-06
+densityPenalty_: 4.6985e-06
 WL GradSum: 3.25958
 De GradSum: 698469
 cDist: 116.268
@@ -2333,7 +2333,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 110 overflow: 0.483519 HPWL: 5582394
 Iter: 111
 stepLength_: 426378
-densityPanelty_: 4.93342e-06
+densityPenalty_: 4.93342e-06
 WL GradSum: 3.39768
 De GradSum: 687820
 cDist: 115.167
@@ -2353,7 +2353,7 @@ phiCoef: 1.05
 
 Iter: 112
 stepLength_: 408161
-densityPanelty_: 5.1801e-06
+densityPenalty_: 5.1801e-06
 WL GradSum: 3.50041
 De GradSum: 677931
 cDist: 114.76
@@ -2373,7 +2373,7 @@ phiCoef: 1.05
 
 Iter: 113
 stepLength_: 388262
-densityPanelty_: 5.4391e-06
+densityPenalty_: 5.4391e-06
 WL GradSum: 3.62607
 De GradSum: 668129
 cDist: 110.927
@@ -2393,7 +2393,7 @@ phiCoef: 1.05
 
 Iter: 114
 stepLength_: 380922
-densityPanelty_: 5.71105e-06
+densityPenalty_: 5.71105e-06
 WL GradSum: 3.72128
 De GradSum: 658040
 cDist: 106.068
@@ -2413,7 +2413,7 @@ phiCoef: 1.05
 
 Iter: 115
 stepLength_: 386080
-densityPanelty_: 5.99661e-06
+densityPenalty_: 5.99661e-06
 WL GradSum: 3.86785
 De GradSum: 647687
 cDist: 104.54
@@ -2433,7 +2433,7 @@ phiCoef: 1.05
 
 Iter: 116
 stepLength_: 384847
-densityPanelty_: 6.29644e-06
+densityPenalty_: 6.29644e-06
 WL GradSum: 3.98866
 De GradSum: 637789
 cDist: 107.316
@@ -2453,14 +2453,14 @@ phiCoef: 1.05
 
 Iter: 117
 stepLength_: 368058
-densityPanelty_: 6.61126e-06
+densityPenalty_: 6.61126e-06
 WL GradSum: 4.13914
 De GradSum: 628434
 cDist: 109.358
 gDist: 0.000314676
 calVal: 347525
 newStepLength: 347525
-densityPanelty_: 6.61126e-06
+densityPenalty_: 6.61126e-06
 WL GradSum: 4.1332
 De GradSum: 628430
 cDist: 104.51
@@ -2480,7 +2480,7 @@ phiCoef: 1.05
 
 Iter: 118
 stepLength_: 358334
-densityPanelty_: 6.94182e-06
+densityPenalty_: 6.94182e-06
 WL GradSum: 4.23773
 De GradSum: 618992
 cDist: 101.388
@@ -2500,7 +2500,7 @@ phiCoef: 1.05
 
 Iter: 119
 stepLength_: 364642
-densityPanelty_: 7.28891e-06
+densityPenalty_: 7.28891e-06
 WL GradSum: 4.39289
 De GradSum: 608511
 cDist: 106.669
@@ -2520,14 +2520,14 @@ phiCoef: 1.05
 
 Iter: 120
 stepLength_: 356296
-densityPanelty_: 7.65336e-06
+densityPenalty_: 7.65336e-06
 WL GradSum: 4.52328
 De GradSum: 598021
 cDist: 115.117
 gDist: 0.000341913
 calVal: 336684
 newStepLength: 336684
-densityPanelty_: 7.65336e-06
+densityPenalty_: 7.65336e-06
 WL GradSum: 4.51635
 De GradSum: 598089
 cDist: 110.192
@@ -2548,7 +2548,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 120 overflow: 0.441167 HPWL: 5692033
 Iter: 121
 stepLength_: 347505
-densityPanelty_: 8.03603e-06
+densityPenalty_: 8.03603e-06
 WL GradSum: 4.68791
 De GradSum: 587629
 cDist: 111.93
@@ -2568,14 +2568,14 @@ phiCoef: 1.05
 
 Iter: 122
 stepLength_: 338304
-densityPanelty_: 8.43783e-06
+densityPenalty_: 8.43783e-06
 WL GradSum: 4.83091
 De GradSum: 577416
 cDist: 117.972
 gDist: 0.000368131
 calVal: 320463
 newStepLength: 320463
-densityPanelty_: 8.43783e-06
+densityPenalty_: 8.43783e-06
 WL GradSum: 4.82367
 De GradSum: 577450
 cDist: 113.161
@@ -2595,7 +2595,7 @@ phiCoef: 1.05
 
 Iter: 123
 stepLength_: 330230
-densityPanelty_: 8.85972e-06
+densityPenalty_: 8.85972e-06
 WL GradSum: 5.00531
 De GradSum: 567675
 cDist: 112.647
@@ -2615,7 +2615,7 @@ phiCoef: 1.05
 
 Iter: 124
 stepLength_: 320572
-densityPanelty_: 9.3027e-06
+densityPenalty_: 9.3027e-06
 WL GradSum: 5.14809
 De GradSum: 558026
 cDist: 116.664
@@ -2635,7 +2635,7 @@ phiCoef: 1.05
 
 Iter: 125
 stepLength_: 306038
-densityPanelty_: 9.76784e-06
+densityPenalty_: 9.76784e-06
 WL GradSum: 5.33643
 De GradSum: 548330
 cDist: 117.904
@@ -2655,7 +2655,7 @@ phiCoef: 1.05
 
 Iter: 126
 stepLength_: 294705
-densityPanelty_: 1.02562e-05
+densityPenalty_: 1.02562e-05
 WL GradSum: 5.4875
 De GradSum: 539162
 cDist: 115.585
@@ -2675,7 +2675,7 @@ phiCoef: 1.05
 
 Iter: 127
 stepLength_: 292306
-densityPanelty_: 1.0769e-05
+densityPenalty_: 1.0769e-05
 WL GradSum: 5.67242
 De GradSum: 530104
 cDist: 111.736
@@ -2695,7 +2695,7 @@ phiCoef: 1.05
 
 Iter: 128
 stepLength_: 288532
-densityPanelty_: 1.13075e-05
+densityPenalty_: 1.13075e-05
 WL GradSum: 5.83327
 De GradSum: 521113
 cDist: 112.189
@@ -2715,7 +2715,7 @@ phiCoef: 1.05
 
 Iter: 129
 stepLength_: 287183
-densityPanelty_: 1.18729e-05
+densityPenalty_: 1.18729e-05
 WL GradSum: 6.06134
 De GradSum: 512190
 cDist: 113.125
@@ -2735,7 +2735,7 @@ phiCoef: 1.05
 
 Iter: 130
 stepLength_: 275295
-densityPanelty_: 1.24665e-05
+densityPenalty_: 1.24665e-05
 WL GradSum: 6.24636
 De GradSum: 504359
 cDist: 113.966
@@ -2756,7 +2756,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 130 overflow: 0.397828 HPWL: 5807149
 Iter: 131
 stepLength_: 262051
-densityPanelty_: 1.30898e-05
+densityPenalty_: 1.30898e-05
 WL GradSum: 6.45087
 De GradSum: 496344
 cDist: 110.876
@@ -2776,7 +2776,7 @@ phiCoef: 1.05
 
 Iter: 132
 stepLength_: 255271
-densityPanelty_: 1.37443e-05
+densityPenalty_: 1.37443e-05
 WL GradSum: 6.64694
 De GradSum: 488090
 cDist: 108.061
@@ -2796,7 +2796,7 @@ phiCoef: 1.05
 
 Iter: 133
 stepLength_: 262330
-densityPanelty_: 1.44315e-05
+densityPenalty_: 1.44315e-05
 WL GradSum: 6.90415
 De GradSum: 479876
 cDist: 105.658
@@ -2816,14 +2816,14 @@ phiCoef: 1.05
 
 Iter: 134
 stepLength_: 255235
-densityPanelty_: 1.51531e-05
+densityPenalty_: 1.51531e-05
 WL GradSum: 7.10609
 De GradSum: 473106
 cDist: 107.954
 gDist: 0.000449977
 calVal: 239909
 newStepLength: 239909
-densityPanelty_: 1.51531e-05
+densityPenalty_: 1.51531e-05
 WL GradSum: 7.10605
 De GradSum: 473043
 cDist: 102.966
@@ -2843,7 +2843,7 @@ phiCoef: 1.05
 
 Iter: 135
 stepLength_: 248487
-densityPanelty_: 1.59108e-05
+densityPenalty_: 1.59108e-05
 WL GradSum: 7.30285
 De GradSum: 465641
 cDist: 101.004
@@ -2863,7 +2863,7 @@ phiCoef: 1.05
 
 Iter: 136
 stepLength_: 247169
-densityPanelty_: 1.67063e-05
+densityPenalty_: 1.67063e-05
 WL GradSum: 7.51006
 De GradSum: 457093
 cDist: 109.759
@@ -2883,14 +2883,14 @@ phiCoef: 1.05
 
 Iter: 137
 stepLength_: 248710
-densityPanelty_: 1.75416e-05
+densityPenalty_: 1.75416e-05
 WL GradSum: 7.80887
 De GradSum: 448262
 cDist: 118.257
 gDist: 0.000509665
 calVal: 232028
 newStepLength: 232028
-densityPanelty_: 1.75416e-05
+densityPenalty_: 1.75416e-05
 WL GradSum: 7.79674
 De GradSum: 448368
 cDist: 112.179
@@ -2910,14 +2910,14 @@ phiCoef: 1.05
 
 Iter: 138
 stepLength_: 241246
-densityPanelty_: 1.84187e-05
+densityPenalty_: 1.84187e-05
 WL GradSum: 8.03948
 De GradSum: 440995
 cDist: 114.365
 gDist: 0.000499997
 calVal: 228731
 newStepLength: 228731
-densityPanelty_: 1.84187e-05
+densityPenalty_: 1.84187e-05
 WL GradSum: 8.03804
 De GradSum: 440994
 cDist: 109.964
@@ -2937,14 +2937,14 @@ phiCoef: 1.05
 
 Iter: 139
 stepLength_: 236040
-densityPanelty_: 1.93396e-05
+densityPenalty_: 1.93396e-05
 WL GradSum: 8.30503
 De GradSum: 433713
 cDist: 112.443
 gDist: 0.000507486
 calVal: 221569
 newStepLength: 221569
-densityPanelty_: 1.93396e-05
+densityPenalty_: 1.93396e-05
 WL GradSum: 8.29477
 De GradSum: 433719
 cDist: 107.388
@@ -2964,7 +2964,7 @@ phiCoef: 1.05
 
 Iter: 140
 stepLength_: 230077
-densityPanelty_: 2.03066e-05
+densityPenalty_: 2.03066e-05
 WL GradSum: 8.52155
 De GradSum: 425860
 cDist: 112.375
@@ -2985,14 +2985,14 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 140 overflow: 0.35306 HPWL: 5917910
 Iter: 141
 stepLength_: 225284
-densityPanelty_: 2.1322e-05
+densityPenalty_: 2.1322e-05
 WL GradSum: 8.86472
 De GradSum: 417692
 cDist: 121.03
 gDist: 0.000579737
 calVal: 208768
 newStepLength: 208768
-densityPanelty_: 2.1322e-05
+densityPenalty_: 2.1322e-05
 WL GradSum: 8.84949
 De GradSum: 417735
 cDist: 114.218
@@ -3012,7 +3012,7 @@ phiCoef: 1.05
 
 Iter: 142
 stepLength_: 217685
-densityPanelty_: 2.2388e-05
+densityPenalty_: 2.2388e-05
 WL GradSum: 9.0937
 De GradSum: 410451
 cDist: 112.746
@@ -3032,14 +3032,14 @@ phiCoef: 1.05
 
 Iter: 143
 stepLength_: 207075
-densityPanelty_: 2.35074e-05
+densityPenalty_: 2.35074e-05
 WL GradSum: 9.42498
 De GradSum: 403848
 cDist: 116.284
 gDist: 0.000600958
 calVal: 193498
 newStepLength: 193498
-densityPanelty_: 2.35074e-05
+densityPenalty_: 2.35074e-05
 WL GradSum: 9.4112
 De GradSum: 403813
 cDist: 110.308
@@ -3059,7 +3059,7 @@ phiCoef: 1.05
 
 Iter: 144
 stepLength_: 200849
-densityPanelty_: 2.46828e-05
+densityPenalty_: 2.46828e-05
 WL GradSum: 9.63012
 De GradSum: 395964
 cDist: 108.9
@@ -3079,14 +3079,14 @@ phiCoef: 1.05
 
 Iter: 145
 stepLength_: 203923
-densityPanelty_: 2.5917e-05
+densityPenalty_: 2.5917e-05
 WL GradSum: 10.0395
 De GradSum: 389207
 cDist: 115.591
 gDist: 0.000600317
 calVal: 192550
 newStepLength: 192550
-densityPanelty_: 2.5917e-05
+densityPenalty_: 2.5917e-05
 WL GradSum: 10.0281
 De GradSum: 389167
 cDist: 110.828
@@ -3106,14 +3106,14 @@ phiCoef: 1.05
 
 Iter: 146
 stepLength_: 199276
-densityPanelty_: 2.72128e-05
+densityPenalty_: 2.72128e-05
 WL GradSum: 10.25
 De GradSum: 381554
 cDist: 117.137
 gDist: 0.000623939
 calVal: 187738
 newStepLength: 187738
-densityPanelty_: 2.72128e-05
+densityPenalty_: 2.72128e-05
 WL GradSum: 10.2497
 De GradSum: 381544
 cDist: 112.07
@@ -3133,14 +3133,14 @@ phiCoef: 1.05
 
 Iter: 147
 stepLength_: 193744
-densityPanelty_: 2.85734e-05
+densityPenalty_: 2.85734e-05
 WL GradSum: 10.6728
 De GradSum: 375087
 cDist: 117.514
 gDist: 0.000645148
 calVal: 182150
 newStepLength: 182150
-densityPanelty_: 2.85734e-05
+densityPenalty_: 2.85734e-05
 WL GradSum: 10.662
 De GradSum: 374983
 cDist: 112.335
@@ -3160,14 +3160,14 @@ phiCoef: 1.05
 
 Iter: 148
 stepLength_: 189511
-densityPanelty_: 3.00021e-05
+densityPenalty_: 3.00021e-05
 WL GradSum: 10.8372
 De GradSum: 368179
 cDist: 114.456
 gDist: 0.000650265
 calVal: 176014
 newStepLength: 176014
-densityPanelty_: 3.00021e-05
+densityPenalty_: 3.00021e-05
 WL GradSum: 10.8391
 De GradSum: 368130
 cDist: 108.433
@@ -3187,7 +3187,7 @@ phiCoef: 1.05
 
 Iter: 149
 stepLength_: 183321
-densityPanelty_: 3.15022e-05
+densityPenalty_: 3.15022e-05
 WL GradSum: 11.2524
 De GradSum: 360342
 cDist: 114.723
@@ -3207,14 +3207,14 @@ phiCoef: 1.05
 
 Iter: 150
 stepLength_: 183160
-densityPanelty_: 3.30773e-05
+densityPenalty_: 3.30773e-05
 WL GradSum: 11.4659
 De GradSum: 353323
 cDist: 122.276
 gDist: 0.000736082
 calVal: 166117
 newStepLength: 166117
-densityPanelty_: 3.30773e-05
+densityPenalty_: 3.30773e-05
 WL GradSum: 11.4658
 De GradSum: 353215
 cDist: 113.567
@@ -3235,7 +3235,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 150 overflow: 0.310414 HPWL: 6031826
 Iter: 151
 stepLength_: 174949
-densityPanelty_: 3.47312e-05
+densityPenalty_: 3.47312e-05
 WL GradSum: 11.845
 De GradSum: 344925
 cDist: 123.469
@@ -3255,7 +3255,7 @@ phiCoef: 1.05
 
 Iter: 152
 stepLength_: 183086
-densityPanelty_: 3.64678e-05
+densityPenalty_: 3.64678e-05
 WL GradSum: 12.0415
 De GradSum: 339704
 cDist: 154.407
@@ -3275,14 +3275,14 @@ phiCoef: 1.05
 
 Iter: 153
 stepLength_: 184223
-densityPanelty_: 3.82911e-05
+densityPenalty_: 3.82911e-05
 WL GradSum: 12.5162
 De GradSum: 327024
 cDist: 211.019
 gDist: 0.00123395
 calVal: 171010
 newStepLength: 171010
-densityPanelty_: 3.82911e-05
+densityPenalty_: 3.82911e-05
 WL GradSum: 12.4973
 De GradSum: 327299
 cDist: 199.154
@@ -3302,14 +3302,14 @@ phiCoef: 1.05
 
 Iter: 154
 stepLength_: 176767
-densityPanelty_: 4.02057e-05
+densityPenalty_: 4.02057e-05
 WL GradSum: 12.8016
 De GradSum: 322299
 cDist: 240.569
 gDist: 0.00154347
 calVal: 155863
 newStepLength: 155863
-densityPanelty_: 4.02057e-05
+densityPenalty_: 4.02057e-05
 WL GradSum: 12.8019
 De GradSum: 321871
 cDist: 217.488
@@ -3329,7 +3329,7 @@ phiCoef: 1.05
 
 Iter: 155
 stepLength_: 165788
-densityPanelty_: 4.2216e-05
+densityPenalty_: 4.2216e-05
 WL GradSum: 13.088
 De GradSum: 311120
 cDist: 258.388
@@ -3349,14 +3349,14 @@ phiCoef: 1.05
 
 Iter: 156
 stepLength_: 166312
-densityPanelty_: 4.43268e-05
+densityPenalty_: 4.43268e-05
 WL GradSum: 13.2503
 De GradSum: 305928
 cDist: 313.606
 gDist: 0.00226805
 calVal: 138271
 newStepLength: 138271
-densityPanelty_: 4.43268e-05
+densityPenalty_: 4.43268e-05
 WL GradSum: 13.241
 De GradSum: 305486
 cDist: 271.365
@@ -3376,7 +3376,7 @@ phiCoef: 1.05
 
 Iter: 157
 stepLength_: 152681
-densityPanelty_: 4.65431e-05
+densityPenalty_: 4.65431e-05
 WL GradSum: 13.8022
 De GradSum: 296962
 cDist: 314.188
@@ -3396,14 +3396,14 @@ phiCoef: 1.05
 
 Iter: 158
 stepLength_: 151886
-densityPanelty_: 4.88703e-05
+densityPenalty_: 4.88703e-05
 WL GradSum: 13.6984
 De GradSum: 292185
 cDist: 356.092
 gDist: 0.0028858
 calVal: 123395
 newStepLength: 123395
-densityPanelty_: 4.88703e-05
+densityPenalty_: 4.88703e-05
 WL GradSum: 13.6566
 De GradSum: 291487
 cDist: 301.672
@@ -3423,14 +3423,14 @@ phiCoef: 1.05
 
 Iter: 159
 stepLength_: 139458
-densityPanelty_: 5.13138e-05
+densityPenalty_: 5.13138e-05
 WL GradSum: 14.4053
 De GradSum: 281512
 cDist: 303.342
 gDist: 0.00233744
 calVal: 129775
 newStepLength: 129775
-densityPanelty_: 5.13138e-05
+densityPenalty_: 5.13138e-05
 WL GradSum: 14.3957
 De GradSum: 281285
 cDist: 287.325
@@ -3450,14 +3450,14 @@ phiCoef: 1.05
 
 Iter: 160
 stepLength_: 136011
-densityPanelty_: 5.38795e-05
+densityPenalty_: 5.38795e-05
 WL GradSum: 14.668
 De GradSum: 274270
 cDist: 296.832
 gDist: 0.00252021
 calVal: 117781
 newStepLength: 117781
-densityPanelty_: 5.38795e-05
+densityPenalty_: 5.38795e-05
 WL GradSum: 14.6627
 De GradSum: 273668
 cDist: 266.688
@@ -3478,14 +3478,14 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 160 overflow: 0.267286 HPWL: 6149550
 Iter: 161
 stepLength_: 127066
-densityPanelty_: 5.65734e-05
+densityPenalty_: 5.65734e-05
 WL GradSum: 15.5939
 De GradSum: 272135
 cDist: 258.265
 gDist: 0.00240061
 calVal: 107583
 newStepLength: 107583
-densityPanelty_: 5.65734e-05
+densityPenalty_: 5.65734e-05
 WL GradSum: 15.6001
 De GradSum: 270482
 cDist: 227.413
@@ -3505,14 +3505,14 @@ phiCoef: 1.05
 
 Iter: 162
 stepLength_: 119323
-densityPanelty_: 5.94021e-05
+densityPenalty_: 5.94021e-05
 WL GradSum: 15.3861
 De GradSum: 268812
 cDist: 206.534
 gDist: 0.0020149
 calVal: 102503
 newStepLength: 102503
-densityPanelty_: 5.94021e-05
+densityPenalty_: 5.94021e-05
 WL GradSum: 15.408
 De GradSum: 267949
 cDist: 185.917
@@ -3532,7 +3532,7 @@ phiCoef: 1.05
 
 Iter: 163
 stepLength_: 111258
-densityPanelty_: 6.23722e-05
+densityPenalty_: 6.23722e-05
 WL GradSum: 15.8449
 De GradSum: 262691
 cDist: 192.472
@@ -3552,14 +3552,14 @@ phiCoef: 1.05
 
 Iter: 164
 stepLength_: 105901
-densityPanelty_: 6.54908e-05
+densityPenalty_: 6.54908e-05
 WL GradSum: 16.0338
 De GradSum: 252263
 cDist: 200.129
 gDist: 0.0021378
 calVal: 93614.6
 newStepLength: 93614.6
-densityPanelty_: 6.54908e-05
+densityPenalty_: 6.54908e-05
 WL GradSum: 16.0265
 De GradSum: 252505
 cDist: 180.306
@@ -3579,7 +3579,7 @@ phiCoef: 1.05
 
 Iter: 165
 stepLength_: 97714.6
-densityPanelty_: 6.87653e-05
+densityPenalty_: 6.87653e-05
 WL GradSum: 17.0071
 De GradSum: 248890
 cDist: 177.502
@@ -3599,14 +3599,14 @@ phiCoef: 1.05
 
 Iter: 166
 stepLength_: 98021.7
-densityPanelty_: 7.22036e-05
+densityPenalty_: 7.22036e-05
 WL GradSum: 17.1408
 De GradSum: 241503
 cDist: 177.751
 gDist: 0.00208677
 calVal: 85179.9
 newStepLength: 85179.9
-densityPanelty_: 7.22036e-05
+densityPenalty_: 7.22036e-05
 WL GradSum: 17.1542
 De GradSum: 241298
 cDist: 158.616
@@ -3626,7 +3626,7 @@ phiCoef: 1.05
 
 Iter: 167
 stepLength_: 89006.4
-densityPanelty_: 7.58138e-05
+densityPenalty_: 7.58138e-05
 WL GradSum: 17.8708
 De GradSum: 239728
 cDist: 165.294
@@ -3646,14 +3646,14 @@ phiCoef: 1.05
 
 Iter: 168
 stepLength_: 91084.9
-densityPanelty_: 7.96045e-05
+densityPenalty_: 7.96045e-05
 WL GradSum: 17.8803
 De GradSum: 231971
 cDist: 174.187
 gDist: 0.0021095
 calVal: 82572.9
 newStepLength: 82572.9
-densityPanelty_: 7.96045e-05
+densityPenalty_: 7.96045e-05
 WL GradSum: 17.8844
 De GradSum: 232072
 cDist: 161.108
@@ -3673,7 +3673,7 @@ phiCoef: 1.05
 
 Iter: 169
 stepLength_: 85178.9
-densityPanelty_: 8.35847e-05
+densityPenalty_: 8.35847e-05
 WL GradSum: 18.6087
 De GradSum: 228361
 cDist: 173.9
@@ -3693,14 +3693,14 @@ phiCoef: 1.05
 
 Iter: 170
 stepLength_: 85959.4
-densityPanelty_: 8.77639e-05
+densityPenalty_: 8.77639e-05
 WL GradSum: 18.8888
 De GradSum: 218977
 cDist: 185.055
 gDist: 0.0024159
 calVal: 76598.8
 newStepLength: 76598.8
-densityPanelty_: 8.77639e-05
+densityPenalty_: 8.77639e-05
 WL GradSum: 18.8907
 De GradSum: 219264
 cDist: 169.015
@@ -3721,7 +3721,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 170 overflow: 0.235649 HPWL: 6259935
 Iter: 171
 stepLength_: 80675.7
-densityPanelty_: 9.21521e-05
+densityPenalty_: 9.21521e-05
 WL GradSum: 19.498
 De GradSum: 217680
 cDist: 174.288
@@ -3741,14 +3741,14 @@ phiCoef: 1.05
 
 Iter: 172
 stepLength_: 77441.2
-densityPanelty_: 9.67597e-05
+densityPenalty_: 9.67597e-05
 WL GradSum: 19.6471
 De GradSum: 207930
 cDist: 186.009
 gDist: 0.00270988
 calVal: 68641.1
 newStepLength: 68641.1
-densityPanelty_: 9.67597e-05
+densityPenalty_: 9.67597e-05
 WL GradSum: 19.6482
 De GradSum: 208322
 cDist: 169.14
@@ -3768,7 +3768,7 @@ phiCoef: 1.05
 
 Iter: 173
 stepLength_: 72418.9
-densityPanelty_: 0.000101598
+densityPenalty_: 0.000101598
 WL GradSum: 20.4864
 De GradSum: 205846
 cDist: 174.552
@@ -3788,14 +3788,14 @@ phiCoef: 1.05
 
 Iter: 174
 stepLength_: 72601.6
-densityPanelty_: 0.000106678
+densityPenalty_: 0.000106678
 WL GradSum: 20.6735
 De GradSum: 196962
 cDist: 181.687
 gDist: 0.00291361
 calVal: 62357.9
 newStepLength: 62357.9
-densityPanelty_: 0.000106678
+densityPenalty_: 0.000106678
 WL GradSum: 20.6813
 De GradSum: 197263
 cDist: 161.99
@@ -3815,7 +3815,7 @@ phiCoef: 1.05
 
 Iter: 175
 stepLength_: 67591
-densityPanelty_: 0.000112011
+densityPenalty_: 0.000112011
 WL GradSum: 21.6755
 De GradSum: 196307
 cDist: 170.244
@@ -3835,14 +3835,14 @@ phiCoef: 1.05
 
 Iter: 176
 stepLength_: 64700.3
-densityPanelty_: 0.000117612
+densityPenalty_: 0.000117612
 WL GradSum: 21.8662
 De GradSum: 188310
 cDist: 183.705
 gDist: 0.00343052
 calVal: 53550.1
 newStepLength: 53550.1
-densityPanelty_: 0.000117612
+densityPenalty_: 0.000117612
 WL GradSum: 21.8798
 De GradSum: 188909
 cDist: 158.366
@@ -3862,7 +3862,7 @@ phiCoef: 1.05
 
 Iter: 177
 stepLength_: 60676.2
-densityPanelty_: 0.000123493
+densityPenalty_: 0.000123493
 WL GradSum: 22.5524
 De GradSum: 188386
 cDist: 154.524
@@ -3882,14 +3882,14 @@ phiCoef: 1.05
 
 Iter: 178
 stepLength_: 58293.6
-densityPanelty_: 0.000129667
+densityPenalty_: 0.000129667
 WL GradSum: 22.703
 De GradSum: 178324
 cDist: 173.081
 gDist: 0.00360463
 calVal: 48016.4
 newStepLength: 48016.4
-densityPanelty_: 0.000129667
+densityPenalty_: 0.000129667
 WL GradSum: 22.7056
 De GradSum: 179232
 cDist: 149.621
@@ -3909,14 +3909,14 @@ phiCoef: 1.05
 
 Iter: 179
 stepLength_: 52183.4
-densityPanelty_: 0.00013615
+densityPenalty_: 0.00013615
 WL GradSum: 23.5183
 De GradSum: 178640
 cDist: 147.251
 gDist: 0.00308982
 calVal: 47657
 newStepLength: 47657
-densityPanelty_: 0.00013615
+densityPenalty_: 0.00013615
 WL GradSum: 23.5152
 De GradSum: 178242
 cDist: 138.342
@@ -3936,14 +3936,14 @@ phiCoef: 1.05
 
 Iter: 180
 stepLength_: 49508.2
-densityPanelty_: 0.000142958
+densityPenalty_: 0.000142958
 WL GradSum: 23.7393
 De GradSum: 168618
 cDist: 142.101
 gDist: 0.00322233
 calVal: 44099
 newStepLength: 44099
-densityPanelty_: 0.000142958
+densityPenalty_: 0.000142958
 WL GradSum: 23.7398
 De GradSum: 169095
 cDist: 130.86
@@ -3964,14 +3964,14 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 180 overflow: 0.200107 HPWL: 6346356
 Iter: 181
 stepLength_: 46300.1
-densityPanelty_: 0.000150106
+densityPenalty_: 0.000150106
 WL GradSum: 24.6643
 De GradSum: 168785
 cDist: 132.876
 gDist: 0.00308998
 calVal: 43002.2
 newStepLength: 43002.2
-densityPanelty_: 0.000150106
+densityPenalty_: 0.000150106
 WL GradSum: 24.6625
 De GradSum: 168347
 cDist: 125.921
@@ -3991,14 +3991,14 @@ phiCoef: 1.05
 
 Iter: 182
 stepLength_: 44895.2
-densityPanelty_: 0.000157611
+densityPenalty_: 0.000157611
 WL GradSum: 24.7932
 De GradSum: 159757
 cDist: 125.103
 gDist: 0.00303689
 calVal: 41194.6
 newStepLength: 41194.6
-densityPanelty_: 0.000157611
+densityPenalty_: 0.000157611
 WL GradSum: 24.7958
 De GradSum: 160038
 cDist: 117.567
@@ -4018,14 +4018,14 @@ phiCoef: 1.05
 
 Iter: 183
 stepLength_: 42709.3
-densityPanelty_: 0.000165492
+densityPenalty_: 0.000165492
 WL GradSum: 25.6245
 De GradSum: 159627
 cDist: 123.518
 gDist: 0.00307814
 calVal: 40127.7
 newStepLength: 40127.7
-densityPanelty_: 0.000165492
+densityPenalty_: 0.000165492
 WL GradSum: 25.6235
 De GradSum: 159248
 cDist: 118.031
@@ -4045,14 +4045,14 @@ phiCoef: 1.05
 
 Iter: 184
 stepLength_: 41721.7
-densityPanelty_: 0.000173766
+densityPenalty_: 0.000173766
 WL GradSum: 25.8706
 De GradSum: 150737
 cDist: 123.511
 gDist: 0.00316922
 calVal: 38971.9
 newStepLength: 38971.9
-densityPanelty_: 0.000173766
+densityPenalty_: 0.000173766
 WL GradSum: 25.8722
 De GradSum: 150980
 cDist: 117.416
@@ -4072,14 +4072,14 @@ phiCoef: 1.05
 
 Iter: 185
 stepLength_: 40060.8
-densityPanelty_: 0.000182454
+densityPenalty_: 0.000182454
 WL GradSum: 26.7277
 De GradSum: 151303
 cDist: 124.462
 gDist: 0.00341621
 calVal: 36432.9
 newStepLength: 36432.9
-densityPanelty_: 0.000182454
+densityPenalty_: 0.000182454
 WL GradSum: 26.7275
 De GradSum: 150692
 cDist: 116.038
@@ -4099,7 +4099,7 @@ phiCoef: 1.05
 
 Iter: 186
 stepLength_: 38608.2
-densityPanelty_: 0.000191577
+densityPenalty_: 0.000191577
 WL GradSum: 27.0717
 De GradSum: 142820
 cDist: 121.443
@@ -4119,14 +4119,14 @@ phiCoef: 1.05
 
 Iter: 187
 stepLength_: 37349.8
-densityPanelty_: 0.000201156
+densityPenalty_: 0.000201156
 WL GradSum: 27.9094
 De GradSum: 144275
 cDist: 130.661
 gDist: 0.00402626
 calVal: 32452.3
 newStepLength: 32452.3
-densityPanelty_: 0.000201156
+densityPenalty_: 0.000201156
 WL GradSum: 27.9095
 De GradSum: 143233
 cDist: 117.212
@@ -4146,7 +4146,7 @@ phiCoef: 1.05
 
 Iter: 188
 stepLength_: 35298.1
-densityPanelty_: 0.000211214
+densityPenalty_: 0.000211214
 WL GradSum: 28.1021
 De GradSum: 135846
 cDist: 115.456
@@ -4166,14 +4166,14 @@ phiCoef: 1.05
 
 Iter: 189
 stepLength_: 36041.9
-densityPanelty_: 0.000221774
+densityPenalty_: 0.000221774
 WL GradSum: 28.8494
 De GradSum: 136491
 cDist: 123.597
 gDist: 0.00409164
 calVal: 30207.3
 newStepLength: 30207.3
-densityPanelty_: 0.000221774
+densityPenalty_: 0.000221774
 WL GradSum: 28.8445
 De GradSum: 135439
 cDist: 108.943
@@ -4193,7 +4193,7 @@ phiCoef: 1.05
 
 Iter: 190
 stepLength_: 33652.8
-densityPanelty_: 0.000232863
+densityPenalty_: 0.000232863
 WL GradSum: 29.0337
 De GradSum: 127868
 cDist: 116.476
@@ -4214,14 +4214,14 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 190 overflow: 0.17091 HPWL: 6433722
 Iter: 191
 stepLength_: 35805.2
-densityPanelty_: 0.000244506
+densityPenalty_: 0.000244506
 WL GradSum: 29.9524
 De GradSum: 128256
 cDist: 124.42
 gDist: 0.0043501
 calVal: 28601.6
 newStepLength: 28601.6
-densityPanelty_: 0.000244506
+densityPenalty_: 0.000244506
 WL GradSum: 29.9447
 De GradSum: 126934
 cDist: 106.052
@@ -4241,7 +4241,7 @@ phiCoef: 1.05
 
 Iter: 192
 stepLength_: 33011.4
-densityPanelty_: 0.000256732
+densityPenalty_: 0.000256732
 WL GradSum: 30.19
 De GradSum: 120285
 cDist: 115.739
@@ -4261,14 +4261,14 @@ phiCoef: 1.05
 
 Iter: 193
 stepLength_: 35663.6
-densityPanelty_: 0.000269568
+densityPenalty_: 0.000269568
 WL GradSum: 31.2172
 De GradSum: 120653
 cDist: 128.308
 gDist: 0.00456671
 calVal: 28096.4
 newStepLength: 28096.4
-densityPanelty_: 0.000269568
+densityPenalty_: 0.000269568
 WL GradSum: 31.2173
 De GradSum: 119306
 cDist: 108.252
@@ -4288,7 +4288,7 @@ phiCoef: 1.05
 
 Iter: 194
 stepLength_: 32162.6
-densityPanelty_: 0.000283047
+densityPenalty_: 0.000283047
 WL GradSum: 31.3974
 De GradSum: 113578
 cDist: 121.729
@@ -4308,14 +4308,14 @@ phiCoef: 1.05
 
 Iter: 195
 stepLength_: 33067.7
-densityPanelty_: 0.000297199
+densityPenalty_: 0.000297199
 WL GradSum: 32.4275
 De GradSum: 114270
 cDist: 133.851
 gDist: 0.00513363
 calVal: 26073.5
 newStepLength: 26073.5
-densityPanelty_: 0.000297199
+densityPenalty_: 0.000297199
 WL GradSum: 32.4278
 De GradSum: 112896
 cDist: 112.05
@@ -4335,7 +4335,7 @@ phiCoef: 1.05
 
 Iter: 196
 stepLength_: 29460.9
-densityPanelty_: 0.000312059
+densityPenalty_: 0.000312059
 WL GradSum: 32.5365
 De GradSum: 107503
 cDist: 111.552
@@ -4355,14 +4355,14 @@ phiCoef: 1.05
 
 Iter: 197
 stepLength_: 30159.2
-densityPanelty_: 0.000327662
+densityPenalty_: 0.000327662
 WL GradSum: 33.5751
 De GradSum: 107191
 cDist: 125.023
 gDist: 0.00477315
 calVal: 26192.9
 newStepLength: 26192.9
-densityPanelty_: 0.000327662
+densityPenalty_: 0.000327662
 WL GradSum: 33.5723
 De GradSum: 106478
 cDist: 112.43
@@ -4382,7 +4382,7 @@ phiCoef: 1.05
 
 Iter: 198
 stepLength_: 28593.2
-densityPanelty_: 0.000344045
+densityPenalty_: 0.000344045
 WL GradSum: 33.6564
 De GradSum: 100935
 cDist: 119.896
@@ -4402,14 +4402,14 @@ phiCoef: 1.05
 
 Iter: 199
 stepLength_: 28243.7
-densityPanelty_: 0.000361247
+densityPenalty_: 0.000361247
 WL GradSum: 34.8087
 De GradSum: 100735
 cDist: 127.133
 gDist: 0.00524938
 calVal: 24218.6
 newStepLength: 24218.6
-densityPanelty_: 0.000361247
+densityPenalty_: 0.000361247
 WL GradSum: 34.8026
 De GradSum: 100004
 cDist: 113.038
@@ -4429,7 +4429,7 @@ phiCoef: 1.05
 
 Iter: 200
 stepLength_: 26339.8
-densityPanelty_: 0.000379309
+densityPenalty_: 0.000379309
 WL GradSum: 34.9632
 De GradSum: 95121
 cDist: 108.227
@@ -4450,14 +4450,14 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 200 overflow: 0.141867 HPWL: 6503345
 Iter: 201
 stepLength_: 26651.7
-densityPanelty_: 0.000398275
+densityPenalty_: 0.000398275
 WL GradSum: 36.0217
 De GradSum: 94882.8
 cDist: 114.162
 gDist: 0.0049017
 calVal: 23290.3
 newStepLength: 23290.3
-densityPanelty_: 0.000398275
+densityPenalty_: 0.000398275
 WL GradSum: 36.0183
 De GradSum: 94325.2
 cDist: 103.499
@@ -4477,7 +4477,7 @@ phiCoef: 1.05
 
 Iter: 202
 stepLength_: 25135.5
-densityPanelty_: 0.000418189
+densityPenalty_: 0.000418189
 WL GradSum: 36.3248
 De GradSum: 89571.5
 cDist: 105.166
@@ -4497,14 +4497,14 @@ phiCoef: 1.05
 
 Iter: 203
 stepLength_: 24391.3
-densityPanelty_: 0.000439098
+densityPenalty_: 0.000439098
 WL GradSum: 37.3754
 De GradSum: 89629.7
 cDist: 111.627
 gDist: 0.00512901
 calVal: 21763.9
 newStepLength: 21763.9
-densityPanelty_: 0.000439098
+densityPenalty_: 0.000439098
 WL GradSum: 37.3744
 De GradSum: 89108.9
 cDist: 102.154
@@ -4524,7 +4524,7 @@ phiCoef: 1.05
 
 Iter: 204
 stepLength_: 23240.3
-densityPanelty_: 0.000461053
+densityPenalty_: 0.000461053
 WL GradSum: 37.5796
 De GradSum: 84421.2
 cDist: 101.195
@@ -4544,14 +4544,14 @@ phiCoef: 1.05
 
 Iter: 205
 stepLength_: 23287.4
-densityPanelty_: 0.000484106
+densityPenalty_: 0.000484106
 WL GradSum: 38.5232
 De GradSum: 83985.5
 cDist: 108.566
 gDist: 0.00524103
 calVal: 20714.7
 newStepLength: 20714.7
-densityPanelty_: 0.000484106
+densityPenalty_: 0.000484106
 WL GradSum: 38.5202
 De GradSum: 83537
 cDist: 99.5001
@@ -4571,14 +4571,14 @@ phiCoef: 1.05
 
 Iter: 206
 stepLength_: 22176.7
-densityPanelty_: 0.000508311
+densityPenalty_: 0.000508311
 WL GradSum: 38.7694
 De GradSum: 78790
 cDist: 98.2233
 gDist: 0.00470238
 calVal: 20888
 newStepLength: 20888
-densityPanelty_: 0.000508311
+densityPenalty_: 0.000508311
 WL GradSum: 38.7695
 De GradSum: 78856.4
 cDist: 94.1917
@@ -4598,14 +4598,14 @@ phiCoef: 1.05
 
 Iter: 207
 stepLength_: 21482.1
-densityPanelty_: 0.000533726
+densityPenalty_: 0.000533726
 WL GradSum: 39.7493
 De GradSum: 78277.3
 cDist: 98.2161
 gDist: 0.00496997
 calVal: 19761.9
 newStepLength: 19761.9
-densityPanelty_: 0.000533726
+densityPenalty_: 0.000533726
 WL GradSum: 39.7482
 De GradSum: 77964.3
 cDist: 92.4748
@@ -4625,14 +4625,14 @@ phiCoef: 1.05
 
 Iter: 208
 stepLength_: 20857.6
-densityPanelty_: 0.000560413
+densityPenalty_: 0.000560413
 WL GradSum: 40.0328
 De GradSum: 73696.8
 cDist: 91.003
 gDist: 0.00477807
 calVal: 19046
 newStepLength: 19046
-densityPanelty_: 0.000560413
+densityPenalty_: 0.000560413
 WL GradSum: 40.0345
 De GradSum: 73762.6
 cDist: 85.1736
@@ -4652,7 +4652,7 @@ phiCoef: 1.05
 
 Iter: 209
 stepLength_: 19843.4
-densityPanelty_: 0.000588433
+densityPenalty_: 0.000588433
 WL GradSum: 40.972
 De GradSum: 73117.2
 cDist: 90.8827
@@ -4672,14 +4672,14 @@ phiCoef: 1.05
 
 Iter: 210
 stepLength_: 19215.7
-densityPanelty_: 0.000617855
+densityPenalty_: 0.000617855
 WL GradSum: 41.2444
 De GradSum: 68875.6
 cDist: 97.7811
 gDist: 0.00554877
 calVal: 17622.1
 newStepLength: 17622.1
-densityPanelty_: 0.000617855
+densityPenalty_: 0.000617855
 WL GradSum: 41.2463
 De GradSum: 68924.5
 cDist: 91.4663
@@ -4700,7 +4700,7 @@ phiCoef: 1.05
 [NesterovSolve] Iter: 210 overflow: 0.116294 HPWL: 6559483
 Iter: 211
 stepLength_: 18319
-densityPanelty_: 0.000648748
+densityPenalty_: 0.000648748
 WL GradSum: 42.1708
 De GradSum: 68345.4
 cDist: 93.2149
@@ -4720,14 +4720,14 @@ phiCoef: 1.05
 
 Iter: 212
 stepLength_: 18466.1
-densityPanelty_: 0.000681185
+densityPenalty_: 0.000681185
 WL GradSum: 42.3962
 De GradSum: 64586.5
 cDist: 95.0738
 gDist: 0.00559169
 calVal: 17002.7
 newStepLength: 17002.7
-densityPanelty_: 0.000681185
+densityPenalty_: 0.000681185
 WL GradSum: 42.3973
 De GradSum: 64617.3
 cDist: 89.5446
@@ -4747,14 +4747,14 @@ phiCoef: 1.05
 
 Iter: 213
 stepLength_: 17721.7
-densityPanelty_: 0.000715244
+densityPenalty_: 0.000715244
 WL GradSum: 43.262
 De GradSum: 63984.2
 cDist: 92.0662
 gDist: 0.00547524
 calVal: 16815
 newStepLength: 16815
-densityPanelty_: 0.000715244
+densityPenalty_: 0.000715244
 WL GradSum: 43.2618
 De GradSum: 63809.1
 cDist: 88.7478
@@ -4774,14 +4774,14 @@ phiCoef: 1.05
 
 Iter: 214
 stepLength_: 17397.3
-densityPanelty_: 0.000751006
+densityPenalty_: 0.000751006
 WL GradSum: 43.6524
 De GradSum: 60563.3
 cDist: 90.1619
 gDist: 0.00567727
 calVal: 15881.2
 newStepLength: 15881.2
-densityPanelty_: 0.000751006
+densityPenalty_: 0.000751006
 WL GradSum: 43.6531
 De GradSum: 60555.3
 cDist: 84.6504
@@ -4801,14 +4801,14 @@ phiCoef: 1.05
 
 Iter: 215
 stepLength_: 16765.7
-densityPanelty_: 0.000788557
+densityPenalty_: 0.000788557
 WL GradSum: 44.5166
 De GradSum: 59790.2
 cDist: 89.3487
 gDist: 0.00596352
 calVal: 14982.5
 newStepLength: 14982.5
-densityPanelty_: 0.000788557
+densityPenalty_: 0.000788557
 WL GradSum: 44.5177
 De GradSum: 59467.4
 cDist: 82.6958
@@ -4828,14 +4828,14 @@ phiCoef: 1.05
 
 Iter: 216
 stepLength_: 16076.3
-densityPanelty_: 0.000827984
+densityPenalty_: 0.000827984
 WL GradSum: 45.0075
 De GradSum: 56914.3
 cDist: 86.5894
 gDist: 0.00639787
 calVal: 13534.1
 newStepLength: 13534.1
-densityPanelty_: 0.000827984
+densityPenalty_: 0.000827984
 WL GradSum: 45.0112
 De GradSum: 56830.9
 cDist: 77.5129
@@ -4855,14 +4855,14 @@ phiCoef: 1.05
 
 Iter: 217
 stepLength_: 15140.1
-densityPanelty_: 0.000869383
+densityPenalty_: 0.000869383
 WL GradSum: 45.8147
 De GradSum: 55745
 cDist: 85.0189
 gDist: 0.00648263
 calVal: 13114.9
 newStepLength: 13114.9
-densityPanelty_: 0.000869383
+densityPenalty_: 0.000869383
 WL GradSum: 45.8174
 De GradSum: 55431.3
 cDist: 77.4124
