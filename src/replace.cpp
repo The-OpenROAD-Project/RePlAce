@@ -21,7 +21,7 @@ Replace::Replace()
   nesterovPlaceMaxIter_(2000),
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
-  initDensityPenalityFactor_(10), 
+  initDensityPenalityFactor_(0.0001), 
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(44600000),
   verbose_(0) {
@@ -48,7 +48,7 @@ void Replace::reset() {
   binGridCntX_ = binGridCntY_ = 0;
   overflow_ = 0;
   density_ = 0;
-  initDensityPenalityFactor_ = 10;
+  initDensityPenalityFactor_ = 0.0001;
   minPhiCoef_ = 0;
   maxPhiCoef_ = 0;
   referenceHpwl_= 0;

@@ -19,7 +19,7 @@ NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
   verboseLevel(1),
-  initDensityPenalty(1e1),
+  initDensityPenalty(0.0001),
   initWireLengthCoef(1.0/24.0),
   targetOverflow(0.1),
   minPhiCoef(0.95),
