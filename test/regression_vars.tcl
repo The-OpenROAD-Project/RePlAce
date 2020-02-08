@@ -54,7 +54,7 @@ proc record_test { test cmd_dir } {
 }
 
 # Record a test in the $RESIZER/test directory.
-proc record_resizer_tests { tests } {
+proc record_replace_tests { tests } {
   global test_dir
   foreach test $tests {
     # Prune commented tests from the list.
@@ -115,8 +115,8 @@ proc list_delete { list delete } {
 
 # Regression test lists.
 
-# Record tests in resizer/test
-record_resizer_tests {
+# Record tests in replace/test
+record_replace_tests {
   simple01
   simple02
   core01 

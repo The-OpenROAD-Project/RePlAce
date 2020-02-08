@@ -149,7 +149,7 @@ void NesterovPlace::init() {
   }
 
   densityPenalty_ 
-    = wireLengthGradSum_ / densityGradSum_ 
+    = (wireLengthGradSum_ / densityGradSum_ )
     * npVars_.initDensityPenalty; 
   
   if( npVars_.verboseLevel > 3 ) {
@@ -220,8 +220,17 @@ NesterovPlace::updateGradients(
         gCell, wireLengthCoefX_, wireLengthCoefY_);
     densityGrads[i] = nb_->getDensityGradient(gCell); 
 
-    wireLengthGradSum_ += fabs(wireLengthGrads[i].x) + fabs(wireLengthGrads[i].y);
-    densityGradSum_ += fabs(densityGrads[i].x) + fabs(densityGrads[i].y);
+    // Different compiler has different results on the following formula.
+    // e.g. wireLengthGradSum_ += fabs(~~.x) + fabs(~~.y);
+    //
+    // To prevent instability problem,
+    // I partitioned the fabs(~~.x) + fabs(~~.y) as two terms.
+    //
+    wireLengthGradSum_ += fabs(wireLengthGrads[i].x);
+    wireLengthGradSum_ += fabs(wireLengthGrads[i].y);
+      
+    densityGradSum_ += fabs(densityGrads[i].x);
+    densityGradSum_ += fabs(densityGrads[i].y);
 
     sumGrads[i].x = wireLengthGrads[i].x + densityPenalty_ * densityGrads[i].x;
     sumGrads[i].y = wireLengthGrads[i].y + densityPenalty_ * densityGrads[i].y;
