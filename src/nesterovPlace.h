@@ -115,6 +115,8 @@ private:
   // half-parameter-wire-length
   int64_t prevHpwl_;
 
+  float isDiverged_;
+
   float getWireLengthCoef(float overflow);
 
   void init();

@@ -37,7 +37,8 @@ NesterovPlace::NesterovPlace()
   baseWireLengthCoef_(0), 
   wireLengthCoefX_(0), 
   wireLengthCoefY_(0),
-  prevHpwl_(0) {}
+  prevHpwl_(0),
+  isDiverged_(false) {}
 
 NesterovPlace::NesterovPlace(
     NesterovPlaceVars npVars,
@@ -129,6 +130,10 @@ void NesterovPlace::init() {
       curSLPSumGrads_, curSLPWireLengthGrads_,
       curSLPDensityGrads_);
 
+  if( isDiverged_ ) {
+    return;
+  }
+
   // approximately fill in 
   // prevSLPCoordi_ to calculate lc vars
   updateInitialPrevSLPCoordi();
@@ -142,6 +147,10 @@ void NesterovPlace::init() {
   updateGradients(
       prevSLPSumGrads_, prevSLPWireLengthGrads_,
       prevSLPDensityGrads_);
+  
+  if( isDiverged_ ) {
+    return;
+  }
   
   if( npVars_.verboseLevel > 3 ) {
     cout << "wireLengthGradSum_ : " << wireLengthGradSum_ << endl;
@@ -214,7 +223,7 @@ NesterovPlace::updateGradients(
     cout << "densityPenalty_: " << densityPenalty_ << endl;
   }
 
-  for(int i=0; i<nb_->gCells().size(); i++) {
+  for(size_t i=0; i<nb_->gCells().size(); i++) {
     GCell* gCell = nb_->gCells().at(i);
     wireLengthGrads[i] = nb_->getWireLengthGradientWA(
         gCell, wireLengthCoefX_, wireLengthCoefY_);
@@ -252,25 +261,34 @@ NesterovPlace::updateGradients(
       sumPrecondi.y = npVars_.minPreconditioner; 
     }
     
-    //    cout << "wx: " << wireLengthGrads[i].x << " dx: " << densityGrads[i].x;
-    //    cout << " tx: " << sumGrads[i].x << endl;
-    //    cout << "wy: " << wireLengthGrads[i].y << " dy: " << densityGrads[i].y;
-    //    cout << " ty: " << sumGrads[i].y << endl ;
-
     sumGrads[i].x /= sumPrecondi.x;
     sumGrads[i].y /= sumPrecondi.y; 
-    //    cout << "sumPreCondi: " << sumPrecondi.x << " " << sumPrecondi.y << endl ;
-    //    cout << "atx: " << sumGrads[i].x << " aty: " << sumGrads[i].y << endl << endl;
   }
   
   if( npVars_.verboseLevel > 3 ) {
     cout << "WL GradSum: " << wireLengthGradSum_ << endl;
     cout << "De GradSum: " << densityGradSum_ << endl;
   }
+
+  // divergence detection on 
+  // Wirelength / density gradient calculation
+  if( isnan(wireLengthGradSum_) || isinf(wireLengthGradSum_) ||
+      isnan(densityGradSum_) || isinf(densityGradSum_) ) {
+    cout << "INFO: RePlAce divergence detected. " << endl;
+    cout << "      Please decrease init_wirelength_coeff value" << endl;
+    isDiverged_ = true;
+  }
 }
 
 void
 NesterovPlace::doNesterovPlace() {
+
+  // if replace diverged in init() function, 
+  // replace must be skipped.
+  if( isDiverged_ ) {
+    cout << "INFO: RePlAce diverged. Please tune the parameters again" << endl;
+    return;
+  }
 
 #ifdef ENABLE_CIMG_LIB  
   pe.setPlacerBase(pb_);
@@ -281,6 +299,10 @@ NesterovPlace::doNesterovPlace() {
 
   // backTracking variable.
   float curA = 1.0;
+
+  // divergence detection
+  float minSumOverflow = 1e30;
+  float hpwlWithMinSumOverflow = 1e30;
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
@@ -310,7 +332,7 @@ NesterovPlace::doNesterovPlace() {
     for(numBackTrak = 0; numBackTrak < npVars_.maxBackTrack; numBackTrak++) {
       
       // fill in nextCoordinates with given stepLength_
-      for(int k=0; k<nb_->gCells().size(); k++) {
+      for(size_t k=0; k<nb_->gCells().size(); k++) {
         FloatCoordi nextCoordi(
           curSLPCoordi_[k].x + stepLength_ * curSLPSumGrads_[k].x,
           curSLPCoordi_[k].y + stepLength_ * curSLPSumGrads_[k].y );
@@ -342,6 +364,11 @@ NesterovPlace::doNesterovPlace() {
       nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_);
 
       updateGradients(nextSLPSumGrads_, nextSLPWireLengthGrads_, nextSLPDensityGrads_ );
+
+      // NaN or inf is detected in WireLength/Density Coef 
+      if( isDiverged_ ) {
+        break;
+      }
   
       float newStepLength  
         = getStepLength (curSLPCoordi_, curSLPSumGrads_, nextSLPCoordi_, nextSLPSumGrads_);
@@ -361,6 +388,19 @@ NesterovPlace::doNesterovPlace() {
 
     if( npVars_.verboseLevel > 3 ) {
       cout << "numBackTrak: " << numBackTrak << endl;   
+    }
+
+    // usually, maxBackTrack should be 1~3
+    // 10 is the case when
+    // all of cells are not moved at all.
+    if( npVars_.maxBackTrack == numBackTrak ) {
+      cout << "INFO: RePlAce divergence detected" << endl;
+      cout << "      Please decrease init_density_penalty" << endl;
+      isDiverged_ = true;
+    } 
+
+    if( isDiverged_ ) {
+      break;
     }
 
     updateNextIter(); 
@@ -385,11 +425,37 @@ NesterovPlace::doNesterovPlace() {
 #endif
     }
 
+    if( minSumOverflow > sumOverflow_ ) {
+      minSumOverflow = sumOverflow_;
+      hpwlWithMinSumOverflow = prevHpwl_; 
+    }
+
+    // diverge detection on
+    // large max_phi_cof value + large design 
+    //
+    // 1) happen overflow < 20%
+    // 2) Hpwl is growing
+    //
+    if( sumOverflow_ < 0.2f 
+        && sumOverflow_ - hpwlWithMinSumOverflow >= 0.02f
+        && hpwlWithMinSumOverflow * 1.2f < prevHpwl_ ) {
+      cout << "INFO: RePlAce divergence detected" << endl;
+      cout << "      Please decrease max_phi_cof" << endl;
+      isDiverged_ = true;
+      break;
+    }
+
+    // minimum iteration is 50
     if( i > 50 && sumOverflow_ <= npVars_.targetOverflow) {
       cout << "[NesterovSolve] Finished with Overflow: " << sumOverflow_ << endl;
       break;
     }
   }
+
+  if( isDiverged_ ) { 
+    cout << "INFO: RePlAce diverged. Please tune the parameters again" << endl;
+  }
+
   updateDb();
 }
 
@@ -415,7 +481,7 @@ NesterovPlace::updateWireLengthCoef(float overflow) {
 
 void
 NesterovPlace::updateInitialPrevSLPCoordi() {
-  for(int i=0; i<nb_->gCells().size(); i++) {
+  for(size_t i=0; i<nb_->gCells().size(); i++) {
     GCell* curGCell = nb_->gCells()[i];
 
 
@@ -537,7 +603,7 @@ NesterovPlace::updateDb() {
 static float
 getDistance(vector<FloatCoordi>& a, vector<FloatCoordi>& b) {
   float sumDistance = 0.0f;
-  for(int i=0; i<a.size(); i++) {
+  for(size_t i=0; i<a.size(); i++) {
     sumDistance += (a[i].x - b[i].x) * (a[i].x - b[i].x);
     sumDistance += (a[i].y - b[i].y) * (a[i].y - b[i].y);
   }
