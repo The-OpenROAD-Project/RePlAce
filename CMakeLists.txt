@@ -73,7 +73,7 @@ set (REPLACE_HEADER
 add_custom_command(OUTPUT ${REPLACE_WRAP}
   COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${REPLACE_WRAP} ${REPLACE_HOME}/src/replace.i
   WORKING_DIRECTORY ${REPLACE_HOME}
-  DEPENDS ${REPLACE_HOME}/src/replace.i 
+  DEPENDS ${REPLACE_HOME}/src/replace.i ${REPLACE_HOME}/include/replace/Replace.h 
 )
 
 add_custom_command(OUTPUT ${REPLACE_TCL_INIT}
