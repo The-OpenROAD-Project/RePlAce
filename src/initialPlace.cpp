@@ -150,17 +150,6 @@ void InitialPlace::updatePinInfo() {
         pinMaxY->setMaxPinY();
       } 
     }
-//    cout << "pinAddr: " << pinMinX << " " 
-//      << pinMaxX << " " 
-//      << pinMinY << " " 
-//      << pinMaxY << endl;
-//    cout << pinMinX->isMinPinX() << endl;
-
-//      cout << "final bbox: " 
-//        << pinMinX->cx() << " " 
-//        << pinMinY->cy() << " " 
-//        << pinMaxX->cx() << " " 
-//        << pinMaxY->cy() << endl; 
   } 
 }
 
@@ -344,11 +333,6 @@ void InitialPlace::createSparseMatrix() {
     }
   } 
 
-//  for(auto& t : listX) {
-//    cout << t.row() << " " << t.col() << " " << t.value() << endl; 
-//  }
-
-  
   placeInstForceMatrixX_.setFromTriplets(listX.begin(), listX.end());
   placeInstForceMatrixY_.setFromTriplets(listY.begin(), listY.end());
 }
@@ -356,10 +340,7 @@ void InitialPlace::createSparseMatrix() {
 void InitialPlace::updateCoordi() {
   for(auto& inst : pb_->placeInsts()) {
     int idx = inst->extId();
-    //cout << "extId: " << idx << endl;
     inst->dbSetCenterLocation( instLocVecX_(idx), instLocVecY_(idx) );
-    //cout << "instLocVecX_(" << idx << "): " << instLocVecX_(idx) 
-    //  << " instLocVecY_(" << idx << "): " << instLocVecY_(idx) << endl;
   }
 }
 

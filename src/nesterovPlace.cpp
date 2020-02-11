@@ -23,10 +23,10 @@ NesterovPlaceVars::NesterovPlaceVars()
   initWireLengthCoef(1.0/24.0),
   targetOverflow(0.1),
   minPhiCoef(0.95),
-  maxPhiCoef(1.05),
+  maxPhiCoef(1.04),
   minPreconditioner(1.0),
   initialPrevCoordiUpdateCoef(100),
-  referenceHpwl(44600000) {}
+  referenceHpwl(446000000) {}
 
 NesterovPlace::NesterovPlace() 
   : pb_(nullptr), nb_(nullptr), npVars_(), 
@@ -304,6 +304,9 @@ NesterovPlace::doNesterovPlace() {
   float minSumOverflow = 1e30;
   float hpwlWithMinSumOverflow = 1e30;
 
+  // dynamic adjustment of max_phi_coef
+  bool isMaxPhiCoefChanged = false;
+
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
     if( npVars_.verboseLevel > 3 ) {
@@ -388,6 +391,15 @@ NesterovPlace::doNesterovPlace() {
 
     if( npVars_.verboseLevel > 3 ) {
       cout << "numBackTrak: " << numBackTrak << endl;   
+    }
+
+    // dynamic adjustment for
+    // better convergence with
+    // large designs 
+    if( !isMaxPhiCoefChanged && sumOverflow_ 
+        < 0.35f ) {
+      isMaxPhiCoefChanged = true;
+      npVars_.maxPhiCoef *= 0.99;
     }
 
     // usually, maxBackTrack should be 1~3
@@ -541,7 +553,7 @@ NesterovPlace::updateNextIter() {
   
 
   float phiCoef = getPhiCoef( 
-      static_cast<float>(prevHpwl_ - hpwl) 
+      static_cast<float>(hpwl - prevHpwl_) 
       / npVars_.referenceHpwl );
   
   prevHpwl_ = hpwl;

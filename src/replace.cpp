@@ -23,8 +23,8 @@ Replace::Replace()
   overflow_(0.1), density_(1.0),
   initDensityPenalityFactor_(0.0001), 
   initWireLengthCoef_(1.0/240.0),
-  minPhiCoef_(0.95), maxPhiCoef_(1.05),
-  referenceHpwl_(44600000),
+  minPhiCoef_(0.95), maxPhiCoef_(1.04),
+  referenceHpwl_(446000000),
   verbose_(0) {
 };
 
@@ -51,9 +51,9 @@ void Replace::reset() {
   density_ = 0;
   initDensityPenalityFactor_ = 0.0001;
   initWireLengthCoef_ = 1.0/240.0;
-  minPhiCoef_ = 0;
-  maxPhiCoef_ = 0;
-  referenceHpwl_= 0;
+  minPhiCoef_ = 0.95;
+  maxPhiCoef_ = 0.05;
+  referenceHpwl_= 84600000;
   verbose_ = 0;
 }
 
