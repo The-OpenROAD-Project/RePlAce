@@ -22,6 +22,7 @@ Replace::Replace()
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
   initDensityPenalityFactor_(0.0001), 
+  initWireLengthCoef_(1.0/240.0),
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(44600000),
   verbose_(0) {
@@ -49,6 +50,7 @@ void Replace::reset() {
   overflow_ = 0;
   density_ = 0;
   initDensityPenalityFactor_ = 0.0001;
+  initWireLengthCoef_ = 1.0/240.0;
   minPhiCoef_ = 0;
   maxPhiCoef_ = 0;
   referenceHpwl_= 0;
@@ -103,6 +105,7 @@ void Replace::doNesterovPlace() {
   npVars.maxPhiCoef = maxPhiCoef_;
   npVars.referenceHpwl = referenceHpwl_;
   npVars.initDensityPenalty = initDensityPenalityFactor_;
+  npVars.initWireLengthCoef = initWireLengthCoef_;
   npVars.targetOverflow = overflow_;
   npVars.maxNesterovIter = nesterovPlaceMaxIter_; 
 
@@ -161,6 +164,11 @@ Replace::setTargetDensity(float density) {
 void
 Replace::setInitDensityPenalityFactor(float penaltyFactor) {
   initDensityPenalityFactor_ = penaltyFactor;
+}
+
+void
+Replace::setInitWireLengthCoef(float coef) {
+  initWireLengthCoef_ = coef;
 }
 
 void

@@ -93,6 +93,13 @@ set_replace_init_density_penalty_factor_cmd(float penaltyFactor)
 }
 
 void
+set_replace_init_wirelength_coef_cmd(float coef)
+{
+  Replace* replace = getReplace();
+  replace->setInitWireLengthCoef(coef);
+}
+
+void
 set_replace_verbose_level_cmd(int verbose)
 {
   Replace* replace = getReplace();

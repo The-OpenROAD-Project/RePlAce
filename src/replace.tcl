@@ -7,7 +7,8 @@ sta::define_cmd_args "global_placement" {
 proc global_placement { args } {
   sta::parse_key_args "global_placement" args \
     keys {-bin_grid_count -wire_res -wire_cap -density \
-      -init_density_penalty -min_pcoef -max_pcoef -overflow -verbose_level} \
+      -init_density_penalty -init_wirelength_coef \
+      -min_phi_coef -max_phi_coef -overflow -verbose_level} \
       flags {-skip_initial_place -timing_driven}
     
   set target_density 0.7
@@ -17,44 +18,29 @@ proc global_placement { args } {
   }
   set_replace_density_cmd $target_density
 
-  # Support -wire_res/-wire_cap as overrides but do not make
-  # them user visible. -cherry
-  #
-  #set wire_res 0.0
-  #if { [info exists keys(-wire_res)] } {
-  #  set wire_res $keys(-wire_res)
-  #  sta::check_positive_float "-wire_res" $wire_res
-  #} else {
-  #  set wire_res [expr [sta::wire_resistance] * 1e-6]
-  #}
-  #$rep set_unit_res $wire_res
-
-  #set wire_cap 0.0
-  #if { [info exists keys(-wire_cap)] } {
-  #  set wire_cap $keys(-wire_cap)
-  #  sta::check_positive_float "-wire_cap" $wire_cap
-  #} else {
-  #  set wire_cap [expr [sta::wire_capacitance] * 1e-6]
-  #}
-  #$rep set_unit_cap $wire_cap  
-  
   # hidden parameter to control the RePlAce divergence
-  if { [info exists keys(-min_pcoef)] } { 
-    set min_pcoef $keys(-min_pcoef)
-    sta::check_positive_float "-min_pcoef" $min_pcoef
-    set_replace_min_pcoef_cmd $min_pcoef
+  if { [info exists keys(-min_phi_coef)] } { 
+    set min_phi_coef $keys(-min_phi_coef)
+    sta::check_positive_float "-min_phi_coef" $min_phi_coef
+    set_replace_min_phi_coef_cmd $min_phi_coef
   } 
 
-  if { [info exists keys(-max_pcoef)] } { 
-    set max_pcoef $keys(-max_pcoef)
-    sta::check_positive_float "-max_pcoef" $max_pcoef
-    set_replace_max_pcoef_cmd $max_pcoef  
+  if { [info exists keys(-max_phi_coef)] } { 
+    set max_phi_coef $keys(-max_phi_coef)
+    sta::check_positive_float "-max_phi_coef" $max_phi_coef
+    set_replace_max_phi_coef_cmd $max_phi_coef  
   }
 
   if { [info exists keys(-init_density_penalty)] } {
     set density_penalty $keys(-init_density_penalty)
     sta::check_positive_float "-init_density_penalty" $density_penalty
     set_replace_init_density_penalty_factor_cmd $density_penalty
+  }
+  
+  if { [info exists keys(-init_wirelength_coef)] } {
+    set coef $keys(-init_wirelength_coef)
+    sta::check_positive_float "-init_wirelength_coef" $coef
+    set_replace_init_wirelength_coef_cmd $coef
   }
   
   if { [info exists keys(-overflow)] } {

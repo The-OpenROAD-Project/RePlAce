@@ -47,6 +47,7 @@ class Replace
     void setTargetDensity(float density);
     void setTargetOverflow(float overflow);
     void setInitDensityPenalityFactor(float penaltyFactor);
+    void setInitWireLengthCoef(float coef);
     void setMinPhiCoef(float minPhiCoef);
     void setMaxPhiCoef(float maxPhiCoef);
 
@@ -75,6 +76,7 @@ class Replace
     float overflow_;
     float density_;
     float initDensityPenalityFactor_;
+    float initWireLengthCoef_;
     float minPhiCoef_;
     float maxPhiCoef_;
     float referenceHpwl_;
