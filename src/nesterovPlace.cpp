@@ -436,8 +436,8 @@ NesterovPlace::doNesterovPlace() {
     // 1) happen overflow < 20%
     // 2) Hpwl is growing
     //
-    if( sumOverflow_ < 0.2f 
-        && sumOverflow_ - hpwlWithMinSumOverflow >= 0.02f
+    if( sumOverflow_ < 0.3f 
+        && sumOverflow_ - minSumOverflow >= 0.02f
         && hpwlWithMinSumOverflow * 1.2f < prevHpwl_ ) {
       cout << "INFO: RePlAce divergence detected" << endl;
       cout << "      Please decrease max_phi_cof" << endl;
