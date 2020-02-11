@@ -122,6 +122,8 @@ record_replace_tests {
   core01 
   ar01 
   ar02 
+  diverge01
+  diverge02
 }
 
 # Record tests in $STAX/designs
@@ -138,6 +140,15 @@ define_test_group med {
 }
 
 define_test_group slow {
+  median01
+  median02
+  median03
+  median04
+  median05
+  median06
+  large01
+  large02
+  large03
 }
 
 set fast [group_tests all]
