@@ -139,16 +139,17 @@ record_test_design {
 define_test_group med {
 }
 
+# commented out at this moment..
 define_test_group slow {
-  median01
-  median02
-  median03
-  median04
-  median05
-  median06
-  large01
-  large02
-  large03
+  # medium01
+  # medium02
+  # medium03
+  # medium04
+  # medium05
+  # medium06
+  # large01
+  # large02
+  # large03
 }
 
 set fast [group_tests all]

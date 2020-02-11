@@ -1,0 +1,144 @@
+Notice 0: Reading LEF file:  ./nangate45.lef
+Notice 0:     Created 22 technology layers
+Notice 0:     Created 27 technology vias
+Notice 0:     Created 134 library cells
+Notice 0: Finished LEF file:  ./nangate45.lef
+Notice 0: 
+Reading DEF file: ./diverge02.def
+Notice 0: Design: gcd
+Notice 0:     Created 54 pins.
+Notice 0:     Created 294 components and 1656 component-terminals.
+Notice 0:     Created 364 nets and 1068 connections.
+Notice 0: Finished DEF file: ./diverge02.def
+Design Info
+Instances      : 294
+PlaceInstances : 294
+FixedInstances : 0
+DummyInstances : 0
+Nets           : 364
+Pins           : 1710
+MaxFanout      : 35
+MaxFanoutNet   : clk
+AvgFanout      : 3.08242
+
+DieBox         : ( -140 -140 ) - ( 62070 61740 ) 
+CoreBox        : ( 0 0 ) - ( 61940 61600 ) 
+coreArea       : 3815504000
+placeInstsArea : 2279088000
+nonPlaceInstsArea : 0
+utilization    : 59.7323
+
+Begin InitialPlace ...
+End InitialPlace
+InstGCells     : 294
+FillerSize     : ( 2432, 2800 )
+FillerGCells   : 57
+GCells         : 351
+GNets          : 364
+GPins          : 1710
+TargetDensity  : 0.7
+AveragePlaceInstArea: : 7752000
+IdealBinArea   : 11074286
+IdealBinCnt    : 344
+TotalBinArea   : 3815504000
+BinCnt         : ( 16, 16 )
+BinSize        : ( 3872, 3850 )
+TotalBinCnt    : 256
+Initial Hpwl : 3009930
+baseWireLengthCoef_ : 2.69792e-07
+InitSumOverflow: 0.96303
+newWireLengthCoef: 3.25975e-08
+wireLengthCoef: 3.25975e-08
+densityPenalty_: 0
+WL GradSum: 0.075981
+De GradSum: 307102
+densityPenalty_: 0
+WL GradSum: 0.0759781
+De GradSum: 307103
+wireLengthGradSum_ : 0.0759781
+densityGradSum_ : 307103
+initDensityPenalty_ : 2.47403e-05
+PrevSumOverflow: 0.96303
+cDist: 0.00456087
+gDist: 3.61389e-09
+calVal: 1.26204e+06
+initialStepLength: 1.26204e+06
+Iter: 1
+stepLength_: 1.26204e+06
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.0750613
+De GradSum: 359727
+cDist: 57.7064
+gDist: 0.0276639
+calVal: 2085.98
+newStepLength: 2085.98
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.0759709
+De GradSum: 307093
+cDist: 0.0954471
+gDist: 0.0276396
+calVal: 3.45327
+newStepLength: 3.45327
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+densityPenalty_: 2.47403e-05
+WL GradSum: 0.075981
+De GradSum: 307102
+cDist: 0
+gDist: 0.0276397
+calVal: 0
+newStepLength: 0
+numBackTrak: 10
+INFO: RePlAce divergence detected
+      Please decrease init_density_penalty
+INFO: RePlAce diverged. Please tune the parameters again
+Worst slack: 1.00e+30
+Total negative slack: 0.00e+00
+No differences found.
