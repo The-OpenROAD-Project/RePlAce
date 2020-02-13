@@ -20,10 +20,10 @@ NesterovPlaceVars::NesterovPlaceVars()
   maxBackTrack(10),
   verboseLevel(1),
   initDensityPenalty(0.0001),
-  initWireLengthCoef(1.0/24.0),
+  initWireLengthCoef(1.0),
   targetOverflow(0.1),
   minPhiCoef(0.95),
-  maxPhiCoef(1.04),
+  maxPhiCoef(1.05),
   minPreconditioner(1.0),
   initialPrevCoordiUpdateCoef(100),
   referenceHpwl(446000000) {}

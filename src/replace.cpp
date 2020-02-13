@@ -50,10 +50,10 @@ void Replace::reset() {
   overflow_ = 0;
   density_ = 0;
   initDensityPenalityFactor_ = 0.0001;
-  initWireLengthCoef_ = 1.0/240.0;
+  initWireLengthCoef_ = 1.0;
   minPhiCoef_ = 0.95;
-  maxPhiCoef_ = 0.05;
-  referenceHpwl_= 84600000;
+  maxPhiCoef_ = 1.05;
+  referenceHpwl_= 446000000;
   verbose_ = 0;
 }
 
