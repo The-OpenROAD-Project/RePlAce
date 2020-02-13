@@ -1498,7 +1498,7 @@ NesterovBase::updateWireLengthForceWA(
       float expMinX = (gNet->lx() - gPin->cx()) * wlCoeffX; 
       float expMaxX = (gPin->cx() - gNet->ux()) * wlCoeffX;
       float expMinY = (gNet->ly() - gPin->cy()) * wlCoeffY;
-      float expMaxY = (gPin->cy() - gNet->ly()) * wlCoeffY;
+      float expMaxY = (gPin->cy() - gNet->uy()) * wlCoeffY;
 
       // min x
       if(expMinX > nbVars_.minWireLengthForceBar) {
@@ -1625,7 +1625,7 @@ NesterovBase::getWireLengthPreconditioner(GCell* gCell) {
 
 FloatCoordi
 NesterovBase::getDensityPreconditioner(GCell* gCell) {
-  float areaVal = 0.0001 * static_cast<float>(gCell->dx()) 
+  float areaVal = static_cast<float>(gCell->dx()) 
     * static_cast<float>(gCell->dy());
 
   return FloatCoordi(areaVal, areaVal);
@@ -1648,8 +1648,8 @@ NesterovBase::getDensityGradient(GCell* gCell) {
       float overlapArea 
         = getOverlapDensityArea(bin, gCell) * gCell->densityScale();
 
-      electroForce.x += 0.0001 * overlapArea * bin->electroForceX();
-      electroForce.y += 0.0001 * overlapArea * bin->electroForceY();
+      electroForce.x += overlapArea * bin->electroForceX();
+      electroForce.y += overlapArea * bin->electroForceY();
     }
   }
   return electroForce;
