@@ -63,6 +63,7 @@ set (REPLACE_SRC
   src/fftsg2d.cpp
   src/coordi.cpp
   src/plot.cpp
+  src/logger.cpp
   )
 
 set (REPLACE_HEADER

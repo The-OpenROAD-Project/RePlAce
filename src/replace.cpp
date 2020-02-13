@@ -3,6 +3,7 @@
 #include "nesterovPlace.h"
 #include "placerBase.h"
 #include "nesterovBase.h"
+#include "logger.h"
 #include <iostream>
 
 namespace replace {
@@ -14,6 +15,7 @@ Replace::Replace()
   sta_(nullptr), 
   pb_(nullptr), nb_(nullptr), 
   ip_(nullptr), np_(nullptr),
+  log_(nullptr),
   initialPlaceMaxIter_(20), 
   initialPlaceMinDiffLength_(1500),
   initialPlaceMaxSolverIter_(100),
@@ -64,7 +66,8 @@ void Replace::setSta(sta::dbSta* sta) {
   sta_ = sta;
 }
 void Replace::doInitialPlace() {
-  pb_ = std::make_shared<PlacerBase>(db_);
+  log_ = std::make_shared<Logger>(verbose_);
+  pb_ = std::make_shared<PlacerBase>(db_, log_);
 
   InitialPlaceVars ipVars;
   ipVars.maxIter = initialPlaceMaxIter_;
@@ -73,14 +76,18 @@ void Replace::doInitialPlace() {
   ipVars.netWeightScale = initialPlaceNetWeightScale_;
   ipVars.verbose = verbose_;
   
-  std::unique_ptr<InitialPlace> ip(new InitialPlace(ipVars, pb_));
+  std::unique_ptr<InitialPlace> ip(new InitialPlace(ipVars, pb_, log_));
   ip_ = std::move(ip);
   ip_->doBicgstabPlace();
 }
 
 void Replace::doNesterovPlace() {
+  if( !log_ ) {
+    log_ = std::make_shared<Logger>(verbose_);
+  }
+
   if( !pb_ ) {
-    pb_ = std::make_shared<PlacerBase>(db_);
+    pb_ = std::make_shared<PlacerBase>(db_, log_);
   }
 
   NesterovBaseVars nbVars;
@@ -96,7 +103,7 @@ void Replace::doNesterovPlace() {
     nbVars.binCntY = binGridCntY_;
   }
 
-  nb_ = std::make_shared<NesterovBase>(nbVars, pb_);
+  nb_ = std::make_shared<NesterovBase>(nbVars, pb_, log_);
 
   NesterovPlaceVars npVars;
 
@@ -109,7 +116,7 @@ void Replace::doNesterovPlace() {
   npVars.targetOverflow = overflow_;
   npVars.maxNesterovIter = nesterovPlaceMaxIter_; 
 
-  std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_));
+  std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_, log_));
   np_ = std::move(np);
 
   np_->doNesterovPlace();

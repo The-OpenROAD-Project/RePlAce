@@ -29,7 +29,7 @@ NesterovPlaceVars::NesterovPlaceVars()
   referenceHpwl(446000000) {}
 
 NesterovPlace::NesterovPlace() 
-  : pb_(nullptr), nb_(nullptr), npVars_(), 
+  : pb_(nullptr), nb_(nullptr), log_(nullptr), npVars_(), 
   wireLengthGradSum_(0), 
   densityGradSum_(0),
   stepLength_(0),
@@ -43,11 +43,13 @@ NesterovPlace::NesterovPlace()
 NesterovPlace::NesterovPlace(
     NesterovPlaceVars npVars,
     std::shared_ptr<PlacerBase> pb, 
-    std::shared_ptr<NesterovBase> nb) 
+    std::shared_ptr<NesterovBase> nb,
+    std::shared_ptr<Logger> log) 
 : NesterovPlace() {
   npVars_ = npVars;
   pb_ = pb;
   nb_ = nb;
+  log_ = log;
   init();
 }
 

@@ -26,10 +26,12 @@ void InitialPlaceVars::reset() {
 }
 
 InitialPlace::InitialPlace()
-: ipVars_(), pb_(nullptr) {} 
+: ipVars_(), pb_(nullptr), log_(nullptr) {} 
 
-InitialPlace::InitialPlace(InitialPlaceVars ipVars, std::shared_ptr<PlacerBase> pb)
-: ipVars_(ipVars), pb_(pb) {}
+InitialPlace::InitialPlace(InitialPlaceVars ipVars, 
+    std::shared_ptr<PlacerBase> pb,
+    std::shared_ptr<Logger> log)
+: ipVars_(ipVars), pb_(pb), log_(log) {}
 
 InitialPlace::~InitialPlace() {
   reset();

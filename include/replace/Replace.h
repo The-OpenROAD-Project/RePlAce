@@ -18,6 +18,8 @@ class NesterovBase;
 class InitialPlace;
 class NesterovPlace;
 
+class Logger;
+
 class Replace
 {
   public:
@@ -61,6 +63,7 @@ class Replace
 
     std::shared_ptr<PlacerBase> pb_;
     std::shared_ptr<NesterovBase> nb_;
+    std::shared_ptr<replace::Logger> log_;
 
     std::unique_ptr<InitialPlace> ip_;
     std::unique_ptr<NesterovPlace> np_;

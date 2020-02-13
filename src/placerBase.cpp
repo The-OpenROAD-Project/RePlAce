@@ -561,12 +561,14 @@ Die::coreDy() const {
 // PlacerBase
 
 PlacerBase::PlacerBase() 
-  : db_(nullptr), siteSizeX_(0), siteSizeY_(0),
+  : db_(nullptr), log_(nullptr), siteSizeX_(0), siteSizeY_(0),
   placeInstsArea_(0), nonPlaceInstsArea_(0) {}
 
-PlacerBase::PlacerBase(odb::dbDatabase* db)
+PlacerBase::PlacerBase(odb::dbDatabase* db,
+    std::shared_ptr<Logger> log)
   : PlacerBase() {
   db_ = db;
+  log_ = log;
   init();
 }
 

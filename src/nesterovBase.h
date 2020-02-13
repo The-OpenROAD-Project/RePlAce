@@ -20,6 +20,8 @@ class Net;
 class GPin;
 class FFT;
 
+class Logger;
+
 class GCell {
 public:
   GCell();
@@ -438,7 +440,8 @@ public:
 class NesterovBase {
 public:
   NesterovBase();
-  NesterovBase(NesterovBaseVars nbVars, std::shared_ptr<PlacerBase> pb);
+  NesterovBase(NesterovBaseVars nbVars, std::shared_ptr<PlacerBase> pb,
+      std::shared_ptr<Logger> log);
   ~NesterovBase();
 
   const std::vector<GCell*> & gCells() const { return gCells_; }
@@ -519,6 +522,7 @@ public:
 private:
   NesterovBaseVars nbVars_;
   std::shared_ptr<PlacerBase> pb_;
+  std::shared_ptr<Logger> log_;
 
   BinGrid bg_;
   std::unique_ptr<FFT> fft_;

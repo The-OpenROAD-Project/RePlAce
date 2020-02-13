@@ -3,6 +3,7 @@
 #include "nesterovBase.h"
 #include "placerBase.h"
 #include "fft.h"
+#include "logger.h"
 
 #include <iostream>
 #include <random>
@@ -1090,14 +1091,16 @@ NesterovBaseVars::reset() {
 // NesterovBase 
 
 NesterovBase::NesterovBase()
-  : pb_(nullptr), sumPhi_(0) {}
+  : pb_(nullptr), log_(nullptr), sumPhi_(0) {}
 
 NesterovBase::NesterovBase(
     NesterovBaseVars nbVars, 
-    std::shared_ptr<PlacerBase> pb)
+    std::shared_ptr<PlacerBase> pb,
+    std::shared_ptr<Logger> log)
   : NesterovBase() {
   nbVars_ = nbVars;
   pb_ = pb;
+  log_ = log;
   init();
 }
 
@@ -1285,8 +1288,7 @@ NesterovBase::initFillerGCells() {
   int avgDx = static_cast<int>(dxSum / (maxIdx - minIdx));
   int avgDy = static_cast<int>(dySum / (maxIdx - minIdx));
 
-  cout << "FillerSize     : ( " 
-    << avgDx << ", " << avgDy << " )" << endl;
+  log_->infoIntPair("FillerInit: FillerCellSize", avgDx, avgDy, 3); 
 
   int64_t coreArea = 
     static_cast<int64_t>(pb_->die().coreDx()) *
@@ -1302,18 +1304,20 @@ NesterovBase::initFillerGCells() {
   int64_t totalFillerArea = movableArea 
     - static_cast<int64_t>(pb_->placeInstsArea());
 
+  log_->infoInt64("FillerInit: FillerCellArea", totalFillerArea, 3);
+
   if( totalFillerArea < 0 ) {
-    cout << "ERROR: Filler area is negative!!" << endl;
-    cout << "       Please put higher target density or " << endl;
-    cout << "       Re-floorplan to have enough coreArea" << endl;
-    exit(1);
+    string msg = "Filler area is negative!!\n";
+    msg += "       Please put higher target density or \n";
+    msg += "       Re-floorplan to have enough coreArea\n";
+    log_->error( msg );
   }
 
   int fillerCnt = 
     static_cast<int>(totalFillerArea 
         / static_cast<int64_t>(avgDx * avgDy));
 
-  cout << "FillerGCells   : " << fillerCnt << endl;
+  log_->infoInt("FillerInit: NumCells", fillerCnt, 3);
 
   // 
   // mt19937 supports huge range of random values.

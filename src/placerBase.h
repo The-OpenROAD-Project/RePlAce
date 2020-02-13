@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 namespace odb {
 class dbDatabase;
@@ -25,6 +26,8 @@ namespace replace {
 class Pin;
 class Net;
 class GCell;
+
+class Logger;
 
 class Instance {
 public:
@@ -226,7 +229,7 @@ private:
 class PlacerBase {
 public:
   PlacerBase();
-  PlacerBase(odb::dbDatabase* db);
+  PlacerBase(odb::dbDatabase* db, std::shared_ptr<Logger> log);
   ~PlacerBase();
 
   const std::vector<Instance*>& insts() const { return insts_; }
@@ -263,6 +266,7 @@ public:
 
 private:
   odb::dbDatabase* db_;
+  std::shared_ptr<Logger> log_;
 
   Die die_;
 

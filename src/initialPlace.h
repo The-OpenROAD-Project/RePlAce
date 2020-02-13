@@ -8,6 +8,7 @@
 namespace replace {
 
 class PlacerBase;
+class Logger;
 class InitialPlaceVars {
 public:
   int maxIter;
@@ -25,7 +26,9 @@ typedef Eigen::SparseMatrix<float, Eigen::RowMajor> SMatrix;
 class InitialPlace {
   public:
     InitialPlace();
-    InitialPlace(InitialPlaceVars ipVars, std::shared_ptr<PlacerBase> pb);
+    InitialPlace(InitialPlaceVars ipVars, 
+        std::shared_ptr<PlacerBase> pb,
+        std::shared_ptr<Logger> log);
     ~InitialPlace();
 
     void doBicgstabPlace();
@@ -33,6 +36,7 @@ class InitialPlace {
   private:
     InitialPlaceVars ipVars_;
     std::shared_ptr<PlacerBase> pb_;
+    std::shared_ptr<Logger> log_;
 
     // Solve two SparseMatrix equations here;
     //

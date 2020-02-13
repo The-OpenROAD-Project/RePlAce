@@ -11,6 +11,7 @@ namespace replace
 class PlacerBase;
 class Instance;
 class NesterovBase;
+class Logger;
 
 class NesterovPlaceVars {
   public:
@@ -33,7 +34,8 @@ public:
   NesterovPlace();
   NesterovPlace(NesterovPlaceVars npVars,
       std::shared_ptr<PlacerBase> pb,
-      std::shared_ptr<NesterovBase> nb);
+      std::shared_ptr<NesterovBase> nb,
+      std::shared_ptr<Logger> log);
   ~NesterovPlace();
 
   void doNesterovPlace();
@@ -66,6 +68,7 @@ public:
 private:
   std::shared_ptr<PlacerBase> pb_;
   std::shared_ptr<NesterovBase> nb_;
+  std::shared_ptr<Logger> log_;
   NesterovPlaceVars npVars_;
 
   // SLP is Step Length Prediction.
