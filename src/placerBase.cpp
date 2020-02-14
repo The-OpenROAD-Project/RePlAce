@@ -635,25 +635,6 @@ PlacerBase::init() {
     insts_.push_back(&inst);
   }
 
-  // pins fill 
-  /*
-  dbSet<dbBTerm> bTerms = block->getBTerms();
-  dbSet<dbITerm> iTerms = block->getITerms();
-  pinStor_.reserve(bTerms.size() + iTerms.size());
-  for(dbBTerm* bTerm : bTerms) {
-    Pin myPin(bTerm);
-    pinStor_.push_back( myPin );
-    pinMap_[(void*)bTerm] = &pinStor_[pinStor_.size()-1];
-  }
-  for(dbITerm* iTerm : iTerms) {
-    Pin myPin(iTerm);
-    pinStor_.push_back( myPin );
-    pinMap_[(void*)iTerm] = &pinStor_[pinStor_.size()-1];
-  }
-  log_->infoInt("BTerms", bTerms.size());
-  log_->infoInt("ITerms", iTerms.size());
-  */
-
   // nets fill
   dbSet<dbNet> nets = block->getNets();
   netStor_.reserve(nets.size());
@@ -717,21 +698,6 @@ PlacerBase::init() {
     }
   }
 
-  // pins' net and instance fill 
-  /*
-  pins_.reserve(pinStor_.size());
-  for(auto& pin : pinStor_) {
-    if( pin.isITerm() ) {
-      pin.setInstance( dbToPlace( pin.dbITerm()->getInst() ) );
-      pin.setNet( dbToPlace( pin.dbITerm()->getNet() ) );
-    }
-    else if( pin.isBTerm() ) {
-      pin.setNet( dbToPlace( pin.dbBTerm()->getNet() ) );
-    }
-    pins_.push_back(&pin);
-  }
-  */
- 
   // nets' pin update
   nets_.reserve(netStor_.size());
   for(auto& net : netStor_) {
