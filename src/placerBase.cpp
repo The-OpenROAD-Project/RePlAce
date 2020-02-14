@@ -893,9 +893,10 @@ PlacerBase::printInfo() const {
     static_cast<float>(placeInstsArea_) 
     / (coreArea - nonPlaceInstsArea_) * 100;
 
-  cout << "coreArea       : " << coreArea << endl;
-  cout << "placeInstsArea : " << placeInstsArea_ << endl;
-  cout << "nonPlaceInstsArea : " << nonPlaceInstsArea_ << endl;
+  log_->infoInt64("CoreArea", coreArea);
+  log_->infoInt64("NonPlaceInstsArea", nonPlaceInstsArea_);
+
+  log_->infoInt64("PlaceInstsArea", placeInstsArea_ );
   log_->infoFloat("Util(%)", util);
 
   if( util >= 100.1 ) {

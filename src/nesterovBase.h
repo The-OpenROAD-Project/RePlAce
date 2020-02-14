@@ -362,6 +362,7 @@ public:
   ~BinGrid();
 
   void setPlacerBase(std::shared_ptr<PlacerBase> pb);
+  void setLogger(std::shared_ptr<Logger> log);
   void setCoordi(Die* die);
   void setBinCnt(int binCntX, int binCntY);
   void setBinCntX(int binCntX);
@@ -406,6 +407,7 @@ private:
   std::vector<Bin> binStor_;
   std::vector<Bin*> bins_;
   std::shared_ptr<PlacerBase> pb_;
+  std::shared_ptr<Logger> log_;
   int lx_;
   int ly_;
   int ux_;

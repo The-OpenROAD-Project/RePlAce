@@ -712,6 +712,11 @@ BinGrid::setPlacerBase(std::shared_ptr<PlacerBase> pb) {
 }
 
 void
+BinGrid::setLogger(std::shared_ptr<Logger> log) {
+  log_ = log;
+}
+
+void
 BinGrid::setTargetDensity(float density) {
   targetDensity_ = density;
 }
@@ -814,11 +819,11 @@ BinGrid::initBins() {
     std::round(static_cast<float>(averagePlaceInstArea) / targetDensity_);
   int idealBinCnt = totalBinArea / idealBinArea; 
   
-  cout << "TargetDensity  : " << targetDensity_ << endl;
-  cout << "AveragePlaceInstArea: : " << averagePlaceInstArea << endl;
-  cout << "IdealBinArea   : " << idealBinArea << endl;
-  cout << "IdealBinCnt    : " << idealBinCnt << endl;
-  cout << "TotalBinArea   : " << totalBinArea << endl;
+  log_->infoFloat("TargetDensity", targetDensity_);
+  log_->infoInt64("AveragePlaceInstArea", averagePlaceInstArea);
+  log_->infoInt64("IdealBinArea", idealBinArea);
+  log_->infoInt64("IdealBinCnt", idealBinCnt);
+  log_->infoInt64("TotalBinArea", totalBinArea);
 
   int foundBinCnt = 2;
   // find binCnt: 2, 4, 8, 16, 32, 64, ...
@@ -840,16 +845,15 @@ BinGrid::initBins() {
     binCntY_ = foundBinCnt;
   }
 
-  cout << "BinCnt         : ( " << binCntX_ 
-    << ", " << binCntY_ << " )" << endl;
+
+  log_->infoIntPair("BinCnt", binCntX_, binCntY_ );
   
   binSizeX_ = ceil(
       static_cast<float>((ux_ - lx_))/binCntX_);
   binSizeY_ = ceil(
       static_cast<float>((uy_ - ly_))/binCntY_);
   
-  cout << "BinSize        : ( " << binSizeX_
-    << ", " << binSizeY_ << " )" << endl;
+  log_->infoIntPair("BinSize", binSizeX_, binSizeY_);
 
   // initialize binStor_, bins_ vector
   binStor_.resize(binCntX_ * binCntY_);
@@ -1117,9 +1121,6 @@ NesterovBase::init() {
     gCellStor_.push_back(myGCell);
   }
 
-  cout << "InstGCells     : " 
-    << gCellStor_.size() << endl;
-  
   // TODO: 
   // at this moment, GNet and GPin is equal to
   // Net and Pin
@@ -1137,7 +1138,6 @@ NesterovBase::init() {
     GNet myGNet(net);
     gNetStor_.push_back(myGNet);
   }
-
 
   // update gFillerCells
   initFillerGCells();
@@ -1191,12 +1191,9 @@ NesterovBase::init() {
     }
   }
 
-  cout << "GCells         : " 
-    << gCells_.size() << endl;
-  cout << "GNets          : " 
-    << gNets_.size() << endl;
-  cout << "GPins          : " 
-    << gPins_.size() << endl;
+  log_->infoInt("FillerInit: NumGCells", gCells_.size());
+  log_->infoInt("FillerInit: NumGNets", gNets_.size());
+  log_->infoInt("FillerInit: NumGPins", gPins_.size());
 
   // initialize bin grid structure
   // send param into binGrid structure
@@ -1209,6 +1206,7 @@ NesterovBase::init() {
   }
 
   bg_.setPlacerBase(pb_);
+  bg_.setLogger(log_);
   bg_.setCoordi(&(pb_->die()));
   bg_.setTargetDensity(nbVars_.targetDensity);
   
@@ -1276,8 +1274,8 @@ NesterovBase::initFillerGCells() {
   // average from (10 - 90%) .
   int64_t dxSum = 0, dySum = 0;
 
-  int minIdx = dxStor.size()*0.10;
-  int maxIdx = dxStor.size()*0.90;
+  int minIdx = dxStor.size()*0.05;
+  int maxIdx = dxStor.size()*0.95;
   for(int i=minIdx; i<maxIdx; i++) {
     dxSum += dxStor[i];
     dySum += dyStor[i];
@@ -1288,7 +1286,6 @@ NesterovBase::initFillerGCells() {
   int avgDx = static_cast<int>(dxSum / (maxIdx - minIdx));
   int avgDy = static_cast<int>(dySum / (maxIdx - minIdx));
 
-  log_->infoIntPair("FillerInit: FillerCellSize", avgDx, avgDy, 3); 
 
   int64_t coreArea = 
     static_cast<int64_t>(pb_->die().coreDx()) *
@@ -1304,7 +1301,6 @@ NesterovBase::initFillerGCells() {
   int64_t totalFillerArea = movableArea 
     - static_cast<int64_t>(pb_->placeInstsArea());
 
-  log_->infoInt64("FillerInit: FillerCellArea", totalFillerArea, 3);
 
   if( totalFillerArea < 0 ) {
     string msg = "Filler area is negative!!\n";
@@ -1317,7 +1313,10 @@ NesterovBase::initFillerGCells() {
     static_cast<int>(totalFillerArea 
         / static_cast<int64_t>(avgDx * avgDy));
 
-  log_->infoInt("FillerInit: NumCells", fillerCnt, 3);
+  log_->infoInt64("FillerInit: TotalFillerArea", totalFillerArea, 3);
+  log_->infoInt("FillerInit: NumFillerCells", fillerCnt, 3);
+  log_->infoInt64("FillerInit: FillerCellArea", static_cast<int64_t>(avgDx*avgDy), 3);
+  log_->infoIntPair("FillerInit: FillerCellSize", avgDx, avgDy, 3); 
 
   // 
   // mt19937 supports huge range of random values.
