@@ -1,5 +1,7 @@
 #include "placerBase.h"
 #include "nesterovBase.h"
+#include "logger.h"
+
 #include <opendb/db.h>
 #include <iostream>
 
@@ -579,6 +581,9 @@ PlacerBase::~PlacerBase() {
 
 void 
 PlacerBase::init() {
+
+  log_->infoInt("DBU", db_->getTech()->getDbUnitsPerMicron()); 
+
   dbBlock* block = db_->getChip()->getBlock();
   dbSet<dbInst> insts = block->getInsts();
   
@@ -591,6 +596,10 @@ PlacerBase::init() {
   dbRow* firstRow = *(rows.begin());
   siteSizeX_ = firstRow->getSite()->getWidth();
   siteSizeY_ = firstRow->getSite()->getHeight();
+
+  log_->infoIntPair("SiteSize", siteSizeX_, siteSizeY_);
+  log_->infoIntPair("CoreAreaLxLy", die_.coreLx(), die_.coreLy());
+  log_->infoIntPair("CoreAreaUxUy", die_.coreUx(), die_.coreUy());
   
   // insts fill with real instances
   instStor_.reserve(insts.size());
@@ -627,6 +636,7 @@ PlacerBase::init() {
   }
 
   // pins fill 
+  /*
   dbSet<dbBTerm> bTerms = block->getBTerms();
   dbSet<dbITerm> iTerms = block->getITerms();
   pinStor_.reserve(bTerms.size() + iTerms.size());
@@ -640,14 +650,54 @@ PlacerBase::init() {
     pinStor_.push_back( myPin );
     pinMap_[(void*)iTerm] = &pinStor_[pinStor_.size()-1];
   }
+  log_->infoInt("BTerms", bTerms.size());
+  log_->infoInt("ITerms", iTerms.size());
+  */
 
   // nets fill
   dbSet<dbNet> nets = block->getNets();
   netStor_.reserve(nets.size());
   for(dbNet* net : nets) {
+    dbSigType netType = net->getSigType();
+
+    // escape nets with VDD/VSS/reset nets
+    if( netType == dbSigType::GROUND ||
+        netType == dbSigType::POWER ||
+        netType == dbSigType::RESET ) {
+      continue;
+    }
+
     Net myNet(net);
     netStor_.push_back( myNet );
-    netMap_[net] = &netStor_[netStor_.size()-1];
+    
+    // this is safe because of "reserve"
+    Net* myNetPtr = &netStor_[netStor_.size()-1];
+    netMap_[net] = myNetPtr;
+
+    for(dbITerm* iTerm : net->getITerms()) {
+      Pin myPin(iTerm);
+      myPin.setNet(myNetPtr); 
+      myPin.setInstance( dbToPlace(iTerm->getInst()) );
+      pinStor_.push_back( myPin );
+    }
+
+    for(dbBTerm* bTerm : net->getBTerms()) {
+      Pin myPin(bTerm);
+      myPin.setNet(myNetPtr);
+      pinStor_.push_back( myPin );
+    }
+  }
+
+  // pinMap_ and pins_ update
+  pins_.reserve(pinStor_.size());
+  for(auto& pin : pinStor_) {
+    if( pin.isITerm() ) {
+      pinMap_[(void*)pin.dbITerm()] = &pin;
+    }
+    else if( pin.isBTerm() ) {
+      pinMap_[(void*)pin.dbBTerm()] = &pin;
+    }
+    pins_.push_back(&pin);
   }
 
   // instStor_'s pins_ fill
@@ -656,11 +706,19 @@ PlacerBase::init() {
       continue;
     }
     for(dbITerm* iTerm : inst.dbInst()->getITerms()) {
-      inst.addPin( dbToPlace(iTerm) );
+      // note that, DB's ITerm can have
+      // VDD/VSS pins.
+      //
+      // Escape those pins
+      Pin* curPin = dbToPlace(iTerm);
+      if( curPin ) {
+        inst.addPin( curPin );
+      }
     }
   }
 
   // pins' net and instance fill 
+  /*
   pins_.reserve(pinStor_.size());
   for(auto& pin : pinStor_) {
     if( pin.isITerm() ) {
@@ -672,8 +730,9 @@ PlacerBase::init() {
     }
     pins_.push_back(&pin);
   }
+  */
  
-  //nets' pin update
+  // nets' pin update
   nets_.reserve(netStor_.size());
   for(auto& net : netStor_) {
     for(dbITerm* iTerm : net.dbNet()->getITerms()) {
@@ -829,13 +888,12 @@ PlacerBase::dbToPlace(odb::dbNet* net) const {
 
 void 
 PlacerBase::printInfo() const { 
-  cout << "Design Info" << endl;
-  cout << "Instances      : " << instStor_.size() << endl;
-  cout << "PlaceInstances : " << placeInsts_.size() << endl;
-  cout << "FixedInstances : " << fixedInsts_.size() << endl;
-  cout << "DummyInstances : " << dummyInsts_.size() << endl;
-  cout << "Nets           : " << nets_.size() << endl;
-  cout << "Pins           : " << pins_.size() << endl;
+  log_->infoInt("NunInstances", instStor_.size());
+  log_->infoInt("NumPlaceInstances", placeInsts_.size());
+  log_->infoInt("NumFixedInstances", fixedInsts_.size());
+  log_->infoInt("NumDummyInstances", dummyInsts_.size());
+  log_->infoInt("NumNets", nets_.size());
+  log_->infoInt("NumPins", pins_.size());
 
   int maxFanout = INT_MIN;
   int sumFanout = 0;
@@ -847,23 +905,20 @@ PlacerBase::printInfo() const {
     }
     sumFanout += (int)net->pins().size();
   }
+
+  /*
   cout << "MaxFanout      : " << maxFanout << endl;
   cout << "MaxFanoutNet   : " 
     << maxFanoutNet->getConstName() << endl;
   cout << "AvgFanout      : " 
     << static_cast<float>(sumFanout) / nets_.size() << endl; 
   cout << endl;
+  */
 
-  cout << "DieBox         : ( " 
-    << die_.dieLx() << " " << die_.dieLy() 
-    << " ) - ( " 
-    << die_.dieUx() << " " << die_.dieUy() 
-    << " ) " << endl;
-  cout << "CoreBox        : ( " 
-    << die_.coreLx() << " " << die_.coreLy() 
-    << " ) - ( " 
-    << die_.coreUx() << " " << die_.coreUy() 
-    << " ) " << endl;
+  log_->infoIntPair("DieAreaLxLy", die_.dieLx(), die_.dieLy() );
+  log_->infoIntPair("DieAreaUxUy", die_.dieUx(), die_.dieUy() );
+  log_->infoIntPair("CoreAreaLxLy", die_.coreLx(), die_.coreLy() );
+  log_->infoIntPair("CoreAreaUxUy", die_.coreUx(), die_.coreUy() );
 
   int64_t coreArea = 
     static_cast<int64_t>(die_.coreUx() - die_.coreLx()) * 
@@ -875,8 +930,7 @@ PlacerBase::printInfo() const {
   cout << "coreArea       : " << coreArea << endl;
   cout << "placeInstsArea : " << placeInstsArea_ << endl;
   cout << "nonPlaceInstsArea : " << nonPlaceInstsArea_ << endl;
-  cout << "utilization    : " << util << endl; 
-  cout << endl;
+  log_->infoFloat("Util(%)", util);
 
   if( util >= 100.1 ) {
     cout << "Error: Util exceeds 100%." << endl;
