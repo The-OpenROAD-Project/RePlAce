@@ -1,5 +1,6 @@
 #include "initialPlace.h"
 #include "placerBase.h"
+#include "logger.h" 
 #include <iostream>
 
 #include <Eigen/IterativeLinearSolvers>
@@ -43,9 +44,7 @@ void InitialPlace::reset() {
 }
 
 void InitialPlace::doBicgstabPlace() {
-  if( ipVars_.verbose > 0 ) {
-    cout << "Begin InitialPlace ..." << endl;
-  }
+  log_->procBegin("InitialPlace", 3);
 
   float errorX = 0.0f, errorY = 0.0f;
   
@@ -73,9 +72,7 @@ void InitialPlace::doBicgstabPlace() {
     updateCoordi();
   }
 
-  if( ipVars_.verbose > 0 ) {
-    cout << "End InitialPlace" << endl;
-  }
+  log_->procEnd("InitialPlace", 3);
 }
 
 // starting point of initial place is center.

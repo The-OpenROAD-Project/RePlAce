@@ -17,7 +17,6 @@ class NesterovPlaceVars {
   public:
   int maxNesterovIter;
   int maxBackTrack;
-  int verboseLevel;
   float initDensityPenalty; // INIT_LAMBDA
   float initWireLengthCoef; // base_wcof
   float targetOverflow; // overflow

@@ -2,6 +2,7 @@
 #include "nesterovBase.h"
 #include "nesterovPlace.h"
 #include "opendb/db.h"
+#include "logger.h"
 #include <iostream>
 using namespace std;
 
@@ -18,7 +19,6 @@ getSecondNorm(vector<FloatCoordi>& a);
 NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
-  verboseLevel(1),
   initDensityPenalty(0.0001),
   initWireLengthCoef(1.0),
   targetOverflow(0.1),
@@ -62,6 +62,8 @@ static PlotEnv pe;
 #endif
 
 void NesterovPlace::init() {
+  log_->procBegin("NesterovInit", 3);
+
   const int gCellSize = nb_->gCells().size();
   curSLPCoordi_.resize(gCellSize, FloatCoordi());
   curSLPWireLengthGrads_.resize(gCellSize, FloatCoordi());
@@ -96,33 +98,26 @@ void NesterovPlace::init() {
   prevHpwl_ 
     = nb_->getHpwl();
 
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "InitialHPWL: " << prevHpwl_ << endl;
-  }
+  log_->infoFloatSignificant("InitialHPWL", prevHpwl_, 3);
 
   // FFT update
   nb_->updateDensityForceBin();
 
   baseWireLengthCoef_ 
     = npVars_.initWireLengthCoef 
-    / static_cast<float>(nb_->binSizeX() + nb_->binSizeY()) * 0.5;
+    / (static_cast<float>(nb_->binSizeX() + nb_->binSizeY()) * 0.5);
 
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "BaseWireLengthCoef: " << baseWireLengthCoef_ << endl;
-  }
+  log_->infoFloatSignificant("BaseWireLengthCoef", baseWireLengthCoef_, 3);
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
         / static_cast<float>(pb_->placeInstsArea());
 
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "InitSumOverflow: " << sumOverflow_ << endl;
-  }
+  log_->infoFloatSignificant("InitSumOverflow", sumOverflow_, 3);
+
   updateWireLengthCoef(sumOverflow_);
 
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "WireLengthCoef: " << wireLengthCoefX_ << endl;
-  }
+  log_->infoFloatSignificant("WireLengthCoef", wireLengthCoefX_, 3);
 
   // WL update
   nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_);
@@ -154,34 +149,27 @@ void NesterovPlace::init() {
     return;
   }
   
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "WireLengthGradSum: " << wireLengthGradSum_ << endl;
-    cout << "DensityGradSum: " << densityGradSum_ << endl;
-  }
+  log_->infoFloatSignificant("WireLengthGradSum", wireLengthGradSum_, 3);
+  log_->infoFloatSignificant("DensityGradSum", densityGradSum_, 3);
 
   densityPenalty_ 
     = (wireLengthGradSum_ / densityGradSum_ )
     * npVars_.initDensityPenalty; 
   
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "InitDensityPenalty: " << densityPenalty_ << endl;
-  }
+  log_->infoFloatSignificant("InitDensityPenalty", densityPenalty_, 3);
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
         / static_cast<float>(pb_->placeInstsArea());
   
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "PrevSumOverflow: " << sumOverflow_ << endl;
-  }
+  log_->infoFloatSignificant("PrevSumOverflow", sumOverflow_, 3);
   
   stepLength_  
     = getStepLength (prevSLPCoordi_, prevSLPSumGrads_, curSLPCoordi_, curSLPSumGrads_);
 
 
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "InitialStepLength: " << stepLength_ << endl;
-  }
+  log_->infoFloatSignificant("InitialStepLength", stepLength_, 3);
+  log_->procEnd("NesterovInit", 3);
 }
 
 // clear reset
@@ -223,9 +211,7 @@ NesterovPlace::updateGradients(
 
   float gradSum = 0;
 
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "  DensityPenalty: " << densityPenalty_ << endl;
-  }
+  log_->infoFloatSignificant("  DensityPenalty", densityPenalty_, 3);
 
   for(size_t i=0; i<nb_->gCells().size(); i++) {
     GCell* gCell = nb_->gCells().at(i);
@@ -271,11 +257,9 @@ NesterovPlace::updateGradients(
     gradSum += fabs(sumGrads[i].x) + fabs(sumGrads[i].y);
   }
   
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "  WireLengthGradSum: " << wireLengthGradSum_ << endl;
-    cout << "  DensityGradSum: " << densityGradSum_ << endl;
-    cout << "  GradSum: " << gradSum << endl;
-  }
+  log_->infoFloatSignificant("  WireLengthGradSum", wireLengthGradSum_, 3);
+  log_->infoFloatSignificant("  DensityGradSum", densityGradSum_, 3);
+  log_->infoFloatSignificant("  GradSum", gradSum, 3);
 
   // divergence detection on 
   // Wirelength / density gradient calculation
@@ -316,9 +300,7 @@ NesterovPlace::doNesterovPlace() {
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
-    if( npVars_.verboseLevel > 3 ) {
-      cout << "Iter: " << i+1 << endl;
-    }
+    log_->infoInt("Iter", i+1, 3);
     
 //    updateGradients(curSLPSumGrads_, curSLPWireLengthGrads_, curSLPDensityGrads_);
 //    stepLength_  
@@ -334,12 +316,11 @@ NesterovPlace::doNesterovPlace() {
     // coeff is (a_k -1) / ( a_(k+1)) in paper.
     float coeff = (prevA - 1.0)/curA;
     
-    if( npVars_.verboseLevel > 3 ) {
-      cout << "  PreviousA: " << prevA << endl;
-      cout << "  CurrentA: " << curA << endl;
-      cout << "  Coefficient: " << coeff << endl;
-      cout << "  StepLength: " << stepLength_ << endl; 
-    }
+    log_->infoFloatSignificant("  PreviousA", prevA, 3);
+    log_->infoFloatSignificant("  CurrentA", curA, 3);
+    log_->infoFloatSignificant("  Coefficient", coeff, 3);
+    log_->infoFloatSignificant("  StepLength", stepLength_, 3);
+
     // Back-Tracking loop
     int numBackTrak = 0;
     for(numBackTrak = 0; numBackTrak < npVars_.maxBackTrack; numBackTrak++) {
@@ -386,9 +367,7 @@ NesterovPlace::doNesterovPlace() {
       float newStepLength  
         = getStepLength (curSLPCoordi_, curSLPSumGrads_, nextSLPCoordi_, nextSLPSumGrads_);
      
-      if( npVars_.verboseLevel > 3 ) {
-        cout << "  NewStepLength: " << newStepLength << endl; 
-      }
+      log_->infoFloatSignificant("  NewStepLength", newStepLength, 3);
 
       if( newStepLength > stepLength_ * 0.95) {
         stepLength_ = newStepLength;
@@ -399,9 +378,7 @@ NesterovPlace::doNesterovPlace() {
       } 
     }
 
-    if( npVars_.verboseLevel > 3 ) {
-      cout << "  NumBackTrak: " << numBackTrak << endl;   
-    }
+    log_->infoInt("  NumBackTrak", numBackTrak, 3);
 
     // dynamic adjustment for
     // better convergence with
@@ -496,9 +473,7 @@ NesterovPlace::updateWireLengthCoef(float overflow) {
 
   wireLengthCoefX_ *= baseWireLengthCoef_;
   wireLengthCoefY_ *= baseWireLengthCoef_;
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "  NewWireLengthCoef: " << wireLengthCoefX_ << endl;
-  }
+  log_->infoFloatSignificant("  NewWireLengthCoef", wireLengthCoefX_, 3);
 }
 
 void
@@ -547,19 +522,15 @@ NesterovPlace::updateNextIter() {
       static_cast<float>(nb_->overflowArea()) 
           / static_cast<float>(pb_->placeInstsArea());
 
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "  Gradient: " << getSecondNorm(curSLPSumGrads_) << endl;
-    cout << "  Phi: " << nb_->sumPhi() << endl;
-    cout << "  Overflow: " << sumOverflow_ << endl;
-  }
+  log_->infoFloatSignificant("  Gradient", getSecondNorm(curSLPSumGrads_), 3);
+  log_->infoFloatSignificant("  Phi", nb_->sumPhi(), 3);
+  log_->infoFloatSignificant("  Overflow", sumOverflow_, 3);
 
   updateWireLengthCoef(sumOverflow_);
   int64_t hpwl = nb_->getHpwl();
   
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "  PreviousHpwl: " << prevHpwl_ << endl; 
-    cout << "  NewHpwl: " << hpwl << endl; 
-  }
+  log_->infoFloatSignificant("  PreviousHPWL", prevHpwl_, 3);
+  log_->infoFloatSignificant("  NewHPWL", hpwl, 3);
   
 
   float phiCoef = getPhiCoef( 
@@ -569,10 +540,7 @@ NesterovPlace::updateNextIter() {
   prevHpwl_ = hpwl;
   densityPenalty_ *= phiCoef;
   
-  if( npVars_.verboseLevel > 3 ) {
-    cout << "  PhiCoef: " << phiCoef << endl;
-    cout << endl << endl;
-  }
+  log_->infoFloatSignificant("  PhiCoef", phiCoef, 3);
 }
 
 float
@@ -589,19 +557,15 @@ NesterovPlace::getStepLength(
 
 //  coordiDistance *= 0.001;
 
-  if( npVars_.verboseLevel > 3) {
-    cout << "  CoordinateDistance: " << coordiDistance << endl;
-    cout << "  GradientDistance: " << gradDistance << endl;
-  }
+  log_->infoFloatSignificant("  CoordinateDistance", coordiDistance, 3);
+  log_->infoFloatSignificant("  GradientDistance", gradDistance, 3);
 
   return coordiDistance / gradDistance;
 }
 
 float
 NesterovPlace::getPhiCoef(float scaledDiffHpwl) {
-  if( npVars_.verboseLevel > 3) {
-    cout << "  InputScaleDiffHPWL: " << scaledDiffHpwl << endl;
-  }
+  log_->infoFloatSignificant("  InputScaleDiffHPWL", scaledDiffHpwl, 3);
 
   float retCoef 
     = (scaledDiffHpwl < 0)? 

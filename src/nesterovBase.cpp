@@ -887,7 +887,7 @@ BinGrid::initBins() {
     bins_.push_back( &bin );
   }
 
-  cout << "TotalBinCnt    : " << bins_.size() << endl;
+  log_->infoFloatSignificant("NumBins", bins_.size());
 
   // only initialized once
   updateBinsNonPlaceArea();

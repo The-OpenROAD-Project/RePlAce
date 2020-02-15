@@ -107,7 +107,6 @@ void Replace::doNesterovPlace() {
 
   NesterovPlaceVars npVars;
 
-  npVars.verboseLevel = verbose_;
   npVars.minPhiCoef = minPhiCoef_;
   npVars.maxPhiCoef = maxPhiCoef_;
   npVars.referenceHpwl = referenceHpwl_;
