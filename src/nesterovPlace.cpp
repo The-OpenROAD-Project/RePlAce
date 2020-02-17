@@ -20,7 +20,7 @@ NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
   initDensityPenalty(0.0001),
-  initWireLengthCoef(1.0),
+  initWireLengthCoef(0.25),
   targetOverflow(0.1),
   minPhiCoef(0.95),
   maxPhiCoef(1.05),
@@ -98,7 +98,7 @@ void NesterovPlace::init() {
   prevHpwl_ 
     = nb_->getHpwl();
 
-  log_->infoFloatSignificant("InitialHPWL", prevHpwl_, 3);
+  log_->infoInt64("InitialHPWL", prevHpwl_, 3);
 
   // FFT update
   nb_->updateDensityForceBin();
@@ -378,7 +378,7 @@ NesterovPlace::doNesterovPlace() {
       } 
     }
 
-    log_->infoInt("  NumBackTrak", numBackTrak, 3);
+    log_->infoInt("  NumBackTrak", numBackTrak+1, 3);
 
     // dynamic adjustment for
     // better convergence with
@@ -529,8 +529,8 @@ NesterovPlace::updateNextIter() {
   updateWireLengthCoef(sumOverflow_);
   int64_t hpwl = nb_->getHpwl();
   
-  log_->infoFloatSignificant("  PreviousHPWL", prevHpwl_, 3);
-  log_->infoFloatSignificant("  NewHPWL", hpwl, 3);
+  log_->infoInt64("  PreviousHPWL", prevHpwl_, 3);
+  log_->infoInt64("  NewHPWL", hpwl, 3);
   
 
   float phiCoef = getPhiCoef( 

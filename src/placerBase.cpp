@@ -854,7 +854,7 @@ PlacerBase::dbToPlace(odb::dbNet* net) const {
 
 void 
 PlacerBase::printInfo() const { 
-  log_->infoInt("NunInstances", instStor_.size());
+  log_->infoInt("NumInstances", instStor_.size());
   log_->infoInt("NumPlaceInstances", placeInsts_.size());
   log_->infoInt("NumFixedInstances", fixedInsts_.size());
   log_->infoInt("NumDummyInstances", dummyInsts_.size());

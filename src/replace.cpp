@@ -24,7 +24,7 @@ Replace::Replace()
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
   initDensityPenalityFactor_(0.0001), 
-  initWireLengthCoef_(1.0),
+  initWireLengthCoef_(0.25),
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(446000000),
   verbose_(0) {
