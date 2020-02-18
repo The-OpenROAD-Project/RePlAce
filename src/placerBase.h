@@ -263,6 +263,8 @@ public:
 
   int64_t placeInstsArea() const { return placeInstsArea_; }
   int64_t nonPlaceInstsArea() const { return nonPlaceInstsArea_; }
+  int64_t macroInstsArea() const { return macroInstsArea_; }
+  int64_t stdInstsArea() const { return stdInstsArea_; }
 
 private:
   odb::dbDatabase* db_;
@@ -292,6 +294,12 @@ private:
 
   int64_t placeInstsArea_;
   int64_t nonPlaceInstsArea_;
+  
+  // macroInstsArea_ + stdInstsArea_ = placeInstsArea_;
+  // macroInstsArea_ should be separated
+  // because of target_density tuning
+  int64_t macroInstsArea_;
+  int64_t stdInstsArea_;
 
   void init();
   void initInstsForFragmentedRow();

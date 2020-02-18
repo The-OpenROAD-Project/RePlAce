@@ -97,6 +97,16 @@ GCell::setClusteredInstance(std::vector<Instance*>& insts) {
   insts_ = insts;
 }
 
+void
+GCell::setMacroInstance() {
+  isMacroInstance_ = true;
+}
+
+void
+GCell::setStdInstance() {
+  isMacroInstance_ = false; 
+}
+
 int
 GCell::lx() const {
   return lx_;
@@ -285,6 +295,16 @@ GCell::isClusteredInstance() const {
 bool
 GCell::isFiller() const {
   return (insts_.size() == 0);
+}
+
+bool
+GCell::isMacroInstance() const {
+  return isMacroInstance_; 
+}
+
+bool
+GCell::isStdInstance() const {
+  return !isMacroInstance_;
 }
 
 ////////////////////////////////////////////////
@@ -905,44 +925,18 @@ BinGrid::updateBinsNonPlaceArea() {
     for(int i = pairX.first; i < pairX.second; i++) {
       for(int j = pairY.first; j < pairY.second; j++) {
         Bin* bin = bins_[ j * binCntX_ + i ];
-        bin->addNonPlaceArea( getOverlapArea(bin, inst) );
+
+        // Note that nonPlaceArea should have scale-down with
+        // target density. 
+        // See MS-replace paper
+        //
+        bin->addNonPlaceArea( getOverlapArea(bin, inst) 
+           * bin->targetDensity() );
       }
     }
   }
 }
 
-
-// Core Part
-void
-BinGrid::updateBinsGCellArea(std::vector<GCell*>& cells) {
-  // clear the Bin-area info
-  for(auto& bin : bins_) {
-    bin->setInstPlacedArea(0);
-    bin->setFillerArea(0);
-  }
-
-  for(auto& cell : cells) {
-    std::pair<int, int> pairX = getMinMaxIdxX(cell);
-    std::pair<int, int> pairY = getMinMaxIdxY(cell);
-   
-    if( cell->isInstance() ) {
-      for(int i = pairX.first; i < pairX.second; i++) {
-        for(int j = pairY.first; j < pairY.second; j++) {
-          Bin* bin = bins_[ j * binCntX_ + i ];
-          bin->addInstPlacedArea( getOverlapArea(bin, cell) );
-        }
-      }
-    }
-    else if( cell->isFiller() ) {
-      for(int i = pairX.first; i < pairX.second; i++) {
-        for(int j = pairY.first; j < pairY.second; j++) {
-          Bin* bin = bins_[ j * binCntX_ + i ];
-          bin->addFillerArea( getOverlapArea(bin, cell) );
-        }
-      }
-    }
-  }  
-}
 
 // Core Part
 void
@@ -960,13 +954,31 @@ BinGrid::updateBinsGCellDensityArea(
     std::pair<int, int> pairY 
       = getDensityMinMaxIdxY(cell);
 
+    // The following function is critical runtime hotspot 
+    // for global placer.
+    //
     if( cell->isInstance() ) {
-      for(int i = pairX.first; i < pairX.second; i++) {
-        for(int j = pairY.first; j < pairY.second; j++) {
-          Bin* bin = bins_[ j * binCntX_ + i ];
-          bin->addInstPlacedArea( 
-              getOverlapDensityArea(bin, cell) 
-              * cell->densityScale() ); 
+      // macro should have 
+      // scale-down with target-density
+      if( cell->isMacroInstance() ) {
+        for(int i = pairX.first; i < pairX.second; i++) {
+          for(int j = pairY.first; j < pairY.second; j++) {
+            Bin* bin = bins_[ j * binCntX_ + i ];
+            bin->addInstPlacedArea( 
+                getOverlapDensityArea(bin, cell) 
+                * cell->densityScale() * bin->targetDensity() ); 
+          }
+        }
+      }
+      // normal cells
+      else if( cell->isStdInstance() ) {
+        for(int i = pairX.first; i < pairX.second; i++) {
+          for(int j = pairY.first; j < pairY.second; j++) {
+            Bin* bin = bins_[ j * binCntX_ + i ];
+            bin->addInstPlacedArea( 
+                getOverlapDensityArea(bin, cell) 
+                * cell->densityScale() ); 
+          }
         }
       }
     }
@@ -991,28 +1003,17 @@ BinGrid::updateBinsGCellDensityArea(
     bin->setDensity( 
         ( static_cast<float> (bin->instPlacedArea())
           + static_cast<float> (bin->fillerArea()) 
-          + static_cast<float> (bin->nonPlaceArea()) )
+          + static_cast<float> (bin->nonPlaceArea() * bin->targetDensity()) )
         / static_cast<float>(binArea * bin->targetDensity()));
 
     overflowArea_ 
       += std::max(0.0f, 
           static_cast<float>(bin->instPlacedArea()) 
-          - (binArea - bin->nonPlaceArea())*bin->targetDensity());
+          - (binArea - bin->nonPlaceArea() * bin->targetDensity())*bin->targetDensity());
 
   }
 }
 
-
-
-std::pair<int, int>
-BinGrid::getMinMaxIdxX(GCell* gcell) {
-  int lowerIdx = (gcell->lx() - lx())/binSizeX_;
-  int upperIdx = 
-   ( fastModulo((gcell->ux() - lx()), binSizeX_) == 0)? 
-   (gcell->ux() - lx()) / binSizeX_ 
-   : (gcell->ux() - lx()) / binSizeX_ + 1;
-  return std::make_pair(lowerIdx, upperIdx);
-}
 
 std::pair<int, int>
 BinGrid::getDensityMinMaxIdxX(GCell* gcell) {
@@ -1021,16 +1022,6 @@ BinGrid::getDensityMinMaxIdxX(GCell* gcell) {
    ( fastModulo((gcell->dUx() - lx()), binSizeX_) == 0)? 
    (gcell->dUx() - lx()) / binSizeX_ 
    : (gcell->dUx() - lx()) / binSizeX_ + 1;
-  return std::make_pair(lowerIdx, upperIdx);
-}
-
-std::pair<int, int>
-BinGrid::getMinMaxIdxY(GCell* gcell) {
-  int lowerIdx = (gcell->ly() - ly())/binSizeY_;
-  int upperIdx =
-   ( fastModulo((gcell->uy() - ly()), binSizeY_) == 0)? 
-   (gcell->uy() - ly()) / binSizeY_ 
-   : (gcell->uy() - ly()) / binSizeY_ + 1;
   return std::make_pair(lowerIdx, upperIdx);
 }
 
@@ -1118,6 +1109,14 @@ NesterovBase::init() {
   gCellStor_.reserve(pb_->placeInsts().size());
   for(auto& inst: pb_->placeInsts()) {
     GCell myGCell(inst); 
+    // Check whether the given instance is
+    // macro or not
+    if( inst->dy() > pb_->siteSizeY() ) {
+      myGCell.setMacroInstance();
+    }
+    else {
+      myGCell.setStdInstance();
+    } 
     gCellStor_.push_back(myGCell);
   }
 
@@ -1291,15 +1290,19 @@ NesterovBase::initFillerGCells() {
     static_cast<int64_t>(pb_->die().coreDx()) *
     static_cast<int64_t>(pb_->die().coreDy()); 
 
+  // nonPlaceInstsArea needs targetDensity down-scaling
+  // See MS-replace paper
   int64_t whiteSpaceArea = coreArea - 
-    static_cast<int64_t>(pb_->nonPlaceInstsArea());
+    static_cast<int64_t>(pb_->nonPlaceInstsArea() 
+        * nbVars_.targetDensity);
 
   // TODO density screening
   int64_t movableArea = whiteSpaceArea 
     * nbVars_.targetDensity;
   
   int64_t totalFillerArea = movableArea 
-    - static_cast<int64_t>(pb_->placeInstsArea());
+    - static_cast<int64_t>(pb_->stdInstsArea())
+    - static_cast<int64_t>(pb_->macroInstsArea() * nbVars_.targetDensity);
 
 
   if( totalFillerArea < 0 ) {
@@ -1676,11 +1679,13 @@ NesterovBase::updateDensityForceBin() {
   for(auto& bin : bg_.bins()) {
     auto eForcePair = fft_->getElectroForce(bin->x(), bin->y());
     bin->setElectroForce(eForcePair.first, eForcePair.second);
+
     float electroPhi = fft_->getElectroPhi(bin->x(), bin->y());
     bin->setElectroPhi(electroPhi);
 
     sumPhi_ += electroPhi 
-      * static_cast<float>(bin->nonPlaceArea() + bin->instPlacedArea() + bin->fillerArea());
+      * static_cast<float>(bin->nonPlaceArea() 
+          + bin->instPlacedArea() + bin->fillerArea());
   }
 }
 

@@ -564,7 +564,8 @@ Die::coreDy() const {
 
 PlacerBase::PlacerBase() 
   : db_(nullptr), log_(nullptr), siteSizeX_(0), siteSizeY_(0),
-  placeInstsArea_(0), nonPlaceInstsArea_(0) {}
+  placeInstsArea_(0), nonPlaceInstsArea_(0),
+  macroInstsArea_(0), stdInstsArea_(0) {}
 
 PlacerBase::PlacerBase(odb::dbDatabase* db,
     std::shared_ptr<Logger> log)
@@ -623,8 +624,19 @@ PlacerBase::init() {
       }
       else {
         placeInsts_.push_back(&inst);
-        placeInstsArea_ += static_cast<int64_t>(inst.dx()) 
+        int64_t instArea = static_cast<int64_t>(inst.dx())
           * static_cast<int64_t>(inst.dy());
+        placeInstsArea_ += instArea; 
+        // macro cells should be
+        // macroInstsArea_
+        if( inst.dy() > siteSizeY_ ) {
+          macroInstsArea_ += instArea;
+        }
+        // smaller or equal height cells should be 
+        // stdInstArea_
+        else {
+          stdInstsArea_ += instArea;
+        }
       }
       instMap_[inst.dbInst()] = &inst;
     }
@@ -899,6 +911,9 @@ PlacerBase::printInfo() const {
 
   log_->infoInt64("PlaceInstsArea", placeInstsArea_ );
   log_->infoFloat("Util(%)", util);
+  
+  log_->infoInt64("StdInstsArea", stdInstsArea_ );
+  log_->infoInt64("MacroInstsArea", macroInstsArea_ );
 
   if( util >= 100.1 ) {
     cout << "Error: Util exceeds 100%." << endl;

@@ -43,6 +43,8 @@ public:
   void setClusteredInstance(std::vector<Instance*>& insts);
   void setInstance(Instance* inst);
   void setFiller();
+  void setMacroInstance();
+  void setStdInstance();
 
   // normal coordinates
   int lx() const;
@@ -84,6 +86,8 @@ public:
   bool isInstance() const;
   bool isClusteredInstance() const;
   bool isFiller() const;
+  bool isMacroInstance() const;
+  bool isStdInstance() const;
 
 
 private:
@@ -102,6 +106,10 @@ private:
   float densityScale_;
   float gradientX_;
   float gradientY_;
+
+  // need to be stored for
+  // MS replace
+  bool isMacroInstance_:1;
 };
 
 class GNet {
@@ -368,7 +376,6 @@ public:
   void setBinCntX(int binCntX);
   void setBinCntY(int binCntY);
   void setTargetDensity(float density);
-  void updateBinsGCellArea(std::vector<GCell*>& cells);
   void updateBinsGCellDensityArea(std::vector<GCell*>& cells);
 
 
@@ -392,9 +399,6 @@ public:
   int64_t overflowArea() const;
 
   // return bins_ index with given gcell
-  std::pair<int, int> getMinMaxIdxX(GCell* gcell);
-  std::pair<int, int> getMinMaxIdxY(GCell* gcell);
-
   std::pair<int, int> getDensityMinMaxIdxX(GCell* gcell);
   std::pair<int, int> getDensityMinMaxIdxY(GCell* gcell);
 
