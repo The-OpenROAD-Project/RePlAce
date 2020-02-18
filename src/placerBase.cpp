@@ -623,7 +623,8 @@ PlacerBase::init() {
       }
       else {
         placeInsts_.push_back(&inst);
-        placeInstsArea_ += inst.dx() * inst.dy();
+        placeInstsArea_ += static_cast<int64_t>(inst.dx()) 
+          * static_cast<int64_t>(inst.dy());
       }
       instMap_[inst.dbInst()] = &inst;
     }
