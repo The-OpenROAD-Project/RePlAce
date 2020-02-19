@@ -19,7 +19,7 @@ getSecondNorm(vector<FloatCoordi>& a);
 NesterovPlaceVars::NesterovPlaceVars()
   : maxNesterovIter(2000), 
   maxBackTrack(10),
-  initDensityPenalty(0.0001),
+  initDensityPenalty(0.00008),
   initWireLengthCoef(0.25),
   targetOverflow(0.1),
   minPhiCoef(0.95),
@@ -302,10 +302,6 @@ NesterovPlace::doNesterovPlace() {
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
     log_->infoInt("Iter", i+1, 3);
     
-//    updateGradients(curSLPSumGrads_, curSLPWireLengthGrads_, curSLPDensityGrads_);
-//    stepLength_  
-//      = getStepLength (prevSLPCoordi_, prevSLPSumGrads_, curSLPCoordi_, curSLPSumGrads_);
-
     float prevA = curA;
 
     // here, prevA is a_(k), curA is a_(k+1)
@@ -386,7 +382,7 @@ NesterovPlace::doNesterovPlace() {
     if( !isMaxPhiCoefChanged && sumOverflow_ 
         < 0.35f ) {
       isMaxPhiCoefChanged = true;
-//      npVars_.maxPhiCoef *= 0.99;
+      npVars_.maxPhiCoef *= 0.99;
     }
 
     // usually, maxBackTrack should be 1~3
@@ -495,11 +491,6 @@ NesterovPlace::updateInitialPrevSLPCoordi() {
       nb_->getDensityCoordiLayoutInsideY( curGCell, prevCoordiY) );
 
     prevSLPCoordi_[i] = newCoordi;
-    
-//    cout << "SLP: " << curSLPCoordi_[i].x << " " << curSLPSumGrads_[i].x ;
-//    cout << " new: " << newCoordi.x << endl;
-//    cout << "SLP: " << curSLPCoordi_[i].y << " " << curSLPSumGrads_[i].y ;
-//    cout << " new: " << newCoordi.y << endl;
   } 
 }
 
@@ -554,8 +545,6 @@ NesterovPlace::getStepLength(
     = getDistance(prevSLPCoordi_, curSLPCoordi_);
   float gradDistance 
     = getDistance(prevSLPSumGrads_, curSLPSumGrads_);
-
-//  coordiDistance *= 0.001;
 
   log_->infoFloatSignificant("  CoordinateDistance", coordiDistance, 3);
   log_->infoFloatSignificant("  GradientDistance", gradDistance, 3);
