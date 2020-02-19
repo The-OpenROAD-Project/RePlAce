@@ -386,7 +386,7 @@ NesterovPlace::doNesterovPlace() {
     if( !isMaxPhiCoefChanged && sumOverflow_ 
         < 0.35f ) {
       isMaxPhiCoefChanged = true;
-      npVars_.maxPhiCoef *= 0.99;
+//      npVars_.maxPhiCoef *= 0.99;
     }
 
     // usually, maxBackTrack should be 1~3

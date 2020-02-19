@@ -304,14 +304,14 @@ public:
   int x() const;
   int y() const;
 
-  int lx() const;
-  int ly() const;
-  int ux() const;
-  int uy() const;
-  int cx() const;
-  int cy() const;
-  int dx() const;
-  int dy() const;
+  inline int lx() const;
+  inline int ly() const;
+  inline int ux() const;
+  inline int uy() const;
+  inline int cx() const;
+  inline int cy() const;
+  inline int dx() const;
+  inline int dy() const;
 
   float electroPhi() const;
   float electroForceX() const;
@@ -358,6 +358,46 @@ private:
   float electroForceX_;
   float electroForceY_;
 };
+
+inline int 
+Bin::lx() const { 
+  return lx_; 
+}
+
+inline int
+Bin::ly() const { 
+  return ly_;
+}
+
+inline int
+Bin::ux() const { 
+  return ux_;
+}
+
+inline int
+Bin::uy() const { 
+  return uy_;
+}
+
+inline int
+Bin::cx() const { 
+  return (ux_ + lx_)/2;
+}
+
+inline int
+Bin::cy() const { 
+  return (uy_ + ly_)/2;
+}
+
+inline int
+Bin::dx() const { 
+  return (ux_ - lx_);
+} 
+
+inline int
+Bin::dy() const { 
+  return (uy_ - ly_);
+}
 
 //
 // The bin can be non-uniform because of

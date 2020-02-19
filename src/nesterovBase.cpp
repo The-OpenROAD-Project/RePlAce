@@ -20,13 +20,15 @@ using namespace odb;
 static int 
 fastModulo(const int input, const int ceil);
 
-static int64_t 
-getOverlapArea(Bin* bin, GCell* cell);
-
 static int64_t
 getOverlapArea(Bin* bin, Instance* inst);
 
-static int64_t
+// Note that
+// int64_t is ideal in the following function, but
+// runtime is doubled compared with float.
+//
+// Choose to use "float" only in the following functions
+static float 
 getOverlapDensityArea(Bin* bin, GCell* cell);
 
 static float
@@ -573,44 +575,6 @@ Bin::y() const {
   return y_;
 }
 
-int 
-Bin::lx() const {
-  return lx_;
-}
-int
-Bin::ly() const { 
-  return ly_;
-}
-
-int
-Bin::ux() const { 
-  return ux_;
-}
-
-int
-Bin::uy() const { 
-  return uy_;
-}
-
-int
-Bin::cx() const { 
-  return (ux_ + lx_)/2;
-}
-
-int
-Bin::cy() const { 
-  return (uy_ + ly_)/2;
-}
-
-int
-Bin::dx() const { 
-  return (ux_ - lx_);
-} 
-int
-Bin::dy() const { 
-  return (uy_ - ly_);
-}
-
 void
 Bin::setNonPlaceArea(int64_t area) {
   nonPlaceArea_ = area;
@@ -759,7 +723,6 @@ BinGrid::setBinCntY(int binCntY) {
   binCntY_ = binCntY;
 }
 
-
 int
 BinGrid::lx() const {
   return lx_;
@@ -781,12 +744,12 @@ BinGrid::uy() const {
 
 int
 BinGrid::cx() const { 
-  return (ux_ - lx_)/2;
+  return (ux_ + lx_)/2;
 }
 
 int
 BinGrid::cy() const { 
-  return (uy_ - ly_)/2;
+  return (uy_ + ly_)/2;
 }
 
 int
@@ -797,7 +760,6 @@ int
 BinGrid::dy() const { 
   return (uy_ - ly_);
 }
-
 int
 BinGrid::binCntX() const {
   return binCntX_;
@@ -1712,23 +1674,8 @@ fastModulo(const int input, const int ceil) {
   return input >= ceil? input % ceil : input;
 }
 
-static int64_t 
-getOverlapArea(Bin* bin, GCell* cell) {
-  int rectLx = max(bin->lx(), cell->lx()), 
-      rectLy = max(bin->ly(), cell->ly()),
-      rectUx = min(bin->ux(), cell->ux()), 
-      rectUy = min(bin->uy(), cell->uy());
-
-  if( rectLx >= rectUx || rectLy >= rectUy ) {
-    return 0;
-  }
-  else {
-    return static_cast<int64_t>(rectUx - rectLx) 
-      * static_cast<int64_t>(rectUy - rectLy);
-  }
-}
-
-static int64_t 
+// int64_t is recommended, but float is 2x fast
+static float 
 getOverlapDensityArea(Bin* bin, GCell* cell) {
   int rectLx = max(bin->lx(), cell->dLx()), 
       rectLy = max(bin->ly(), cell->dLy()),
@@ -1739,8 +1686,8 @@ getOverlapDensityArea(Bin* bin, GCell* cell) {
     return 0;
   }
   else {
-    return static_cast<int64_t>(rectUx - rectLx) 
-      * static_cast<int64_t>(rectUy - rectLy);
+    return static_cast<float>(rectUx - rectLx) 
+      * static_cast<float>(rectUy - rectLy);
   }
 }
 
