@@ -10,65 +10,39 @@ Notice 0:     Created 54 pins.
 Notice 0:     Created 294 components and 1656 component-terminals.
 Notice 0:     Created 364 nets and 1068 connections.
 Notice 0: Finished DEF file: ./diverge01.def
-Design Info
-Instances      : 294
-PlaceInstances : 294
-FixedInstances : 0
-DummyInstances : 0
-Nets           : 364
-Pins           : 1710
-MaxFanout      : 35
-MaxFanoutNet   : clk
-AvgFanout      : 3.08242
-
-DieBox         : ( -140 -140 ) - ( 62070 61740 ) 
-CoreBox        : ( 0 0 ) - ( 61940 61600 ) 
-coreArea       : 3815504000
-placeInstsArea : 2279088000
-nonPlaceInstsArea : 0
-utilization    : 59.7323
-
-InstGCells     : 294
-FillerSize     : ( 2432, 2800 )
-FillerGCells   : 57
-GCells         : 351
-GNets          : 364
-GPins          : 1710
-TargetDensity  : 0.7
-AveragePlaceInstArea: : 7752000
-IdealBinArea   : 11074286
-IdealBinCnt    : 344
-TotalBinArea   : 3815504000
-BinCnt         : ( 16, 16 )
-BinSize        : ( 3872, 3850 )
-TotalBinCnt    : 256
-[NesterovSolve] Iter: 1 overflow: 0.885097 HPWL: 3536389
-[NesterovSolve] Iter: 10 overflow: 0.854549 HPWL: 3598328
-[NesterovSolve] Iter: 20 overflow: 0.855114 HPWL: 3586633
-[NesterovSolve] Iter: 30 overflow: 0.855332 HPWL: 3585850
-[NesterovSolve] Iter: 40 overflow: 0.853578 HPWL: 3583723
-[NesterovSolve] Iter: 50 overflow: 0.852356 HPWL: 3579419
-[NesterovSolve] Iter: 60 overflow: 0.851402 HPWL: 3575644
-[NesterovSolve] Iter: 70 overflow: 0.850711 HPWL: 3577407
-[NesterovSolve] Iter: 80 overflow: 0.849851 HPWL: 3578683
-[NesterovSolve] Iter: 90 overflow: 0.848748 HPWL: 3580636
-[NesterovSolve] Iter: 100 overflow: 0.847165 HPWL: 3583846
-[NesterovSolve] Iter: 110 overflow: 0.844595 HPWL: 3587556
-[NesterovSolve] Iter: 120 overflow: 0.84047 HPWL: 3592998
-[NesterovSolve] Iter: 130 overflow: 0.834571 HPWL: 3599648
-[NesterovSolve] Iter: 140 overflow: 0.828299 HPWL: 3617117
-[NesterovSolve] Iter: 150 overflow: 0.818307 HPWL: 3635200
-[NesterovSolve] Iter: 160 overflow: 0.803869 HPWL: 3660939
-[NesterovSolve] Iter: 170 overflow: 0.784645 HPWL: 3692262
-[NesterovSolve] Iter: 180 overflow: 0.750315 HPWL: 3710076
-[NesterovSolve] Iter: 190 overflow: 0.719154 HPWL: 3744845
-[NesterovSolve] Iter: 200 overflow: 0.679836 HPWL: 3840424
-[NesterovSolve] Iter: 210 overflow: 0.627886 HPWL: 3930066
-[NesterovSolve] Iter: 220 overflow: 0.575948 HPWL: 4083843
-[NesterovSolve] Iter: 230 overflow: 0.534601 HPWL: 4201586
-[NesterovSolve] Iter: 240 overflow: 0.48547 HPWL: 4304902
-INFO: RePlAce divergence detected. 
-      Please decrease init_wirelength_coeff value
+[INFO] DBU = 2000
+[INFO] SiteSize = (380, 2800)
+[INFO] CoreAreaLxLy = (0, 0)
+[INFO] CoreAreaUxUy = (61940, 61600)
+[INFO] NumInstances = 294
+[INFO] NumPlaceInstances = 294
+[INFO] NumFixedInstances = 0
+[INFO] NumDummyInstances = 0
+[INFO] NumNets = 364
+[INFO] NumPins = 1122
+[INFO] DieAreaLxLy = (-140, -140)
+[INFO] DieAreaUxUy = (62070, 61740)
+[INFO] CoreAreaLxLy = (0, 0)
+[INFO] CoreAreaUxUy = (61940, 61600)
+[INFO] CoreArea = 3815504000
+[INFO] NonPlaceInstsArea = 0
+[INFO] PlaceInstsArea = 2279088000
+[INFO] Util(%) = 59.732300
+[INFO] StdInstsArea = 2279088000
+[INFO] MacroInstsArea = 0
+[INFO] FillerInit: NumGCells = 348
+[INFO] FillerInit: NumGNets = 364
+[INFO] FillerInit: NumGPins = 1122
+[INFO] TargetDensity = 0.700000
+[INFO] AveragePlaceInstArea = 7752000
+[INFO] IdealBinArea = 11074286
+[INFO] IdealBinCnt = 344
+[INFO] TotalBinArea = 3815504000
+[INFO] BinCnt = (16, 16)
+[INFO] BinSize = (3872, 3850)
+[INFO] NumBins = 256
+INFO: RePlAce divergence detected
+      Please decrease init_density_penalty
 INFO: RePlAce diverged. Please tune the parameters again
 Worst slack: 1.00e+30
 Total negative slack: 0.00e+00

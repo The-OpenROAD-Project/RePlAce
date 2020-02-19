@@ -123,7 +123,6 @@ record_replace_tests {
   ar01 
   ar02 
   diverge01
-  diverge02
 }
 
 # Record tests in $STAX/designs

@@ -3,7 +3,7 @@ set test_name core01
 read_lef ./nangate45.lef
 read_def ./$test_name.def
 
-global_placement -verbose 5 -density 0.6 -init_density_penalty 0.01
+global_placement -density 0.6 -init_density_penalty 0.01
 set def_file [make_result_file $test_name.def]
 write_def $def_file
 diff_file $def_file $test_name.defok
