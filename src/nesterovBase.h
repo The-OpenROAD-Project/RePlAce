@@ -112,6 +112,85 @@ private:
   bool isMacroInstance_:1;
 };
 
+inline int
+GCell::lx() const {
+  return lx_;
+}
+inline int
+GCell::ly() const {
+  return ly_; 
+}
+
+inline int
+GCell::ux() const { 
+  return ux_; 
+}
+
+inline int
+GCell::uy() const {
+  return uy_; 
+}
+
+inline int
+GCell::cx() const {
+  return (lx_ + ux_)/2;
+}
+
+inline int
+GCell::cy() const {
+  return (ly_ + uy_)/2;
+}
+
+inline int 
+GCell::dx() const {
+  return ux_ - lx_; 
+}
+
+inline int
+GCell::dy() const {
+  return uy_ - ly_;
+}
+
+inline int
+GCell::dLx() const {
+  return dLx_;
+}
+
+inline int
+GCell::dLy() const {
+  return dLy_;
+}
+
+inline int
+GCell::dUx() const {
+  return dUx_;
+}
+
+inline int
+GCell::dUy() const {
+  return dUy_;
+}
+
+inline int
+GCell::dCx() const {
+  return (dUx_ + dLx_)/2;
+}
+
+inline int
+GCell::dCy() const {
+  return (dUy_ + dLy_)/2;
+}
+
+inline int
+GCell::dDx() const {
+  return dUx_ - dLx_; 
+}
+
+inline int
+GCell::dDy() const {
+  return dUy_ - dLy_;
+}
+
 class GNet {
   public:
     GNet();
@@ -123,10 +202,10 @@ class GNet {
     const std::vector<Net*> & nets() const { return nets_; }
     const std::vector<GPin*> & gPins() const { return gPins_; }
 
-    int lx() const { return lx_; }
-    int ly() const { return ly_; }
-    int ux() const { return ux_; }
-    int uy() const { return uy_; }
+    int lx() const;
+    int ly() const;
+    int ux() const;
+    int uy() const;
 
     void setCustomWeight( float customWeight );
     float customWeight() const { return customWeight_; }
@@ -154,17 +233,17 @@ class GNet {
     void addWaExpMaxSumY(float waExpMaxSumY);
     void addWaYExpMaxSumY(float waExpXMaxSumY);
 
-    float waExpMinSumX() const { return waExpMinSumStorX_; }
-    float waXExpMinSumX() const { return waXExpMinSumStorX_; }
+    float waExpMinSumX() const; 
+    float waXExpMinSumX() const;
 
-    float waExpMinSumY() const { return waExpMinSumStorY_; }
-    float waYExpMinSumY() const { return waYExpMinSumStorY_; }
+    float waExpMinSumY() const;
+    float waYExpMinSumY() const;
 
-    float waExpMaxSumX() const { return waExpMaxSumStorX_; }
-    float waXExpMaxSumX() const { return waXExpMaxSumStorX_; }
+    float waExpMaxSumX() const;
+    float waXExpMaxSumX() const;
 
-    float waExpMaxSumY() const { return waExpMaxSumStorY_; }
-    float waYExpMaxSumY() const { return waYExpMaxSumStorY_; }
+    float waExpMaxSumY() const;
+    float waYExpMaxSumY() const;
 
 
   private:
@@ -190,34 +269,135 @@ class GNet {
     //
     // X forces.
     //
-    // waExpMinSumStorX_: store sigma {exp(x_i/gamma)}
-    // waXExpMinSumStorX_: store signa {x_i*exp(e_i/gamma)}
-    // waExpMaxSumStorX_ : store sigma {exp(-x_i/gamma)}
-    // waXExpMaxSumStorX_: store sigma {x_i*exp(-x_i/gamma)}
+    // waExpMinSumX_: store sigma {exp(x_i/gamma)}
+    // waXExpMinSumX_: store signa {x_i*exp(e_i/gamma)}
+    // waExpMaxSumX_ : store sigma {exp(-x_i/gamma)}
+    // waXExpMaxSumX_: store sigma {x_i*exp(-x_i/gamma)}
     //
-    float waExpMinSumStorX_;
-    float waXExpMinSumStorX_;
+    float waExpMinSumX_;
+    float waXExpMinSumX_;
 
-    float waExpMaxSumStorX_;
-    float waXExpMaxSumStorX_;
+    float waExpMaxSumX_;
+    float waXExpMaxSumX_;
 
     //
     // Y forces.
     //
-    // waExpMinSumStorY_: store sigma {exp(y_i/gamma)}
-    // waYExpMinSumStorY_: store signa {y_i*exp(e_i/gamma)}
-    // waExpMaxSumStorY_ : store sigma {exp(-y_i/gamma)}
-    // waYExpMaxSumStorY_: store sigma {y_i*exp(-y_i/gamma)}
+    // waExpMinSumY_: store sigma {exp(y_i/gamma)}
+    // waYExpMinSumY_: store signa {y_i*exp(e_i/gamma)}
+    // waExpMaxSumY_ : store sigma {exp(-y_i/gamma)}
+    // waYExpMaxSumY_: store sigma {y_i*exp(-y_i/gamma)}
     //
-    float waExpMinSumStorY_;
-    float waYExpMinSumStorY_;
+    float waExpMinSumY_;
+    float waYExpMinSumY_;
 
-    float waExpMaxSumStorY_;
-    float waYExpMaxSumStorY_;
+    float waExpMaxSumY_;
+    float waYExpMaxSumY_;
 
     unsigned char isDontCare_:1;
-
 };
+
+inline int 
+GNet::lx() const {
+  return lx_; 
+}
+
+inline int
+GNet::ly() const {
+  return ly_;
+}
+
+inline int
+GNet::ux() const {
+  return ux_;
+}
+
+inline int
+GNet::uy() const {
+  return uy_;
+}
+
+// eight add functions
+inline void
+GNet::addWaExpMinSumX(float waExpMinSumX) {
+  waExpMinSumX_ += waExpMinSumX;
+}
+
+inline void
+GNet::addWaXExpMinSumX(float waXExpMinSumX) {
+  waXExpMinSumX_ += waXExpMinSumX;
+}
+
+inline void
+GNet::addWaExpMinSumY(float waExpMinSumY) {
+  waExpMinSumY_ += waExpMinSumY;
+}
+
+inline void
+GNet::addWaYExpMinSumY(float waYExpMinSumY) {
+  waYExpMinSumY_ += waYExpMinSumY;
+}
+
+inline void
+GNet::addWaExpMaxSumX(float waExpMaxSumX) {
+  waExpMaxSumX_ += waExpMaxSumX;
+}
+
+inline void
+GNet::addWaXExpMaxSumX(float waXExpMaxSumX) {
+  waXExpMaxSumX_ += waXExpMaxSumX;
+}
+
+inline void
+GNet::addWaExpMaxSumY(float waExpMaxSumY) {
+  waExpMaxSumY_ += waExpMaxSumY;
+}
+
+inline void
+GNet::addWaYExpMaxSumY(float waYExpMaxSumY) {
+  waYExpMaxSumY_ += waYExpMaxSumY;
+}
+
+inline float
+GNet::waExpMinSumX() const {
+  return waExpMinSumX_;
+}
+
+inline float
+GNet::waXExpMinSumX() const {
+  return waXExpMinSumX_;
+}
+
+inline float
+GNet::waExpMinSumY() const {
+  return waExpMinSumY_;
+}
+
+inline float
+GNet::waYExpMinSumY() const {
+  return waYExpMinSumY_;
+}
+
+inline float
+GNet::waExpMaxSumX() const {
+  return waExpMaxSumX_;
+}
+
+inline float
+GNet::waXExpMaxSumX() const {
+  return waXExpMaxSumX_; 
+}
+
+inline float
+GNet::waExpMaxSumY() const {
+  return waExpMaxSumY_; 
+}
+
+inline float
+GNet::waYExpMaxSumY() const {
+  return waYExpMaxSumY_;
+}
+
 
 class GPin {
   public:
@@ -304,14 +484,14 @@ public:
   int x() const;
   int y() const;
 
-  inline int lx() const;
-  inline int ly() const;
-  inline int ux() const;
-  inline int uy() const;
-  inline int cx() const;
-  inline int cy() const;
-  inline int dx() const;
-  inline int dy() const;
+  int lx() const;
+  int ly() const;
+  int ux() const;
+  int uy() const;
+  int cx() const;
+  int cy() const;
+  int dx() const;
+  int dy() const;
 
   float electroPhi() const;
   float electroForceX() const;
@@ -359,6 +539,16 @@ private:
   float electroForceY_;
 };
 
+inline int
+Bin::x() const {
+  return x_;
+}
+
+inline int
+Bin::y() const { 
+  return y_;
+}
+
 inline int 
 Bin::lx() const { 
   return lx_; 
@@ -397,6 +587,36 @@ Bin::dx() const {
 inline int
 Bin::dy() const { 
   return (uy_ - ly_);
+}
+
+inline void
+Bin::setNonPlaceArea(int64_t area) {
+  nonPlaceArea_ = area;
+}
+
+inline void
+Bin::setInstPlacedArea(int64_t area) {
+  instPlacedArea_ = area;
+}
+
+inline void
+Bin::setFillerArea(int64_t area) {
+  fillerArea_ = area;
+}
+
+inline void
+Bin::addNonPlaceArea(int64_t area) {
+  nonPlaceArea_ += area;
+}
+
+inline void
+Bin::addInstPlacedArea(int64_t area) {
+  instPlacedArea_ += area;
+}
+
+inline void
+Bin::addFillerArea(int64_t area) {
+  fillerArea_ += area;
 }
 
 //
@@ -445,7 +665,7 @@ public:
   std::pair<int, int> getMinMaxIdxX(Instance* inst);
   std::pair<int, int> getMinMaxIdxY(Instance* inst);
 
-  const std::vector<Bin*> & bins() const { return bins_; }
+  const std::vector<Bin*> & bins() const;
 
 private:
   std::vector<Bin> binStor_;
@@ -467,6 +687,10 @@ private:
 
   void updateBinsNonPlaceArea();
 };
+
+inline const std::vector<Bin*> & BinGrid::bins() const {
+  return bins_; 
+}
 
 class NesterovBaseVars {
 public:
@@ -520,7 +744,7 @@ public:
   int binSizeX() const;
   int binSizeY() const;
   
-  const std::vector<Bin*> & bins() const { return bg_.bins(); }
+  const std::vector<Bin*> & bins() const; 
 
   int64_t overflowArea() const;
   float sumPhi() const;
@@ -596,6 +820,10 @@ private:
 
   void reset();
 };
+
+inline const std::vector<Bin*> & NesterovBase::bins() const {
+  return bg_.bins();
+}
 
 }
 

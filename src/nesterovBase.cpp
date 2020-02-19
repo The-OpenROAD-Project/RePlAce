@@ -109,85 +109,6 @@ GCell::setStdInstance() {
   isMacroInstance_ = false; 
 }
 
-int
-GCell::lx() const {
-  return lx_;
-}
-int
-GCell::ly() const {
-  return ly_; 
-}
-
-int
-GCell::ux() const { 
-  return ux_; 
-}
-
-int
-GCell::uy() const {
-  return uy_; 
-}
-
-int
-GCell::cx() const {
-  return (lx_ + ux_)/2;
-}
-
-int
-GCell::cy() const {
-  return (ly_ + uy_)/2;
-}
-
-int 
-GCell::dx() const {
-  return ux_ - lx_; 
-}
-
-int
-GCell::dy() const {
-  return uy_ - ly_;
-}
-
-int
-GCell::dLx() const {
-  return dLx_;
-}
-
-int
-GCell::dLy() const {
-  return dLy_;
-}
-
-int
-GCell::dUx() const {
-  return dUx_;
-}
-
-int
-GCell::dUy() const {
-  return dUy_;
-}
-
-int
-GCell::dCx() const {
-  return (dUx_ + dLx_)/2;
-}
-
-int
-GCell::dCy() const {
-  return (dUy_ + dLy_)/2;
-}
-
-int
-GCell::dDx() const {
-  return dUx_ - dLx_; 
-}
-
-int
-GCell::dDy() const {
-  return dUy_ - dLy_;
-}
-
 void
 GCell::setLocation(int lx, int ly) {
   ux_ = lx + (ux_ - lx_);
@@ -315,10 +236,10 @@ GCell::isStdInstance() const {
 GNet::GNet()
   : lx_(0), ly_(0), ux_(0), uy_(0),
   customWeight_(1), weight_(1),
-  waExpMinSumStorX_(0), waXExpMinSumStorX_(0),
-  waExpMaxSumStorX_(0), waXExpMaxSumStorX_(0),
-  waExpMinSumStorY_(0), waYExpMinSumStorY_(0),
-  waExpMaxSumStorY_(0), waYExpMaxSumStorY_(0),
+  waExpMinSumX_(0), waXExpMinSumX_(0),
+  waExpMaxSumX_(0), waXExpMaxSumX_(0),
+  waExpMinSumY_(0), waYExpMinSumY_(0),
+  waExpMaxSumY_(0), waYExpMaxSumY_(0),
   isDontCare_(0) {}
 
 GNet::GNet(Net* net) : GNet() {
@@ -369,59 +290,19 @@ GNet::hpwl() {
 
 void
 GNet::clearWaVars() {
-  waExpMinSumStorX_ = 0;
-  waXExpMinSumStorX_ = 0;
+  waExpMinSumX_ = 0;
+  waXExpMinSumX_ = 0;
 
-  waExpMaxSumStorX_ = 0;
-  waXExpMaxSumStorX_ = 0;
+  waExpMaxSumX_ = 0;
+  waXExpMaxSumX_ = 0;
     
-  waExpMinSumStorY_ = 0;
-  waYExpMinSumStorY_ = 0;
+  waExpMinSumY_ = 0;
+  waYExpMinSumY_ = 0;
 
-  waExpMaxSumStorY_ = 0;
-  waYExpMaxSumStorY_ = 0;
+  waExpMaxSumY_ = 0;
+  waYExpMaxSumY_ = 0;
 }
 
-// eight add functions
-void
-GNet::addWaExpMinSumX(float waExpMinSumX) {
-  waExpMinSumStorX_ += waExpMinSumX;
-}
-
-void
-GNet::addWaXExpMinSumX(float waXExpMinSumX) {
-  waXExpMinSumStorX_ += waXExpMinSumX;
-}
-
-void
-GNet::addWaExpMinSumY(float waExpMinSumY) {
-  waExpMinSumStorY_ += waExpMinSumY;
-}
-
-void
-GNet::addWaYExpMinSumY(float waYExpMinSumY) {
-  waYExpMinSumStorY_ += waYExpMinSumY;
-}
-
-void
-GNet::addWaExpMaxSumX(float waExpMaxSumX) {
-  waExpMaxSumStorX_ += waExpMaxSumX;
-}
-
-void
-GNet::addWaXExpMaxSumX(float waXExpMaxSumX) {
-  waXExpMaxSumStorX_ += waXExpMaxSumX;
-}
-
-void
-GNet::addWaExpMaxSumY(float waExpMaxSumY) {
-  waExpMaxSumStorY_ += waExpMaxSumY;
-}
-
-void
-GNet::addWaYExpMaxSumY(float waYExpMaxSumY) {
-  waYExpMaxSumStorY_ += waYExpMaxSumY;
-}
 
 void
 GNet::setDontCare() {
@@ -565,52 +446,12 @@ Bin::~Bin() {
   density_ = targetDensity_ = 0;
 }
 
-int
-Bin::x() const {
-  return x_;
-}
-
-int
-Bin::y() const { 
-  return y_;
-}
-
-void
-Bin::setNonPlaceArea(int64_t area) {
-  nonPlaceArea_ = area;
-}
-
-void
-Bin::setInstPlacedArea(int64_t area) {
-  instPlacedArea_ = area;
-}
-
-void
-Bin::setFillerArea(int64_t area) {
-  fillerArea_ = area;
-}
-
-void
-Bin::addNonPlaceArea(int64_t area) {
-  nonPlaceArea_ += area;
-}
-
-void
-Bin::addInstPlacedArea(int64_t area) {
-  instPlacedArea_ += area;
-}
-
-void
-Bin::addFillerArea(int64_t area) {
-  fillerArea_ += area;
-}
 
 const int64_t 
 Bin::binArea() const { 
   return static_cast<int64_t>( dx() ) 
     * static_cast<int64_t>( dy() );
 }
-
 
 float
 Bin::density() const {
