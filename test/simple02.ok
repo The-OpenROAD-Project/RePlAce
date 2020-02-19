@@ -49,13 +49,15 @@ Notice 0: Finished DEF file: ./simple02.def
 [NesterovSolve] Iter: 50 overflow: 0.44704 HPWL: 4860877
 [NesterovSolve] Iter: 60 overflow: 0.388898 HPWL: 4862635
 [NesterovSolve] Iter: 70 overflow: 0.33567 HPWL: 4895763
-[NesterovSolve] Iter: 80 overflow: 0.30026 HPWL: 4968043
-[NesterovSolve] Iter: 90 overflow: 0.261815 HPWL: 5028482
-[NesterovSolve] Iter: 100 overflow: 0.220787 HPWL: 5074332
-[NesterovSolve] Iter: 110 overflow: 0.186362 HPWL: 5131621
-[NesterovSolve] Iter: 120 overflow: 0.153547 HPWL: 5186889
-[NesterovSolve] Iter: 130 overflow: 0.120576 HPWL: 5224290
-[NesterovSolve] Finished with Overflow: 0.0981092
+[NesterovSolve] Iter: 80 overflow: 0.307562 HPWL: 4948859
+[NesterovSolve] Iter: 90 overflow: 0.280456 HPWL: 5001547
+[NesterovSolve] Iter: 100 overflow: 0.244117 HPWL: 5036519
+[NesterovSolve] Iter: 110 overflow: 0.214676 HPWL: 5081729
+[NesterovSolve] Iter: 120 overflow: 0.188638 HPWL: 5132671
+[NesterovSolve] Iter: 130 overflow: 0.158319 HPWL: 5170378
+[NesterovSolve] Iter: 140 overflow: 0.136408 HPWL: 5206267
+[NesterovSolve] Iter: 150 overflow: 0.11531 HPWL: 5236680
+[NesterovSolve] Finished with Overflow: 0.0987775
 Worst slack: 1.00e+30
 Total negative slack: 0.00e+00
 No differences found.

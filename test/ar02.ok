@@ -55,14 +55,16 @@ Notice 0: Finished DEF file: ./ar02.def
 [NesterovSolve] Iter: 110 overflow: 0.453185 HPWL: 5424785
 [NesterovSolve] Iter: 120 overflow: 0.404862 HPWL: 5393147
 [NesterovSolve] Iter: 130 overflow: 0.355944 HPWL: 5421035
-[NesterovSolve] Iter: 140 overflow: 0.312872 HPWL: 5446653
-[NesterovSolve] Iter: 150 overflow: 0.279704 HPWL: 5515320
-[NesterovSolve] Iter: 160 overflow: 0.241488 HPWL: 5569813
-[NesterovSolve] Iter: 170 overflow: 0.203418 HPWL: 5623665
-[NesterovSolve] Iter: 180 overflow: 0.164436 HPWL: 5681493
-[NesterovSolve] Iter: 190 overflow: 0.138992 HPWL: 5738804
-[NesterovSolve] Iter: 200 overflow: 0.115099 HPWL: 5781671
-[NesterovSolve] Finished with Overflow: 0.0970588
+[NesterovSolve] Iter: 140 overflow: 0.318543 HPWL: 5437306
+[NesterovSolve] Iter: 150 overflow: 0.291374 HPWL: 5485167
+[NesterovSolve] Iter: 160 overflow: 0.261932 HPWL: 5536909
+[NesterovSolve] Iter: 170 overflow: 0.234174 HPWL: 5579350
+[NesterovSolve] Iter: 180 overflow: 0.201474 HPWL: 5622504
+[NesterovSolve] Iter: 190 overflow: 0.167887 HPWL: 5666005
+[NesterovSolve] Iter: 200 overflow: 0.146432 HPWL: 5710659
+[NesterovSolve] Iter: 210 overflow: 0.125072 HPWL: 5746822
+[NesterovSolve] Iter: 220 overflow: 0.101588 HPWL: 5784341
+[NesterovSolve] Finished with Overflow: 0.0995778
 Worst slack: 1.00e+30
 Total negative slack: 0.00e+00
 No differences found.
