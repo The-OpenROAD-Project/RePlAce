@@ -174,23 +174,24 @@ void NesterovPlace::init() {
 
 // clear reset
 void NesterovPlace::reset() {
-  vector<FloatPoint> ().swap(curSLPCoordi_);
-  vector<FloatPoint> ().swap(curSLPWireLengthGrads_);
-  vector<FloatPoint> ().swap(curSLPDensityGrads_);
-  vector<FloatPoint> ().swap(curSLPSumGrads_);
 
-  vector<FloatPoint> ().swap(nextSLPCoordi_);
-  vector<FloatPoint> ().swap(nextSLPWireLengthGrads_);
-  vector<FloatPoint> ().swap(nextSLPDensityGrads_);
-  vector<FloatPoint> ().swap(nextSLPSumGrads_);
-
-  vector<FloatPoint> ().swap(prevSLPCoordi_);
-  vector<FloatPoint> ().swap(prevSLPWireLengthGrads_);
-  vector<FloatPoint> ().swap(prevSLPDensityGrads_);
-  vector<FloatPoint> ().swap(prevSLPSumGrads_);
-
-  vector<FloatPoint> ().swap(curCoordi_);
-  vector<FloatPoint> ().swap(nextCoordi_);
+  curSLPCoordi_.clear();
+  curSLPWireLengthGrads_.clear();
+  curSLPDensityGrads_.clear();
+  curSLPSumGrads_.clear();
+  
+  nextSLPCoordi_.clear();
+  nextSLPWireLengthGrads_.clear();
+  nextSLPDensityGrads_.clear();
+  nextSLPSumGrads_.clear();
+  
+  prevSLPCoordi_.clear();
+  prevSLPWireLengthGrads_.clear();
+  prevSLPDensityGrads_.clear();
+  prevSLPSumGrads_.clear();
+  
+  curCoordi_.clear();
+  nextCoordi_.clear();
 }
 
 // to execute following function,

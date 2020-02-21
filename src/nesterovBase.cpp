@@ -65,7 +65,7 @@ GCell::GCell(int cx, int cy, int dx, int dy)
 }
 
 GCell::~GCell() {
-  vector<Instance*> ().swap(insts_);
+  insts_.clear();
 }
 
 void
@@ -515,8 +515,8 @@ BinGrid::BinGrid(Die* die) : BinGrid() {
 }
 
 BinGrid::~BinGrid() {
-  std::vector<Bin> ().swap(binStor_);
-  std::vector<Bin*> ().swap(bins_);
+  binStor_.clear();
+  bins_.clear();
   binCntX_ = binCntY_ = 0;
   binSizeX_ = binSizeY_ = 0;
   isSetBinCntX_ = isSetBinCntY_ = 0;

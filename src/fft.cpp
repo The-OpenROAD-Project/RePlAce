@@ -34,13 +34,13 @@ FFT::~FFT() {
   delete(electroForceY_);
 
 
-  vector<float> ().swap(csTable_);
-  vector<float> ().swap(wx_);
-  vector<float> ().swap(wxSquare_);
-  vector<float> ().swap(wy_);
-  vector<float> ().swap(wySquare_);
+  csTable_.clear();
+  wx_.clear();
+  wxSquare_.clear();
+  wy_.clear();
+  wySquare_.clear();
   
-  vector<int> ().swap(workArea_);
+  workArea_.clear();
 }
 
 
