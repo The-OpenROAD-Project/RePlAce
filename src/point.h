@@ -3,20 +3,20 @@
 
 namespace replace {
 
-class FloatCoordi {
+class FloatPoint {
   public:
   float x;
   float y;
-  FloatCoordi();
-  FloatCoordi(float x, float y);
+  FloatPoint();
+  FloatPoint(float x, float y);
 };
 
-class IntCoordi {
+class IntPoint {
   public:
   int x;
   int y;
-  IntCoordi();
-  IntCoordi(int x, int y);
+  IntPoint();
+  IntPoint(int x, int y);
 };
 }
 

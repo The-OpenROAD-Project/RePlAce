@@ -61,7 +61,7 @@ set (REPLACE_SRC
   src/fft.cpp
   src/fftsg.cpp
   src/fftsg2d.cpp
-  src/coordi.cpp
+  src/point.cpp
   src/plot.cpp
   src/logger.cpp
   )

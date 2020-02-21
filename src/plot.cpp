@@ -160,7 +160,7 @@ int PlotEnv::GetTotalImageHeight() {
   return imageHeight + 2 * yMargin;
 }
 
-int PlotEnv::GetX(FloatCoordi &coord) {
+int PlotEnv::GetX(FloatPoint &coord) {
   return (coord.x - pb_->die().dieLx()) * unitX + xMargin;
 }
 
@@ -168,7 +168,7 @@ int PlotEnv::GetX(float coord) {
   return (coord - pb_->die().dieLx()) * unitX + xMargin;
 }
 
-int PlotEnv::GetY(FloatCoordi &coord) {
+int PlotEnv::GetY(FloatPoint &coord) {
   return (origHeight - (coord.y - pb_->die().dieLy())) * unitY + yMargin;
 }
 

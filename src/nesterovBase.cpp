@@ -1170,7 +1170,7 @@ NesterovBase::placerToNesterov(Pin* pin) {
 // gcell update
 void
 NesterovBase::updateGCellLocation(
-    std::vector<FloatCoordi>& coordis) {
+    std::vector<FloatPoint>& coordis) {
   for(auto& coordi : coordis) {
     int idx = &coordi - &coordis[0];
     gCells_[idx]->setLocation( coordi.x, coordi.y );
@@ -1180,7 +1180,7 @@ NesterovBase::updateGCellLocation(
 // gcell update
 void
 NesterovBase::updateGCellCenterLocation(
-    std::vector<FloatCoordi>& coordis) {
+    std::vector<FloatPoint>& coordis) {
   for(auto& coordi : coordis) {
     int idx = &coordi - &coordis[0];
     gCells_[idx]->setCenterLocation( coordi.x, coordi.y );
@@ -1189,7 +1189,7 @@ NesterovBase::updateGCellCenterLocation(
 
 void
 NesterovBase::updateGCellDensityCenterLocation(
-    std::vector<FloatCoordi>& coordis) {
+    std::vector<FloatPoint>& coordis) {
   for(auto& coordi : coordis) {
     int idx = &coordi - &coordis[0];
     gCells_[idx]->setDensityCenterLocation( 
@@ -1347,9 +1347,9 @@ NesterovBase::updateWireLengthForceWA(
 }
 
 // get x,y WA Gradient values with given GCell
-FloatCoordi
+FloatPoint
 NesterovBase::getWireLengthGradientWA(GCell* gCell, float wlCoeffX, float wlCoeffY) {
-  FloatCoordi gradientPair;
+  FloatPoint gradientPair;
 
   for(auto& gPin : gCell->gPins()) {
     auto tmpPair = getWireLengthGradientPinWA(gPin, wlCoeffX, wlCoeffY);
@@ -1367,7 +1367,7 @@ NesterovBase::getWireLengthGradientWA(GCell* gCell, float wlCoeffX, float wlCoef
 //
 // You can't understand the following function
 // unless you read the (4.13) formula
-FloatCoordi
+FloatPoint
 NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoeffY) {
 
   float gradientMinX = 0, gradientMinY = 0;
@@ -1422,34 +1422,34 @@ NesterovBase::getWireLengthGradientPinWA(GPin* gPin, float wlCoeffX, float wlCoe
         / ( waExpMaxSumY * waExpMaxSumY );
   }
 
-  return FloatCoordi(gradientMinX - gradientMaxX, 
+  return FloatPoint(gradientMinX - gradientMaxX, 
       gradientMinY - gradientMaxY);
 }
 
-FloatCoordi
+FloatPoint
 NesterovBase::getWireLengthPreconditioner(GCell* gCell) {
-  return FloatCoordi( gCell->gPins().size(), 
+  return FloatPoint( gCell->gPins().size(), 
      gCell->gPins().size() );
 }
 
-FloatCoordi
+FloatPoint
 NesterovBase::getDensityPreconditioner(GCell* gCell) {
   float areaVal = static_cast<float>(gCell->dx()) 
     * static_cast<float>(gCell->dy());
 
-  return FloatCoordi(areaVal, areaVal);
+  return FloatPoint(areaVal, areaVal);
 }
 
 // get GCells' electroForcePair
 // i.e. get DensityGradient with given GCell
-FloatCoordi 
+FloatPoint 
 NesterovBase::getDensityGradient(GCell* gCell) {
   std::pair<int, int> pairX 
     = bg_.getDensityMinMaxIdxX(gCell);
   std::pair<int, int> pairY 
     = bg_.getDensityMinMaxIdxY(gCell);
   
-  FloatCoordi electroForce;
+  FloatPoint electroForce;
 
   for(int i = pairX.first; i < pairX.second; i++) {
     for(int j = pairY.first; j < pairY.second; j++) {

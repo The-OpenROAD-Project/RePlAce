@@ -5,7 +5,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "coordi.h"
+#include "point.h"
 
 namespace replace {
 
@@ -730,14 +730,14 @@ public:
 
   // update gCells with lx, ly
   void updateGCellLocation(
-      std::vector<FloatCoordi>& coordis);
+      std::vector<FloatPoint>& points);
 
   // update gCells with cx, cy
   void updateGCellCenterLocation(
-      std::vector<FloatCoordi>& coordis);
+      std::vector<FloatPoint>& points);
 
   void updateGCellDensityCenterLocation(
-      std::vector<FloatCoordi>& coordis);
+      std::vector<FloatPoint>& points);
 
   int binCntX() const;
   int binCntY() const;
@@ -766,22 +766,22 @@ public:
       float wlCoeffX,
       float wlCoeffY);
 
-  FloatCoordi
+  FloatPoint
     getWireLengthGradientPinWA(GPin* gPin,
         float wlCoeffX, float wlCoeffY);
 
-  FloatCoordi
+  FloatPoint
     getWireLengthGradientWA(GCell* gCell,
         float wlCoeffX, float wlCoeffY);
 
   // for preconditioner
-  FloatCoordi
+  FloatPoint
     getWireLengthPreconditioner(GCell* gCell);
 
-  FloatCoordi
+  FloatPoint
     getDensityPreconditioner(GCell* gCell);
 
-  FloatCoordi
+  FloatPoint
     getDensityGradient(GCell* gCell);
 
   int64_t getHpwl();

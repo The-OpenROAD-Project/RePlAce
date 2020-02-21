@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <memory>
-#include "coordi.h"
+#include "point.h"
 
 // 
 // The following structure/header will be removed.
@@ -87,9 +87,9 @@ class PlotEnv {
   void InitCellColors(std::string colorFile);
   int GetTotalImageWidth();
   int GetTotalImageHeight();
-  int GetX(FloatCoordi &coord);
+  int GetX(FloatPoint &coord);
   int GetX(float coord);
-  int GetY(FloatCoordi &coord);
+  int GetY(FloatPoint &coord);
   int GetY(float coord);
   
   void DrawModule(CImgObj *img, const unsigned char color[], float opacity);
