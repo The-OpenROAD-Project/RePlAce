@@ -16,7 +16,7 @@ using replace::Replace;
 %inline %{
 
 void 
-replace_init_place_cmd()
+replace_initial_place_cmd()
 {
   Replace* replace = getReplace();
   replace->doInitialPlace();
@@ -37,10 +37,17 @@ set_replace_density_cmd(float density)
 }
 
 void
-set_replace_init_place_iter_cmd(int iter)
+set_replace_initial_place_max_iter_cmd(int iter)
 {
   Replace* replace = getReplace();
   replace->setInitialPlaceMaxIter(iter); 
+}
+
+void
+set_replace_initial_place_max_fanout_cmd(int fanout)
+{
+  Replace* replace = getReplace();
+  replace->setInitialPlaceMaxFanout(fanout);
 }
 
 void

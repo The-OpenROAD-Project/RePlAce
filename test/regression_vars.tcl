@@ -119,6 +119,7 @@ proc list_delete { list delete } {
 record_replace_tests {
   simple01
   simple02
+  simple03
   core01 
   ar01 
   ar02 

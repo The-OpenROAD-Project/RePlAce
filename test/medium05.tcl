@@ -1,6 +1,7 @@
 source helpers.tcl
 set test_name medium05
 read_lef ./nangate45.lef
+read_lef ./RocketTile_macro.lef
 read_def ./$test_name.def
 
 global_placement 

@@ -19,6 +19,7 @@ Replace::Replace()
   initialPlaceMaxIter_(20), 
   initialPlaceMinDiffLength_(1500),
   initialPlaceMaxSolverIter_(100),
+  initialPlaceMaxFanout_(200),
   initialPlaceNetWeightScale_(800),
   nesterovPlaceMaxIter_(2000),
   binGridCntX_(0), binGridCntY_(0), 
@@ -45,6 +46,7 @@ void Replace::reset() {
   initialPlaceMaxIter_ = 20;
   initialPlaceMinDiffLength_ = 1500;
   initialPlaceMaxSolverIter_ = 100;
+  initialPlaceMaxFanout_ = 200;
   initialPlaceNetWeightScale_ = 800;
 
   nesterovPlaceMaxIter_ = 2000;
@@ -73,8 +75,8 @@ void Replace::doInitialPlace() {
   ipVars.maxIter = initialPlaceMaxIter_;
   ipVars.minDiffLength = initialPlaceMinDiffLength_;
   ipVars.maxSolverIter = initialPlaceMaxSolverIter_;
+  ipVars.maxFanout = initialPlaceMaxFanout_;
   ipVars.netWeightScale = initialPlaceNetWeightScale_;
-  ipVars.verbose = verbose_;
   
   std::unique_ptr<InitialPlace> ip(new InitialPlace(ipVars, pb_, log_));
   ip_ = std::move(ip);
@@ -135,6 +137,11 @@ Replace::setInitialPlaceMinDiffLength(int length) {
 void
 Replace::setInitialPlaceMaxSolverIter(int iter) {
   initialPlaceMaxSolverIter_ = iter;
+}
+
+void
+Replace::setInitialPlaceMaxFanout(int fanout) {
+  initialPlaceMaxFanout_ = fanout;
 }
 
 void

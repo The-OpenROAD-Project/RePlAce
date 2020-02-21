@@ -5,6 +5,8 @@
 
 #include <Eigen/IterativeLinearSolvers>
 
+#include "plot.h"
+
 namespace replace {
 using namespace std;
 
@@ -17,13 +19,15 @@ InitialPlaceVars::InitialPlaceVars()
   : maxIter(20), 
   minDiffLength(1500), 
   maxSolverIter(100),
-  netWeightScale(800.0),
-  verbose(0) {}
+  maxFanout(200),
+  netWeightScale(800.0) {}
 
 void InitialPlaceVars::reset() {
-  maxIter = 0;
-  minDiffLength = 0;
-  verbose = 0;
+  maxIter = 20;
+  minDiffLength = 1500;
+  maxSolverIter = 100;
+  maxFanout = 200;
+  netWeightScale = 800.0;
 }
 
 InitialPlace::InitialPlace()
@@ -43,10 +47,19 @@ void InitialPlace::reset() {
   ipVars_.reset();
 }
 
+#ifdef ENABLE_CIMG_LIB
+static PlotEnv pe;
+#endif
+
 void InitialPlace::doBicgstabPlace() {
   log_->procBegin("InitialPlace", 3);
 
   float errorX = 0.0f, errorY = 0.0f;
+
+#ifdef ENABLE_CIMG_LIB
+  pe.setPlacerBase(pb_);
+  pe.Init();
+#endif
   
   placeInstsCenter();
   // set ExtId for idx reference // easy recovery
@@ -70,6 +83,16 @@ void InitialPlace::doBicgstabPlace() {
       << " CG Error: " << max(errorX, errorY)
       << " HPWL: " << pb_->hpwl() << endl; 
     updateCoordi();
+
+#ifdef ENABLE_CIMG_LIB
+    pe.SaveCellPlotAsJPEG(
+        string("InitPlace ") + to_string(i), false,
+        string("./plot/cell/ip_") + to_string(i));
+#endif
+
+    if( max(errorX, errorY) <= 1e-5 && i >= 5 ) {
+      break;
+    }
   }
 
   log_->procEnd("InitialPlace", 3);
@@ -193,6 +216,12 @@ void InitialPlace::createSparseMatrix() {
 
     // skip for small nets.
     if( net->pins().size() <= 1 ) {
+      continue;
+    }
+ 
+    // escape long time cals on huge fanout.
+    //
+    if( net->pins().size() >= ipVars_.maxFanout) { 
       continue;
     }
 

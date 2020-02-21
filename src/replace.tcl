@@ -8,7 +8,9 @@ proc global_placement { args } {
   sta::parse_key_args "global_placement" args \
     keys {-bin_grid_count -wire_res -wire_cap -density \
       -init_density_penalty -init_wirelength_coef \
-      -min_phi_coef -max_phi_coef -overflow -verbose_level} \
+      -min_phi_coef -max_phi_coef -overflow \
+      -initial_place_max_iter -initial_place_max_fanout \
+      -verbose_level} \
       flags {-skip_initial_place -timing_driven}
     
   set target_density 0.7
@@ -17,6 +19,21 @@ proc global_placement { args } {
     sta::check_positive_float "-density" $target_density
   }
   set_replace_density_cmd $target_density
+
+  if { [info exists flags(-skip_initial_place)] } {
+    set_replace_initial_place_max_iter_cmd 0
+  } elseif { [info exists keys(-initial_place_max_iter)] } { 
+    set initial_place_max_iter $keys(-initial_place_max_iter)
+    sta::check_positive_integer "-initial_place_max_iter" $initial_place_max_iter
+    set_replace_initial_place_max_iter_cmd $initial_place_max_iter
+  } 
+
+  if { [info exists keys(-initial_place_max_fanout)] } { 
+    set initial_place_max_fanout $keys(-initial_place_max_fanout)
+    sta::check_positive_integer "-initial_place_max_fanout" $initial_place_max_fanout
+    set_replace_initial_place_max_fanout_cmd $initial_place_max_fanout
+  }
+
 
   # hidden parameter to control the RePlAce divergence
   if { [info exists keys(-min_phi_coef)] } { 
@@ -62,14 +79,11 @@ proc global_placement { args } {
     set_replace_bin_grid_cnt_y_cmd $bin_grid_count    
   }
 
-  if { ![info exists flags(-skip_initial_place)] } {
-    set_replace_init_place_iter_cmd 0
-  }
 
   if { [ord::db_has_rows] } {
     sta::check_argc_eq0 "global_placement" $args
   
-    replace_init_place_cmd
+    replace_initial_place_cmd
     replace_nesterov_place_cmd
     
     puts "Worst slack: [format %.2e [sta::worst_slack]]"

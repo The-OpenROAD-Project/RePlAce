@@ -286,6 +286,13 @@ NesterovPlace::doNesterovPlace() {
   pe.setPlacerBase(pb_);
   pe.setNesterovBase(nb_);
   pe.Init();
+      
+  pe.SaveCellPlotAsJPEG("Nesterov - BeforeStart", true,
+     "./plot/cell/cell_0");
+  pe.SaveBinPlotAsJPEG("Nesterov - BeforeStart",
+     "./plot/bin/bin_0");
+  pe.SaveArrowPlotAsJPEG("Nesterov - BeforeStart",
+     "./plot/arrow/arrow_0");
 #endif
 
 

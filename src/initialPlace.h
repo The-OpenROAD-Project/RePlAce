@@ -14,8 +14,8 @@ public:
   int maxIter;
   int minDiffLength;
   int maxSolverIter;
+  int maxFanout;
   float netWeightScale;
-  int verbose;
 
   InitialPlaceVars();
   void reset();

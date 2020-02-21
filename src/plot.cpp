@@ -248,41 +248,37 @@ PlotEnv::DrawGcell(CImgObj *img, const unsigned char fillerColor[],
         }
       }
     } 
-    img->draw_rectangle(x1, y1, x3, y3, color, opacity);
+
+    if( gCell->isInstance() ) {
+      img->draw_rectangle(x1, y1, x3, y3, color, opacity);
+    }
 //    img->draw_text((x1+x3)/2, (y1+y3)/2, 
 //        string(to_string(gCell->dCx()) + " " + to_string(gCell->dCy())).c_str(), black, NULL, 1, 20);
   }
 }
 
+// for initPlace
 void PlotEnv::DrawModule(CImgObj *img, const unsigned char color[], float opacity) {
-//  for(int i = 0; i < moduleCNT; i++) {
-//    MODULE *curModule = &moduleInstance[i];
-//
-//    // update pmin & pmax
-//    curModule->pmin.x = curModule->center.x - 0.5 * curModule->size.x;
-//    curModule->pmax.x = curModule->center.x + 0.5 * curModule->size.x;
-//
-//    curModule->pmin.y = curModule->center.y - 0.5 * curModule->size.y;
-//    curModule->pmax.y = curModule->center.y + 0.5 * curModule->size.y;
-//
-//    int x1 = pe.GetX(curModule->pmin);
-//    int x3 = pe.GetX(curModule->pmax);
-//    int y1 = pe.GetY(curModule->pmin);
-//    int y3 = pe.GetY(curModule->pmax);
-//
-//    unsigned char cColor[3] = {0, };
+
+  for(auto& inst: pb_->placeInsts()) {
+    int x1 = GetX(inst->lx());
+    int y1 = GetY(inst->ly());
+    int x3 = GetX(inst->ux());
+    int y3 = GetY(inst->uy());
+
+    unsigned char cColor[3] = {0, };
 //    if( pe.hasCellColor ) {
 //      cColor[0] = pe.colors[i].r();
 //      cColor[1] = pe.colors[i].g();
 //      cColor[2] = pe.colors[i].b();
 //    }
 //    else {
-//      for(int j=0; j<3; j++) {
-//        cColor[j] = color[j];
-//      }
+      for(int j=0; j<3; j++) {
+        cColor[j] = color[j];
+      }
 //    }
-//    img.draw_rectangle(x1, y1, x3, y3, cColor, opacity);
-//  }
+    img->draw_rectangle(x1, y1, x3, y3, cColor, opacity);
+  }
 }
 
 void PlotEnv::DrawBinDensity(CImgObj *img, float opacity) {

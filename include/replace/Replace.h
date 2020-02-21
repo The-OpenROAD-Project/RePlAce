@@ -39,6 +39,7 @@ class Replace
     void setInitialPlaceMaxIter(int iter);
     void setInitialPlaceMinDiffLength(int length);
     void setInitialPlaceMaxSolverIter(int iter);
+    void setInitialPlaceMaxFanout(int fanout);
     void setInitialPlaceNetWeightScale(float scale);
 
     void setNesterovPlaceMaxIter(int iter);
@@ -72,6 +73,7 @@ class Replace
     int initialPlaceMaxIter_;
     int initialPlaceMinDiffLength_;
     int initialPlaceMaxSolverIter_;
+    int initialPlaceMaxFanout_;
     float initialPlaceNetWeightScale_;
 
     int nesterovPlaceMaxIter_;
