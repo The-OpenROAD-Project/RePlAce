@@ -44,6 +44,8 @@ public:
   // a instance that need to be moved.
   bool isInstance() const;
 
+  bool isPlaceInstance() const;
+
   // Dummy is virtual instance to fill in
   // empty fragmented row structures.
   // will have inst_ as nullptr
@@ -121,6 +123,8 @@ public:
 
   void setInstance(Instance* inst);
   void setNet(Net* net);
+
+  bool isPlaceInstConnected() const;
 
   Instance* instance() const { return inst_; }
   Net* net() const { return net_; }

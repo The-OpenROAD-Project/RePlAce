@@ -91,6 +91,11 @@ Instance::isInstance() const {
 }
 
 bool
+Instance::isPlaceInstance() const {
+  return (isInstance() && !isFixed());
+}
+
+bool
 Instance::isDummy() const {
   return (inst_ == nullptr);
 }
@@ -405,6 +410,14 @@ Pin::setInstance(Instance* inst) {
 void
 Pin::setNet(Net* net) {
   net_ = net;
+}
+
+bool
+Pin::isPlaceInstConnected() const {
+  if( !inst_ ) {
+    return false;
+  }
+  return inst_->isPlaceInstance();
 }
 
 Pin::~Pin() {
@@ -770,12 +783,15 @@ PlacerBase::initInstsForFragmentedRow() {
   }
 
   // fill fixed instances' bbox
-  for(auto& fixedInst : fixedInsts_) {
+  for(auto& inst: instStor_) {
+    if( !inst.isFixed() ) {
+      continue;
+    }
     std::pair<int, int> pairX 
-      = getMinMaxIdx(fixedInst->lx(), fixedInst->ux(),
+      = getMinMaxIdx(inst.lx(), inst.ux(),
           die_.coreLx(), siteSizeX_);
     std::pair<int, int> pairY 
-      = getMinMaxIdx(fixedInst->ly(), fixedInst->uy(),
+      = getMinMaxIdx(inst.ly(), inst.uy(),
           die_.coreLy(), siteSizeY_);
 
     for(int i=pairX.first; i<pairX.second; i++) {

@@ -262,7 +262,8 @@ void InitialPlace::createSparseMatrix() {
           //cout << weightX << endl;
 
           // both pin cames from instance
-          if( pin1->instance() && pin2->instance() ) {
+          if( pin1->isPlaceInstConnected() 
+              && pin2->isPlaceInstConnected() ) {
             const int inst1 = pin1->instance()->extId();
             const int inst2 = pin2->instance()->extId();
             //cout << "inst: " << inst1 << " " << inst2 << endl;
@@ -286,7 +287,8 @@ void InitialPlace::createSparseMatrix() {
               (pin1->cx() - pin1->instance()->cx())); 
           }
           // pin1 from IO port / pin2 from Instance
-          else if( !pin1->instance() && pin2->instance() ) {
+          else if( !pin1->isPlaceInstConnected() 
+              && pin2->isPlaceInstConnected() ) {
             const int inst2 = pin2->instance()->extId();
             //cout << "inst2: " << inst2 << endl;
             listX.push_back( T(inst2, inst2, weightX) );
@@ -295,7 +297,8 @@ void InitialPlace::createSparseMatrix() {
                 ( pin2->cx() - pin2->instance()->cx()) );
           }
           // pin1 from Instance / pin2 from IO port
-          else if( pin1->instance() && !pin2->instance() ) {
+          else if( pin1->isPlaceInstConnected() 
+              && !pin2->isPlaceInstConnected() ) {
             const int inst1 = pin1->instance()->extId();
             //cout << "inst1: " << inst1 << endl;
             listX.push_back( T(inst1, inst1, weightX) );
@@ -320,7 +323,8 @@ void InitialPlace::createSparseMatrix() {
           }
 
           // both pin cames from instance
-          if( pin1->instance() && pin2->instance() ) {
+          if( pin1->isPlaceInstConnected() 
+              && pin2->isPlaceInstConnected() ) {
             const int inst1 = pin1->instance()->extId();
             const int inst2 = pin2->instance()->extId();
 
@@ -341,7 +345,8 @@ void InitialPlace::createSparseMatrix() {
               (pin1->cy() - pin1->instance()->cy())); 
           }
           // pin1 from IO port / pin2 from Instance
-          else if( !pin1->instance() && pin2->instance() ) {
+          else if( !pin1->isPlaceInstConnected() 
+              && pin2->isPlaceInstConnected() ) {
             const int inst2 = pin2->instance()->extId();
             listY.push_back( T(inst2, inst2, weightY) );
             fixedInstForceVecY_(inst2) += weightY * 
@@ -349,7 +354,8 @@ void InitialPlace::createSparseMatrix() {
                 ( pin2->cy() - pin2->instance()->cy()) );
           }
           // pin1 from Instance / pin2 from IO port
-          else if( pin1->instance() && !pin2->instance() ) {
+          else if( pin1->isPlaceInstConnected() 
+              && !pin2->isPlaceInstConnected() ) {
             const int inst1 = pin1->instance()->extId();
             listY.push_back( T(inst1, inst1, weightY) );
             fixedInstForceVecY_(inst1) += weightY *
