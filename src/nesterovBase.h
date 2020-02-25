@@ -748,6 +748,7 @@ public:
 
   int64_t overflowArea() const;
   float sumPhi() const;
+  float targetDensity() const;
 
   void updateDensityCoordiLayoutInside(GCell* gcell);
 

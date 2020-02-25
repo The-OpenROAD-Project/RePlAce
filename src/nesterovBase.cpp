@@ -806,13 +806,14 @@ BinGrid::updateBinsGCellDensityArea(
     bin->setDensity( 
         ( static_cast<float> (bin->instPlacedArea())
           + static_cast<float> (bin->fillerArea()) 
-          + static_cast<float> (bin->nonPlaceArea() * bin->targetDensity()) )
+          + static_cast<float> (bin->nonPlaceArea()) )
         / static_cast<float>(binArea * bin->targetDensity()));
 
     overflowArea_ 
       += std::max(0.0f, 
           static_cast<float>(bin->instPlacedArea()) 
-          - (binArea - bin->nonPlaceArea() * bin->targetDensity())*bin->targetDensity());
+          + static_cast<float>(bin->nonPlaceArea())
+          - (binArea * bin->targetDensity()));
 
   }
 }
@@ -1096,8 +1097,8 @@ NesterovBase::initFillerGCells() {
   // nonPlaceInstsArea needs targetDensity down-scaling
   // See MS-replace paper
   int64_t whiteSpaceArea = coreArea - 
-    static_cast<int64_t>(pb_->nonPlaceInstsArea() 
-        * nbVars_.targetDensity);
+//    static_cast<int64_t>(pb_->nonPlaceInstsArea());
+    static_cast<int64_t>(pb_->nonPlaceInstsArea() * nbVars_.targetDensity);
 
   // TODO density screening
   int64_t movableArea = whiteSpaceArea 
@@ -1119,6 +1120,9 @@ NesterovBase::initFillerGCells() {
     static_cast<int>(totalFillerArea 
         / static_cast<int64_t>(avgDx * avgDy));
 
+  log_->infoInt64("FillerInit: CoreArea", coreArea, 3);
+  log_->infoInt64("FillerInit: WhiteSpaceArea", whiteSpaceArea, 3);
+  log_->infoInt64("FillerInit: MovableArea", movableArea, 3);
   log_->infoInt64("FillerInit: TotalFillerArea", totalFillerArea, 3);
   log_->infoInt("FillerInit: NumFillerCells", fillerCnt, 3);
   log_->infoInt64("FillerInit: FillerCellArea", static_cast<int64_t>(avgDx*avgDy), 3);
@@ -1227,6 +1231,11 @@ NesterovBase::overflowArea() const {
 float
 NesterovBase::sumPhi() const {
   return sumPhi_;
+}
+
+float
+NesterovBase::targetDensity() const {
+  return nbVars_.targetDensity;
 }
 
 void 
@@ -1507,6 +1516,7 @@ NesterovBase::reset() {
   pb_ = nullptr;
   nbVars_.reset();
 }
+
 
 
 // https://stackoverflow.com/questions/33333363/built-in-mod-vs-custom-mod-function-improve-the-performance-of-modulus-op

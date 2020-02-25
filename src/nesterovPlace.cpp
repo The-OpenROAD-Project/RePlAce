@@ -111,7 +111,8 @@ void NesterovPlace::init() {
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
-        / static_cast<float>(pb_->placeInstsArea());
+        / static_cast<float>(pb_->stdInstsArea() 
+            + pb_->macroInstsArea() * nb_->targetDensity() );
 
   log_->infoFloatSignificant("InitSumOverflow", sumOverflow_, 3);
 
