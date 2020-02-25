@@ -633,7 +633,8 @@ PlacerBase::init() {
       if(inst.isFixed()) {
         fixedInsts_.push_back(&inst); 
         nonPlaceInsts_.push_back(&inst);
-        nonPlaceInstsArea_ += inst.dx() * inst.dy();
+        nonPlaceInstsArea_ += static_cast<int64_t>(inst.dx()) 
+          * static_cast<int64_t>(inst.dy());
       }
       else {
         placeInsts_.push_back(&inst);
@@ -656,7 +657,8 @@ PlacerBase::init() {
     else if(inst.isDummy()) {
       dummyInsts_.push_back(&inst);
       nonPlaceInsts_.push_back(&inst);
-      nonPlaceInstsArea_ += inst.dx() * inst.dy();
+      nonPlaceInstsArea_ += static_cast<int64_t>(inst.dx()) 
+        * static_cast<int64_t>(inst.dy());
     }
     insts_.push_back(&inst);
   }
