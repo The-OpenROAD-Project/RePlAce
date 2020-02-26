@@ -1094,11 +1094,9 @@ NesterovBase::initFillerGCells() {
     static_cast<int64_t>(pb_->die().coreDx()) *
     static_cast<int64_t>(pb_->die().coreDy()); 
 
-  // nonPlaceInstsArea needs targetDensity down-scaling
-  // See MS-replace paper
+  // nonPlaceInstsArea should not have targetDensity downscaling!!! 
   int64_t whiteSpaceArea = coreArea - 
-//    static_cast<int64_t>(pb_->nonPlaceInstsArea());
-    static_cast<int64_t>(pb_->nonPlaceInstsArea() * nbVars_.targetDensity);
+    static_cast<int64_t>(pb_->nonPlaceInstsArea());
 
   // TODO density screening
   int64_t movableArea = whiteSpaceArea 
