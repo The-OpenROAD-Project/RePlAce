@@ -57,7 +57,9 @@ class Tile {
     float inflationRatio() const;
     float inflationArea() const;
     float inflationAreaDelta() const;
-    float inflatedRation() const;
+    float inflatedRatio() const;
+
+    bool isMacroIncluded() const;
 
   private:
     // the followings will store
@@ -108,6 +110,8 @@ class Tile {
     float inflationAreaDelta_;
 
     float inflatedRatio_;
+    
+    bool isMacroIncluded_;
 
     void reset();
 };
@@ -163,7 +167,10 @@ class TileGrid {
   private:
     vector<Tile> tileStor_;
     vector<Tile*> tiles_;
+
+    // extract routing layer info
     odb::dbDatabase* db_;
+    std::shared_ptr<Logger> log_;
 
     int lx_; 
     int ly_;
@@ -176,16 +183,43 @@ TileGrid::tiles() const {
   return tiles_;
 }
 
+struct EdgeCapacityInfo {
+  int col1;
+  int row1;
+  int layer1;
+  int col2;
+  int row2;
+  int layer2;
+  int capacity;
+  EdgeCapacityInfo();
+};
+
 class RouteBase {
   public:
-    RouteBase(std::shared_ptr<NesterovBase> nb);
+    RouteBase(std::shared_ptr<NesterovBase> nb,
+        std::shared_ptr<Logger> log);
     ~RouteBase();
 
     void estimateCongestion();
     void initFromGuide(const char* fileName);
+    void importEst(const char* fileName);
 
   private:
     TileGrid tg_;
+
+    std::shared_ptr<NesterovBase> nb_;
+    std::shared_ptr<Logger> log_;
+    
+    // from *.route file
+    std::vector<int> verticalCapacity_;
+    std::vector<int> minWireWidth_;
+    std::vector<int> minWireSpacing_;
+
+    float gRoutePitchScale_;
+
+    // from *.est file
+    std::vector<EdgeCapacityInfo> edgeCapacityStor_;
+
 
     void init();
     void reset();

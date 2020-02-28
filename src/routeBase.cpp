@@ -176,7 +176,15 @@ TileGrid::setDb(odb::dbDatabase* db) {
 void
 TileGrid::initTiles() {
   const int numLayer = db_->getTech()->getRoutingLayerCount();
-  
+  int numHTracks = 0;
+  int numVTracks = 0;
+  for(int i=0; i<numLayer; i++) {
+
+  }
+
+  log_->infoPrint("NumHTracks", numHTracks, 3);
+  log_->infoPrint("NumVTracks", numVTracks, 3);
+
 }
 
 void
@@ -185,8 +193,9 @@ TileGrid::initFromGuide(const char* fileName) {
 }
 
 
-RouteBase::RouteBase()
-  : {};
+RouteBase::RouteBase(std::shared_ptr<NesterovBase> nb,
+    std::shared_ptr<Logger> log)
+  : nb_(nb), log_(log) {};
 
 RouteBase::~RouteBase() {
   reset();

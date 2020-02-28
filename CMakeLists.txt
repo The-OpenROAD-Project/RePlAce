@@ -64,6 +64,7 @@ set (REPLACE_SRC
   src/point.cpp
   src/plot.cpp
   src/logger.cpp
+  src/routeBase.cpp
   )
 
 set (REPLACE_HEADER
