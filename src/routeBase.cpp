@@ -1,4 +1,5 @@
 #include "routeBase.h"
+#include "logger.h"
 #include <opendb/db.h>
 
 namespace replace {
@@ -92,8 +93,8 @@ Tile::usageVR(int layer) const {
 }
 
 void
-Tile::setBlockage(int layer, int blocakge) {
-  blockage_[layer] = blockage;
+Tile::setBlockage(int layer, int block) {
+  blockage_[layer] = block;
 }
 
 void
@@ -132,18 +133,26 @@ Tile::sumUsageH() const {
 }
 
 float
-Tile::sumUsasgeV() const {
-  return sumSuageV_; 
+Tile::sumUsageV() const {
+  return sumUsageV_; 
 }
 
 float
-Tile::supplyH() const {
-  return supplyH_;
+Tile::supplyHL() const {
+  return supplyHL_;
+}
+float
+Tile::supplyHR() const {
+  return supplyHR_;
 }
 
 float
-Tile::supplyV() const {
-  return supplyV_;
+Tile::supplyVL() const {
+  return supplyVL_;
+}
+float
+Tile::supplyVR() const {
+  return supplyVR_;
 }
 
 
@@ -182,8 +191,8 @@ TileGrid::initTiles() {
 
   }
 
-  log_->infoPrint("NumHTracks", numHTracks, 3);
-  log_->infoPrint("NumVTracks", numVTracks, 3);
+  log_->infoInt("NumHTracks", numHTracks, 3);
+  log_->infoInt("NumVTracks", numVTracks, 3);
 
 }
 

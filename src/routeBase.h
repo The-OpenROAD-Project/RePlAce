@@ -2,12 +2,16 @@
 #define __REPLACE_ROUTE_BASE__
 
 #include <memory>
+#include <vector>
 
-namespace odb {  
+namespace odb {
   class dbDatabase;
 }
 
 namespace replace {
+
+class Logger;
+class NesterovBase;
 
 // for GGrid
 class Tile {
@@ -15,7 +19,7 @@ class Tile {
     Tile();
     Tile(int x, int y, int lx, int ly, int ux, int uy, int layers);
     ~Tile();
-    
+
     int x() const;
     int y() const;
 
@@ -63,9 +67,9 @@ class Tile {
 
   private:
     // the followings will store
-    // blockage / capacity / route-ability 
+    // blockage / capacity / route-ability
     // idx : metalLayer
-    
+
     // Note that the layerNum starts from 0 in this Tile class
     std::vector<int> blockage_;
     std::vector<int> capacity_;
@@ -101,7 +105,7 @@ class Tile {
     float supplyVL_;
     float supplyVR_;
 
-    // to bloat cells in tile 
+    // to bloat cells in tile
     float inflationRatioH_;
     float inflationRatioV_;
     float inflationRatio_;
@@ -110,39 +114,39 @@ class Tile {
     float inflationAreaDelta_;
 
     float inflatedRatio_;
-    
+
     bool isMacroIncluded_;
 
     void reset();
 };
 
 inline int
-Tile::x() {
-  return x_; 
+Tile::x() const {
+  return x_;
 }
 
 inline int
-Tile::y() {
-  return y_; 
+Tile::y() const {
+  return y_;
 }
 
-inline int 
-Tile::lx() {
+inline int
+Tile::lx() const {
   return lx_;
 }
 
 inline int
-Tile::ly() {
+Tile::ly() const {
   return ly_;
 }
 
 inline int
-Tile::ux() {
-  return ux_;  
+Tile::ux() const {
+  return ux_;
 }
 
 inline int
-Tile::uy() {
+Tile::uy() const {
   return uy_;
 }
 
@@ -151,11 +155,11 @@ class TileGrid {
     TileGrid();
     ~TileGrid();
 
-    int lx() const; 
+    int lx() const;
     int ly() const;
     int ux() const;
     int uy() const;
-    
+
     void reset();
 
     const std::vector<Tile*> & tiles() const;
@@ -163,22 +167,22 @@ class TileGrid {
 
     void initTiles();
     void initFromGuide(const char* fileName);
-  
+
   private:
-    vector<Tile> tileStor_;
-    vector<Tile*> tiles_;
+    std::vector<Tile> tileStor_;
+    std::vector<Tile*> tiles_;
 
     // extract routing layer info
     odb::dbDatabase* db_;
     std::shared_ptr<Logger> log_;
 
-    int lx_; 
+    int lx_;
     int ly_;
-    int ux_; 
+    int ux_;
     int uy_;
 };
 
-inline const std::vector<Tile*> & 
+inline const std::vector<Tile*> &
 TileGrid::tiles() const {
   return tiles_;
 }
@@ -209,7 +213,7 @@ class RouteBase {
 
     std::shared_ptr<NesterovBase> nb_;
     std::shared_ptr<Logger> log_;
-    
+
     // from *.route file
     std::vector<int> verticalCapacity_;
     std::vector<int> minWireWidth_;
