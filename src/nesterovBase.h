@@ -631,7 +631,7 @@ public:
 
   void setPlacerBase(std::shared_ptr<PlacerBase> pb);
   void setLogger(std::shared_ptr<Logger> log);
-  void setCoordi(Die* die);
+  void setCorePoints(Die* die);
   void setBinCnt(int binCntX, int binCntY);
   void setBinCntX(int binCntX);
   void setBinCntY(int binCntY);

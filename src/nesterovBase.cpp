@@ -511,7 +511,7 @@ BinGrid::BinGrid()
   isSetBinCntX_(0), isSetBinCntY_(0) {}
 
 BinGrid::BinGrid(Die* die) : BinGrid() {
-  setCoordi(die);
+  setCorePoints(die);
 }
 
 BinGrid::~BinGrid() {
@@ -524,7 +524,7 @@ BinGrid::~BinGrid() {
 }
 
 void
-BinGrid::setCoordi(Die* die) {
+BinGrid::setCorePoints(Die* die) {
   lx_ = die->coreLx();
   ly_ = die->coreLy();
   ux_ = die->coreUx();
@@ -1010,7 +1010,7 @@ NesterovBase::init() {
 
   bg_.setPlacerBase(pb_);
   bg_.setLogger(log_);
-  bg_.setCoordi(&(pb_->die()));
+  bg_.setCorePoints(&(pb_->die()));
   bg_.setTargetDensity(nbVars_.targetDensity);
   
   // update binGrid info

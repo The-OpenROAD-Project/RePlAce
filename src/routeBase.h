@@ -12,6 +12,8 @@ namespace replace {
 
 class Logger;
 class NesterovBase;
+class GNet;
+class Die;
 
 // for GGrid
 class Tile {
@@ -155,18 +157,28 @@ class TileGrid {
     TileGrid();
     ~TileGrid();
 
+    void setDb(odb::dbDatabase* db);
+    void setLogger(std::shared_ptr<Logger> log);
+    void setDiePoints(Die* die);
+    void setTileCnt(int tileCntX, int tileCntY);
+    void setTileCntX(int tileCntX);
+    void setTileCntY(int tileCntY);
+
     int lx() const;
     int ly() const;
     int ux() const;
     int uy() const;
 
+    int tileCntX() const;
+    int tileCntY() const;
+    int tileSizeX() const;
+    int tileSizeY() const;
+
     void reset();
 
     const std::vector<Tile*> & tiles() const;
-    void setDb(odb::dbDatabase* db);
 
     void initTiles();
-    void initFromGuide(const char* fileName);
 
   private:
     std::vector<Tile> tileStor_;
@@ -180,6 +192,10 @@ class TileGrid {
     int ly_;
     int ux_;
     int uy_;
+    int tileCntX_;
+    int tileCntY_;
+    int tileSizeX_;
+    int tileSizeY_;
 };
 
 inline const std::vector<Tile*> &
@@ -187,25 +203,39 @@ TileGrid::tiles() const {
   return tiles_;
 }
 
+// For *.route EdgeCapacityAdjustment
 struct EdgeCapacityInfo {
-  int col1;
-  int row1;
-  int layer1;
-  int col2;
-  int row2;
-  int layer2;
+  int lx;
+  int ly;
+  int ll;
+  int ux;
+  int uy;
+  int ul;
   int capacity;
   EdgeCapacityInfo();
+  EdgeCapacityInfo(int lx, int ly, int ll,
+      int ux, int uy, int ul, int capacity);
+};
+
+// For *.est file communication
+struct RoutingTrack {
+  int lx, ly, ux, uy;
+  int layer;
+  GNet* gNet;
+  RoutingTrack();
+  RoutingTrack(int lx, int ly, int ux, int uy,
+      int layer, GNet* net);
 };
 
 class RouteBase {
   public:
+    RouteBase();
     RouteBase(std::shared_ptr<NesterovBase> nb,
         std::shared_ptr<Logger> log);
     ~RouteBase();
 
     void estimateCongestion();
-    void initFromGuide(const char* fileName);
+    void initFromRoute(const char* fileName);
     void importEst(const char* fileName);
 
   private:
@@ -216,13 +246,26 @@ class RouteBase {
 
     // from *.route file
     std::vector<int> verticalCapacity_;
+    std::vector<int> horizontalCapacity_;
     std::vector<int> minWireWidth_;
     std::vector<int> minWireSpacing_;
+    std::vector<int> viaSpacing_;
 
-    float gRoutePitchScale_;
+    int tileLx_;
+    int tileLy_;
+    int tileCntX_;
+    int tileCntY_;
+    int tileNumLayers_;
+    int tileSizeX_;
+    int tileSizeY_;
+
+    float blockagePorosity_;
+    std::vector<EdgeCapacityInfo> edgeCapacityStor_;
 
     // from *.est file
-    std::vector<EdgeCapacityInfo> edgeCapacityStor_;
+    std::vector<RoutingTrack> routingTracks_;
+
+    float gRoutePitchScale_;
 
 
     void init();
