@@ -28,6 +28,8 @@ Replace::Replace()
   initWireLengthCoef_(0.25),
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(446000000),
+  timingDrivenMode_(true),
+  routabilityDrivenMode_(true),
   verbose_(0) {
 };
 
@@ -58,6 +60,9 @@ void Replace::reset() {
   minPhiCoef_ = 0.95;
   maxPhiCoef_ = 1.05;
   referenceHpwl_= 446000000;
+
+  timingDrivenMode_ = true;
+  routabilityDrivenMode_ = true; 
   verbose_ = 0;
 }
 
@@ -116,6 +121,8 @@ void Replace::doNesterovPlace() {
   npVars.initWireLengthCoef = initWireLengthCoef_;
   npVars.targetOverflow = overflow_;
   npVars.maxNesterovIter = nesterovPlaceMaxIter_; 
+  npVars.timingDrivenMode = timingDrivenMode_;
+  npVars.routabilityDrivenMode = routabilityDrivenMode_;
 
   std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_, log_));
   np_ = std::move(np);
@@ -202,6 +209,16 @@ Replace::setReferenceHpwl(float refHpwl) {
 void
 Replace::setVerboseLevel(int verbose) {
   verbose_ = verbose;
+}
+
+void
+Replace::setTimingDrivenMode(bool mode) {
+  timingDrivenMode_ = mode;
+}
+
+void
+Replace::setRoutabilityDrivenMode(bool mode) {
+  routabilityDrivenMode_ = mode;  
 }
 
 }

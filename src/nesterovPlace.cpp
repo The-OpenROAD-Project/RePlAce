@@ -2,6 +2,7 @@
 #include "nesterovBase.h"
 #include "nesterovPlace.h"
 #include "opendb/db.h"
+#include "routeBase.h"
 #include "logger.h"
 #include <iostream>
 using namespace std;
@@ -26,7 +27,9 @@ NesterovPlaceVars::NesterovPlaceVars()
   maxPhiCoef(1.05),
   minPreconditioner(1.0),
   initialPrevCoordiUpdateCoef(100),
-  referenceHpwl(446000000) {}
+  referenceHpwl(446000000),
+  timingDrivenMode(true),
+  routabilityDrivenMode(true) {}
 
 NesterovPlace::NesterovPlace() 
   : pb_(nullptr), nb_(nullptr), log_(nullptr), npVars_(), 
@@ -171,6 +174,12 @@ void NesterovPlace::init() {
 
   log_->infoFloatSignificant("InitialStepLength", stepLength_, 3);
   log_->procEnd("NesterovInit", 3);
+
+  if( npVars_.routabilityDrivenMode ) {
+    // make_unique
+    std::unique_ptr<RouteBase> rb(new RouteBase(nb_, log_));
+    rb_ = std::move(rb);
+  }
 }
 
 // clear reset

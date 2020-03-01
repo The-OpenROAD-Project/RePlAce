@@ -1,7 +1,8 @@
 sta::define_cmd_args "global_placement" {
   [-skip_initial_place]\
   [-density target_density]\
-  [-timing_driven]\
+  [-disable_timing_driven]\
+  [-disable_routability_driven]\
     [-bin_grid_count grid_count]}
 
 proc global_placement { args } {
@@ -11,7 +12,7 @@ proc global_placement { args } {
       -min_phi_coef -max_phi_coef -overflow \
       -initial_place_max_iter -initial_place_max_fanout \
       -verbose_level} \
-      flags {-skip_initial_place -timing_driven}
+      flags {-skip_initial_place -disable_timing_driven -disable_routability_driven}
     
   set target_density 0.7
   if { [info exists keys(-density)] } {

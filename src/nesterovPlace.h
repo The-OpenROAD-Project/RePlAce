@@ -12,6 +12,7 @@ class PlacerBase;
 class Instance;
 class NesterovBase;
 class Logger;
+class RouteBase;
 
 class NesterovPlaceVars {
   public:
@@ -25,6 +26,8 @@ class NesterovPlaceVars {
   float minPreconditioner; // MIN_PRE
   float initialPrevCoordiUpdateCoef; // z_ref_alpha
   float referenceHpwl; // refDeltaHpwl
+  bool timingDrivenMode;
+  bool routabilityDrivenMode;
   NesterovPlaceVars();
 };
 
@@ -68,6 +71,7 @@ private:
   std::shared_ptr<PlacerBase> pb_;
   std::shared_ptr<NesterovBase> nb_;
   std::shared_ptr<Logger> log_;
+  std::unique_ptr<RouteBase> rb_;
   NesterovPlaceVars npVars_;
 
   // SLP is Step Length Prediction.

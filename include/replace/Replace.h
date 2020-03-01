@@ -58,6 +58,9 @@ class Replace
     void setReferenceHpwl(float deltaHpwl);
     void setVerboseLevel(int verbose);
 
+    void setTimingDrivenMode(bool mode);
+    void setRoutabilityDrivenMode(bool mode);
+
   private:
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
@@ -86,6 +89,9 @@ class Replace
     float minPhiCoef_;
     float maxPhiCoef_;
     float referenceHpwl_;
+
+    bool timingDrivenMode_;
+    bool routabilityDrivenMode_;
     int verbose_;
 };
 }

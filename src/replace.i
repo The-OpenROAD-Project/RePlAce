@@ -113,6 +113,18 @@ set_replace_verbose_level_cmd(int verbose)
   replace->setVerboseLevel(verbose);
 }
 
+void
+set_replace_disable_timing_driven_mode_cmd()
+{
+  Replace* replace = getReplace();
+  replace->setTimingDrivenMode(false);
+}
 
+void
+set_replace_disable_routability_driven_mode_cmd()
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityDrivenMode(false);
+}
 
 %} // inline
