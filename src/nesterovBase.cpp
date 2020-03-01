@@ -710,7 +710,7 @@ BinGrid::initBins() {
     bins_.push_back( &bin );
   }
 
-  log_->infoFloatSignificant("NumBins", bins_.size());
+  log_->infoInt("NumBins", bins_.size());
 
   // only initialized once
   updateBinsNonPlaceArea();

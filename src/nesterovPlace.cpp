@@ -178,7 +178,7 @@ void NesterovPlace::init() {
 
   if( npVars_.routabilityDrivenMode ) {
     // make_unique
-    std::unique_ptr<RouteBase> rb(new RouteBase(nb_, log_));
+    std::unique_ptr<RouteBase> rb(new RouteBase(pb_->db(), nb_, log_));
     rb_ = std::move(rb);
   }
 }

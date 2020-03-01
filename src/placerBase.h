@@ -270,6 +270,8 @@ public:
   int64_t macroInstsArea() const { return macroInstsArea_; }
   int64_t stdInstsArea() const { return stdInstsArea_; }
 
+  odb::dbDatabase* db() const { return db_; }
+
 private:
   odb::dbDatabase* db_;
   std::shared_ptr<Logger> log_;
