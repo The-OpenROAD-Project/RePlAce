@@ -168,7 +168,7 @@ TileGrid::TileGrid()
   tileCntX_(0), tileCntY_(0), 
   tileSizeX_(0), tileSizeY_(0),
   tileNumLayers_(0),
-  blockagePorosity_(0), gRoutePitchScale_(0) {}
+  blockagePorosity_(0), gRoutePitchScale_(1.08) {}
 
 TileGrid::~TileGrid() {
   reset();
@@ -181,7 +181,7 @@ TileGrid::reset() {
   tileCntX_ = tileCntY_ = 0;
   tileSizeX_ = tileSizeY_ = 0;
   tileNumLayers_ = 0;
-  gRoutePitchScale_ = 0;
+  gRoutePitchScale_ = 1.08;
 
   tileStor_.clear();
   tiles_.clear();
@@ -255,6 +255,12 @@ TileGrid::initTiles() {
 
   log_->infoInt("NumHTracks", numHTracks);
   log_->infoInt("NumVTracks", numVTracks);
+
+  int pitchH = std::round(static_cast<float>(tileSizeY_) / numHTracks * gRoutePitchScale_);
+  int pitchV = std::round(static_cast<float>(tileSizeX_) / numVTracks * gRoutePitchScale_);
+
+  log_->infoInt("PitchH", pitchH );
+  log_->infoInt("PitchV", pitchV );
 
   // 2D tile grid structure init
   int x = lx_, y = ly_;
