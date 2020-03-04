@@ -18,7 +18,7 @@ fastModulo(const int input, const int ceil);
 
 static std::pair<int, int>
 getMinMaxIdx(int ll, int uu, int coreLL, 
-    int siteSize);
+    int siteSize, int minIdx, int maxIdx);
 
 
 ////////////////////////////////////////////////////////
@@ -771,11 +771,11 @@ PlacerBase::initInstsForFragmentedRow() {
     
     std::pair<int, int> pairX 
       = getMinMaxIdx(rect.xMin(), rect.xMax(), 
-          die_.coreLx(), siteSizeX_);
+          die_.coreLx(), siteSizeX_, 0, siteCountX);
 
     std::pair<int, int> pairY
       = getMinMaxIdx(rect.yMin(), rect.yMax(),
-          die_.coreLy(), siteSizeY_);
+          die_.coreLy(), siteSizeY_, 0, siteCountY);
 
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
@@ -791,10 +791,10 @@ PlacerBase::initInstsForFragmentedRow() {
     }
     std::pair<int, int> pairX 
       = getMinMaxIdx(inst.lx(), inst.ux(),
-          die_.coreLx(), siteSizeX_);
+          die_.coreLx(), siteSizeX_, 0, siteCountX);
     std::pair<int, int> pairY 
       = getMinMaxIdx(inst.ly(), inst.uy(),
-          die_.coreLy(), siteSizeY_);
+          die_.coreLy(), siteSizeY_, 0, siteCountY);
 
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
@@ -966,12 +966,14 @@ fastModulo(const int input, const int ceil) {
 }
 
 static std::pair<int, int>
-getMinMaxIdx(int ll, int uu, int coreLL, int siteSize) {
+getMinMaxIdx(int ll, int uu, int coreLL, int siteSize, int minIdx, int maxIdx) {
   int lowerIdx = (ll - coreLL)/siteSize;
   int upperIdx =
    ( fastModulo((uu - coreLL), siteSize) == 0)? 
    (uu - coreLL) / siteSize : (uu - coreLL)/siteSize + 1;
-  return std::make_pair(lowerIdx, upperIdx);
+  return std::make_pair(
+      std::max(minIdx, lowerIdx), 
+      std::min(maxIdx, upperIdx));
 }
 
 
