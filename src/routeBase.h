@@ -31,6 +31,9 @@ class Tile {
     int ux() const;
     int uy() const;
 
+    // only area is needed
+    const int64_t area() const;
+
     int blockage(int layer) const;
     int capacity(int layer) const;
     int route(int layer) const;
@@ -42,12 +45,22 @@ class Tile {
 
     void setBlockage(int layer, int blockage);
     void setCapacity(int layer, int capacity);
+    void setCapacity(std::vector<int>& capacity);
     void setRoute(int layer, int route);
 
     void setUsageHL(int layer, int usage);
     void setUsageHR(int layer, int usage);
     void setUsageVL(int layer, int usage);
     void setUsageVR(int layer, int usage);
+
+    void setSupplyH(float supply);
+    void setSupplyV(float supply);
+
+    void setSupplyHL(float supply);
+    void setSupplyHR(float supply);
+    void setSupplyVL(float supply);
+    void setSupplyVR(float supply);
+
 
     float sumUsageH() const;
     float sumUsageV() const;
@@ -66,6 +79,8 @@ class Tile {
     float inflationAreaDelta() const;
     float inflatedRatio() const;
 
+
+    void setMacroIncluded(bool mode);
     bool isMacroIncluded() const;
 
   private:
@@ -151,6 +166,13 @@ Tile::ux() const {
 inline int
 Tile::uy() const {
   return uy_;
+}
+
+inline const int64_t
+Tile::area() const {
+  return 
+    static_cast<int64_t>(ux_ - lx_) * 
+    static_cast<int64_t>(uy_ - ly_);
 }
 
 // For *.route EdgeCapacityAdjustment

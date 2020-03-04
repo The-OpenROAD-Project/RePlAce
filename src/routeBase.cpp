@@ -4,6 +4,7 @@
 #include <opendb/db.h>
 #include <string>
 #include <iostream>
+#include <cmath>
 
 using std::vector;
 using std::string;
@@ -15,12 +16,15 @@ Tile::Tile()
   lx_(0), ly_(0), ux_(0), uy_(0),
   sumUsageH_(0), sumUsageV_(0),
   supplyH_(0), supplyV_(0),
+  supplyHL_(0), supplyHR_(0),
+  supplyVL_(0), supplyVR_(0), 
   inflationRatioH_(0),
   inflationRatioV_(0),
   inflationRatio_(0),
   inflationArea_(0),
   inflationAreaDelta_(0),
-  inflatedRatio_(0) {}
+  inflatedRatio_(0), 
+  isMacroIncluded_(false) {}
 
 Tile::Tile(int x, int y, int lx, int ly, int ux, int uy, int layers) 
 : Tile() {
@@ -109,6 +113,11 @@ Tile::setCapacity(int layer, int capacity) {
 }
 
 void
+Tile::setCapacity(vector<int>& capacity) {
+  capacity_ = capacity; 
+}
+
+void
 Tile::setRoute(int layer, int route) {
   route_[layer] = route;
 }
@@ -160,6 +169,43 @@ float
 Tile::supplyVR() const {
   return supplyVR_;
 }
+
+void
+Tile::setSupplyH(float supply) {
+  supplyH_ = supply;
+}
+
+void
+Tile::setSupplyV(float supply) {
+  supplyV_ = supply;
+}
+
+// set func for supply*
+void
+Tile::setSupplyHL(float supply) {
+  supplyHL_ = supply;
+}
+
+void
+Tile::setSupplyHR(float supply) {
+  supplyHR_ = supply;
+}
+
+void
+Tile::setSupplyVL(float supply) {
+  supplyVL_ = supply; 
+}
+
+void
+Tile::setSupplyVR(float supply) {
+  supplyVR_ = supply; 
+}
+
+void
+Tile::setMacroIncluded(bool mode) {
+  isMacroIncluded_ = mode;
+}
+
 
 
 TileGrid::TileGrid()
@@ -256,8 +302,12 @@ TileGrid::initTiles() {
   log_->infoInt("NumHTracks", numHTracks);
   log_->infoInt("NumVTracks", numVTracks);
 
-  int pitchH = std::round(static_cast<float>(tileSizeY_) / numHTracks * gRoutePitchScale_);
-  int pitchV = std::round(static_cast<float>(tileSizeX_) / numVTracks * gRoutePitchScale_);
+  // A bit curious why gRoutePitchScale is set as 1.08 ????
+  //
+  int pitchH = std::round(static_cast<float>(tileSizeY_) 
+      / numHTracks * gRoutePitchScale_);
+  int pitchV = std::round(static_cast<float>(tileSizeX_) 
+      / numVTracks * gRoutePitchScale_);
 
   log_->infoInt("PitchH", pitchH );
   log_->infoInt("PitchV", pitchV );
@@ -280,10 +330,100 @@ TileGrid::initTiles() {
       idxY ++;
       idxX = 0;
     }
+
+    tile.setSupplyHL( tile.area() / pitchH );
+    tile.setSupplyHR( tile.supplyHL() );
+
+    tile.setSupplyVL( tile.area() / pitchV );
+    tile.setSupplyVR( tile.supplyVL() );
   
     tiles_.push_back( &tile );
   }
   log_->infoInt("NumTiles", tiles_.size());
+
+  // apply edgeCapacityInfo from *.route
+  for(auto& ecInfo : edgeCapacityStor_) {
+    bool isHorizontal = (ecInfo.ly == ecInfo.uy);
+    
+    // l : lower
+    // u : upper
+    int lx = std::min( ecInfo.lx, ecInfo.ux );
+    int ux = std::max( ecInfo.lx, ecInfo.ux );
+    int ly = std::min( ecInfo.ly, ecInfo.uy );
+    int uy = std::max( ecInfo.ly, ecInfo.uy );
+
+    // Note that ecInfo.ll == ecInfo.ul
+    assert( ecInfo.ll == ecInfo.ul );
+    int layer = ecInfo.ll;
+    int capacity = ecInfo.capacity;
+
+    Tile* lTile = tiles()[lx * tileCntY() + ly];
+    Tile* uTile = tiles()[ux * tileCntY() + uy];
+
+    if( isHorizontal ) {
+      // lower -> right edge
+      lTile->setSupplyHR( 
+          lTile->supplyHR() - 
+          (horizontalCapacity_[layer - 1] - capacity) /
+          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          tileSizeX_ );
+
+      // upper -> left edge
+      uTile->setSupplyHL(
+          uTile->supplyHL() -
+          (horizontalCapacity_[layer - 1] - capacity) /
+          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          tileSizeX_ );
+
+      // lower layer check
+      if( layer <= 5 && horizontalCapacity_[layer - 1] > 0 &&
+          capacity < 0.01 ) {
+        lTile->setMacroIncluded(true);
+      }
+    }
+    else {
+      // lower -> right edge
+      lTile->setSupplyVR( 
+          lTile->supplyVR() - 
+          (verticalCapacity_[layer - 1] - capacity) /
+          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          tileSizeY_ );
+
+      // upper -> left edge
+      uTile->setSupplyVL(
+          uTile->supplyVL() -
+          (verticalCapacity_[layer - 1] - capacity) /
+          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          tileSizeY_ );
+
+      // lower layer check
+      if( layer <= 5 && verticalCapacity_[layer - 1] > 0 &&
+          capacity < 0.01 ) {
+        lTile->setMacroIncluded(true);
+      }
+    }
+  } 
+  
+  // fill capacity
+  std::vector<int> capacity(tileNumLayers_, 0);
+  for(int i=0; i<tileNumLayers_; i++) {
+    if( horizontalCapacity_[i] > 0 ) {
+      capacity[i] = horizontalCapacity_[i]; 
+    }
+    else {
+      capacity[i] = verticalCapacity_[i];
+    }
+  }
+
+  for(auto& tile : tiles_) {
+    // set H, V from L, R
+    tile->setSupplyH( std::fmin( tile->supplyHL(), tile->supplyHR() ) );
+    tile->setSupplyV( std::fmin( tile->supplyVL(), tile->supplyVR() ) );
+
+    // set capacity initially
+    tile->setCapacity( capacity );
+  }
+
 }
 
 int
