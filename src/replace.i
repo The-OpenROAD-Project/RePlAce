@@ -5,15 +5,28 @@
 #include "replace/Replace.h"
 
 namespace ord {
+OpenRoad*
+getOpenRoad();
+
 replace::Replace*
 getReplace();
 }
 
+using ord::getOpenRoad;
 using ord::getReplace;
 using replace::Replace;
 %}
 
 %inline %{
+
+void 
+replace_reset_cmd() 
+{
+  Replace* replace = getReplace();  
+  replace->reset();
+  replace->setDb(getOpenRoad()->getDb());
+  replace->setSta(getOpenRoad()->getSta());
+}
 
 void 
 replace_initial_place_cmd()

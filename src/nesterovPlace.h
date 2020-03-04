@@ -28,7 +28,9 @@ class NesterovPlaceVars {
   float referenceHpwl; // refDeltaHpwl
   bool timingDrivenMode;
   bool routabilityDrivenMode;
+
   NesterovPlaceVars();
+  void reset();
 };
 
 class NesterovPlace {

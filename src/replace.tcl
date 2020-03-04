@@ -21,6 +21,7 @@ proc global_placement { args } {
   }
   set_replace_density_cmd $target_density
 
+  # flow control for initial_place
   if { [info exists flags(-skip_initial_place)] } {
     set_replace_initial_place_max_iter_cmd 0
   } elseif { [info exists keys(-initial_place_max_iter)] } { 
@@ -28,6 +29,16 @@ proc global_placement { args } {
     sta::check_positive_integer "-initial_place_max_iter" $initial_place_max_iter
     set_replace_initial_place_max_iter_cmd $initial_place_max_iter
   } 
+
+  # flow control for timing-driven 
+  if { [info exists flags(-disable_timing_driven)] } { 
+    set_replace_disable_timing_driven_mode_cmd
+  }
+
+  # flow control for routability-driven 
+  if { [info exists flags(-disable_routability_driven)] } {
+    set_replace_disable_routability_driven_mode_cmd
+  }
 
   if { [info exists keys(-initial_place_max_fanout)] } { 
     set initial_place_max_fanout $keys(-initial_place_max_fanout)
@@ -89,6 +100,9 @@ proc global_placement { args } {
     
     puts "Worst slack: [format %.2e [sta::worst_slack]]"
     puts "Total negative slack: [format %.2e [sta::total_negative_slack]]"
+
+    # clear replace for next runs
+    replace_reset_cmd
   } else {
     puts "Error: no rows defined in design. Use initialize_floorplan to add rows."
   }

@@ -31,6 +31,22 @@ NesterovPlaceVars::NesterovPlaceVars()
   timingDrivenMode(true),
   routabilityDrivenMode(true) {}
 
+void
+NesterovPlaceVars::reset() {
+  maxNesterovIter = 2000;
+  maxBackTrack = 10;
+  initDensityPenalty = 0.00008;
+  initWireLengthCoef = 0.25;
+  targetOverflow = 0.1;
+  minPhiCoef = 0.95;
+  maxPhiCoef = 1.05;
+  minPreconditioner = 1.0;
+  initialPrevCoordiUpdateCoef = 100;
+  referenceHpwl = 446000000;
+  timingDrivenMode = true;
+  routabilityDrivenMode = true;
+}
+
 NesterovPlace::NesterovPlace() 
   : pb_(nullptr), nb_(nullptr), log_(nullptr), npVars_(), 
   wireLengthGradSum_(0), 
@@ -186,6 +202,8 @@ void NesterovPlace::init() {
 // clear reset
 void NesterovPlace::reset() {
 
+  npVars_.reset();
+
   curSLPCoordi_.clear();
   curSLPWireLengthGrads_.clear();
   curSLPDensityGrads_.clear();
@@ -203,6 +221,24 @@ void NesterovPlace::reset() {
   
   curCoordi_.clear();
   nextCoordi_.clear();
+  
+  curSLPCoordi_.shrink_to_fit();
+  curSLPWireLengthGrads_.shrink_to_fit();
+  curSLPDensityGrads_.shrink_to_fit();
+  curSLPSumGrads_.shrink_to_fit();
+  
+  nextSLPCoordi_.shrink_to_fit();
+  nextSLPWireLengthGrads_.shrink_to_fit();
+  nextSLPDensityGrads_.shrink_to_fit();
+  nextSLPSumGrads_.shrink_to_fit();
+  
+  prevSLPCoordi_.shrink_to_fit();
+  prevSLPWireLengthGrads_.shrink_to_fit();
+  prevSLPDensityGrads_.shrink_to_fit();
+  prevSLPSumGrads_.shrink_to_fit();
+  
+  curCoordi_.shrink_to_fit();
+  nextCoordi_.shrink_to_fit();
 }
 
 // to execute following function,

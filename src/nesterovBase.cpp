@@ -880,9 +880,9 @@ NesterovBaseVars::reset() {
   targetDensity = 1.0;
   minAvgCut = 0.1;
   maxAvgCut = 0.9;
-  isSetBinCntX = isSetBinCntY = 0;
   binCntX = binCntY = 0;
   minWireLengthForceBar = -300;
+  isSetBinCntX = isSetBinCntY = 0;
 }
 
 
@@ -905,6 +905,7 @@ NesterovBase::NesterovBase(
 
 NesterovBase::~NesterovBase() {
   pb_ = nullptr;
+  reset();
 }
 
 void

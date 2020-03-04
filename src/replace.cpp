@@ -45,6 +45,12 @@ void Replace::reset() {
   db_ = nullptr;
   sta_ = nullptr;
 
+  ip_.reset();
+  np_.reset();
+
+  pb_.reset();
+  nb_.reset();
+
   initialPlaceMaxIter_ = 20;
   initialPlaceMinDiffLength_ = 1500;
   initialPlaceMaxSolverIter_ = 100;
@@ -53,10 +59,10 @@ void Replace::reset() {
 
   nesterovPlaceMaxIter_ = 2000;
   binGridCntX_ = binGridCntY_ = 0;
-  overflow_ = 0;
-  density_ = 0;
+  overflow_ = 0.1;
+  density_ = 1.0;
   initDensityPenalityFactor_ = 0.0001;
-  initWireLengthCoef_ = 1.0;
+  initWireLengthCoef_ = 0.25;
   minPhiCoef_ = 0.95;
   maxPhiCoef_ = 1.05;
   referenceHpwl_= 446000000;
