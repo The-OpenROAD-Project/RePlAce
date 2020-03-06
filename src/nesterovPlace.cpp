@@ -268,8 +268,6 @@ NesterovPlace::updateGradients(
   // Wirelength / density gradient calculation
   if( isnan(wireLengthGradSum_) || isinf(wireLengthGradSum_) ||
       isnan(densityGradSum_) || isinf(densityGradSum_) ) {
-    cout << "INFO: RePlAce divergence detected. " << endl;
-    cout << "      Please decrease init_wirelength_coeff value" << endl;
     isDiverged_ = true;
   }
 }
@@ -280,7 +278,8 @@ NesterovPlace::doNesterovPlace() {
   // if replace diverged in init() function, 
   // replace must be skipped.
   if( isDiverged_ ) {
-    cout << "INFO: RePlAce diverged. Please tune the parameters again" << endl;
+    string msg = "RePlAce diverged. Please tune the parameters again";
+    log_->error(msg, 2);
     return;
   }
 
@@ -307,6 +306,10 @@ NesterovPlace::doNesterovPlace() {
 
   // dynamic adjustment of max_phi_coef
   bool isMaxPhiCoefChanged = false;
+
+  // diverge error handling
+  string divergeMsg = "";
+  int divergeCode = 0;
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
@@ -399,8 +402,9 @@ NesterovPlace::doNesterovPlace() {
     // 10 is the case when
     // all of cells are not moved at all.
     if( npVars_.maxBackTrack == numBackTrak ) {
-      cout << "INFO: RePlAce divergence detected" << endl;
-      cout << "      Please decrease init_density_penalty" << endl;
+      divergeMsg = "RePlAce divergence detected. \n";
+      divergeMsg += "        Please decrease init_density_penalty value";
+      divergeCode = 3;
       isDiverged_ = true;
     } 
 
@@ -444,8 +448,9 @@ NesterovPlace::doNesterovPlace() {
     if( sumOverflow_ < 0.3f 
         && sumOverflow_ - minSumOverflow >= 0.02f
         && hpwlWithMinSumOverflow * 1.2f < prevHpwl_ ) {
-      cout << "INFO: RePlAce divergence detected" << endl;
-      cout << "      Please decrease max_phi_cof" << endl;
+      divergeMsg = "RePlAce divergence detected. \n";
+      divergeMsg += "        Please decrease max_phi_cof value";
+      divergeCode = 4;
       isDiverged_ = true;
       break;
     }
@@ -456,12 +461,14 @@ NesterovPlace::doNesterovPlace() {
       break;
     }
   }
+ 
+  // in all case including diverge, 
+  // db should be updated. 
+  updateDb();
 
   if( isDiverged_ ) { 
-    cout << "INFO: RePlAce diverged. Please tune the parameters again" << endl;
+    log_->error(divergeMsg, divergeCode);
   }
-
-  updateDb();
 }
 
 void

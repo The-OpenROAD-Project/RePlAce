@@ -20,6 +20,9 @@ static std::pair<int, int>
 getMinMaxIdx(int ll, int uu, int coreLL, 
     int siteSize, int minIdx, int maxIdx);
 
+static
+std::shared_ptr<Logger> slog_;
+
 
 ////////////////////////////////////////////////////////
 // Instance 
@@ -383,9 +386,9 @@ void Pin::updateCoordi(odb::dbBTerm* bTerm) {
 
   if( lx == INT_MAX || ly == INT_MAX ||
       ux == INT_MIN || uy == INT_MIN ) {
-    cout << "Warning: " << bTerm->getConstName() 
-      << " toplevel port is not placed!" << endl;
-    cout << "         RePlAce will regard those pin is placed in (0, 0)" << endl;
+    string msg = string(bTerm->getConstName()) + " toplevel port is not placed!\n";
+    msg += "       Replace will regard " + string(bTerm->getConstName()) + " is placed in (0, 0)";
+    slog_->warn(msg, 1);
   }
 
   // Just center 
@@ -594,6 +597,7 @@ PlacerBase::~PlacerBase() {
 
 void 
 PlacerBase::init() {
+  slog_ = log_;
 
   log_->infoInt("DBU", db_->getTech()->getDbUnitsPerMicron()); 
 

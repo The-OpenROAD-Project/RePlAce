@@ -10,8 +10,8 @@ using std::string;
 
 namespace replace {
 
-Logger::Logger(int verbose)
-  : verbose_(verbose) {}
+Logger::Logger(string name, int verbose)
+  : name_(name), verbose_(verbose) {}
 
 // Procedure message
 void Logger::proc(string input, int verbose) {
@@ -28,9 +28,17 @@ void Logger::procEnd(string input, int verbose) {
 }
 
 // Error message
-void Logger::error(string input, int verbose) {
-  cout << "[ERROR] " << input << endl;
-  exit(1);
+void Logger::error(string input, int code, int verbose) {
+  VERBOSE_CHECK()
+  cout << "[ERROR] " << input;
+  cout << " (" << name_ << "-" << code << ")" << endl;
+  exit(code);
+}
+
+void Logger::warn(string input, int code, int verbose) {
+  VERBOSE_CHECK()
+  cout << "[WARN] " << input;
+  cout << " (" << name_ << "-" << code << ")" << endl;
 }
 
 // Info message

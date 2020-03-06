@@ -68,7 +68,7 @@ void Replace::setSta(sta::dbSta* sta) {
   sta_ = sta;
 }
 void Replace::doInitialPlace() {
-  log_ = std::make_shared<Logger>(verbose_);
+  log_ = std::make_shared<Logger>("REPL", verbose_);
   pb_ = std::make_shared<PlacerBase>(db_, log_);
 
   InitialPlaceVars ipVars;
@@ -85,7 +85,7 @@ void Replace::doInitialPlace() {
 
 void Replace::doNesterovPlace() {
   if( !log_ ) {
-    log_ = std::make_shared<Logger>(verbose_);
+    log_ = std::make_shared<Logger>("REPL", verbose_);
   }
 
   if( !pb_ ) {

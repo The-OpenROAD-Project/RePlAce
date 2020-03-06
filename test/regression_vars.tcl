@@ -120,10 +120,10 @@ record_replace_tests {
   simple01
   simple02
   simple03
+  simple04
   core01 
   ar01 
   ar02 
-  diverge01
 }
 
 # Record tests in $STAX/designs
