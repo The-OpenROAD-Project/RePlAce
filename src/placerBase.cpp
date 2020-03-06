@@ -383,10 +383,9 @@ void Pin::updateCoordi(odb::dbBTerm* bTerm) {
 
   if( lx == INT_MAX || ly == INT_MAX ||
       ux == INT_MIN || uy == INT_MIN ) {
-    cout << "Error: " << bTerm->getConstName() 
-      << "I/O port is not placed!" << endl;
-    cout << "       Please Run ioPlacer to place I/O ports" << endl;
-    exit(1);
+    cout << "Warning: " << bTerm->getConstName() 
+      << " toplevel port is not placed!" << endl;
+    cout << "         RePlAce will regard those pin is placed in (0, 0)" << endl;
   }
 
   // Just center 
