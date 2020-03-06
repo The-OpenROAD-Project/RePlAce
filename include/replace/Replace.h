@@ -56,6 +56,8 @@ class Replace
 
     // HPWL: half-parameter wire length.
     void setReferenceHpwl(float deltaHpwl);
+
+    void setIncrementalPlaceMode(bool mode);
     void setVerboseLevel(int verbose);
 
   private:
@@ -86,6 +88,8 @@ class Replace
     float minPhiCoef_;
     float maxPhiCoef_;
     float referenceHpwl_;
+
+    bool incrementalPlaceMode_;
     int verbose_;
 };
 }

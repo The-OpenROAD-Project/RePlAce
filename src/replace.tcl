@@ -1,7 +1,8 @@
 sta::define_cmd_args "global_placement" {
   [-skip_initial_place]\
-  [-density target_density]\
   [-timing_driven]\
+  [-incremental]\
+  [-density target_density]\
     [-bin_grid_count grid_count]}
 
 proc global_placement { args } {
@@ -11,7 +12,7 @@ proc global_placement { args } {
       -min_phi_coef -max_phi_coef -overflow \
       -initial_place_max_iter -initial_place_max_fanout \
       -verbose_level} \
-      flags {-skip_initial_place -timing_driven}
+      flags {-skip_initial_place -timing_driven -incremental}
     
   set target_density 0.7
   if { [info exists keys(-density)] } {
@@ -27,6 +28,11 @@ proc global_placement { args } {
     sta::check_positive_integer "-initial_place_max_iter" $initial_place_max_iter
     set_replace_initial_place_max_iter_cmd $initial_place_max_iter
   } 
+
+  if { [info exists flags(-incremental)] } {
+    set_replace_initial_place_max_iter_cmd 0
+    set_replace_incremental_place_mode_cmd
+  }
 
   if { [info exists keys(-initial_place_max_fanout)] } { 
     set initial_place_max_fanout $keys(-initial_place_max_fanout)

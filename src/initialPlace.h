@@ -16,6 +16,7 @@ public:
   int maxSolverIter;
   int maxFanout;
   float netWeightScale;
+  bool incrementalPlaceMode;
 
   InitialPlaceVars();
   void reset();

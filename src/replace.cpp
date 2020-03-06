@@ -28,6 +28,7 @@ Replace::Replace()
   initWireLengthCoef_(0.25),
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(446000000),
+  incrementalPlaceMode_(false),
   verbose_(0) {
 };
 
@@ -58,6 +59,8 @@ void Replace::reset() {
   minPhiCoef_ = 0.95;
   maxPhiCoef_ = 1.05;
   referenceHpwl_= 446000000;
+
+  incrementalPlaceMode_ = false;
   verbose_ = 0;
 }
 
@@ -77,6 +80,7 @@ void Replace::doInitialPlace() {
   ipVars.maxSolverIter = initialPlaceMaxSolverIter_;
   ipVars.maxFanout = initialPlaceMaxFanout_;
   ipVars.netWeightScale = initialPlaceNetWeightScale_;
+  ipVars.incrementalPlaceMode = incrementalPlaceMode_;
   
   std::unique_ptr<InitialPlace> ip(new InitialPlace(ipVars, pb_, log_));
   ip_ = std::move(ip);
@@ -197,6 +201,11 @@ Replace::setMaxPhiCoef(float maxPhiCoef) {
 void
 Replace::setReferenceHpwl(float refHpwl) {
   referenceHpwl_ = refHpwl;
+}
+
+void
+Replace::setIncrementalPlaceMode(bool mode) {
+  incrementalPlaceMode_ = mode;
 }
 
 void

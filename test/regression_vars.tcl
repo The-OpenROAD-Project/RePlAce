@@ -124,6 +124,7 @@ record_replace_tests {
   core01 
   ar01 
   ar02 
+  incremental01
 }
 
 # Record tests in $STAX/designs
