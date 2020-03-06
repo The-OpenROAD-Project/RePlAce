@@ -41,9 +41,6 @@ Notice 0: Finished DEF file: ./diverge01.def
 [INFO] BinCnt = (16, 16)
 [INFO] BinSize = (3872, 3850)
 [INFO] NumBins = 256
-INFO: RePlAce divergence detected
-      Please decrease init_density_penalty
-INFO: RePlAce diverged. Please tune the parameters again
-Worst slack: 1.00e+30
-Total negative slack: 0.00e+00
-No differences found.
+[ERROR] RePlAce divergence detected. 
+        Please decrease init_density_penalty value (REPL-3)
+ERROR 
