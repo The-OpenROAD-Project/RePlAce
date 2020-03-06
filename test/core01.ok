@@ -65,6 +65,4 @@ Notice 0: Finished DEF file: ./core01.def
 [NesterovSolve] Iter: 210 overflow: 0.127782 HPWL: 5525539
 [NesterovSolve] Iter: 220 overflow: 0.109808 HPWL: 5548120
 [NesterovSolve] Finished with Overflow: 0.0998344
-Worst slack: 1.00e+30
-Total negative slack: 0.00e+00
 No differences found.

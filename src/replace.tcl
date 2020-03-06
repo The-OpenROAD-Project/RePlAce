@@ -85,9 +85,6 @@ proc global_placement { args } {
   
     replace_initial_place_cmd
     replace_nesterov_place_cmd
-    
-    puts "Worst slack: [format %.2e [sta::worst_slack]]"
-    puts "Total negative slack: [format %.2e [sta::total_negative_slack]]"
   } else {
     puts "Error: no rows defined in design. Use initialize_floorplan to add rows."
   }

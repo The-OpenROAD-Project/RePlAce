@@ -94,6 +94,4 @@ Notice 0: Finished DEF file: ./simple04.def
 [NesterovSolve] Iter: 350 overflow: 0.119088 HPWL: 4986492
 [NesterovSolve] Iter: 360 overflow: 0.102524 HPWL: 5007503
 [NesterovSolve] Finished with Overflow: 0.0984983
-Worst slack: 1.00e+30
-Total negative slack: 0.00e+00
 No differences found.
