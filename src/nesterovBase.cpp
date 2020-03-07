@@ -915,7 +915,7 @@ NesterovBase::init() {
     GCell myGCell(inst); 
     // Check whether the given instance is
     // macro or not
-    if( inst->dy() > pb_->siteSizeY() ) {
+    if( inst->dy() > pb_->siteSizeY() * 6 ) {
       myGCell.setMacroInstance();
     }
     else {

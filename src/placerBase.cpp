@@ -646,7 +646,7 @@ PlacerBase::init() {
         placeInstsArea_ += instArea; 
         // macro cells should be
         // macroInstsArea_
-        if( inst.dy() > siteSizeY_ ) {
+        if( inst.dy() > siteSizeY_ * 6 ) {
           macroInstsArea_ += instArea;
         }
         // smaller or equal height cells should be 
