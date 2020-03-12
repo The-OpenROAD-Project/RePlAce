@@ -24,6 +24,13 @@ static
 std::shared_ptr<Logger> slog_;
 
 
+static bool
+isCoreAreaOverlap(Die& die, Instance& inst);
+
+static int64_t
+getOverlapWithCoreArea(Die& die, Instance& inst);
+
+
 ////////////////////////////////////////////////////////
 // Instance 
 
@@ -634,10 +641,16 @@ PlacerBase::init() {
   for(auto& inst : instStor_) {
     if(inst.isInstance()) {
       if(inst.isFixed()) {
-        fixedInsts_.push_back(&inst); 
-        nonPlaceInsts_.push_back(&inst);
-        nonPlaceInstsArea_ += static_cast<int64_t>(inst.dx()) 
-          * static_cast<int64_t>(inst.dy());
+        // Check whether fixed instance is 
+        // within the corearea
+        //
+        // outside of corearea is none of RePlAce's business
+        if( isCoreAreaOverlap( die_, inst ) ) {
+          fixedInsts_.push_back(&inst); 
+          nonPlaceInsts_.push_back(&inst);
+          nonPlaceInstsArea_ += 
+            getOverlapWithCoreArea( die_, inst );
+        }
       }
       else {
         placeInsts_.push_back(&inst);
@@ -977,6 +990,25 @@ getMinMaxIdx(int ll, int uu, int coreLL, int siteSize, int minIdx, int maxIdx) {
   return std::make_pair(
       std::max(minIdx, lowerIdx), 
       std::min(maxIdx, upperIdx));
+}
+
+static bool
+isCoreAreaOverlap(Die& die, Instance& inst) {
+  int rectLx = max(die.coreLx(), inst.lx()),
+      rectLy = max(die.coreLy(), inst.ly()),
+      rectUx = min(die.coreUx(), inst.ux()),
+      rectUy = min(die.coreUy(), inst.uy()); 
+  return !( rectLx >= rectUx || rectLy >= rectUy );
+}
+
+static int64_t
+getOverlapWithCoreArea(Die& die, Instance& inst) {
+  int rectLx = max(die.coreLx(), inst.lx()),
+      rectLy = max(die.coreLy(), inst.ly()),
+      rectUx = min(die.coreUx(), inst.ux()),
+      rectUy = min(die.coreUy(), inst.uy()); 
+  return static_cast<int64_t>(rectUx - rectLx)
+    * static_cast<int64_t>(rectUy - rectLy);
 }
 
 
