@@ -702,7 +702,7 @@ PlacerBase::init() {
     for(dbITerm* iTerm : net->getITerms()) {
       Pin myPin(iTerm);
       myPin.setNet(myNetPtr); 
-      myPin.setInstance( dbToPlace(iTerm->getInst()) );
+      myPin.setInstance( dbToPb(iTerm->getInst()) );
       pinStor_.push_back( myPin );
     }
 
@@ -735,7 +735,7 @@ PlacerBase::init() {
       // VDD/VSS pins.
       //
       // Escape those pins
-      Pin* curPin = dbToPlace(iTerm);
+      Pin* curPin = dbToPb(iTerm);
       if( curPin ) {
         inst.addPin( curPin );
       }
@@ -746,10 +746,10 @@ PlacerBase::init() {
   nets_.reserve(netStor_.size());
   for(auto& net : netStor_) {
     for(dbITerm* iTerm : net.dbNet()->getITerms()) {
-      net.addPin( dbToPlace( iTerm ) );
+      net.addPin( dbToPb( iTerm ) );
     }
     for(dbBTerm* bTerm : net.dbNet()->getBTerms()) {
-      net.addPin( dbToPlace( bTerm ) );
+      net.addPin( dbToPb( bTerm ) );
     }
     nets_.push_back(&net);
   }
@@ -876,25 +876,25 @@ PlacerBase::hpwl() const {
 }
 
 Instance* 
-PlacerBase::dbToPlace(odb::dbInst* inst) const {
+PlacerBase::dbToPb(odb::dbInst* inst) const {
   auto instPtr = instMap_.find(inst);
   return (instPtr == instMap_.end())? nullptr : instPtr->second;
 }
 
 Pin* 
-PlacerBase::dbToPlace(odb::dbITerm* term) const {
+PlacerBase::dbToPb(odb::dbITerm* term) const {
   auto pinPtr = pinMap_.find((void*)term);
   return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
 }
 
 Pin* 
-PlacerBase::dbToPlace(odb::dbBTerm* term) const {
+PlacerBase::dbToPb(odb::dbBTerm* term) const {
   auto pinPtr = pinMap_.find((void*)term);
   return (pinPtr == pinMap_.end())? nullptr : pinPtr->second;
 }
 
 Net* 
-PlacerBase::dbToPlace(odb::dbNet* net) const {
+PlacerBase::dbToPb(odb::dbNet* net) const {
   auto netPtr = netMap_.find(net);
   return (netPtr == netMap_.end())? nullptr : netPtr->second;
 }

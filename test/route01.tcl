@@ -3,8 +3,8 @@ set test_name medium01
 read_lef ./nangate45.lef
 read_def ./$test_name.def
 
-global_placement -disable_routability_driven
-fastroute -write_route -write_est
+#global_placement -disable_routability_driven
+#fastroute -write_route -write_est
 global_placement 
 
 

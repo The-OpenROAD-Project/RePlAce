@@ -254,10 +254,11 @@ public:
 
   Die& die() { return die_; }
 
-  Instance* dbToPlace(odb::dbInst* inst) const;
-  Pin* dbToPlace(odb::dbITerm* pin) const;
-  Pin* dbToPlace(odb::dbBTerm* pin) const;
-  Net* dbToPlace(odb::dbNet* net) const;
+  // Pb : PlacerBase
+  Instance* dbToPb(odb::dbInst* inst) const;
+  Pin* dbToPb(odb::dbITerm* pin) const;
+  Pin* dbToPb(odb::dbBTerm* pin) const;
+  Net* dbToPb(odb::dbNet* net) const;
 
   int siteSizeX() const { return siteSizeX_; }
   int siteSizeY() const { return siteSizeY_; }

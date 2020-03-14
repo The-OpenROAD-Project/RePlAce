@@ -206,6 +206,7 @@ class TileGrid {
 
     void setDb(odb::dbDatabase* db);
     void setLogger(std::shared_ptr<Logger> log);
+    void setNesterovBase(std::shared_ptr<NesterovBase> nb);
     void setTileCnt(int tileCntX, int tileCntY);
     void setTileCntX(int tileCntX);
     void setTileCntY(int tileCntY);
@@ -224,18 +225,21 @@ class TileGrid {
     int tileSizeX() const;
     int tileSizeY() const;
 
-
     const std::vector<Tile*> & tiles() const;
 
     void initTiles();
     void reset();
 
+    void initCongestionMap();
+
+    // temp func
     void initFromRoute(const char* fileName);
     void importEst(const char* fileName);
 
   private:
     // for traversing layer info!
     odb::dbDatabase* db_;
+    std::shared_ptr<NesterovBase> nb_;
     std::shared_ptr<Logger> log_;
 
     std::vector<Tile> tileStor_;
@@ -263,7 +267,6 @@ class TileGrid {
 
     float gRoutePitchScale_;
 
-
 };
 
 inline const std::vector<Tile*> &
@@ -280,12 +283,7 @@ class RouteBase {
         std::shared_ptr<Logger> log);
     ~RouteBase();
 
-    // temporary interface
-    void initFromRoute(const char* fileName);
-    void importEst(const char* fileName);
-
-
-    void estimateCongestion();
+    void initCongestionMap();
 
   private:
     odb::dbDatabase* db_;

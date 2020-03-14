@@ -7,6 +7,14 @@
 
 #include "point.h"
 
+
+namespace odb {
+class dbInst;
+class dbITerm;
+class dbBTerm;
+class dbNet;
+}
+
 namespace replace {
 
 class Instance;
@@ -724,9 +732,17 @@ public:
   //
   // placerBase To NesterovBase functions
   //
-  GCell* placerToNesterov(Instance* inst);
-  GPin* placerToNesterov(Pin* pin);
-  GNet* placerToNesterov(Net* net);
+  GCell* pbToNb(Instance* inst) const;
+  GPin* pbToNb(Pin* pin) const;
+  GNet* pbToNb(Net* net) const;
+
+  //
+  // OpenDB To NesterovBase functions
+  //
+  GCell* dbToNb(odb::dbInst* inst) const;
+  GPin* dbToNb(odb::dbITerm* pin) const;
+  GPin* dbToNb(odb::dbBTerm* pin) const;
+  GNet* dbToNb(odb::dbNet* net) const;
 
   // update gCells with lx, ly
   void updateGCellLocation(

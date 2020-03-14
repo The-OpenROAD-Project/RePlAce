@@ -976,22 +976,22 @@ NesterovBase::init() {
     }
 
     for( auto& pin : gCell.instance()->pins() ) {
-      gCell.addGPin( placerToNesterov(pin) );
+      gCell.addGPin( pbToNb(pin) );
     }
   }
 
   // gPinStor_' GNet and GCell fill
   for(auto& gPin : gPinStor_) {
     gPin.setGCell( 
-        placerToNesterov(gPin.pin()->instance()));
+        pbToNb(gPin.pin()->instance()));
     gPin.setGNet(
-        placerToNesterov(gPin.pin()->net()));
+        pbToNb(gPin.pin()->net()));
   } 
 
   // gNetStor_'s GPin fill
   for(auto& gNet : gNetStor_) {
     for(auto& pin : gNet.net()->pins()) {
-      gNet.addGPin( placerToNesterov(pin) );
+      gNet.addGPin( pbToNb(pin) );
     }
   }
 
@@ -1150,24 +1150,49 @@ NesterovBase::initFillerGCells() {
 }
 
 GCell*
-NesterovBase::placerToNesterov(Instance* inst) {
+NesterovBase::pbToNb(Instance* inst) const {
   auto gcPtr = gCellMap_.find(inst);
   return (gcPtr == gCellMap_.end())?
     nullptr : gcPtr->second;
 }
 
+GPin*
+NesterovBase::pbToNb(Pin* pin) const {
+  auto gpPtr = gPinMap_.find(pin);
+  return (gpPtr == gPinMap_.end())?
+    nullptr : gpPtr->second;
+}
+
 GNet*
-NesterovBase::placerToNesterov(Net* net) {
+NesterovBase::pbToNb(Net* net) const {
   auto gnPtr = gNetMap_.find(net);
   return (gnPtr == gNetMap_.end())?
     nullptr : gnPtr->second;
 }
 
+
+GCell*
+NesterovBase::dbToNb(odb::dbInst* inst) const {
+  Instance* pbInst = pb_->dbToPb(inst);
+  return pbToNb(pbInst); 
+}
+
 GPin*
-NesterovBase::placerToNesterov(Pin* pin) {
-  auto gpPtr = gPinMap_.find(pin);
-  return (gpPtr == gPinMap_.end())?
-    nullptr : gpPtr->second;
+NesterovBase::dbToNb(odb::dbITerm* pin) const {
+  Pin* pbPin = pb_->dbToPb(pin);
+  return pbToNb(pbPin);
+}
+
+GPin*
+NesterovBase::dbToNb(odb::dbBTerm* pin) const {
+  Pin* pbPin = pb_->dbToPb(pin);
+  return pbToNb(pbPin);
+}
+
+GNet*
+NesterovBase::dbToNb(odb::dbNet* net) const {
+  Net* pbNet = pb_->dbToPb(net);
+  return pbToNb(pbNet);
 }
 
 // gcell update

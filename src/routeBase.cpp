@@ -1,6 +1,6 @@
 #include "routeBase.h"
 #include "logger.h"
-#include "placerBase.h"
+#include "nesterovBase.h"
 #include <opendb/db.h>
 #include <string>
 #include <iostream>
@@ -242,6 +242,11 @@ TileGrid::setDb(odb::dbDatabase* db) {
 }
 
 void
+TileGrid::setNesterovBase(std::shared_ptr<NesterovBase> nb) {
+  nb_ = nb;
+}
+
+void
 TileGrid::setLogger(std::shared_ptr<Logger> log) {
   log_ = log;
 }
@@ -342,6 +347,7 @@ TileGrid::initTiles() {
   log_->infoInt("NumTiles", tiles_.size());
 
   // apply edgeCapacityInfo from *.route
+  // update supplyH/V
   for(auto& ecInfo : edgeCapacityStor_) {
     bool isHorizontal = (ecInfo.ly == ecInfo.uy);
     
@@ -423,7 +429,21 @@ TileGrid::initTiles() {
     // set capacity initially
     tile->setCapacity( capacity );
   }
-
+  
+  // apply edgeCapacityInfo from *.route
+  // update blockage from possible capacity
+  for(auto& ecInfo : edgeCapacityStor_) {
+    
+    int lx = std::min( ecInfo.lx, ecInfo.ux );
+    int ly = std::min( ecInfo.ly, ecInfo.uy );
+    int layer = ecInfo.ll;
+    int capacity = ecInfo.capacity;
+    
+    Tile* tile = tiles()[lx * tileCntY() + ly];
+    tile->setBlockage(layer-1, 
+        tile ->blockage(layer-1) 
+        + tile->capacity(layer-1) - capacity);
+  }
 }
 
 int
@@ -480,6 +500,8 @@ TileGrid::tileSizeY() const {
 // minWireSpacing_
 //
 // edgeCapacityStor_
+
+// following code is temp!
 void
 TileGrid::initFromRoute(const char* fileName) {
   char *token = NULL;
@@ -491,7 +513,7 @@ TileGrid::initFromRoute(const char* fileName) {
 
   FILE *fp = nullptr;
   if((fp = fopen(fileName, "r")) == NULL) {
-    log_->error("Cannot open " + string(fileName) + " file!");
+    log_->error("Cannot open " + string(fileName) + " file!", 999);
     exit(1);
   }
 
@@ -600,25 +622,77 @@ TileGrid::initFromRoute(const char* fileName) {
       int e1, e2, e3, e4, e5, e6, e7;
       sscanf(line, "%d %d %d %d %d %d %d ", &e1, &e2, &e3, &e4, &e5, &e6, &e7);
       edgeCapacityStor_.push_back(EdgeCapacityInfo(e1, e2, e3, e4, e5, e6, e7));
-//      using std::cout;
-//      using std::endl;
-//      cout << e1<< " " << e2 << " " << e3 << " ";
-//      cout << e4 << " " << e5 << " " << e6 << " " << e7 << endl;
     }
   }
-
-
-  // init Tiles
-  initTiles();
 }
 
 // Fill routingTracks_;
+// following code is temp!
 void 
 TileGrid::importEst(const char* fileName) {
 
+  // *.est importing.
+  //
+
+  FILE *fp = fopen(fileName, "r");
+  if(fp == NULL) {
+    log_->error("Cannot open " + string(fileName) + " file!", 999);
+		exit(1);
+  }
+      
+  char temp[255] = {0, };
+  char netName[255] = {0, };
+  char line[255] = {0, };
+  bool flag = false;
+
+  while(!feof(fp)) {
+    *line = '\0';
+    fgets(line, 255, fp);
+    sscanf(line, "%s%*s", temp);
+
+    if(strlen(line) < 3)
+      continue;
+
+    if(temp[0] != '(') {
+			int netIdx = 0;
+      sscanf(line, "%s %d%*s", netName, &netIdx);
+      flag = true;
+      continue;
+    }
+
+    if(temp[0] == '!') {
+      flag = false;
+      continue;
+    }
+
+    if(flag) {
+      if(temp[0] == '(') {
+  			int lx = 0, ly = 0, ll = 0, 
+            ux = 0, uy = 0, ul = 0;
+
+        sscanf(line, "(%d,%d,%d)-(%d,%d,%d)%*s", &lx, &ly, &ll, 
+            &ux, &uy, &ul);
+
+        // This is unexpected...!
+        if(ll != ul)
+          continue;
+
+        odb::dbNet* dbNet = db_->getChip()->getBlock()->findNet(netName);
+        //log_->infoString("net " + string(netName) + " " + string(dbNet->getConstName()));
+        GNet* gNet = nb_->dbToNb(dbNet);
+        routingTracks_.push_back(RoutingTrack(lx, ly, ux, uy, ll, gNet));
+      }
+    }
+  }
 }
 
 
+void
+TileGrid::initCongestionMap() {
+  // update congestionMap
+  for (auto& rTrack : routingTracks_) {
+  }
+}
 
 
 EdgeCapacityInfo::EdgeCapacityInfo()
@@ -673,22 +747,23 @@ RouteBase::reset() {
 
 void
 RouteBase::init() {
-  initFromRoute("input.route");
-  log_->infoString("input.route parsing is done");
-}
-
-
-// will be removed in the near future
-void
-RouteBase::initFromRoute(const char* fileName) {
   tg_.setDb(db_);
+  tg_.setNesterovBase(nb_);
   tg_.setLogger(log_);
-  tg_.initFromRoute(fileName);
+
+  tg_.initFromRoute("input.route");
+  log_->infoString("input.route parsing is done");
+
+  tg_.importEst("out.guide.est");
+  log_->infoString("out.guide.est parsing is done");
+
 }
 
 void
-RouteBase::importEst(const char* fileName) {
-  tg_.importEst(fileName);
+RouteBase::initCongestionMap() {
+  tg_.initTiles();
+  tg_.initCongestionMap();
 }
+
 
 }
