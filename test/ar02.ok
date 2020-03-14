@@ -65,6 +65,4 @@ Notice 0: Finished DEF file: ./ar02.def
 [NesterovSolve] Iter: 210 overflow: 0.125072 HPWL: 5746822
 [NesterovSolve] Iter: 220 overflow: 0.101588 HPWL: 5784341
 [NesterovSolve] Finished with Overflow: 0.0995778
-Worst slack: 1.00e+30
-Total negative slack: 0.00e+00
 No differences found.

@@ -18,7 +18,17 @@ fastModulo(const int input, const int ceil);
 
 static std::pair<int, int>
 getMinMaxIdx(int ll, int uu, int coreLL, 
-    int siteSize);
+    int siteSize, int minIdx, int maxIdx);
+
+static
+std::shared_ptr<Logger> slog_;
+
+
+static bool
+isCoreAreaOverlap(Die& die, Instance& inst);
+
+static int64_t
+getOverlapWithCoreArea(Die& die, Instance& inst);
 
 
 ////////////////////////////////////////////////////////
@@ -383,10 +393,9 @@ void Pin::updateCoordi(odb::dbBTerm* bTerm) {
 
   if( lx == INT_MAX || ly == INT_MAX ||
       ux == INT_MIN || uy == INT_MIN ) {
-    cout << "Error: " << bTerm->getConstName() 
-      << "I/O port is not placed!" << endl;
-    cout << "       Please Run ioPlacer to place I/O ports" << endl;
-    exit(1);
+    string msg = string(bTerm->getConstName()) + " toplevel port is not placed!\n";
+    msg += "       Replace will regard " + string(bTerm->getConstName()) + " is placed in (0, 0)";
+    slog_->warn(msg, 1);
   }
 
   // Just center 
@@ -595,6 +604,7 @@ PlacerBase::~PlacerBase() {
 
 void 
 PlacerBase::init() {
+  slog_ = log_;
 
   log_->infoInt("DBU", db_->getTech()->getDbUnitsPerMicron()); 
 
@@ -631,10 +641,16 @@ PlacerBase::init() {
   for(auto& inst : instStor_) {
     if(inst.isInstance()) {
       if(inst.isFixed()) {
-        fixedInsts_.push_back(&inst); 
-        nonPlaceInsts_.push_back(&inst);
-        nonPlaceInstsArea_ += static_cast<int64_t>(inst.dx()) 
-          * static_cast<int64_t>(inst.dy());
+        // Check whether fixed instance is 
+        // within the corearea
+        //
+        // outside of corearea is none of RePlAce's business
+        if( isCoreAreaOverlap( die_, inst ) ) {
+          fixedInsts_.push_back(&inst); 
+          nonPlaceInsts_.push_back(&inst);
+          nonPlaceInstsArea_ += 
+            getOverlapWithCoreArea( die_, inst );
+        }
       }
       else {
         placeInsts_.push_back(&inst);
@@ -643,7 +659,7 @@ PlacerBase::init() {
         placeInstsArea_ += instArea; 
         // macro cells should be
         // macroInstsArea_
-        if( inst.dy() > siteSizeY_ ) {
+        if( inst.dy() > siteSizeY_ * 6 ) {
           macroInstsArea_ += instArea;
         }
         // smaller or equal height cells should be 
@@ -771,11 +787,11 @@ PlacerBase::initInstsForFragmentedRow() {
     
     std::pair<int, int> pairX 
       = getMinMaxIdx(rect.xMin(), rect.xMax(), 
-          die_.coreLx(), siteSizeX_);
+          die_.coreLx(), siteSizeX_, 0, siteCountX);
 
     std::pair<int, int> pairY
       = getMinMaxIdx(rect.yMin(), rect.yMax(),
-          die_.coreLy(), siteSizeY_);
+          die_.coreLy(), siteSizeY_, 0, siteCountY);
 
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
@@ -791,10 +807,10 @@ PlacerBase::initInstsForFragmentedRow() {
     }
     std::pair<int, int> pairX 
       = getMinMaxIdx(inst.lx(), inst.ux(),
-          die_.coreLx(), siteSizeX_);
+          die_.coreLx(), siteSizeX_, 0, siteCountX);
     std::pair<int, int> pairY 
       = getMinMaxIdx(inst.ly(), inst.uy(),
-          die_.coreLy(), siteSizeY_);
+          die_.coreLy(), siteSizeY_, 0, siteCountY);
 
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
@@ -966,12 +982,33 @@ fastModulo(const int input, const int ceil) {
 }
 
 static std::pair<int, int>
-getMinMaxIdx(int ll, int uu, int coreLL, int siteSize) {
+getMinMaxIdx(int ll, int uu, int coreLL, int siteSize, int minIdx, int maxIdx) {
   int lowerIdx = (ll - coreLL)/siteSize;
   int upperIdx =
    ( fastModulo((uu - coreLL), siteSize) == 0)? 
    (uu - coreLL) / siteSize : (uu - coreLL)/siteSize + 1;
-  return std::make_pair(lowerIdx, upperIdx);
+  return std::make_pair(
+      std::max(minIdx, lowerIdx), 
+      std::min(maxIdx, upperIdx));
+}
+
+static bool
+isCoreAreaOverlap(Die& die, Instance& inst) {
+  int rectLx = max(die.coreLx(), inst.lx()),
+      rectLy = max(die.coreLy(), inst.ly()),
+      rectUx = min(die.coreUx(), inst.ux()),
+      rectUy = min(die.coreUy(), inst.uy()); 
+  return !( rectLx >= rectUx || rectLy >= rectUy );
+}
+
+static int64_t
+getOverlapWithCoreArea(Die& die, Instance& inst) {
+  int rectLx = max(die.coreLx(), inst.lx()),
+      rectLy = max(die.coreLy(), inst.ly()),
+      rectUx = min(die.coreUx(), inst.ux()),
+      rectUy = min(die.coreUy(), inst.uy()); 
+  return static_cast<int64_t>(rectUx - rectLx)
+    * static_cast<int64_t>(rectUy - rectLy);
 }
 
 

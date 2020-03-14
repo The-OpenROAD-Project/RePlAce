@@ -916,7 +916,7 @@ NesterovBase::init() {
     GCell myGCell(inst); 
     // Check whether the given instance is
     // macro or not
-    if( inst->dy() > pb_->siteSizeY() ) {
+    if( inst->dy() > pb_->siteSizeY() * 6 ) {
       myGCell.setMacroInstance();
     }
     else {
@@ -1112,7 +1112,7 @@ NesterovBase::initFillerGCells() {
     string msg = "Filler area is negative!!\n";
     msg += "       Please put higher target density or \n";
     msg += "       Re-floorplan to have enough coreArea\n";
-    log_->error( msg );
+    log_->error( msg, 1 );
   }
 
   int fillerCnt = 

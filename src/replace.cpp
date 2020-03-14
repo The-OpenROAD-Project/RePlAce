@@ -30,6 +30,7 @@ Replace::Replace()
   referenceHpwl_(446000000),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
+  incrementalPlaceMode_(false),
   verbose_(0) {
 };
 
@@ -69,6 +70,7 @@ void Replace::reset() {
 
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
+  incrementalPlaceMode_ = false;
   verbose_ = 0;
 }
 
@@ -79,7 +81,7 @@ void Replace::setSta(sta::dbSta* sta) {
   sta_ = sta;
 }
 void Replace::doInitialPlace() {
-  log_ = std::make_shared<Logger>(verbose_);
+  log_ = std::make_shared<Logger>("REPL", verbose_);
   pb_ = std::make_shared<PlacerBase>(db_, log_);
 
   InitialPlaceVars ipVars;
@@ -88,6 +90,7 @@ void Replace::doInitialPlace() {
   ipVars.maxSolverIter = initialPlaceMaxSolverIter_;
   ipVars.maxFanout = initialPlaceMaxFanout_;
   ipVars.netWeightScale = initialPlaceNetWeightScale_;
+  ipVars.incrementalPlaceMode = incrementalPlaceMode_;
   
   std::unique_ptr<InitialPlace> ip(new InitialPlace(ipVars, pb_, log_));
   ip_ = std::move(ip);
@@ -96,7 +99,7 @@ void Replace::doInitialPlace() {
 
 void Replace::doNesterovPlace() {
   if( !log_ ) {
-    log_ = std::make_shared<Logger>(verbose_);
+    log_ = std::make_shared<Logger>("REPL", verbose_);
   }
 
   if( !pb_ ) {
@@ -210,6 +213,11 @@ Replace::setMaxPhiCoef(float maxPhiCoef) {
 void
 Replace::setReferenceHpwl(float refHpwl) {
   referenceHpwl_ = refHpwl;
+}
+
+void
+Replace::setIncrementalPlaceMode(bool mode) {
+  incrementalPlaceMode_ = mode;
 }
 
 void

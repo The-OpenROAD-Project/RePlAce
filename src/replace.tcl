@@ -3,6 +3,9 @@ sta::define_cmd_args "global_placement" {
   [-density target_density]\
   [-disable_timing_driven]\
   [-disable_routability_driven]\
+  [-timing_driven]\
+  [-incremental]\
+  [-density target_density]\
     [-bin_grid_count grid_count]}
 
 proc global_placement { args } {
@@ -12,7 +15,7 @@ proc global_placement { args } {
       -min_phi_coef -max_phi_coef -overflow \
       -initial_place_max_iter -initial_place_max_fanout \
       -verbose_level} \
-      flags {-skip_initial_place -disable_timing_driven -disable_routability_driven}
+      flags {-skip_initial_place -disable_timing_driven -disable_routability_driven -incremental}
     
   set target_density 0.7
   if { [info exists keys(-density)] } {
@@ -38,6 +41,12 @@ proc global_placement { args } {
   # flow control for routability-driven 
   if { [info exists flags(-disable_routability_driven)] } {
     set_replace_disable_routability_driven_mode_cmd
+  }
+  
+  # flow control for incremental GP
+  if { [info exists flags(-incremental)] } {
+    set_replace_initial_place_max_iter_cmd 0
+    set_replace_incremental_place_mode_cmd
   }
 
   if { [info exists keys(-initial_place_max_fanout)] } { 
@@ -97,11 +106,6 @@ proc global_placement { args } {
   
     replace_initial_place_cmd
     replace_nesterov_place_cmd
-    
-    puts "Worst slack: [format %.2e [sta::worst_slack]]"
-    puts "Total negative slack: [format %.2e [sta::total_negative_slack]]"
-
-    # clear replace for next runs
     replace_reset_cmd
   } else {
     puts "Error: no rows defined in design. Use initialize_floorplan to add rows."

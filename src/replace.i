@@ -120,6 +120,13 @@ set_replace_init_wirelength_coef_cmd(float coef)
 }
 
 void
+set_replace_incremental_place_mode_cmd()
+{
+  Replace* replace = getReplace();
+  replace->setIncrementalPlaceMode(true);
+}
+
+void
 set_replace_verbose_level_cmd(int verbose)
 {
   Replace* replace = getReplace();

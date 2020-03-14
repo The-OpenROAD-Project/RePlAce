@@ -8,16 +8,16 @@ namespace replace {
 class Logger {
 
 public:
-  Logger(int verbose);
+  Logger(std::string name, int verbose);
 
   // Print functions
   void proc(std::string input, int verbose = 0);
   void procBegin(std::string input, int verbose = 0);
   void procEnd(std::string input, int verbose = 0);
 
-  void error(std::string input, int verbose = 0); 
+  void error(std::string input, int code, int verbose = 0); 
 
-  void warning(std::string input, int verbos = 0);
+  void warn(std::string input, int code, int verbose = 0);
 
   void infoInt(std::string input, int val, int verbose = 0);
   void infoIntPair(std::string input, int val1, int val2, int verbose = 0);
@@ -33,8 +33,10 @@ public:
 
   void infoRuntime(std::string input, double runtime, int verbose = 0);
 
+
 private:
   int verbose_;
+  std::string name_;
 
 };
 

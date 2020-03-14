@@ -56,6 +56,8 @@ class Replace
 
     // HPWL: half-parameter wire length.
     void setReferenceHpwl(float deltaHpwl);
+
+    void setIncrementalPlaceMode(bool mode);
     void setVerboseLevel(int verbose);
 
     void setTimingDrivenMode(bool mode);
@@ -92,6 +94,7 @@ class Replace
 
     bool timingDrivenMode_;
     bool routabilityDrivenMode_;
+    bool incrementalPlaceMode_;
     int verbose_;
 };
 }

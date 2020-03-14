@@ -20,7 +20,8 @@ InitialPlaceVars::InitialPlaceVars()
   minDiffLength(1500), 
   maxSolverIter(100),
   maxFanout(200),
-  netWeightScale(800.0) {}
+  netWeightScale(800.0),
+  incrementalPlaceMode(false) {}
 
 void InitialPlaceVars::reset() {
   maxIter = 20;
@@ -28,6 +29,7 @@ void InitialPlaceVars::reset() {
   maxSolverIter = 100;
   maxFanout = 200;
   netWeightScale = 800.0;
+  incrementalPlaceMode = false;
 }
 
 InitialPlace::InitialPlace()
@@ -60,8 +62,12 @@ void InitialPlace::doBicgstabPlace() {
   pe.setPlacerBase(pb_);
   pe.Init();
 #endif
-  
-  placeInstsCenter();
+ 
+  // normally, initial place will place all cells in the centers.
+  if( !ipVars_.incrementalPlaceMode ) {
+    placeInstsCenter();
+  }
+
   // set ExtId for idx reference // easy recovery
   setPlaceInstExtId();
   for(int i=1; i<=ipVars_.maxIter; i++) {
