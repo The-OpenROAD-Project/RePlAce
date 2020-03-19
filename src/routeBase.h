@@ -61,7 +61,6 @@ class Tile {
     void setSupplyVL(float supply);
     void setSupplyVR(float supply);
 
-
     float sumUsageH() const;
     float sumUsageV() const;
 
@@ -82,6 +81,8 @@ class Tile {
 
     void setMacroIncluded(bool mode);
     bool isMacroIncluded() const;
+    
+    void updateSumUsages();
 
   private:
     // the followings will store

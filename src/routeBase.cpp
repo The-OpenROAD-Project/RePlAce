@@ -206,6 +206,23 @@ Tile::setMacroIncluded(bool mode) {
   isMacroIncluded_ = mode;
 }
 
+void 
+Tile::updateSumUsages() {
+  sumUsageH_ = 0;
+  sumUsageV_ = 0;
+
+  int grSumUsageH = 0, grSumUsageV = 0;
+
+  for(int i=0; i<usageHL_.size(); i++) {
+    grSumUsageH += std::max( usageHL_[i], usageHR_[i] );
+    grSumUsageV += std::max( usageVL_[i], usageVR_[i] );
+  }
+  sumUsageH_ = static_cast<float>(grSumUsageH) 
+    * static_cast<float>(ux() - lx());
+  sumUsageV_ = static_cast<float>(grSumUsageV) 
+    * static_cast<float>(uy() - ly());
+}
+
 
 
 TileGrid::TileGrid()
@@ -353,6 +370,7 @@ TileGrid::initTiles() {
     
     // l : lower
     // u : upper
+    // index
     int lx = std::min( ecInfo.lx, ecInfo.ux );
     int ux = std::max( ecInfo.lx, ecInfo.ux );
     int ly = std::min( ecInfo.ly, ecInfo.uy );
@@ -360,7 +378,7 @@ TileGrid::initTiles() {
 
     // Note that ecInfo.ll == ecInfo.ul
     assert( ecInfo.ll == ecInfo.ul );
-    int layer = ecInfo.ll;
+    int layer = ecInfo.ll - 1;
     int capacity = ecInfo.capacity;
 
     Tile* lTile = tiles()[lx * tileCntY() + ly];
@@ -370,19 +388,19 @@ TileGrid::initTiles() {
       // lower -> right edge
       lTile->setSupplyHR( 
           lTile->supplyHR() - 
-          (horizontalCapacity_[layer - 1] - capacity) /
-          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          (horizontalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
           tileSizeX_ );
 
       // upper -> left edge
       uTile->setSupplyHL(
           uTile->supplyHL() -
-          (horizontalCapacity_[layer - 1] - capacity) /
-          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          (horizontalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
           tileSizeX_ );
 
       // lower layer check
-      if( layer <= 5 && horizontalCapacity_[layer - 1] > 0 &&
+      if( layer <= 4 && horizontalCapacity_[layer] > 0 &&
           capacity < 0.01 ) {
         lTile->setMacroIncluded(true);
       }
@@ -391,19 +409,19 @@ TileGrid::initTiles() {
       // lower -> right edge
       lTile->setSupplyVR( 
           lTile->supplyVR() - 
-          (verticalCapacity_[layer - 1] - capacity) /
-          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          (verticalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
           tileSizeY_ );
 
       // upper -> left edge
       uTile->setSupplyVL(
           uTile->supplyVL() -
-          (verticalCapacity_[layer - 1] - capacity) /
-          (minWireWidth_[layer - 1] + minWireSpacing_[layer - 1]) /
+          (verticalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
           tileSizeY_ );
 
       // lower layer check
-      if( layer <= 5 && verticalCapacity_[layer - 1] > 0 &&
+      if( layer <= 4 && verticalCapacity_[layer] > 0 &&
           capacity < 0.01 ) {
         lTile->setMacroIncluded(true);
       }
@@ -436,13 +454,13 @@ TileGrid::initTiles() {
     
     int lx = std::min( ecInfo.lx, ecInfo.ux );
     int ly = std::min( ecInfo.ly, ecInfo.uy );
-    int layer = ecInfo.ll;
+    int layer = ecInfo.ll - 1;
     int capacity = ecInfo.capacity;
     
     Tile* tile = tiles()[lx * tileCntY() + ly];
-    tile->setBlockage(layer-1, 
-        tile ->blockage(layer-1) 
-        + tile->capacity(layer-1) - capacity);
+    tile->setBlockage(layer, 
+        tile ->blockage(layer) 
+        + tile->capacity(layer) - capacity);
   }
 }
 
@@ -456,6 +474,7 @@ TileGrid::ly() const {
   return ly_;
 }
 
+    // this is points
 int 
 TileGrid::ux() const {
   return lx_ + tileCntX_ * tileSizeX_;
@@ -690,8 +709,64 @@ TileGrid::importEst(const char* fileName) {
 void
 TileGrid::initCongestionMap() {
   // update congestionMap
+  // tiles' usageHR, usageHL, usageVR, usage VL
   for (auto& rTrack : routingTracks_) {
+    bool isHorizontal = ( rTrack.ly == rTrack.uy );
+
+    // points
+    int lx = std::min( rTrack.lx, rTrack.ux );
+    int ux = std::max( rTrack.lx, rTrack.ux );
+    int ly = std::min( rTrack.ly, rTrack.uy );
+    int uy = std::max( rTrack.ly, rTrack.uy );
+
+    int layer = rTrack.layer - 1;
+
+    // getIdx from coordinates.
+    int lIdxX = lx - lx_/tileSizeX();
+    int lIdxY = ly - ly_/tileSizeY();
+    int uIdxX = ux - lx_/tileSizeX();
+    int uIdxY = uy - ly_/tileSizeY();
+
+
+    if( lIdxX < 0 || lIdxX >= tileCntX() ) {
+      log_->error("lIdxX is wrong. Check the *.est file", 100);
+    }
+    if( lIdxY < 0 || lIdxY >= tileCntY() ) {
+      log_->error("lIdxY is wrong. Check the *.est file", 100);
+    }
+    if( uIdxX < 0 || uIdxX >= tileCntX() ) {
+      log_->error("uIdxX is wrong. Check the *.est file", 100);
+    }
+    if( uIdxY < 0 || uIdxY >= tileCntY() ) {
+      log_->error("uIdxY is wrong. Check the *.est file", 100);
+    }
+   
+    // get lTile and uTile using lx, ly, ux, uy 
+    Tile* lTile = tiles()[lIdxX * tileCntY() + lIdxY];
+    Tile* uTile = tiles()[uIdxX * tileCntY() + uIdxY];
+
+    // horizontal
+    if( isHorizontal ) {
+      lTile->setUsageHR( layer, lTile->usageHR(layer) + 1 );
+      uTile->setUsageHL( layer, uTile->usageHL(layer) + 1 );
+    }
+    // vertical
+    else {
+      lTile->setUsageVR( layer, lTile->usageVR(layer) + 1 );
+      uTile->setUsageVL( layer, uTile->usageVL(layer) + 1 );
+    }
+
+    // update route info
+    lTile->setRoute(layer, lTile->route(layer) 
+        + minWireWidth_[layer] + minWireSpacing_[layer] );
   }
+
+  
+  // update sumUsageH and sumUsageV
+  for(auto& tile : tiles_) {
+    tile->updateSumUsages();
+  }
+
 }
 
 
