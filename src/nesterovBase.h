@@ -425,7 +425,7 @@ class GPin {
 
     int cx() const { return cx_; }
     int cy() const { return cy_; }
-    
+
     // clear WA(Weighted Average) variables.
     void clearWaVars();
 

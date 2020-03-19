@@ -23,6 +23,7 @@ class Tile {
         int ux, int uy, int layers);
     ~Tile();
 
+    // getter funcs
     int x() const;
     int y() const;
 
@@ -43,6 +44,26 @@ class Tile {
     int usageVL(int layer) const;
     int usageVR(int layer) const;
 
+    float sumUsageH() const;
+    float sumUsageV() const;
+
+    float supplyHL() const;
+    float supplyHR() const;
+    float supplyVL() const;
+    float supplyVR() const;
+
+    float inflationRatioH() const;
+    float inflationRatioV() const;
+
+    float inflationRatio() const;
+    float inflationArea() const;
+    float inflationAreaDelta() const;
+    float inflatedRatio() const;
+
+    bool isMacroIncluded() const;
+    int pinCnt() const;
+
+    // setter funcs
     void setBlockage(int layer, int blockage);
     void setCapacity(int layer, int capacity);
     void setCapacity(std::vector<int>& capacity);
@@ -61,27 +82,10 @@ class Tile {
     void setSupplyVL(float supply);
     void setSupplyVR(float supply);
 
-    float sumUsageH() const;
-    float sumUsageV() const;
-
-    float supplyHL() const;
-    float supplyHR() const;
-    float supplyVL() const;
-    float supplyVR() const;
-
-
-    float inflationRatioH() const;
-    float inflationRatioV() const;
-
-    float inflationRatio() const;
-    float inflationArea() const;
-    float inflationAreaDelta() const;
-    float inflatedRatio() const;
-
-
+    void setPinCnt(int cnt);
     void setMacroIncluded(bool mode);
-    bool isMacroIncluded() const;
-    
+
+
     void updateSumUsages();
 
   private:
@@ -111,6 +115,9 @@ class Tile {
     int ly_;
     int ux_;
     int uy_;
+
+    // pin counts
+    int pinCnt_;
 
     float sumUsageH_;
     float sumUsageV_;
@@ -171,8 +178,8 @@ Tile::uy() const {
 
 inline const int64_t
 Tile::area() const {
-  return 
-    static_cast<int64_t>(ux_ - lx_) * 
+  return
+    static_cast<int64_t>(ux_ - lx_) *
     static_cast<int64_t>(uy_ - ly_);
 }
 
@@ -231,7 +238,9 @@ class TileGrid {
     void initTiles();
     void reset();
 
-    void initCongestionMap();
+    void updateUsages();
+    void updatePinCount();
+    void updateInflationRatio();
 
     // temp func
     void initFromRoute(const char* fileName);
@@ -284,7 +293,8 @@ class RouteBase {
         std::shared_ptr<Logger> log);
     ~RouteBase();
 
-    void initCongestionMap();
+    // init congestion maps based on given points
+    void updateCongestionMap();
 
   private:
     odb::dbDatabase* db_;

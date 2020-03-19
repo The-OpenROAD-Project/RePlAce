@@ -196,6 +196,7 @@ void NesterovPlace::init() {
     // make_unique
     std::unique_ptr<RouteBase> rb(new RouteBase(pb_->db(), nb_, log_));
     rb_ = std::move(rb);
+    rb_->updateCongestionMap();
   }
 }
 

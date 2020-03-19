@@ -8,12 +8,14 @@
 
 using std::vector;
 using std::string;
+using std::to_string; 
 
 namespace replace {
 
 Tile::Tile()
 : x_(0), y_(0), 
   lx_(0), ly_(0), ux_(0), uy_(0),
+  pinCnt_(0),
   sumUsageH_(0), sumUsageV_(0),
   supplyH_(0), supplyV_(0),
   supplyHL_(0), supplyHR_(0),
@@ -51,7 +53,16 @@ Tile::~Tile() {
 
 void
 Tile::reset() {
-  x_ = y_ = lx_ = ly_ = ux_ = uy_ = 0;
+  x_ = y_ = lx_ = ly_ = ux_ = uy_ = pinCnt_ = 0;
+  sumUsageH_ = sumUsageV_ = supplyH_ = supplyV_ = 0;
+  supplyHL_ = supplyHR_ = supplyVL_ = supplyVR_ = 0;
+  inflationRatioH_ = inflationRatioV_ = 0;
+  inflationRatio_ = 0;
+
+  inflationArea_ = inflationAreaDelta_ = 0;
+  inflatedRatio_ = 0;
+  isMacroIncluded_ = false;
+
   blockage_.clear();
   capacity_.clear();
   route_.clear();
@@ -102,46 +113,6 @@ Tile::usageVR(int layer) const {
   return usageVR_[layer];
 }
 
-void
-Tile::setBlockage(int layer, int block) {
-  blockage_[layer] = block;
-}
-
-void
-Tile::setCapacity(int layer, int capacity) {
-  capacity_[layer] = capacity;
-}
-
-void
-Tile::setCapacity(vector<int>& capacity) {
-  capacity_ = capacity; 
-}
-
-void
-Tile::setRoute(int layer, int route) {
-  route_[layer] = route;
-}
-
-void
-Tile::setUsageHL(int layer, int usage) { 
-  usageHL_[layer] = usage;
-}
-
-void
-Tile::setUsageHR(int layer, int usage) { 
-  usageHR_[layer] = usage;
-}
-
-void
-Tile::setUsageVL(int layer, int usage) { 
-  usageVL_[layer] = usage;
-}
-
-void
-Tile::setUsageVR(int layer, int usage) { 
-  usageVR_[layer] = usage;
-}
-
 float 
 Tile::sumUsageH() const {
   return sumUsageH_;
@@ -169,6 +140,90 @@ float
 Tile::supplyVR() const {
   return supplyVR_;
 }
+
+float 
+Tile::inflationRatioH() const {
+  return inflationRatioH_;
+}
+
+float 
+Tile::inflationRatioV() const {
+  return inflationRatioV_;
+}
+
+float
+Tile::inflationRatio() const {
+  return inflationRatio_;
+}
+
+float
+Tile::inflationArea() const {
+  return inflationArea_;
+}
+
+float
+Tile::inflationAreaDelta() const {
+  return inflationAreaDelta_;
+}
+
+float
+Tile::inflatedRatio() const {
+  return inflatedRatio_;
+}
+
+bool
+Tile::isMacroIncluded() const {
+  return isMacroIncluded_;
+}
+
+int
+Tile::pinCnt() const {
+  return pinCnt_;
+}
+
+
+
+void
+Tile::setBlockage(int layer, int block) {
+  blockage_[layer] = block;
+}
+
+void
+Tile::setCapacity(int layer, int capacity) {
+  capacity_[layer] = capacity;
+}
+
+void
+Tile::setCapacity(vector<int>& capacity) {
+  capacity_ = capacity; 
+}
+
+void
+Tile::setRoute(int layer, int route) {
+  route_[layer] = route;
+}
+
+
+void
+Tile::setUsageHL(int layer, int usage) { 
+  usageHL_[layer] = usage;
+}
+
+void
+Tile::setUsageHR(int layer, int usage) { 
+  usageHR_[layer] = usage;
+}
+
+void
+Tile::setUsageVL(int layer, int usage) { 
+  usageVL_[layer] = usage;
+}
+
+void
+Tile::setUsageVR(int layer, int usage) { 
+  usageVR_[layer] = usage;
+}
+
 
 void
 Tile::setSupplyH(float supply) {
@@ -207,6 +262,11 @@ Tile::setMacroIncluded(bool mode) {
 }
 
 void 
+Tile::setPinCnt(int cnt) {
+  pinCnt_ = cnt;
+}
+
+void 
 Tile::updateSumUsages() {
   sumUsageH_ = 0;
   sumUsageV_ = 0;
@@ -217,6 +277,8 @@ Tile::updateSumUsages() {
     grSumUsageH += std::max( usageHL_[i], usageHR_[i] );
     grSumUsageV += std::max( usageVL_[i], usageVR_[i] );
   }
+
+  // scaled by tileSizeX and tileSizeY
   sumUsageH_ = static_cast<float>(grSumUsageH) 
     * static_cast<float>(ux() - lx());
   sumUsageV_ = static_cast<float>(grSumUsageV) 
@@ -248,9 +310,13 @@ TileGrid::reset() {
 
   tileStor_.clear();
   tiles_.clear();
+  edgeCapacityStor_.clear();
+  routingTracks_.clear();
 
   tileStor_.shrink_to_fit();
   tiles_.shrink_to_fit();
+  edgeCapacityStor_.shrink_to_fit();
+  routingTracks_.shrink_to_fit();
 }
 
 void
@@ -706,10 +772,9 @@ TileGrid::importEst(const char* fileName) {
 }
 
 
+// update tiles' usageHR, usageHL, usageVR, usage VL
 void
-TileGrid::initCongestionMap() {
-  // update congestionMap
-  // tiles' usageHR, usageHL, usageVR, usage VL
+TileGrid::updateUsages() {
   for (auto& rTrack : routingTracks_) {
     bool isHorizontal = ( rTrack.ly == rTrack.uy );
 
@@ -722,23 +787,23 @@ TileGrid::initCongestionMap() {
     int layer = rTrack.layer - 1;
 
     // getIdx from coordinates.
-    int lIdxX = lx - lx_/tileSizeX();
-    int lIdxY = ly - ly_/tileSizeY();
-    int uIdxX = ux - lx_/tileSizeX();
-    int uIdxY = uy - ly_/tileSizeY();
+    int lIdxX = (lx - lx_)/tileSizeX();
+    int lIdxY = (ly - ly_)/tileSizeY();
+    int uIdxX = (ux - lx_)/tileSizeX();
+    int uIdxY = (uy - ly_)/tileSizeY();
 
 
     if( lIdxX < 0 || lIdxX >= tileCntX() ) {
-      log_->error("lIdxX is wrong. Check the *.est file", 100);
+      log_->error("lIdxX is wrong. Check the *.est file. lIdx: " + to_string(lIdxX), 100);
     }
     if( lIdxY < 0 || lIdxY >= tileCntY() ) {
-      log_->error("lIdxY is wrong. Check the *.est file", 100);
+      log_->error("lIdxY is wrong. Check the *.est file. lIdxY: " + to_string(lIdxY), 100);
     }
     if( uIdxX < 0 || uIdxX >= tileCntX() ) {
-      log_->error("uIdxX is wrong. Check the *.est file", 100);
+      log_->error("uIdxX is wrong. Check the *.est file. uIdxX: " + to_string(uIdxX), 100);
     }
     if( uIdxY < 0 || uIdxY >= tileCntY() ) {
-      log_->error("uIdxY is wrong. Check the *.est file", 100);
+      log_->error("uIdxY is wrong. Check the *.est file. uIdxY: " + to_string(uIdxY), 100);
     }
    
     // get lTile and uTile using lx, ly, ux, uy 
@@ -767,6 +832,26 @@ TileGrid::initCongestionMap() {
     tile->updateSumUsages();
   }
 
+}
+
+// update pin density on tiles
+void
+TileGrid::updatePinCount() {
+  for(auto& gCell : nb_->gCells()) {
+    for(auto& gPin : gCell->gPins()) {
+      int idxX = (gPin->cx() - lx_)/tileSizeX_;
+      int idxY = (gPin->cy() - ly_)/tileSizeY_;
+      Tile* tile = tiles()[idxX * tileCntY() + idxY];
+      tile->setPinCnt( tile->pinCnt() + 1 );
+    }
+  }
+}
+
+// inflationRatio
+void
+TileGrid::updateInflationRatio() {
+  for(auto& tile : tiles_) {
+  }
 }
 
 
@@ -835,9 +920,11 @@ RouteBase::init() {
 }
 
 void
-RouteBase::initCongestionMap() {
+RouteBase::updateCongestionMap() {
   tg_.initTiles();
-  tg_.initCongestionMap();
+  tg_.updateUsages();
+  tg_.updatePinCount();
+  tg_.updateInflationRatio();
 }
 
 
