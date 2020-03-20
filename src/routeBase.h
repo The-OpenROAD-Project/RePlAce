@@ -207,7 +207,7 @@ class TileGrid {
     void setTileSizeX(int tileSizeX);
     void setTileSizeY(int tileSizeY);
     void setNumRoutingLayers(int num);
-    
+
     void setLx(int lx);
     void setLy(int ly);
 

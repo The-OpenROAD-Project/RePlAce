@@ -1024,14 +1024,48 @@ RouteBase::updatePinCount() {
 // inflationRatio
 void
 RouteBase::updateInflationRatio() {
+  float maxInflV = 0, maxInflH = 0;
+
   for(auto& tile : tg_.tiles()) {
+    // Vertical InflationRatio
     tile->setInflationRatioV( 
         std::fmax(
           tile->inflationRatioV(), 
-          tile->usageH() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyH() 
-          ));
-//    tile->set
+          tile->usageH() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyH()));
+
+    // upper bound
+    tile->setInflationRatioV(
+        std::fmin( 
+          rbVars_.maxInflationRatio, 
+          tile->inflationRatioV()));
+
+    maxInflV = std::max(maxInflV, tile->inflationRatioV());
+    
+    // Horizontal InflationRatio
+    tile->setInflationRatioH( 
+        std::fmax(
+          tile->inflationRatioH(), 
+          tile->usageV() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyV()));
+
+    // upper bound
+    tile->setInflationRatioH(
+        std::fmin( 
+          rbVars_.maxInflationRatio, 
+          tile->inflationRatioH()));
+
+    maxInflH = std::max(maxInflH, tile->inflationRatioH());
+
+    log_->infoIntPair("xy", tile->x(), tile->y()); 
+    log_->infoFloatPair("usageHV", 
+        tile->usageH(), tile->usageV()); 
+    log_->infoFloatPair("supplyHV", 
+        tile->supplyH(), tile->supplyV()); 
+    log_->infoInt("pinCnt", tile->pinCnt());
+    log_->infoFloatPair("calcInflRatioHV", 
+          tile->usageV() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyV(),
+          tile->usageH() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyH());
   }
+  log_->infoFloatPair("MaxInflationRatioHV", maxInflH, maxInflV);
 }
 
 
