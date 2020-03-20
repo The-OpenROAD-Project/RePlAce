@@ -44,13 +44,16 @@ class Tile {
     int usageVL(int layer) const;
     int usageVR(int layer) const;
 
-    float sumUsageH() const;
-    float sumUsageV() const;
+    float usageH() const;
+    float usageV() const;
 
     float supplyHL() const;
     float supplyHR() const;
     float supplyVL() const;
     float supplyVR() const;
+
+    float supplyH() const;
+    float supplyV() const;
 
     float inflationRatioH() const;
     float inflationRatioV() const;
@@ -82,11 +85,18 @@ class Tile {
     void setSupplyVL(float supply);
     void setSupplyVR(float supply);
 
+    void setInflationRatioH(float val);
+    void setInflationRatioV(float val);
+    void setInflationRatio(float ratio);
+
+    void setInflationArea(float area);
+    void setInflationAreaDelta(float delta);
+
     void setPinCnt(int cnt);
     void setMacroIncluded(bool mode);
 
 
-    void updateSumUsages();
+    void updateUsages();
 
   private:
     // the followings will store
@@ -119,8 +129,8 @@ class Tile {
     // pin counts
     int pinCnt_;
 
-    float sumUsageH_;
-    float sumUsageV_;
+    float usageH_;
+    float usageV_;
 
     float supplyH_;
     float supplyV_;
@@ -183,6 +193,63 @@ Tile::area() const {
     static_cast<int64_t>(uy_ - ly_);
 }
 
+
+class TileGrid {
+  public:
+    TileGrid();
+    ~TileGrid();
+
+    void setLogger(std::shared_ptr<Logger> log);
+    void setTileCnt(int tileCntX, int tileCntY);
+    void setTileCntX(int tileCntX);
+    void setTileCntY(int tileCntY);
+    void setTileSize(int tileSizeX, int tileSizeY);
+    void setTileSizeX(int tileSizeX);
+    void setTileSizeY(int tileSizeY);
+    void setNumRoutingLayers(int num);
+    
+    void setLx(int lx);
+    void setLy(int ly);
+
+    int lx() const;
+    int ly() const;
+    int ux() const;
+    int uy() const;
+
+    int tileCntX() const;
+    int tileCntY() const;
+    int tileSizeX() const;
+    int tileSizeY() const;
+
+    int numRoutingLayers() const;
+
+    const std::vector<Tile*> & tiles() const;
+
+    void initTiles();
+
+  private:
+    // for traversing layer info!
+    std::shared_ptr<Logger> log_;
+
+    std::vector<Tile> tileStor_;
+    std::vector<Tile*> tiles_;
+
+    int lx_;
+    int ly_;
+    int tileCntX_;
+    int tileCntY_;
+    int tileSizeX_;
+    int tileSizeY_;
+    int numRoutingLayers_;
+
+    void reset();
+};
+
+inline const std::vector<Tile*> &
+TileGrid::tiles() const {
+  return tiles_;
+}
+
 // For *.route EdgeCapacityAdjustment
 struct EdgeCapacityInfo {
   int lx;
@@ -207,96 +274,35 @@ struct RoutingTrack {
       int layer, GNet* net);
 };
 
-class TileGrid {
-  public:
-    TileGrid();
-    ~TileGrid();
+class RouteBaseVars {
+public:
+  float gRoutePitchScale;
+  float pinCoef;
+  float maxInflationRatio;
+  float blockagePorosity;
 
-    void setDb(odb::dbDatabase* db);
-    void setLogger(std::shared_ptr<Logger> log);
-    void setNesterovBase(std::shared_ptr<NesterovBase> nb);
-    void setTileCnt(int tileCntX, int tileCntY);
-    void setTileCntX(int tileCntX);
-    void setTileCntY(int tileCntY);
-    void setTileSize(int tileSizeX, int tileSizeY);
-    void setTileSizeX(int tileSizeX);
-    void setTileSizeY(int tileSizeY);
-    void setNumRoutingLayers(int num);
-
-    int lx() const;
-    int ly() const;
-    int ux() const;
-    int uy() const;
-
-    int tileCntX() const;
-    int tileCntY() const;
-    int tileSizeX() const;
-    int tileSizeY() const;
-
-    const std::vector<Tile*> & tiles() const;
-
-    void initTiles();
-    void reset();
-
-    void updateUsages();
-    void updatePinCount();
-    void updateInflationRatio();
-
-    // temp func
-    void initFromRoute(const char* fileName);
-    void importEst(const char* fileName);
-
-  private:
-    // for traversing layer info!
-    odb::dbDatabase* db_;
-    std::shared_ptr<NesterovBase> nb_;
-    std::shared_ptr<Logger> log_;
-
-    std::vector<Tile> tileStor_;
-    std::vector<Tile*> tiles_;
-
-    // from *.route file
-    std::vector<int> verticalCapacity_;
-    std::vector<int> horizontalCapacity_;
-    std::vector<int> minWireWidth_;
-    std::vector<int> minWireSpacing_;
-
-    int lx_;
-    int ly_;
-    int tileCntX_;
-    int tileCntY_;
-    int tileSizeX_;
-    int tileSizeY_;
-    int tileNumLayers_;
-
-    float blockagePorosity_;
-    std::vector<EdgeCapacityInfo> edgeCapacityStor_;
-
-    // from *.est file
-    std::vector<RoutingTrack> routingTracks_;
-
-    float gRoutePitchScale_;
-
+  RouteBaseVars();
+  void reset();
 };
-
-inline const std::vector<Tile*> &
-TileGrid::tiles() const {
-  return tiles_;
-}
 
 
 class RouteBase {
   public:
     RouteBase();
-    RouteBase(odb::dbDatabase* db,
+    RouteBase(RouteBaseVars rbVars,
+        odb::dbDatabase* db,
         std::shared_ptr<NesterovBase> nb,
         std::shared_ptr<Logger> log);
     ~RouteBase();
 
-    // init congestion maps based on given points
+    // temp func
+    void importRoute(const char* fileName);
+    void importEst(const char* fileName);
+
     void updateCongestionMap();
 
   private:
+    RouteBaseVars rbVars_;
     odb::dbDatabase* db_;
 
     std::shared_ptr<NesterovBase> nb_;
@@ -304,8 +310,25 @@ class RouteBase {
 
     TileGrid tg_;
 
+    // from *.route file
+    std::vector<int> verticalCapacity_;
+    std::vector<int> horizontalCapacity_;
+    std::vector<int> minWireWidth_;
+    std::vector<int> minWireSpacing_;
+
+    std::vector<EdgeCapacityInfo> edgeCapacityStor_;
+
+    // from *.est file
+    std::vector<RoutingTrack> routingTracks_;
+
     void init();
     void reset();
+
+    // init congestion maps based on given points
+    void updateSupplies();
+    void updateUsages();
+    void updatePinCount();
+    void updateInflationRatio();
 };
 }
 

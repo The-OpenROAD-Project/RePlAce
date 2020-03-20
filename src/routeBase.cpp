@@ -16,7 +16,7 @@ Tile::Tile()
 : x_(0), y_(0), 
   lx_(0), ly_(0), ux_(0), uy_(0),
   pinCnt_(0),
-  sumUsageH_(0), sumUsageV_(0),
+  usageH_(0), usageV_(0),
   supplyH_(0), supplyV_(0),
   supplyHL_(0), supplyHR_(0),
   supplyVL_(0), supplyVR_(0), 
@@ -54,7 +54,7 @@ Tile::~Tile() {
 void
 Tile::reset() {
   x_ = y_ = lx_ = ly_ = ux_ = uy_ = pinCnt_ = 0;
-  sumUsageH_ = sumUsageV_ = supplyH_ = supplyV_ = 0;
+  usageH_ = usageV_ = supplyH_ = supplyV_ = 0;
   supplyHL_ = supplyHR_ = supplyVL_ = supplyVR_ = 0;
   inflationRatioH_ = inflationRatioV_ = 0;
   inflationRatio_ = 0;
@@ -114,13 +114,13 @@ Tile::usageVR(int layer) const {
 }
 
 float 
-Tile::sumUsageH() const {
-  return sumUsageH_;
+Tile::usageH() const {
+  return usageH_;
 }
 
 float
-Tile::sumUsageV() const {
-  return sumUsageV_; 
+Tile::usageV() const {
+  return usageV_; 
 }
 
 float
@@ -139,6 +139,16 @@ Tile::supplyVL() const {
 float
 Tile::supplyVR() const {
   return supplyVR_;
+}
+
+float
+Tile::supplyH() const {
+  return supplyH_; 
+}
+
+float
+Tile::supplyV() const {
+  return supplyV_;
 }
 
 float 
@@ -257,6 +267,32 @@ Tile::setSupplyVR(float supply) {
 }
 
 void
+Tile::setInflationRatioH(float val) {
+  inflationRatioH_ = val;
+}
+
+void
+Tile::setInflationRatioV(float val) {
+  inflationRatioV_ = val;
+}
+
+void
+Tile::setInflationRatio(float val) {
+  inflationRatio_ = val;
+}
+
+void
+Tile::setInflationArea(float area) {
+  inflationArea_ = area;
+}
+
+void
+Tile::setInflationAreaDelta(float delta) {
+  inflationAreaDelta_ = delta;
+}
+
+
+void
 Tile::setMacroIncluded(bool mode) {
   isMacroIncluded_ = mode;
 }
@@ -267,9 +303,9 @@ Tile::setPinCnt(int cnt) {
 }
 
 void 
-Tile::updateSumUsages() {
-  sumUsageH_ = 0;
-  sumUsageV_ = 0;
+Tile::updateUsages() {
+  usageH_ = 0;
+  usageV_ = 0;
 
   int grSumUsageH = 0, grSumUsageV = 0;
 
@@ -279,21 +315,19 @@ Tile::updateSumUsages() {
   }
 
   // scaled by tileSizeX and tileSizeY
-  sumUsageH_ = static_cast<float>(grSumUsageH) 
+  usageH_ = static_cast<float>(grSumUsageH) 
     * static_cast<float>(ux() - lx());
-  sumUsageV_ = static_cast<float>(grSumUsageV) 
+  usageV_ = static_cast<float>(grSumUsageV) 
     * static_cast<float>(uy() - ly());
 }
 
 
 
 TileGrid::TileGrid()
-  : db_(nullptr), 
-  lx_(0), ly_(0), 
+  : lx_(0), ly_(0), 
   tileCntX_(0), tileCntY_(0), 
   tileSizeX_(0), tileSizeY_(0),
-  tileNumLayers_(0),
-  blockagePorosity_(0), gRoutePitchScale_(1.08) {}
+  numRoutingLayers_(0) {}
 
 TileGrid::~TileGrid() {
   reset();
@@ -301,32 +335,16 @@ TileGrid::~TileGrid() {
 
 void
 TileGrid::reset() {
-  db_ = nullptr;
   lx_ = ly_ = 0; 
   tileCntX_ = tileCntY_ = 0;
   tileSizeX_ = tileSizeY_ = 0;
-  tileNumLayers_ = 0;
-  gRoutePitchScale_ = 1.08;
+  numRoutingLayers_ = 0;
 
   tileStor_.clear();
   tiles_.clear();
-  edgeCapacityStor_.clear();
-  routingTracks_.clear();
 
   tileStor_.shrink_to_fit();
   tiles_.shrink_to_fit();
-  edgeCapacityStor_.shrink_to_fit();
-  routingTracks_.shrink_to_fit();
-}
-
-void
-TileGrid::setDb(odb::dbDatabase* db) {
-  db_ = db;
-}
-
-void
-TileGrid::setNesterovBase(std::shared_ptr<NesterovBase> nb) {
-  nb_ = nb;
 }
 
 void
@@ -367,38 +385,26 @@ TileGrid::setTileSizeY(int tileSizeY) {
 }
 
 void
-TileGrid::initTiles() {
+TileGrid::setNumRoutingLayers(int num) {
+  numRoutingLayers_ = num;
+}
 
+void
+TileGrid::setLx(int lx) {
+  lx_ = lx;
+}
+
+void
+TileGrid::setLy(int ly) {
+  ly_ = ly;
+}
+
+void
+TileGrid::initTiles() {
   log_->infoIntPair("TileLxLy", lx_, ly_);
   log_->infoIntPair("TileSize", tileSizeX_, tileSizeY_);
   log_->infoIntPair("TileCnt", tileCntX_, tileCntY_);
-
-  assert( tileNumLayers_ 
-      == db_->getTech()->getRoutingLayerCount() );
-
-  int numHTracks = 0;
-  int numVTracks = 0;
-  for(int i=0; i<tileNumLayers_; i++) {
-    numVTracks += 
-      verticalCapacity_[i] 
-      / (minWireWidth_[i] + minWireSpacing_[i]);
-    numHTracks +=
-      horizontalCapacity_[i] 
-      / (minWireWidth_[i] + minWireSpacing_[i]);
-  }
-
-  log_->infoInt("NumHTracks", numHTracks);
-  log_->infoInt("NumVTracks", numVTracks);
-
-  // A bit curious why gRoutePitchScale is set as 1.08 ????
-  //
-  int pitchH = std::round(static_cast<float>(tileSizeY_) 
-      / numHTracks * gRoutePitchScale_);
-  int pitchV = std::round(static_cast<float>(tileSizeX_) 
-      / numVTracks * gRoutePitchScale_);
-
-  log_->infoInt("PitchH", pitchH );
-  log_->infoInt("PitchV", pitchV );
+  log_->infoInt("numRoutingLayers", numRoutingLayers_);
 
   // 2D tile grid structure init
   int x = lx_, y = ly_;
@@ -407,7 +413,7 @@ TileGrid::initTiles() {
   for(auto& tile : tileStor_) {
     tile = Tile(idxX, idxY, x, y, 
         x + tileSizeX_, y + tileSizeY_,
-        tileNumLayers_); 
+        numRoutingLayers_); 
 
     x += tileSizeX_;
     idxX += 1;
@@ -419,115 +425,9 @@ TileGrid::initTiles() {
       idxX = 0;
     }
 
-    tile.setSupplyHL( tile.area() / pitchH );
-    tile.setSupplyHR( tile.supplyHL() );
-
-    tile.setSupplyVL( tile.area() / pitchV );
-    tile.setSupplyVR( tile.supplyVL() );
-  
     tiles_.push_back( &tile );
   }
   log_->infoInt("NumTiles", tiles_.size());
-
-  // apply edgeCapacityInfo from *.route
-  // update supplyH/V
-  for(auto& ecInfo : edgeCapacityStor_) {
-    bool isHorizontal = (ecInfo.ly == ecInfo.uy);
-    
-    // l : lower
-    // u : upper
-    // index
-    int lx = std::min( ecInfo.lx, ecInfo.ux );
-    int ux = std::max( ecInfo.lx, ecInfo.ux );
-    int ly = std::min( ecInfo.ly, ecInfo.uy );
-    int uy = std::max( ecInfo.ly, ecInfo.uy );
-
-    // Note that ecInfo.ll == ecInfo.ul
-    assert( ecInfo.ll == ecInfo.ul );
-    int layer = ecInfo.ll - 1;
-    int capacity = ecInfo.capacity;
-
-    Tile* lTile = tiles()[lx * tileCntY() + ly];
-    Tile* uTile = tiles()[ux * tileCntY() + uy];
-
-    if( isHorizontal ) {
-      // lower -> right edge
-      lTile->setSupplyHR( 
-          lTile->supplyHR() - 
-          (horizontalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tileSizeX_ );
-
-      // upper -> left edge
-      uTile->setSupplyHL(
-          uTile->supplyHL() -
-          (horizontalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tileSizeX_ );
-
-      // lower layer check
-      if( layer <= 4 && horizontalCapacity_[layer] > 0 &&
-          capacity < 0.01 ) {
-        lTile->setMacroIncluded(true);
-      }
-    }
-    else {
-      // lower -> right edge
-      lTile->setSupplyVR( 
-          lTile->supplyVR() - 
-          (verticalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tileSizeY_ );
-
-      // upper -> left edge
-      uTile->setSupplyVL(
-          uTile->supplyVL() -
-          (verticalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tileSizeY_ );
-
-      // lower layer check
-      if( layer <= 4 && verticalCapacity_[layer] > 0 &&
-          capacity < 0.01 ) {
-        lTile->setMacroIncluded(true);
-      }
-    }
-  } 
-  
-  // fill capacity
-  std::vector<int> capacity(tileNumLayers_, 0);
-  for(int i=0; i<tileNumLayers_; i++) {
-    if( horizontalCapacity_[i] > 0 ) {
-      capacity[i] = horizontalCapacity_[i]; 
-    }
-    else {
-      capacity[i] = verticalCapacity_[i];
-    }
-  }
-
-  for(auto& tile : tiles_) {
-    // set H, V from L, R
-    tile->setSupplyH( std::fmin( tile->supplyHL(), tile->supplyHR() ) );
-    tile->setSupplyV( std::fmin( tile->supplyVL(), tile->supplyVR() ) );
-
-    // set capacity initially
-    tile->setCapacity( capacity );
-  }
-  
-  // apply edgeCapacityInfo from *.route
-  // update blockage from possible capacity
-  for(auto& ecInfo : edgeCapacityStor_) {
-    
-    int lx = std::min( ecInfo.lx, ecInfo.ux );
-    int ly = std::min( ecInfo.ly, ecInfo.uy );
-    int layer = ecInfo.ll - 1;
-    int capacity = ecInfo.capacity;
-    
-    Tile* tile = tiles()[lx * tileCntY() + ly];
-    tile->setBlockage(layer, 
-        tile ->blockage(layer) 
-        + tile->capacity(layer) - capacity);
-  }
 }
 
 int
@@ -570,14 +470,137 @@ TileGrid::tileSizeY() const {
   return tileSizeY_;
 }
 
+int
+TileGrid::numRoutingLayers() const {
+  return numRoutingLayers_;
+}
+
+/////////////////////////////////////////////
+// EdgeCapacityInfo 
+//
+EdgeCapacityInfo::EdgeCapacityInfo()
+: lx(0), ly(0), ll(0), ux(0), uy(0), ul(0), capacity(0) {}
+
+EdgeCapacityInfo::EdgeCapacityInfo(int lx1, int ly1, int ll1,
+  int ux1, int uy1, int ul1, int capacity1)
+  : lx(lx1), ly(ly1), ll(ll1), ux(ux1), uy(uy1), ul(ul1), capacity(capacity1) {}
+
+
+/////////////////////////////////////////////
+// RoutingTrack  
+//
+RoutingTrack::RoutingTrack() 
+: lx(0), ly(0), ux(0), uy(0), layer(0), gNet(nullptr) {}
+
+RoutingTrack::RoutingTrack(int lx1, int ly1, int ux1, int uy1, int layer1, GNet* gNet1) 
+: RoutingTrack() {
+  lx = lx1;
+  ly = ly1;
+  ux = ux1;
+  uy = uy1;
+  layer = layer1;
+  gNet = gNet1;
+}
+
+
+/////////////////////////////////////////////
+// RouteBaseVars
+
+RouteBaseVars::RouteBaseVars()
+  : gRoutePitchScale(1.08), 
+  pinCoef(1.66), 
+  maxInflationRatio(2.5), 
+  blockagePorosity(0) {}
+
+void 
+RouteBaseVars::reset() {
+  gRoutePitchScale = 1.08;
+  pinCoef = 1.66;
+  maxInflationRatio = 2.5;
+  blockagePorosity = 0;
+}
+
+/////////////////////////////////////////////
+// RouteBase
+
+RouteBase::RouteBase()
+  : rbVars_(), 
+  db_(nullptr), nb_(nullptr), log_(nullptr) {}
+
+RouteBase::RouteBase(
+    RouteBaseVars rbVars, 
+    odb::dbDatabase* db, 
+    std::shared_ptr<NesterovBase> nb,
+    std::shared_ptr<Logger> log)
+  : RouteBase() {
+  rbVars_ = rbVars;
+  db_ = db;
+  nb_ = nb;
+  log_ = log;
+
+  init();
+}
+
+RouteBase::~RouteBase() {
+  reset();
+}
+
+void 
+RouteBase::reset() {
+  rbVars_.reset();
+  db_ = nullptr;
+  nb_ = nullptr;
+  log_ = nullptr;
+
+  verticalCapacity_.clear();
+  horizontalCapacity_.clear();
+  minWireWidth_.clear();
+  minWireSpacing_.clear();
+  edgeCapacityStor_.clear();
+  routingTracks_.clear();
+
+  verticalCapacity_.shrink_to_fit();
+  horizontalCapacity_.shrink_to_fit();
+  minWireWidth_.shrink_to_fit();
+  minWireSpacing_.shrink_to_fit();
+  edgeCapacityStor_.shrink_to_fit();
+  routingTracks_.shrink_to_fit();
+}
+
+void
+RouteBase::init() {
+  tg_.setLogger(log_);
+
+  importRoute("input.route");
+  log_->infoString("input.route parsing is done");
+
+  importEst("out.guide.est");
+  log_->infoString("out.guide.est parsing is done");
+
+  tg_.initTiles();
+}
+
+void
+RouteBase::updateCongestionMap() {
+  updateSupplies();
+  updateUsages();
+  updatePinCount();
+  updateInflationRatio();
+
+  log_->infoString("Congestion Map building is done");
+}
 
 // fill 
+//
+// TileGrids' 
 // lx_ ly_ 
 // tileCntX_ tileCntY_
 // tileSizeX_ tileSizeY_ 
 //
+// rbVars_' 
 // blockagePorosity_
 //
+// RouteBases' 
 // verticalCapacity_
 // horizontalCapacity_
 //
@@ -588,7 +611,7 @@ TileGrid::tileSizeY() const {
 
 // following code is temp!
 void
-TileGrid::initFromRoute(const char* fileName) {
+RouteBase::importRoute(const char* fileName) {
   char *token = NULL;
   char temp[255];
   char line[255];
@@ -601,6 +624,9 @@ TileGrid::initFromRoute(const char* fileName) {
     log_->error("Cannot open " + string(fileName) + " file!", 999);
     exit(1);
   }
+  
+
+  int tileCntX = 0, tileCntY = 0, numRoutingLayers = 0;
 
   while(!feof(fp)) {
     *line = '\0';
@@ -629,14 +655,18 @@ TileGrid::initFromRoute(const char* fileName) {
     if(beolFlag) {
       sscanf(line, "%s :%*s", temp);
       if(strcmp(temp, "Grid") == 0) {
-        sscanf(line, "%*s : %d %d %d", &tileCntX_, &tileCntY_, &tileNumLayers_);
+
+        sscanf(line, "%*s : %d %d %d", &tileCntX, &tileCntY, &numRoutingLayers);
+
+        tg_.setTileCnt(tileCntX, tileCntY);
+        tg_.setNumRoutingLayers(numRoutingLayers);
       }
       else if(strcmp(temp, "VerticalCapacity") == 0) {
         verticalCapacity_.clear();
         token = strtok(line, " \t\n");
         token = strtok(NULL, " \t\n");
         token = strtok(NULL, " \t\n");
-        for(int i = 0; i < tileNumLayers_; i++) {
+        for(int i = 0; i < numRoutingLayers; i++) {
           verticalCapacity_.push_back(atoi(token));
           token = strtok(NULL, " \t\n");
         }
@@ -646,7 +676,7 @@ TileGrid::initFromRoute(const char* fileName) {
         token = strtok(line, " \t\n");
         token = strtok(NULL, " \t\n");
         token = strtok(NULL, " \t\n");
-        for(int i = 0; i < tileNumLayers_; i++) {
+        for(int i = 0; i < numRoutingLayers; i++) {
           horizontalCapacity_.push_back(atoi(token));
           token = strtok(NULL, " \t\n");
         }
@@ -656,8 +686,9 @@ TileGrid::initFromRoute(const char* fileName) {
         token = strtok(line, " \t\n");
         token = strtok(NULL, " \t\n");
         token = strtok(NULL, " \t\n");
-        for(int i = 0; i < tileNumLayers_; i++) {
+        for(int i = 0; i < numRoutingLayers; i++) {
           minWireWidth_.push_back(atof(token));
+
           token = strtok(NULL, " \t\n");
         }
       }
@@ -666,7 +697,7 @@ TileGrid::initFromRoute(const char* fileName) {
         token = strtok(line, " \t\n");
         token = strtok(NULL, " \t\n");
         token = strtok(NULL, " \t\n");
-        for(int i = 0; i < tileNumLayers_; i++) {
+        for(int i = 0; i < numRoutingLayers; i++) {
           minWireSpacing_.push_back(atof(token));
           token = strtok(NULL, " \t\n");
         }
@@ -675,29 +706,38 @@ TileGrid::initFromRoute(const char* fileName) {
         token = strtok(line, " \t\n");
         token = strtok(NULL, " \t\n");
         token = strtok(NULL, " \t\n");
-        for(int i = 0; i < tileNumLayers_; i++) {
+        for(int i = 0; i < numRoutingLayers; i++) {
           token = strtok(NULL, " \t\n");
         }
       }
       else if(strcmp(temp, "GridOrigin") == 0) {
         double temp_gridLLx, temp_gridLLy;
         sscanf(line, "%*s : %lf %lf", &temp_gridLLx, &temp_gridLLy);
-        lx_ = temp_gridLLx;
-        ly_ = temp_gridLLy;
+
+        int lx = 0, ly = 0;
+        lx = static_cast<int>(round(temp_gridLLx));
+        ly = static_cast<int>(round(temp_gridLLy));
+
+        tg_.setLx(lx);
+        tg_.setLy(ly);
       }
       else if(strcmp(temp, "TileSize") == 0) {
         double temp_tileWidth, temp_tileHeight;
         sscanf(line, "%*s : %lf %lf", &temp_tileWidth, &temp_tileHeight);
-        tileSizeX_ = temp_tileWidth;
-        tileSizeY_ = temp_tileHeight;
+        int tileSizeX = 0, tileSizeY = 0;
+        tileSizeX = static_cast<int>(round(temp_tileWidth));
+        tileSizeY = static_cast<int>(round(temp_tileHeight));
+
+        tg_.setTileSize(tileSizeX, tileSizeY);
       }
       else if(strcmp(temp, "BlockagePorosity") == 0) {
         double temp_blockagePorosity;
         sscanf(line, "%*s : %lf", &temp_blockagePorosity);
-        blockagePorosity_ = (float)temp_blockagePorosity;
+        // blockagePorosity changes..!
+        rbVars_.blockagePorosity 
+          = static_cast<float>(temp_blockagePorosity);
       }
     }
-
 
     // No need to care
     if(blockageFlag) {
@@ -714,7 +754,7 @@ TileGrid::initFromRoute(const char* fileName) {
 // Fill routingTracks_;
 // following code is temp!
 void 
-TileGrid::importEst(const char* fileName) {
+RouteBase::importEst(const char* fileName) {
 
   // *.est importing.
   //
@@ -762,19 +802,153 @@ TileGrid::importEst(const char* fileName) {
         if(ll != ul)
           continue;
 
-        odb::dbNet* dbNet = db_->getChip()->getBlock()->findNet(netName);
+        odb::dbNet* dbNet = 
+          db_->getChip()->getBlock()->findNet(netName);
         //log_->infoString("net " + string(netName) + " " + string(dbNet->getConstName()));
         GNet* gNet = nb_->dbToNb(dbNet);
-        routingTracks_.push_back(RoutingTrack(lx, ly, ux, uy, ll, gNet));
+        routingTracks_.push_back(
+            RoutingTrack(lx, ly, ux, uy, ll, gNet));
       }
     }
+  }
+}
+
+void
+RouteBase::updateSupplies() {
+  int numHTracks = 0;
+  int numVTracks = 0;
+  for(int i=0; i<tg_.numRoutingLayers(); i++) {
+    numVTracks += 
+      verticalCapacity_[i] 
+      / (minWireWidth_[i] + minWireSpacing_[i]);
+    numHTracks +=
+      horizontalCapacity_[i] 
+      / (minWireWidth_[i] + minWireSpacing_[i]);
+  }
+  
+  log_->infoInt("NumHTracks", numHTracks);
+  log_->infoInt("NumVTracks", numVTracks);
+  
+  int pitchH = std::round(static_cast<float>(tg_.tileSizeY()) 
+      / numHTracks * rbVars_.gRoutePitchScale);
+  int pitchV = std::round(static_cast<float>(tg_.tileSizeX()) 
+      / numVTracks * rbVars_.gRoutePitchScale);
+
+  for(auto& tile : tg_.tiles()) {
+    tile->setSupplyHL( tile->area() / pitchH );
+    tile->setSupplyHR( tile->supplyHL() );
+    tile->setSupplyVL( tile->area() / pitchV );
+    tile->setSupplyVR( tile->supplyVL() );
+  }
+
+  log_->infoInt("PitchH", pitchH );
+  log_->infoInt("PitchV", pitchV );
+
+  // apply edgeCapacityInfo from *.route
+  // update supplyH/V
+  for(auto& ecInfo : edgeCapacityStor_) {
+    bool isHorizontal = (ecInfo.ly == ecInfo.uy);
+    
+    // l : lower
+    // u : upper
+    // index
+    int lx = std::min( ecInfo.lx, ecInfo.ux );
+    int ux = std::max( ecInfo.lx, ecInfo.ux );
+    int ly = std::min( ecInfo.ly, ecInfo.uy );
+    int uy = std::max( ecInfo.ly, ecInfo.uy );
+
+    // Note that ecInfo.ll == ecInfo.ul
+    assert( ecInfo.ll == ecInfo.ul );
+    int layer = ecInfo.ll - 1;
+    int capacity = ecInfo.capacity;
+
+    Tile* lTile = tg_.tiles()[lx * tg_.tileCntY() + ly];
+    Tile* uTile = tg_.tiles()[ux * tg_.tileCntY() + uy];
+
+    if( isHorizontal ) {
+      // lower -> right edge
+      lTile->setSupplyHR( 
+          lTile->supplyHR() - 
+          (horizontalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
+          tg_.tileSizeX() );
+
+      // upper -> left edge
+      uTile->setSupplyHL(
+          uTile->supplyHL() -
+          (horizontalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
+          tg_.tileSizeX() );
+
+      // lower layer check
+      if( layer <= 4 && horizontalCapacity_[layer] > 0 &&
+          capacity < 0.01 ) {
+        lTile->setMacroIncluded(true);
+      }
+    }
+    else {
+      // lower -> right edge
+      lTile->setSupplyVR( 
+          lTile->supplyVR() - 
+          (verticalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
+          tg_.tileSizeY() );
+
+      // upper -> left edge
+      uTile->setSupplyVL(
+          uTile->supplyVL() -
+          (verticalCapacity_[layer] - capacity) /
+          (minWireWidth_[layer] + minWireSpacing_[layer]) /
+          tg_.tileSizeY() );
+
+      // lower layer check
+      if( layer <= 4 && verticalCapacity_[layer] > 0 &&
+          capacity < 0.01 ) {
+        lTile->setMacroIncluded(true);
+      }
+    }
+  } 
+  
+  // fill capacity
+  std::vector<int> capacity(tg_.numRoutingLayers(), 0);
+  for(int i=0; i<tg_.numRoutingLayers(); i++) {
+    if( horizontalCapacity_[i] > 0 ) {
+      capacity[i] = horizontalCapacity_[i]; 
+    }
+    else {
+      capacity[i] = verticalCapacity_[i];
+    }
+  }
+
+  for(auto& tile : tg_.tiles()) {
+    // set H, V from L, R
+    tile->setSupplyH( std::fmin( tile->supplyHL(), tile->supplyHR() ) );
+    tile->setSupplyV( std::fmin( tile->supplyVL(), tile->supplyVR() ) );
+
+    // set capacity initially
+    tile->setCapacity( capacity );
+  }
+  
+  // apply edgeCapacityInfo from *.route
+  // update blockage from possible capacity
+  for(auto& ecInfo : edgeCapacityStor_) {
+    
+    int lx = std::min( ecInfo.lx, ecInfo.ux );
+    int ly = std::min( ecInfo.ly, ecInfo.uy );
+    int layer = ecInfo.ll - 1;
+    int capacity = ecInfo.capacity;
+    
+    Tile* tile = tg_.tiles()[lx * tg_.tileCntY() + ly];
+    tile->setBlockage(layer, 
+        tile ->blockage(layer) 
+        + tile->capacity(layer) - capacity);
   }
 }
 
 
 // update tiles' usageHR, usageHL, usageVR, usage VL
 void
-TileGrid::updateUsages() {
+RouteBase::updateUsages() {
   for (auto& rTrack : routingTracks_) {
     bool isHorizontal = ( rTrack.ly == rTrack.uy );
 
@@ -787,28 +961,28 @@ TileGrid::updateUsages() {
     int layer = rTrack.layer - 1;
 
     // getIdx from coordinates.
-    int lIdxX = (lx - lx_)/tileSizeX();
-    int lIdxY = (ly - ly_)/tileSizeY();
-    int uIdxX = (ux - lx_)/tileSizeX();
-    int uIdxY = (uy - ly_)/tileSizeY();
+    int lIdxX = (lx - tg_.lx())/tg_.tileSizeX();
+    int lIdxY = (ly - tg_.ly())/tg_.tileSizeY();
+    int uIdxX = (ux - tg_.lx())/tg_.tileSizeX();
+    int uIdxY = (uy - tg_.ly())/tg_.tileSizeY();
 
 
-    if( lIdxX < 0 || lIdxX >= tileCntX() ) {
+    if( lIdxX < 0 || lIdxX >= tg_.tileCntX() ) {
       log_->error("lIdxX is wrong. Check the *.est file. lIdx: " + to_string(lIdxX), 100);
     }
-    if( lIdxY < 0 || lIdxY >= tileCntY() ) {
+    if( lIdxY < 0 || lIdxY >= tg_.tileCntY() ) {
       log_->error("lIdxY is wrong. Check the *.est file. lIdxY: " + to_string(lIdxY), 100);
     }
-    if( uIdxX < 0 || uIdxX >= tileCntX() ) {
+    if( uIdxX < 0 || uIdxX >= tg_.tileCntX() ) {
       log_->error("uIdxX is wrong. Check the *.est file. uIdxX: " + to_string(uIdxX), 100);
     }
-    if( uIdxY < 0 || uIdxY >= tileCntY() ) {
+    if( uIdxY < 0 || uIdxY >= tg_.tileCntY() ) {
       log_->error("uIdxY is wrong. Check the *.est file. uIdxY: " + to_string(uIdxY), 100);
     }
    
     // get lTile and uTile using lx, ly, ux, uy 
-    Tile* lTile = tiles()[lIdxX * tileCntY() + lIdxY];
-    Tile* uTile = tiles()[uIdxX * tileCntY() + uIdxY];
+    Tile* lTile = tg_.tiles()[lIdxX * tg_.tileCntY() + lIdxY];
+    Tile* uTile = tg_.tiles()[uIdxX * tg_.tileCntY() + uIdxY];
 
     // horizontal
     if( isHorizontal ) {
@@ -827,21 +1001,21 @@ TileGrid::updateUsages() {
   }
 
   
-  // update sumUsageH and sumUsageV
-  for(auto& tile : tiles_) {
-    tile->updateSumUsages();
+  // update usageH and usageV
+  for(auto& tile : tg_.tiles()) {
+    tile->updateUsages();
   }
 
 }
 
 // update pin density on tiles
 void
-TileGrid::updatePinCount() {
+RouteBase::updatePinCount() {
   for(auto& gCell : nb_->gCells()) {
     for(auto& gPin : gCell->gPins()) {
-      int idxX = (gPin->cx() - lx_)/tileSizeX_;
-      int idxY = (gPin->cy() - ly_)/tileSizeY_;
-      Tile* tile = tiles()[idxX * tileCntY() + idxY];
+      int idxX = (gPin->cx() - tg_.lx())/tg_.tileSizeX();
+      int idxY = (gPin->cy() - tg_.ly())/tg_.tileSizeY();
+      Tile* tile = tg_.tiles()[idxX * tg_.tileCntY() + idxY];
       tile->setPinCnt( tile->pinCnt() + 1 );
     }
   }
@@ -849,82 +1023,15 @@ TileGrid::updatePinCount() {
 
 // inflationRatio
 void
-TileGrid::updateInflationRatio() {
-  for(auto& tile : tiles_) {
+RouteBase::updateInflationRatio() {
+  for(auto& tile : tg_.tiles()) {
+    tile->setInflationRatioV( 
+        std::fmax(
+          tile->inflationRatioV(), 
+          tile->usageH() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyH() 
+          ));
+//    tile->set
   }
-}
-
-
-EdgeCapacityInfo::EdgeCapacityInfo()
-: lx(0), ly(0), ll(0), ux(0), uy(0), ul(0), capacity(0) {}
-
-EdgeCapacityInfo::EdgeCapacityInfo(int lx1, int ly1, int ll1,
-  int ux1, int uy1, int ul1, int capacity1)
-  : lx(lx1), ly(ly1), ll(ll1), ux(ux1), uy(uy1), ul(ul1), capacity(capacity1) {}
-
-// RoutingTrack structure
-RoutingTrack::RoutingTrack() 
-: lx(0), ly(0), ux(0), uy(0), layer(0), gNet(nullptr) {}
-
-RoutingTrack::RoutingTrack(int lx1, int ly1, int ux1, int uy1, int layer1, GNet* gNet1) 
-: RoutingTrack() {
-  lx = lx1;
-  ly = ly1;
-  ux = ux1;
-  uy = uy1;
-  layer = layer1;
-  gNet = gNet1;
-}
-
-
-
-
-RouteBase::RouteBase()
-  : db_(nullptr), nb_(nullptr), log_(nullptr) {}
-
-RouteBase::RouteBase(
-    odb::dbDatabase* db, 
-    std::shared_ptr<NesterovBase> nb,
-    std::shared_ptr<Logger> log)
-  : RouteBase() {
-  db_ = db;
-  nb_ = nb;
-  log_ = log;
-
-  init();
-}
-
-RouteBase::~RouteBase() {
-  reset();
-}
-
-void 
-RouteBase::reset() {
-  db_ = nullptr;
-  nb_ = nullptr;
-  log_ = nullptr;
-}
-
-void
-RouteBase::init() {
-  tg_.setDb(db_);
-  tg_.setNesterovBase(nb_);
-  tg_.setLogger(log_);
-
-  tg_.initFromRoute("input.route");
-  log_->infoString("input.route parsing is done");
-
-  tg_.importEst("out.guide.est");
-  log_->infoString("out.guide.est parsing is done");
-
-}
-
-void
-RouteBase::updateCongestionMap() {
-  tg_.initTiles();
-  tg_.updateUsages();
-  tg_.updatePinCount();
-  tg_.updateInflationRatio();
 }
 
 

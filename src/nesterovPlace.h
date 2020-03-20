@@ -39,6 +39,7 @@ public:
   NesterovPlace(NesterovPlaceVars npVars,
       std::shared_ptr<PlacerBase> pb,
       std::shared_ptr<NesterovBase> nb,
+      std::shared_ptr<RouteBase> rb,
       std::shared_ptr<Logger> log);
   ~NesterovPlace();
 
@@ -73,7 +74,7 @@ private:
   std::shared_ptr<PlacerBase> pb_;
   std::shared_ptr<NesterovBase> nb_;
   std::shared_ptr<Logger> log_;
-  std::unique_ptr<RouteBase> rb_;
+  std::shared_ptr<RouteBase> rb_;
   NesterovPlaceVars npVars_;
 
   // SLP is Step Length Prediction.

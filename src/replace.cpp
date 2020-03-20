@@ -3,6 +3,7 @@
 #include "nesterovPlace.h"
 #include "placerBase.h"
 #include "nesterovBase.h"
+#include "routeBase.h" 
 #include "logger.h"
 #include <iostream>
 
@@ -105,6 +106,7 @@ void Replace::doNesterovPlace() {
   if( !pb_ ) {
     pb_ = std::make_shared<PlacerBase>(db_, log_);
   }
+  
 
   NesterovBaseVars nbVars;
   nbVars.targetDensity = density_;
@@ -120,6 +122,10 @@ void Replace::doNesterovPlace() {
   }
 
   nb_ = std::make_shared<NesterovBase>(nbVars, pb_, log_);
+  
+
+  RouteBaseVars rbVars;
+  rb_ = std::make_shared<RouteBase>(rbVars, db_, nb_, log_);
 
   NesterovPlaceVars npVars;
 
@@ -133,7 +139,7 @@ void Replace::doNesterovPlace() {
   npVars.timingDrivenMode = timingDrivenMode_;
   npVars.routabilityDrivenMode = routabilityDrivenMode_;
 
-  std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_, log_));
+  std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_, rb_, log_));
   np_ = std::move(np);
 
   np_->doNesterovPlace();

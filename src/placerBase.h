@@ -301,7 +301,7 @@ private:
 
   int64_t placeInstsArea_;
   int64_t nonPlaceInstsArea_;
-  
+
   // macroInstsArea_ + stdInstsArea_ = placeInstsArea_;
   // macroInstsArea_ should be separated
   // because of target_density tuning

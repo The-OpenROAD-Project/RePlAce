@@ -48,7 +48,7 @@ NesterovPlaceVars::reset() {
 }
 
 NesterovPlace::NesterovPlace() 
-  : pb_(nullptr), nb_(nullptr), log_(nullptr), npVars_(), 
+  : pb_(nullptr), nb_(nullptr), rb_(nullptr), log_(nullptr), npVars_(), 
   wireLengthGradSum_(0), 
   densityGradSum_(0),
   stepLength_(0),
@@ -63,11 +63,13 @@ NesterovPlace::NesterovPlace(
     NesterovPlaceVars npVars,
     std::shared_ptr<PlacerBase> pb, 
     std::shared_ptr<NesterovBase> nb,
+    std::shared_ptr<RouteBase> rb,
     std::shared_ptr<Logger> log) 
 : NesterovPlace() {
   npVars_ = npVars;
   pb_ = pb;
   nb_ = nb;
+  rb_ = rb;
   log_ = log;
   init();
 }
@@ -193,9 +195,7 @@ void NesterovPlace::init() {
   log_->procEnd("NesterovInit", 3);
 
   if( npVars_.routabilityDrivenMode ) {
-    // make_unique
-    std::unique_ptr<RouteBase> rb(new RouteBase(pb_->db(), nb_, log_));
-    rb_ = std::move(rb);
+    // init routeBase structure 
     rb_->updateCongestionMap();
   }
 }

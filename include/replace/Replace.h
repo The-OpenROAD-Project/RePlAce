@@ -14,6 +14,7 @@ namespace replace {
 
 class PlacerBase;
 class NesterovBase;
+class RouteBase;
 
 class InitialPlace;
 class NesterovPlace;
@@ -69,6 +70,7 @@ class Replace
 
     std::shared_ptr<PlacerBase> pb_;
     std::shared_ptr<NesterovBase> nb_;
+    std::shared_ptr<RouteBase> rb_;
 
     std::unique_ptr<InitialPlace> ip_;
     std::unique_ptr<NesterovPlace> np_;

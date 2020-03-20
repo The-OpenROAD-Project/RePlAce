@@ -696,8 +696,9 @@ private:
   void updateBinsNonPlaceArea();
 };
 
-inline const std::vector<Bin*> & BinGrid::bins() const {
-  return bins_; 
+inline const std::vector<Bin*>&
+BinGrid::bins() const {
+  return bins_;
 }
 
 class NesterovBaseVars {
@@ -718,7 +719,8 @@ public:
 class NesterovBase {
 public:
   NesterovBase();
-  NesterovBase(NesterovBaseVars nbVars, std::shared_ptr<PlacerBase> pb,
+  NesterovBase(NesterovBaseVars nbVars,
+      std::shared_ptr<PlacerBase> pb,
       std::shared_ptr<Logger> log);
   ~NesterovBase();
 
@@ -759,8 +761,8 @@ public:
   int binCntY() const;
   int binSizeX() const;
   int binSizeY() const;
-  
-  const std::vector<Bin*> & bins() const; 
+
+  const std::vector<Bin*> & bins() const;
 
   int64_t overflowArea() const;
   float sumPhi() const;
