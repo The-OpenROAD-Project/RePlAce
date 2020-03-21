@@ -10,7 +10,7 @@ namespace replace {
 using namespace odb;
 using namespace std;
 
-static odb::adsRect 
+static odb::Rect 
 getCoreRectFromDb(dbSet<odb::dbRow> &rows);
 
 static int 
@@ -515,7 +515,7 @@ Die::Die() :
   coreLx_(0), coreLy_(0), coreUx_(0), coreUy_(0) {}
 
 Die::Die(odb::dbBox* dieBox, 
-    odb::adsRect* coreRect) : Die() {
+    odb::Rect* coreRect) : Die() {
   setDieBox(dieBox);
   setCoreBox(coreRect);
 }
@@ -534,7 +534,7 @@ Die::setDieBox(odb::dbBox* dieBox) {
 }
 
 void
-Die::setCoreBox(odb::adsRect* coreRect) {
+Die::setCoreBox(odb::Rect* coreRect) {
   coreLx_ = coreRect->xMin();
   coreLy_ = coreRect->yMin();
   coreUx_ = coreRect->xMax();
@@ -613,7 +613,7 @@ PlacerBase::init() {
   
   // die-core area update
   dbSet<dbRow> rows = block->getRows();
-  odb::adsRect coreRect = getCoreRectFromDb(rows);
+  odb::Rect coreRect = getCoreRectFromDb(rows);
   die_ = Die(block->getBBox(), &coreRect);
  
   // siteSize update 
@@ -782,7 +782,7 @@ PlacerBase::initInstsForFragmentedRow() {
 
   // fill in rows' bbox
   for(dbRow* row : rows) {
-    adsRect rect;
+    Rect rect;
     row->getBBox(rect);
     
     std::pair<int, int> pairX 
@@ -958,13 +958,13 @@ PlacerBase::printInfo() const {
 }
 
 
-static odb::adsRect 
+static odb::Rect 
 getCoreRectFromDb(dbSet<odb::dbRow> &rows) {
   int minX = INT_MAX, minY = INT_MAX;
   int maxX = INT_MIN, maxY = INT_MIN;
 
   for(dbRow* row : rows) {
-    adsRect rowRect;
+    Rect rowRect;
     row->getBBox( rowRect );
 
     minX = std::min(rowRect.xMin(), minX);
@@ -972,7 +972,7 @@ getCoreRectFromDb(dbSet<odb::dbRow> &rows) {
     maxX = std::max(rowRect.xMax(), maxX);
     maxY = std::max(rowRect.yMax(), maxY);
   }
-  return odb::adsRect(minX, minY, maxX, maxY);
+  return odb::Rect(minX, minY, maxX, maxY);
 }
 
 // https://stackoverflow.com/questions/33333363/built-in-mod-vs-custom-mod-function-improve-the-performance-of-modulus-op

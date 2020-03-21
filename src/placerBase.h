@@ -18,7 +18,7 @@ class dbSigType;
 
 class dbBox;
 
-class adsRect;
+class Rect;
 }
 
 namespace replace {
@@ -194,11 +194,11 @@ private:
 class Die {
 public:
   Die();
-  Die(odb::dbBox* dieBox, odb::adsRect* coreRect);
+  Die(odb::dbBox* dieBox, odb::Rect* coreRect);
   ~Die();
 
   void setDieBox(odb::dbBox* dieBox);
-  void setCoreBox(odb::adsRect* coreBox);
+  void setCoreBox(odb::Rect* coreBox);
 
   int dieLx() const { return dieLx_; }
   int dieLy() const { return dieLy_; }
