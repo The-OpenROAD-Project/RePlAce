@@ -1056,6 +1056,8 @@ RouteBase::updateInflationRatio() {
     maxInflH = std::max(maxInflH, tile->inflationRatioH());
 
     log_->infoIntPair("xy", tile->x(), tile->y()); 
+    log_->infoIntPair("minxy", tile->lx(), tile->ly());
+    log_->infoIntPair("maxxy", tile->ux(), tile->uy());
     log_->infoFloatPair("usageHV", 
         tile->usageH(), tile->usageV()); 
     log_->infoFloatPair("supplyHV", 
@@ -1064,6 +1066,7 @@ RouteBase::updateInflationRatio() {
     log_->infoFloatPair("calcInflRatioHV", 
           tile->usageV() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyV(),
           tile->usageH() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyH());
+    std::cout << std::endl;
   }
   log_->infoFloatPair("MaxInflationRatioHV", maxInflH, maxInflV);
 }
