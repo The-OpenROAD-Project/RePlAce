@@ -510,6 +510,7 @@ RouteBaseVars::RouteBaseVars()
   : gRoutePitchScale(1.09), 
   edgeAdjustmentCoef(1.19),
   pinCoef(1.66), 
+  inflationRatioCoef(2.33), 
   maxInflationRatio(2.5), 
   blockagePorosity(0) {}
 
@@ -518,6 +519,7 @@ RouteBaseVars::reset() {
   gRoutePitchScale = 1.09;
   edgeAdjustmentCoef = 1.19;
   pinCoef = 1.66;
+  inflationRatioCoef = 2.33;
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
 }
@@ -1029,11 +1031,14 @@ RouteBase::updateInflationRatio() {
   float maxInflV = 0, maxInflH = 0;
 
   for(auto& tile : tg_.tiles()) {
+
+    float newRatioV = (tile->usageH() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyH();
+    newRatioV = pow(newRatioV, rbVars_.inflationRatioCoef);
+
     // Vertical InflationRatio
     tile->setInflationRatioV( 
         std::fmax(
-          tile->inflationRatioV(), 
-          (tile->usageH() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyH()));
+          tile->inflationRatioV(), newRatioV));
 
     // upper bound
     tile->setInflationRatioV(
@@ -1043,11 +1048,13 @@ RouteBase::updateInflationRatio() {
 
     maxInflV = std::max(maxInflV, tile->inflationRatioV());
     
+    float newRatioH = (tile->usageV() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyV();
+    newRatioH = pow(newRatioH, rbVars_.inflationRatioCoef);
+
     // Horizontal InflationRatio
     tile->setInflationRatioH( 
         std::fmax(
-          tile->inflationRatioH(), 
-          (tile->usageV() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyV()));
+          tile->inflationRatioH(), newRatioH));
 
     // upper bound
     tile->setInflationRatioH(

@@ -279,6 +279,7 @@ public:
   float gRoutePitchScale;
   float edgeAdjustmentCoef;
   float pinCoef;
+  float inflationRatioCoef;
   float maxInflationRatio;
   float blockagePorosity;
 
