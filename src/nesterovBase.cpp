@@ -848,7 +848,10 @@ BinGrid::getMinMaxIdxX(Instance* inst) {
    ( fastModulo((inst->ux() - lx()), binSizeX_) == 0)? 
    (inst->ux() - lx()) / binSizeX_ 
    : (inst->ux() - lx()) / binSizeX_ + 1;
-  return std::make_pair(lowerIdx, upperIdx);
+
+  return std::make_pair(
+      std::max(lowerIdx, 0),
+      std::min(upperIdx, binCntX_));
 }
 
 std::pair<int, int>
@@ -858,7 +861,10 @@ BinGrid::getMinMaxIdxY(Instance* inst) {
    ( fastModulo((inst->uy() - ly()), binSizeY_) == 0)? 
    (inst->uy() - ly()) / binSizeY_ 
    : (inst->uy() - ly()) / binSizeY_ + 1;
-  return std::make_pair(lowerIdx, upperIdx);
+  
+  return std::make_pair(
+      std::max(lowerIdx, 0),
+      std::min(upperIdx, binCntY_));
 }
 
 
