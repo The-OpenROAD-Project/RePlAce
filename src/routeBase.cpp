@@ -507,14 +507,16 @@ RoutingTrack::RoutingTrack(int lx1, int ly1, int ux1, int uy1, int layer1, GNet*
 // RouteBaseVars
 
 RouteBaseVars::RouteBaseVars()
-  : gRoutePitchScale(1.08), 
+  : gRoutePitchScale(1.09), 
+  edgeAdjustmentCoef(1.19),
   pinCoef(1.66), 
   maxInflationRatio(2.5), 
   blockagePorosity(0) {}
 
 void 
 RouteBaseVars::reset() {
-  gRoutePitchScale = 1.08;
+  gRoutePitchScale = 1.09;
+  edgeAdjustmentCoef = 1.19;
   pinCoef = 1.66;
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
@@ -862,23 +864,23 @@ RouteBase::updateSupplies() {
     int layer = ecInfo.ll - 1;
     int capacity = ecInfo.capacity;
 
-    Tile* lTile = tg_.tiles()[lx * tg_.tileCntY() + ly];
-    Tile* uTile = tg_.tiles()[ux * tg_.tileCntY() + uy];
+    Tile* lTile = tg_.tiles()[ly * tg_.tileCntX() + lx];
+    Tile* uTile = tg_.tiles()[uy * tg_.tileCntX() + ux];
 
     if( isHorizontal ) {
       // lower -> right edge
       lTile->setSupplyHR( 
           lTile->supplyHR() - 
-          (horizontalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tg_.tileSizeX() );
+          static_cast<float>((horizontalCapacity_[layer] - capacity)) /
+          static_cast<float>((minWireWidth_[layer] + minWireSpacing_[layer])) /
+          rbVars_.edgeAdjustmentCoef * tg_.tileSizeX() );
 
       // upper -> left edge
       uTile->setSupplyHL(
           uTile->supplyHL() -
-          (horizontalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tg_.tileSizeX() );
+          static_cast<float>((horizontalCapacity_[layer] - capacity)) /
+          static_cast<float>((minWireWidth_[layer] + minWireSpacing_[layer])) /
+          rbVars_.edgeAdjustmentCoef * tg_.tileSizeX() );
 
       // lower layer check
       if( layer <= 4 && horizontalCapacity_[layer] > 0 &&
@@ -890,17 +892,17 @@ RouteBase::updateSupplies() {
       // lower -> right edge
       lTile->setSupplyVR( 
           lTile->supplyVR() - 
-          (verticalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tg_.tileSizeY() );
-
+          static_cast<float>((verticalCapacity_[layer] - capacity)) /
+          static_cast<float>((minWireWidth_[layer] + minWireSpacing_[layer])) /
+          rbVars_.edgeAdjustmentCoef * tg_.tileSizeY() );
+      
       // upper -> left edge
       uTile->setSupplyVL(
           uTile->supplyVL() -
-          (verticalCapacity_[layer] - capacity) /
-          (minWireWidth_[layer] + minWireSpacing_[layer]) /
-          tg_.tileSizeY() );
-
+          static_cast<float>((verticalCapacity_[layer] - capacity)) /
+          static_cast<float>((minWireWidth_[layer] + minWireSpacing_[layer])) /
+          rbVars_.edgeAdjustmentCoef * tg_.tileSizeY() );
+      
       // lower layer check
       if( layer <= 4 && verticalCapacity_[layer] > 0 &&
           capacity < 0.01 ) {
@@ -938,7 +940,7 @@ RouteBase::updateSupplies() {
     int layer = ecInfo.ll - 1;
     int capacity = ecInfo.capacity;
     
-    Tile* tile = tg_.tiles()[lx * tg_.tileCntY() + ly];
+    Tile* tile = tg_.tiles()[ly * tg_.tileCntX() + lx];
     tile->setBlockage(layer, 
         tile ->blockage(layer) 
         + tile->capacity(layer) - capacity);
@@ -981,8 +983,8 @@ RouteBase::updateUsages() {
     }
    
     // get lTile and uTile using lx, ly, ux, uy 
-    Tile* lTile = tg_.tiles()[lIdxX * tg_.tileCntY() + lIdxY];
-    Tile* uTile = tg_.tiles()[uIdxX * tg_.tileCntY() + uIdxY];
+    Tile* lTile = tg_.tiles()[lIdxY * tg_.tileCntX() + lIdxX];
+    Tile* uTile = tg_.tiles()[uIdxY * tg_.tileCntX() + uIdxX];
 
     // horizontal
     if( isHorizontal ) {
@@ -1015,7 +1017,7 @@ RouteBase::updatePinCount() {
     for(auto& gPin : gCell->gPins()) {
       int idxX = (gPin->cx() - tg_.lx())/tg_.tileSizeX();
       int idxY = (gPin->cy() - tg_.ly())/tg_.tileSizeY();
-      Tile* tile = tg_.tiles()[idxX * tg_.tileCntY() + idxY];
+      Tile* tile = tg_.tiles()[idxY * tg_.tileCntX() + idxX];
       tile->setPinCnt( tile->pinCnt() + 1 );
     }
   }
@@ -1031,7 +1033,7 @@ RouteBase::updateInflationRatio() {
     tile->setInflationRatioV( 
         std::fmax(
           tile->inflationRatioV(), 
-          tile->usageH() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyH()));
+          (tile->usageH() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyH()));
 
     // upper bound
     tile->setInflationRatioV(
@@ -1045,7 +1047,7 @@ RouteBase::updateInflationRatio() {
     tile->setInflationRatioH( 
         std::fmax(
           tile->inflationRatioH(), 
-          tile->usageV() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyV()));
+          (tile->usageV() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyV()));
 
     // upper bound
     tile->setInflationRatioH(
@@ -1055,18 +1057,21 @@ RouteBase::updateInflationRatio() {
 
     maxInflH = std::max(maxInflH, tile->inflationRatioH());
 
-    log_->infoIntPair("xy", tile->x(), tile->y()); 
-    log_->infoIntPair("minxy", tile->lx(), tile->ly());
-    log_->infoIntPair("maxxy", tile->ux(), tile->uy());
+    log_->infoIntPair("xy", tile->x(), tile->y(), 5); 
+    log_->infoIntPair("minxy", tile->lx(), tile->ly(), 5);
+    log_->infoIntPair("maxxy", tile->ux(), tile->uy(), 5);
     log_->infoFloatPair("usageHV", 
-        tile->usageH(), tile->usageV()); 
+        tile->usageH(), tile->usageV(), 5); 
     log_->infoFloatPair("supplyHV", 
-        tile->supplyH(), tile->supplyV()); 
-    log_->infoInt("pinCnt", tile->pinCnt());
+        tile->supplyH(), tile->supplyV(), 5); 
+    log_->infoInt("pinCnt", tile->pinCnt(), 5);
+//    log_->infoFloatPair("calcInflRatioHV", 
+//          (tile->usageV() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyV(),
+//          (tile->usageH() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyH(), 5);
     log_->infoFloatPair("calcInflRatioHV", 
-          tile->usageV() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyV(),
-          tile->usageH() + rbVars_.pinCoef * tile->pinCnt() / tile->supplyH());
-    std::cout << std::endl;
+          tile->inflationRatioH(),
+          tile->inflationRatioV(), 5);
+//    std::cout << std::endl;
   }
   log_->infoFloatPair("MaxInflationRatioHV", maxInflH, maxInflV);
 }

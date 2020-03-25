@@ -277,6 +277,7 @@ struct RoutingTrack {
 class RouteBaseVars {
 public:
   float gRoutePitchScale;
+  float edgeAdjustmentCoef;
   float pinCoef;
   float maxInflationRatio;
   float blockagePorosity;
