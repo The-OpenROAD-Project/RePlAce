@@ -38,27 +38,29 @@ global_placement
     [-initial_place_max_iter max_iter]
     [-initial_place_max_fanout max_fanout]
     [-verbose_level verbose_level]
-  
 ```
 
 ### Flow Control
-* __skip_initial_place__ : Skip the initial placement (BiCGSTAB solving) before Nesterov placement. IP improves HPWL by ~5% on large designs.
-* __incremental__ : Enable the incremental global placement. Users would need to tune other parameters (e.g. init_density_penalty) with the pre-placed solutions. 
+* __skip_initial_place__ : Skip the initial placement (BiCGSTAB solving) before Nesterov placement. IP improves HPWL by ~5% on large designs. Equal to '-initial_place_max_iter 0'
+* __incremental__ : Enable the incremental global placement. Users would need to tune other parameters (e.g. init_density_penalty) with pre-placed solutions. 
 
 ### Tuning Parameters
-* __bin_grid_count__ : Set bin grid's count manually. Default: Defined by internal algorithm. [64,128,256,512,..., int]
+* __bin_grid_count__ : Set bin grid's counts. Default: Defined by internal algorithm. [64,128,256,512,..., int]
 * __density__ : Set target density. Default: 0.70 [0-1, float]
-* __init_density_penalty__ : Set initial density penalty. Default : 8e-5 [1e-6 - 1e6, float]
+* __init_density_penalty__ : Set initial density penalty. Default: 8e-5 [1e-6 - 1e6, float]
+* __init_wire_length__coef__ : Set initial wirelength coefficient. Default: 0.25 [unlimited, float] 
 * __min_phi_coef__ : Set pcof_min(µ_k Lower Bound). Default: 0.95 [0.95-1.05, float]
 * __max_phi_coef__ : Set pcof_max(µ_k Upper Bound). Default: 1.05 [1.00-1.20, float]
 * __overflow__ : Set target overflow for termination condition. Default: 0.1 [0-1, float]
+* __initial_place_max_iter__ : Set maximum iterations in initial place. Default: 20 [0-, int]
+* __initial_place_max_fanout__ : Set net escape condition in initial place when 'fanout >= initial_place_max_fanout'. Default: 200 [1-, int]
 
 ### Other Options
-* __verbose_level__ [0-10, int] : Set verbose level for RePlAce. Default: 1
+* __verbose_level__ : Set verbose level for RePlAce. Default: 1 [0-10, int]
 
 Note that all of the TCL commands are defined in the [replace.tcl](../src/replace.tcl) and [replace.i](../src/replace.i).
 
-### Verified/supported Technologies
+## Verified/supported Technologies
 * ASAP 7
 * GF 14
 * TSMC 16 (7.5T/9T)
@@ -67,15 +69,15 @@ Note that all of the TCL commands are defined in the [replace.tcl](../src/replac
 * Fujitsu 55
 * TSMC 65
 
-### 3rd Party Module List
-* CImg
+## 3rd Party Module List
+* [CImg](https://github.com/dtschump/CImg)
     
-### License
+## License
 * BSD-3-clause License [[Link]](LICENSE)
 * Code found under the Modules directory (e.g., submodules CImg source files) have individual copyright and license declarations at each folder.
 
 
-### Authors
+## Authors
 - Paper reference: C.-K. Cheng, A. B. Kahng, I. Kang and L. Wang, "RePlAce: Advancing Solution Quality and Routability Validation in Global Placement", to appear in IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, 2018.  (Digital Object Identifier: 10.1109/TCAD.2018.2859220)
 - Mingyu Woo rewrites the whole RePlAce with a clean C++11 structure.
 - The timing-Driven mode has been implemented by Mingyu Woo (only available in [standalone branch](https://github.com/The-OpenROAD-Project/RePlAce/tree/standalone).)
