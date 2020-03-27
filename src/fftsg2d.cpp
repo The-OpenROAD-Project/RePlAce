@@ -1,45 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////
-// Authors: Ilgweon Kang and Lutong Wang
-//          (respective Ph.D. advisors: Chung-Kuan Cheng, Andrew B. Kahng),
-//          based on Dr. Jingwei Lu with ePlace and ePlace-MS
-//
-//          Many subsequent improvements were made by Mingyu Woo
-//          leading up to the initial release.
-//
-// BSD 3-Clause License
-//
-// Copyright (c) 2018, The Regents of the University of California
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// * Redistributions of source code must retain the above copyright notice, this
-//   list of conditions and the following disclaimer.
-//
-// * Redistributions in binary form must reproduce the above copyright notice,
-//   this list of conditions and the following disclaimer in the documentation
-//   and/or other materials provided with the distribution.
-//
-// * Neither the name of the copyright holder nor the names of its
-//   contributors may be used to endorse or promote products derived from
-//   this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-// ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-///////////////////////////////////////////////////////////////////////////////
-
-#include "replace_private.h"
-
 /*
 Fast Fourier/Cosine/Sine Transform
     dimension   :two
@@ -54,11 +12,11 @@ functions
     ddct2d: Discrete Cosine Transform
     ddst2d: Discrete Sine Transform
 function prototypes
-    void cdft2d(int, int, int, prec   **, prec   *, int *, prec   *);
-    void rdft2d(int, int, int, prec   **, prec   *, int *, prec   *);
-    void rdft2dsort(int, int, int, prec   **);
-    void ddct2d(int, int, int, prec   **, prec   *, int *, prec   *);
-    void ddst2d(int, int, int, prec   **, prec   *, int *, prec   *);
+    void cdft2d(int, int, int, float   **, float   *, int *, float   *);
+    void rdft2d(int, int, int, float   **, float   *, int *, float   *);
+    void rdft2dsort(int, int, int, float   **);
+    void ddct2d(int, int, int, float   **, float   *, int *, float   *);
+    void ddst2d(int, int, int, float   **, float   *, int *, float   *);
 necessary package
     fftsg.c  : 1D-FFT package
 macro definitions
@@ -94,7 +52,7 @@ macro definitions
         2*n2   :data length (int)
                 n2 >= 1, n2 = power of 2
         a[0...n1-1][0...2*n2-1]
-               :input/output data (prec   **)
+               :input/output data (float   **)
                 input data
                     a[j1][2*j2] = Re(x[j1][j2]),
                     a[j1][2*j2+1] = Im(x[j1][j2]),
@@ -104,7 +62,7 @@ macro definitions
                     a[k1][2*k2+1] = Im(X[k1][k2]),
                     0<=k1<n1, 0<=k2<n2
         t[0...*]
-               :work area (prec   *)
+               :work area (float   *)
                 length of t >= 8*n1,                   if single thread,
                 length of t >= 8*n1*FFT2D_MAX_THREADS, if multi threads,
                 t is dynamically allocated, if t == NULL.
@@ -114,7 +72,7 @@ macro definitions
                 (n = max(n1, n2))
                 ip[0],ip[1] are pointers of the cos/sin table.
         w[0...*]
-               :cos/sin table (prec   *)
+               :cos/sin table (float   *)
                 length of w >= max(n1/2, n2/2)
                 w[],ip[] are initialized if ip[0] == 0.
     [remark]
@@ -166,7 +124,7 @@ macro definitions
         n2     :data length (int)
                 n2 >= 2, n2 = power of 2
         a[0...n1-1][0...n2-1]
-               :input/output data (prec   **)
+               :input/output data (float   **)
                 <case1>
                     output data
                         a[k1][2*k2] = R[k1][k2] = R[n1-k1][n2-k2],
@@ -213,7 +171,7 @@ macro definitions
                     rdft2dsort(n1, n2, -1, a);
                     rdft2d(n1, n2, -1, a, t, ip, w);
         t[0...*]
-               :work area (prec   *)
+               :work area (float   *)
                 length of t >= 8*n1,                   if single thread,
                 length of t >= 8*n1*FFT2D_MAX_THREADS, if multi threads,
                 t is dynamically allocated, if t == NULL.
@@ -223,7 +181,7 @@ macro definitions
                 (n = max(n1, n2/2))
                 ip[0],ip[1] are pointers of the cos/sin table.
         w[0...*]
-               :cos/sin table (prec   *)
+               :cos/sin table (float   *)
                 length of w >= max(n1/2, n2/4) + n2/4
                 w[],ip[] are initialized if ip[0] == 0.
     [remark]
@@ -264,11 +222,11 @@ macro definitions
         n2     :data length (int)
                 n2 >= 2, n2 = power of 2
         a[0...n1-1][0...n2-1]
-               :input/output data (prec   **)
+               :input/output data (float   **)
                 output data
                     a[k1][k2] = C[k1][k2], 0<=k1<n1, 0<=k2<n2
         t[0...*]
-               :work area (prec   *)
+               :work area (float   *)
                 length of t >= 4*n1,                   if single thread,
                 length of t >= 4*n1*FFT2D_MAX_THREADS, if multi threads,
                 t is dynamically allocated, if t == NULL.
@@ -278,7 +236,7 @@ macro definitions
                 (n = max(n1/2, n2/2))
                 ip[0],ip[1] are pointers of the cos/sin table.
         w[0...*]
-               :cos/sin table (prec   *)
+               :cos/sin table (float   *)
                 length of w >= max(n1*3/2, n2*3/2)
                 w[],ip[] are initialized if ip[0] == 0.
     [remark]
@@ -325,7 +283,7 @@ macro definitions
         n2     :data length (int)
                 n2 >= 2, n2 = power of 2
         a[0...n1-1][0...n2-1]
-               :input/output data (prec   **)
+               :input/output data (float   **)
                 <case1>
                     input data
                         a[j1][j2] = A[j1][j2], 0<j1<n1, 0<j2<n2,
@@ -343,7 +301,7 @@ macro definitions
                         a[0][0] = S[n1][n2]
                         (i.e. S[k1][k2] = a[k1 % n1][k2 % n2])
         t[0...*]
-               :work area (prec   *)
+               :work area (float   *)
                 length of t >= 4*n1,                   if single thread,
                 length of t >= 4*n1*FFT2D_MAX_THREADS, if multi threads,
                 t is dynamically allocated, if t == NULL.
@@ -353,7 +311,7 @@ macro definitions
                 (n = max(n1/2, n2/2))
                 ip[0],ip[1] are pointers of the cos/sin table.
         w[0...*]
-               :cos/sin table (prec   *)
+               :cos/sin table (float   *)
                 length of w >= max(n1*3/2, n2*3/2)
                 w[],ip[] are initialized if ip[0] == 0.
     [remark]
@@ -374,6 +332,8 @@ macro definitions
             }
         .
 */
+
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -438,16 +398,18 @@ macro definitions
   }
 #endif /* USE_FFT2D_WINTHREADS */
 
-void cdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
-  void makewt(int nw, int *ip, prec *w);
-  void cdft(int n, int isgn, prec *a, int *ip, prec *w);
-  void cdft2d_sub(int n1, int n2, int isgn, prec **a, prec *t, int *ip,
-                  prec *w);
+namespace replace {
+
+void cdft2d(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
+  void makewt(int nw, int *ip, float *w);
+  void cdft(int n, int isgn, float *a, int *ip, float *w);
+  void cdft2d_sub(int n1, int n2, int isgn, float **a, float *t, int *ip,
+                  float *w);
 #ifdef USE_FFT2D_THREADS
-  void xdft2d0_subth(int n1, int n2, int icr, int isgn, prec **a, int *ip,
-                     prec *w);
-  void cdft2d_subth(int n1, int n2, int isgn, prec **a, prec *t, int *ip,
-                    prec *w);
+  void xdft2d0_subth(int n1, int n2, int icr, int isgn, float **a, int *ip,
+                     float *w);
+  void cdft2d_subth(int n1, int n2, int isgn, float **a, float *t, int *ip,
+                    float *w);
 #endif /* USE_FFT2D_THREADS */
   int n, itnull, nthread, nt, i;
 
@@ -472,11 +434,11 @@ void cdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 4 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)malloc(sizeof(prec) * nt);
+    t = (float *)malloc(sizeof(float) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
-  if((prec)n1 * n2 >= (prec)FFT2D_THREADS_BEGIN_N) {
+  if((float)n1 * n2 >= (float)FFT2D_THREADS_BEGIN_N) {
     xdft2d0_subth(n1, n2, 0, isgn, a, ip, w);
     cdft2d_subth(n1, n2, isgn, a, t, ip, w);
   }
@@ -493,18 +455,18 @@ void cdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
   }
 }
 
-void rdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
-  void makewt(int nw, int *ip, prec *w);
-  void makect(int nc, int *ip, prec *c);
-  void rdft(int n, int isgn, prec *a, int *ip, prec *w);
-  void cdft2d_sub(int n1, int n2, int isgn, prec **a, prec *t, int *ip,
-                  prec *w);
-  void rdft2d_sub(int n1, int isgn, prec **a);
+void rdft2d(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
+  void makewt(int nw, int *ip, float *w);
+  void makect(int nc, int *ip, float *c);
+  void rdft(int n, int isgn, float *a, int *ip, float *w);
+  void cdft2d_sub(int n1, int n2, int isgn, float **a, float *t, int *ip,
+                  float *w);
+  void rdft2d_sub(int n1, int isgn, float **a);
 #ifdef USE_FFT2D_THREADS
-  void xdft2d0_subth(int n1, int n2, int icr, int isgn, prec **a, int *ip,
-                     prec *w);
-  void cdft2d_subth(int n1, int n2, int isgn, prec **a, prec *t, int *ip,
-                    prec *w);
+  void xdft2d0_subth(int n1, int n2, int icr, int isgn, float **a, int *ip,
+                     float *w);
+  void cdft2d_subth(int n1, int n2, int isgn, float **a, float *t, int *ip,
+                    float *w);
 #endif /* USE_FFT2D_THREADS */
   int n, nw, nc, itnull, nthread, nt, i;
 
@@ -536,11 +498,11 @@ void rdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 4 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)malloc(sizeof(prec) * nt);
+    t = (float *)malloc(sizeof(float) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
-  if((prec)n1 * n2 >= (prec)FFT2D_THREADS_BEGIN_N) {
+  if((float)n1 * n2 >= (float)FFT2D_THREADS_BEGIN_N) {
     if(isgn < 0) {
       rdft2d_sub(n1, isgn, a);
       cdft2d_subth(n1, n2, isgn, a, t, ip, w);
@@ -571,9 +533,9 @@ void rdft2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
   }
 }
 
-void rdft2dsort(int n1, int n2, int isgn, prec **a) {
+void rdft2dsort(int n1, int n2, int isgn, float **a) {
   int n1h, i;
-  prec x, y;
+  float x, y;
 
   n1h = n1 >> 1;
   if(isgn < 0) {
@@ -604,18 +566,18 @@ void rdft2dsort(int n1, int n2, int isgn, prec **a) {
   }
 }
 
-void ddcst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
-  void makewt(int nw, int *ip, prec *w);
-  void makect(int nc, int *ip, prec *c);
-  void ddct(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddst(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddxt2d_sub(int n1, int n2, int ics, int isgn, prec **a, prec *t, int *ip,
-                  prec *w);
+void ddcst2d(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
+  void makewt(int nw, int *ip, float *w);
+  void makect(int nc, int *ip, float *c);
+  void ddct(int n, int isgn, float *a, int *ip, float *w);
+  void ddst(int n, int isgn, float *a, int *ip, float *w);
+  void ddxt2d_sub(int n1, int n2, int ics, int isgn, float **a, float *t, int *ip,
+                  float *w);
 #ifdef USE_FFT2D_THREADS
-  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, prec **a, int *ip,
-                     prec *w);
-  void ddxt2d_subth(int n1, int n2, int ics, int isgn, prec **a, prec *t,
-                    int *ip, prec *w);
+  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, float **a, int *ip,
+                     float *w);
+  void ddxt2d_subth(int n1, int n2, int ics, int isgn, float **a, float *t,
+                    int *ip, float *w);
 #endif /* USE_FFT2D_THREADS */
   int n, nw, nc, itnull, nthread, nt, i;
 
@@ -647,11 +609,11 @@ void ddcst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)malloc(sizeof(prec) * nt);
+    t = (float *)malloc(sizeof(float) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
-  if((prec)n1 * n2 >= (prec)FFT2D_THREADS_BEGIN_N) {
+  if((float)n1 * n2 >= (float)FFT2D_THREADS_BEGIN_N) {
     ddxt2d0_subth(n1, n2, 1, isgn, a, ip, w);
     ddxt2d_subth(n1, n2, 0, isgn, a, t, ip, w);
   }
@@ -668,18 +630,18 @@ void ddcst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
   }
 }
 
-void ddsct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
-  void makewt(int nw, int *ip, prec *w);
-  void makect(int nc, int *ip, prec *c);
-  void ddct(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddst(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddxt2d_sub(int n1, int n2, int ics, int isgn, prec **a, prec *t, int *ip,
-                  prec *w);
+void ddsct2d(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
+  void makewt(int nw, int *ip, float *w);
+  void makect(int nc, int *ip, float *c);
+  void ddct(int n, int isgn, float *a, int *ip, float *w);
+  void ddst(int n, int isgn, float *a, int *ip, float *w);
+  void ddxt2d_sub(int n1, int n2, int ics, int isgn, float **a, float *t, int *ip,
+                  float *w);
 #ifdef USE_FFT2D_THREADS
-  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, prec **a, int *ip,
-                     prec *w);
-  void ddxt2d_subth(int n1, int n2, int ics, int isgn, prec **a, prec *t,
-                    int *ip, prec *w);
+  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, float **a, int *ip,
+                     float *w);
+  void ddxt2d_subth(int n1, int n2, int ics, int isgn, float **a, float *t,
+                    int *ip, float *w);
 #endif /* USE_FFT2D_THREADS */
   int n, nw, nc, itnull, nthread, nt, i;
 
@@ -711,11 +673,11 @@ void ddsct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)malloc(sizeof(prec) * nt);
+    t = (float *)malloc(sizeof(float) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
-  if((prec)n1 * n2 >= (prec)FFT2D_THREADS_BEGIN_N) {
+  if((float)n1 * n2 >= (float)FFT2D_THREADS_BEGIN_N) {
     ddxt2d0_subth(n1, n2, 0, isgn, a, ip, w);
     ddxt2d_subth(n1, n2, 1, isgn, a, t, ip, w);
   }
@@ -732,17 +694,17 @@ void ddsct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
   }
 }
 
-void ddct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
-  void makewt(int nw, int *ip, prec *w);
-  void makect(int nc, int *ip, prec *c);
-  void ddct(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddxt2d_sub(int n1, int n2, int ics, int isgn, prec **a, prec *t, int *ip,
-                  prec *w);
+void ddct2d(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
+  void makewt(int nw, int *ip, float *w);
+  void makect(int nc, int *ip, float *c);
+  void ddct(int n, int isgn, float *a, int *ip, float *w);
+  void ddxt2d_sub(int n1, int n2, int ics, int isgn, float **a, float *t, int *ip,
+                  float *w);
 #ifdef USE_FFT2D_THREADS
-  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, prec **a, int *ip,
-                     prec *w);
-  void ddxt2d_subth(int n1, int n2, int ics, int isgn, prec **a, prec *t,
-                    int *ip, prec *w);
+  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, float **a, int *ip,
+                     float *w);
+  void ddxt2d_subth(int n1, int n2, int ics, int isgn, float **a, float *t,
+                    int *ip, float *w);
 #endif /* USE_FFT2D_THREADS */
   int n, nw, nc, itnull, nthread, nt, i;
 
@@ -774,11 +736,11 @@ void ddct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)malloc(sizeof(prec) * nt);
+    t = (float *)malloc(sizeof(float) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
-  if((prec)n1 * n2 >= (prec)FFT2D_THREADS_BEGIN_N) {
+  if((float)n1 * n2 >= (float)FFT2D_THREADS_BEGIN_N) {
     ddxt2d0_subth(n1, n2, 0, isgn, a, ip, w);
     ddxt2d_subth(n1, n2, 0, isgn, a, t, ip, w);
   }
@@ -795,17 +757,17 @@ void ddct2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
   }
 }
 
-void ddst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
-  void makewt(int nw, int *ip, prec *w);
-  void makect(int nc, int *ip, prec *c);
-  void ddst(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddxt2d_sub(int n1, int n2, int ics, int isgn, prec **a, prec *t, int *ip,
-                  prec *w);
+void ddst2d(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
+  void makewt(int nw, int *ip, float *w);
+  void makect(int nc, int *ip, float *c);
+  void ddst(int n, int isgn, float *a, int *ip, float *w);
+  void ddxt2d_sub(int n1, int n2, int ics, int isgn, float **a, float *t, int *ip,
+                  float *w);
 #ifdef USE_FFT2D_THREADS
-  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, prec **a, int *ip,
-                     prec *w);
-  void ddxt2d_subth(int n1, int n2, int ics, int isgn, prec **a, prec *t,
-                    int *ip, prec *w);
+  void ddxt2d0_subth(int n1, int n2, int ics, int isgn, float **a, int *ip,
+                     float *w);
+  void ddxt2d_subth(int n1, int n2, int ics, int isgn, float **a, float *t,
+                    int *ip, float *w);
 #endif /* USE_FFT2D_THREADS */
   int n, nw, nc, itnull, nthread, nt, i;
 
@@ -837,11 +799,11 @@ void ddst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
     else if(n2 < 2 * nthread) {
       nt >>= 2;
     }
-    t = (prec *)malloc(sizeof(prec) * nt);
+    t = (float *)malloc(sizeof(float) * nt);
     fft2d_alloc_error_check(t);
   }
 #ifdef USE_FFT2D_THREADS
-  if((prec)n1 * n2 >= (prec)FFT2D_THREADS_BEGIN_N) {
+  if((float)n1 * n2 >= (float)FFT2D_THREADS_BEGIN_N) {
     ddxt2d0_subth(n1, n2, 1, isgn, a, ip, w);
     ddxt2d_subth(n1, n2, 1, isgn, a, t, ip, w);
   }
@@ -860,8 +822,8 @@ void ddst2d(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
 
 /* -------- child routines -------- */
 
-void cdft2d_sub(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
-  void cdft(int n, int isgn, prec *a, int *ip, prec *w);
+void cdft2d_sub(int n1, int n2, int isgn, float **a, float *t, int *ip, float *w) {
+  void cdft(int n, int isgn, float *a, int *ip, float *w);
   int i, j;
 
   if(n2 > 4) {
@@ -921,9 +883,9 @@ void cdft2d_sub(int n1, int n2, int isgn, prec **a, prec *t, int *ip, prec *w) {
   }
 }
 
-void rdft2d_sub(int n1, int isgn, prec **a) {
+void rdft2d_sub(int n1, int isgn, float **a) {
   int n1h, i, j;
-  prec xi;
+  float xi;
 
   n1h = n1 >> 1;
   if(isgn < 0) {
@@ -948,10 +910,10 @@ void rdft2d_sub(int n1, int isgn, prec **a) {
   }
 }
 
-void ddxt2d_sub(int n1, int n2, int ics, int isgn, prec **a, prec *t, int *ip,
-                prec *w) {
-  void ddct(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddst(int n, int isgn, prec *a, int *ip, prec *w);
+void ddxt2d_sub(int n1, int n2, int ics, int isgn, float **a, float *t, int *ip,
+                float *w) {
+  void ddct(int n, int isgn, float *a, int *ip, float *w);
+  void ddst(int n, int isgn, float *a, int *ip, float *w);
   int i, j;
 
   if(n2 > 2) {
@@ -1010,15 +972,15 @@ struct fft2d_arg_st {
   int n2;
   int ic;
   int isgn;
-  prec **a;
-  prec *t;
+  float **a;
+  float *t;
   int *ip;
-  prec *w;
+  float *w;
 };
 typedef struct fft2d_arg_st fft2d_arg_t;
 
-void xdft2d0_subth(int n1, int n2, int icr, int isgn, prec **a, int *ip,
-                   prec *w) {
+void xdft2d0_subth(int n1, int n2, int icr, int isgn, float **a, int *ip,
+                   float *w) {
   void *xdft2d0_th(void *p);
   fft2d_thread_t th[FFT2D_MAX_THREADS];
   fft2d_arg_t ag[FFT2D_MAX_THREADS];
@@ -1045,8 +1007,8 @@ void xdft2d0_subth(int n1, int n2, int icr, int isgn, prec **a, int *ip,
   }
 }
 
-void cdft2d_subth(int n1, int n2, int isgn, prec **a, prec *t, int *ip,
-                  prec *w) {
+void cdft2d_subth(int n1, int n2, int isgn, float **a, float *t, int *ip,
+                  float *w) {
   void *cdft2d_th(void *p);
   fft2d_thread_t th[FFT2D_MAX_THREADS];
   fft2d_arg_t ag[FFT2D_MAX_THREADS];
@@ -1078,8 +1040,8 @@ void cdft2d_subth(int n1, int n2, int isgn, prec **a, prec *t, int *ip,
   }
 }
 
-void ddxt2d0_subth(int n1, int n2, int ics, int isgn, prec **a, int *ip,
-                   prec *w) {
+void ddxt2d0_subth(int n1, int n2, int ics, int isgn, float **a, int *ip,
+                   float *w) {
   void *ddxt2d0_th(void *p);
   fft2d_thread_t th[FFT2D_MAX_THREADS];
   fft2d_arg_t ag[FFT2D_MAX_THREADS];
@@ -1106,8 +1068,8 @@ void ddxt2d0_subth(int n1, int n2, int ics, int isgn, prec **a, int *ip,
   }
 }
 
-void ddxt2d_subth(int n1, int n2, int ics, int isgn, prec **a, prec *t, int *ip,
-                  prec *w) {
+void ddxt2d_subth(int n1, int n2, int ics, int isgn, float **a, float *t, int *ip,
+                  float *w) {
   void *ddxt2d_th(void *p);
   fft2d_thread_t th[FFT2D_MAX_THREADS];
   fft2d_arg_t ag[FFT2D_MAX_THREADS];
@@ -1141,10 +1103,10 @@ void ddxt2d_subth(int n1, int n2, int ics, int isgn, prec **a, prec *t, int *ip,
 }
 
 void *xdft2d0_th(void *p) {
-  void cdft(int n, int isgn, prec *a, int *ip, prec *w);
-  void rdft(int n, int isgn, prec *a, int *ip, prec *w);
+  void cdft(int n, int isgn, float *a, int *ip, float *w);
+  void rdft(int n, int isgn, float *a, int *ip, float *w);
   int nthread, n0, n1, n2, icr, isgn, *ip, i;
-  prec **a, *w;
+  float **a, *w;
 
   nthread = ((fft2d_arg_t *)p)->nthread;
   n0 = ((fft2d_arg_t *)p)->n0;
@@ -1169,9 +1131,9 @@ void *xdft2d0_th(void *p) {
 }
 
 void *cdft2d_th(void *p) {
-  void cdft(int n, int isgn, prec *a, int *ip, prec *w);
+  void cdft(int n, int isgn, float *a, int *ip, float *w);
   int nthread, n0, n1, n2, isgn, *ip, i, j;
-  prec **a, *t, *w;
+  float **a, *t, *w;
 
   nthread = ((fft2d_arg_t *)p)->nthread;
   n0 = ((fft2d_arg_t *)p)->n0;
@@ -1241,10 +1203,10 @@ void *cdft2d_th(void *p) {
 }
 
 void *ddxt2d0_th(void *p) {
-  void ddct(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddst(int n, int isgn, prec *a, int *ip, prec *w);
+  void ddct(int n, int isgn, float *a, int *ip, float *w);
+  void ddst(int n, int isgn, float *a, int *ip, float *w);
   int nthread, n0, n1, n2, ics, isgn, *ip, i;
-  prec **a, *w;
+  float **a, *w;
 
   nthread = ((fft2d_arg_t *)p)->nthread;
   n0 = ((fft2d_arg_t *)p)->n0;
@@ -1269,10 +1231,10 @@ void *ddxt2d0_th(void *p) {
 }
 
 void *ddxt2d_th(void *p) {
-  void ddct(int n, int isgn, prec *a, int *ip, prec *w);
-  void ddst(int n, int isgn, prec *a, int *ip, prec *w);
+  void ddct(int n, int isgn, float *a, int *ip, float *w);
+  void ddst(int n, int isgn, float *a, int *ip, float *w);
   int nthread, n0, n1, n2, ics, isgn, *ip, i, j;
-  prec **a, *t, *w;
+  float **a, *t, *w;
 
   nthread = ((fft2d_arg_t *)p)->nthread;
   n0 = ((fft2d_arg_t *)p)->n0;
@@ -1347,3 +1309,4 @@ void *ddxt2d_th(void *p) {
   return (void *)0;
 }
 #endif /* USE_FFT2D_THREADS */
+}
