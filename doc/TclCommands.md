@@ -18,8 +18,8 @@ global_placement
 ```
 
 ## Flow Control
-* __skip_initial_place__ : Skip the initial placement (BiCGSTAB solving) before Nesterov placement. IP improves HPWL by 5% on large designs.
-* __incremental__ : Enable the incremental global placement. May need parameter tuning based on the given placed solutions. 
+* __skip_initial_place__ : Skip the initial placement (BiCGSTAB solving) before Nesterov placement. IP improves HPWL by ~5% on large designs.
+* __incremental__ : Enable the incremental global placement. Users would need to tune other parameters with the pre-placed solutions. 
 
 ## Tuning Parameters
 * __bin_grid_count__ : Set bin grid's count manually. Default: Defined by internal algorithm. [64,128,256,512,..., int]
