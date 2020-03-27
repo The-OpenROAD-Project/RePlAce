@@ -19,7 +19,7 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 - If you want to use this as part of the OpenROAD project you should build it and use it from inside the integrated [OpenROAD app](https://github.com/The-OpenROAD-Project/OpenROAD). The standalone version is available as a legacy code in [standalone branch](https://github.com/The-OpenROAD-Project/RePlAce/tree/standalone).
 - For OpenROAD-flow users, manuals for released binaries are available in readthedocs. [(Getting-Started)](https://openroad.readthedocs.io/en/latest/user/getting-started.html)
 - For developers, manuals for building a binary is available in OpenROAD app repo. [(OpenROAD app)](https://github.com/The-OpenROAD-Project/OpenROAD) 
-- Note that RePlAce is a submodule of OpenROAD repo, and take a place as **"global_placement"** commands. 
+- Note that RePlAce is a submodule of OpenROAD repo, and take a place as the **"global_placement"** command. 
 
 
 ## OpenROAD Tcl Usage (global_placement)
