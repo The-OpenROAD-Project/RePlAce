@@ -278,7 +278,8 @@ class RouteBaseVars {
 public:
   float gRoutePitchScale;
   float edgeAdjustmentCoef;
-  float pinCoef;
+  float pinInflationCoef;
+  float pinBlockageFactor;
   float inflationRatioCoef;
   float maxInflationRatio;
   float blockagePorosity;
@@ -330,6 +331,7 @@ class RouteBase {
     void updateSupplies();
     void updateUsages();
     void updatePinCount();
+    void updateRoutes();
     void updateInflationRatio();
 };
 }

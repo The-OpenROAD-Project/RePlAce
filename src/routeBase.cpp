@@ -22,7 +22,7 @@ Tile::Tile()
   supplyVL_(0), supplyVR_(0), 
   inflationRatioH_(0),
   inflationRatioV_(0),
-  inflationRatio_(0),
+  inflationRatio_(1.0),
   inflationArea_(0),
   inflationAreaDelta_(0),
   inflatedRatio_(0), 
@@ -57,7 +57,7 @@ Tile::reset() {
   usageH_ = usageV_ = supplyH_ = supplyV_ = 0;
   supplyHL_ = supplyHR_ = supplyVL_ = supplyVR_ = 0;
   inflationRatioH_ = inflationRatioV_ = 0;
-  inflationRatio_ = 0;
+  inflationRatio_ = 1.0;
 
   inflationArea_ = inflationAreaDelta_ = 0;
   inflatedRatio_ = 0;
@@ -309,11 +309,7 @@ Tile::updateUsages() {
 
   int grSumUsageH = 0, grSumUsageV = 0;
 
-  using std::cout;
-  using std::endl;
-
   for(int i=0; i<usageHL_.size(); i++) {
-    cout << "final usage " << x_ << " " << y_ << " " << i << " " << usageHL_[i] << " " << usageHR_[i] << " " << usageVL_[i] << " " << usageVR_[i] << endl;
     grSumUsageH += std::max( usageHL_[i], usageHR_[i] );
     grSumUsageV += std::max( usageVL_[i], usageVR_[i] );
   }
@@ -513,7 +509,8 @@ RoutingTrack::RoutingTrack(int lx1, int ly1, int ux1, int uy1, int layer1, GNet*
 RouteBaseVars::RouteBaseVars()
   : gRoutePitchScale(1.09), 
   edgeAdjustmentCoef(1.19),
-  pinCoef(1.66), 
+  pinInflationCoef(1.66), 
+  pinBlockageFactor(0.05),
   inflationRatioCoef(2.33), 
   maxInflationRatio(2.5), 
   blockagePorosity(0) {}
@@ -522,7 +519,8 @@ void
 RouteBaseVars::reset() {
   gRoutePitchScale = 1.09;
   edgeAdjustmentCoef = 1.19;
-  pinCoef = 1.66;
+  pinInflationCoef = 1.66;
+  pinBlockageFactor = 0.05;
   inflationRatioCoef = 2.33;
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
@@ -593,6 +591,7 @@ RouteBase::updateCongestionMap() {
   updateSupplies();
   updateUsages();
   updatePinCount();
+  updateRoutes();
   updateInflationRatio();
 
   log_->infoString("Congestion Map building is done");
@@ -806,9 +805,16 @@ RouteBase::importEst(const char* fileName) {
         sscanf(line, "(%d,%d,%d)-(%d,%d,%d)%*s", &lx, &ly, &ll, 
             &ux, &uy, &ul);
 
-        // This is unexpected...!
-        if(ll != ul)
+        // This can be ignored
+        // CGM doesn't care about this.
+        if(ll != ul) {
           continue;
+        }
+
+        // CGN doesn't care about the single tile consumption
+        if( lx == ux && ly == uy && ll == ul ) {
+          continue;
+        }
 
         odb::dbNet* dbNet = 
           db_->getChip()->getBlock()->findNet(netName);
@@ -937,20 +943,6 @@ RouteBase::updateSupplies() {
     tile->setCapacity( capacity );
   }
   
-  // apply edgeCapacityInfo from *.route
-  // update blockage from possible capacity
-  for(auto& ecInfo : edgeCapacityStor_) {
-    
-    int lx = std::min( ecInfo.lx, ecInfo.ux );
-    int ly = std::min( ecInfo.ly, ecInfo.uy );
-    int layer = ecInfo.ll - 1;
-    int capacity = ecInfo.capacity;
-    
-    Tile* tile = tg_.tiles()[ly * tg_.tileCntX() + lx];
-    tile->setBlockage(layer, 
-        tile ->blockage(layer) 
-        + tile->capacity(layer) - capacity);
-  }
 }
 
 
@@ -960,12 +952,6 @@ RouteBase::updateUsages() {
   for (auto& rTrack : routingTracks_) {
     bool isHorizontal = ( rTrack.ly == rTrack.uy );
     
-    using std::cout;
-    using std::endl;
-
-    cout << "rTrack: " << rTrack.lx << " " << rTrack.ly << " " 
-      << rTrack.ux << " " << rTrack.uy << " " << rTrack.layer -1 << endl; 
-
     // points
     int lx = std::min( rTrack.lx, rTrack.ux );
     int ux = std::max( rTrack.lx, rTrack.ux );
@@ -1001,18 +987,11 @@ RouteBase::updateUsages() {
     if( isHorizontal ) {
       lTile->setUsageHR( layer, lTile->usageHR(layer) + 1 );
       uTile->setUsageHL( layer, uTile->usageHL(layer) + 1 );
-      cout << "HR " << lIdxX << " " << lIdxY << " " << layer << " " << lTile->usageHR(layer) << endl;
-      cout << "HL " << uIdxX << " " << uIdxY << " " << layer << " " << uTile->usageHL(layer) << endl;
-
-
     }
     // vertical
     else {
       lTile->setUsageVR( layer, lTile->usageVR(layer) + 1 );
       uTile->setUsageVL( layer, uTile->usageVL(layer) + 1 );
-      
-      cout << "VR " << lIdxX << " " << lIdxY << " " << layer << " " << lTile->usageVR(layer) << endl;
-      cout << "VL " << uIdxX << " " << uIdxY << " " << layer << " " << uTile->usageVL(layer) << endl;
     }
 
     // update route info
@@ -1041,6 +1020,72 @@ RouteBase::updatePinCount() {
   }
 }
 
+
+void
+RouteBase::updateRoutes() {
+  // apply edgeCapacityInfo from *.route
+  // update blockage from possible capacity
+  //
+  // Note that route += blockage
+  //
+  for(auto& ecInfo : edgeCapacityStor_) {
+    int lx = std::min( ecInfo.lx, ecInfo.ux );
+    int ly = std::min( ecInfo.ly, ecInfo.uy );
+    int layer = ecInfo.ll - 1;
+    int capacity = ecInfo.capacity;
+    
+    Tile* tile = tg_.tiles()[ly * tg_.tileCntX() + lx];
+    tile->setRoute(layer, 
+        tile->route(layer) 
+        + tile->capacity(layer) - capacity);
+  }
+
+  // update routes based on pin Density
+  for(auto& tile : tg_.tiles()) {
+    for(int i=0; i<tg_.numRoutingLayers(); i++) {
+
+      if( horizontalCapacity_[i] > 0 ) {
+        tile->setRoute(i,
+            tile->route(i)
+            + static_cast<int>(round(rbVars_.pinBlockageFactor * tile->pinCnt()))
+            * (minWireWidth_[i] + minWireSpacing_[i])
+            );
+
+
+        if( tile->x() <= tg_.tileCntX() - 2 ) {
+          Tile* rightTile = tg_.tiles()
+            [tile->y() * tg_.tileCntX() + (tile->x()+1)];
+
+          tile->setRoute(i,
+              tile->route(i)
+              + static_cast<int>(round(rbVars_.pinBlockageFactor * rightTile->pinCnt()))
+              * (minWireWidth_[i] + minWireSpacing_[i])
+              ); 
+
+        }
+      }
+      else if( verticalCapacity_[i] > 0 ) {
+        tile->setRoute(i,
+            tile->route(i)
+            + static_cast<int>(round(rbVars_.pinBlockageFactor * tile->pinCnt()))
+            * (minWireWidth_[i] + minWireSpacing_[i])
+            );
+
+        if( tile->y() <= tg_.tileCntY() - 2 ) {
+          Tile* upperTile = tg_.tiles()
+            [ (tile->y()+1) * tg_.tileCntX() + tile->x()];
+
+          tile->setRoute(i,
+              tile->route(i)
+              + static_cast<int>(round(rbVars_.pinBlockageFactor * upperTile->pinCnt()))
+              * (minWireWidth_[i] + minWireSpacing_[i])
+              ); 
+        }
+      }
+    }  
+  }
+}
+
 // inflationRatio
 void
 RouteBase::updateInflationRatio() {
@@ -1048,7 +1093,7 @@ RouteBase::updateInflationRatio() {
 
   for(auto& tile : tg_.tiles()) {
 
-    float newRatioV = (tile->usageH() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyH();
+    float newRatioV = (tile->usageH() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyH();
     newRatioV = pow(newRatioV, rbVars_.inflationRatioCoef);
 
     // Vertical InflationRatio
@@ -1064,7 +1109,7 @@ RouteBase::updateInflationRatio() {
 
     maxInflV = std::max(maxInflV, tile->inflationRatioV());
     
-    float newRatioH = (tile->usageV() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyV();
+    float newRatioH = (tile->usageV() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyV();
     newRatioH = pow(newRatioH, rbVars_.inflationRatioCoef);
 
     // Horizontal InflationRatio
@@ -1079,24 +1124,92 @@ RouteBase::updateInflationRatio() {
           tile->inflationRatioH()));
 
     maxInflH = std::max(maxInflH, tile->inflationRatioH());
-
-    log_->infoIntPair("xy", tile->x(), tile->y(), 5); 
-    log_->infoIntPair("minxy", tile->lx(), tile->ly(), 5);
-    log_->infoIntPair("maxxy", tile->ux(), tile->uy(), 5);
-    log_->infoFloatPair("usageHV", 
-        tile->usageH(), tile->usageV(), 5); 
-    log_->infoFloatPair("supplyHV", 
-        tile->supplyH(), tile->supplyV(), 5); 
-    log_->infoInt("pinCnt", tile->pinCnt(), 5);
-//    log_->infoFloatPair("calcInflRatioHV", 
-//          (tile->usageV() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyV(),
-//          (tile->usageH() + rbVars_.pinCoef * tile->pinCnt()) / tile->supplyH(), 5);
-    log_->infoFloatPair("calcInflRatioHV", 
-          tile->inflationRatioH(),
-          tile->inflationRatioV(), 5);
-//    std::cout << std::endl;
   }
   log_->infoFloatPair("MaxInflationRatioHV", maxInflH, maxInflV);
+
+
+  // newly set inflationRatio from H/V
+  // for each tile
+  for(auto& tile : tg_.tiles()) {
+
+    // for each layer
+    for(int i=0; i<tg_.numRoutingLayers(); i++) {
+      // horizontal
+      if( horizontalCapacity_[i] > 0 ) {
+        tile->setInflationRatio(
+            fmax( 
+              tile->inflationRatio(), 
+              static_cast<float>(tile->route(i)) 
+              / horizontalCapacity_[i]
+              * rbVars_.gRoutePitchScale)
+            );
+
+        // left tile exists
+        if( tile->x() >= 1 ) {
+
+          Tile* leftTile = tg_.tiles()
+            [ tile->y() * tg_.tileCntX() 
+            + (tile->x()-1) ];
+        
+          tile->setInflationRatio(
+            fmax(
+              tile->inflationRatio(),
+              static_cast<float>(leftTile->route(i)) 
+              / horizontalCapacity_[i]
+              * rbVars_.gRoutePitchScale)
+      
+            );
+        }
+      }
+      // vertical
+      else if( verticalCapacity_[i] > 0 ) {
+        tile->setInflationRatio(
+            fmax(
+               tile->inflationRatio(),
+               static_cast<float>(tile->route(i))
+               / verticalCapacity_[i]
+               * rbVars_.gRoutePitchScale)
+            );
+           
+        // lower tile exists
+        if( tile->y() >= 1 ) {
+          Tile* lowerTile = tg_.tiles()
+            [ (tile->y()-1) * tg_.tileCntX()
+            + tile->x() ];
+
+          tile->setInflationRatio(
+              fmax(
+                tile->inflationRatio(),
+                static_cast<float>(lowerTile->route(i))
+                / verticalCapacity_[i]
+                * rbVars_.gRoutePitchScale)
+              );
+        }
+      } 
+    } 
+
+    if( tile->inflationRatio() > 1.0 ) {
+      tile->setInflationRatio( pow(tile->inflationRatio(), rbVars_.inflationRatioCoef) );
+    }
+  }
+    
+  for(auto& tile : tg_.tiles()) {
+    if( tile->inflationRatio() > 1.0 ) {
+      log_->infoIntPair("xy", tile->x(), tile->y(), 5); 
+      log_->infoIntPair("minxy", tile->lx(), tile->ly(), 5);
+      log_->infoIntPair("maxxy", tile->ux(), tile->uy(), 5);
+      log_->infoFloatPair("usageHV", 
+          tile->usageH(), tile->usageV(), 5); 
+      log_->infoFloatPair("supplyHV", 
+          tile->supplyH(), tile->supplyV(), 5); 
+      log_->infoInt("pinCnt", tile->pinCnt(), 5);
+      log_->infoFloatPair("calcInflRatioHV", 
+          tile->inflationRatioH(),
+          tile->inflationRatioV(), 5);
+      log_->infoFloat("calcInflationRatio", tile->inflationRatio(), 5);
+      std::cout << std::endl;
+    }
+  }
 }
 
 
