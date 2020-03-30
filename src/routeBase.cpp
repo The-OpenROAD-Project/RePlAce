@@ -309,7 +309,11 @@ Tile::updateUsages() {
 
   int grSumUsageH = 0, grSumUsageV = 0;
 
+  using std::cout;
+  using std::endl;
+
   for(int i=0; i<usageHL_.size(); i++) {
+    cout << "final usage " << x_ << " " << y_ << " " << i << " " << usageHL_[i] << " " << usageHR_[i] << " " << usageVL_[i] << " " << usageVR_[i] << endl;
     grSumUsageH += std::max( usageHL_[i], usageHR_[i] );
     grSumUsageV += std::max( usageVL_[i], usageVR_[i] );
   }
@@ -955,6 +959,12 @@ void
 RouteBase::updateUsages() {
   for (auto& rTrack : routingTracks_) {
     bool isHorizontal = ( rTrack.ly == rTrack.uy );
+    
+    using std::cout;
+    using std::endl;
+
+    cout << "rTrack: " << rTrack.lx << " " << rTrack.ly << " " 
+      << rTrack.ux << " " << rTrack.uy << " " << rTrack.layer -1 << endl; 
 
     // points
     int lx = std::min( rTrack.lx, rTrack.ux );
@@ -987,16 +997,22 @@ RouteBase::updateUsages() {
     // get lTile and uTile using lx, ly, ux, uy 
     Tile* lTile = tg_.tiles()[lIdxY * tg_.tileCntX() + lIdxX];
     Tile* uTile = tg_.tiles()[uIdxY * tg_.tileCntX() + uIdxX];
-
     // horizontal
     if( isHorizontal ) {
       lTile->setUsageHR( layer, lTile->usageHR(layer) + 1 );
       uTile->setUsageHL( layer, uTile->usageHL(layer) + 1 );
+      cout << "HR " << lIdxX << " " << lIdxY << " " << layer << " " << lTile->usageHR(layer) << endl;
+      cout << "HL " << uIdxX << " " << uIdxY << " " << layer << " " << uTile->usageHL(layer) << endl;
+
+
     }
     // vertical
     else {
       lTile->setUsageVR( layer, lTile->usageVR(layer) + 1 );
       uTile->setUsageVL( layer, uTile->usageVL(layer) + 1 );
+      
+      cout << "VR " << lIdxX << " " << lIdxY << " " << layer << " " << lTile->usageVR(layer) << endl;
+      cout << "VL " << uIdxX << " " << uIdxY << " " << layer << " " << uTile->usageVL(layer) << endl;
     }
 
     // update route info
