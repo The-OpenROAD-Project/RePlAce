@@ -92,6 +92,9 @@ class Tile {
     void setInflationArea(float area);
     void setInflationAreaDelta(float delta);
 
+    // accumulated Ratio as iteration goes on
+    void setInflatedRatio(float ratio);
+
     void setPinCnt(int cnt);
     void setMacroIncluded(bool mode);
 
@@ -303,6 +306,10 @@ class RouteBase {
     void importEst(const char* fileName);
 
     void updateCongestionMap();
+    void routability();
+
+    int64_t inflatedAreaDelta() const;
+    int numCall() const;
 
   private:
     RouteBaseVars rbVars_;
@@ -324,6 +331,12 @@ class RouteBase {
     // from *.est file
     std::vector<RoutingTrack> routingTracks_;
 
+    // inflationList_ for dynamic Inflation Adjustment
+    std::vector<std::pair<Tile*, float>> inflationList_;
+
+    int64_t inflatedAreaDelta_;
+    int numCall_;
+
     void init();
     void reset();
 
@@ -333,6 +346,9 @@ class RouteBase {
     void updatePinCount();
     void updateRoutes();
     void updateInflationRatio();
+
+    // routability funcs
+    void initGCells();
 };
 }
 

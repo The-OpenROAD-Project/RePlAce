@@ -5,12 +5,21 @@
 #include <string>
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 using std::vector;
 using std::string;
 using std::to_string; 
+using std::pair;
+using std::make_pair;
+using std::sort;
 
 namespace replace {
+
+static bool
+inflationListCompare(std::pair<Tile*, float> l, 
+    std::pair<Tile*, float> r);
+
 
 Tile::Tile()
 : x_(0), y_(0), 
@@ -291,6 +300,11 @@ Tile::setInflationAreaDelta(float delta) {
   inflationAreaDelta_ = delta;
 }
 
+void
+Tile::setInflatedRatio(float ratio) {
+  inflatedRatio_ = ratio;
+}
+
 
 void
 Tile::setMacroIncluded(bool mode) {
@@ -531,7 +545,8 @@ RouteBaseVars::reset() {
 
 RouteBase::RouteBase()
   : rbVars_(), 
-  db_(nullptr), nb_(nullptr), log_(nullptr) {}
+  db_(nullptr), nb_(nullptr), log_(nullptr),
+  inflatedAreaDelta_(0), numCall_(0) {}
 
 RouteBase::RouteBase(
     RouteBaseVars rbVars, 
@@ -564,6 +579,7 @@ RouteBase::reset() {
   minWireSpacing_.clear();
   edgeCapacityStor_.clear();
   routingTracks_.clear();
+  inflationList_.clear();
 
   verticalCapacity_.shrink_to_fit();
   horizontalCapacity_.shrink_to_fit();
@@ -571,6 +587,10 @@ RouteBase::reset() {
   minWireSpacing_.shrink_to_fit();
   edgeCapacityStor_.shrink_to_fit();
   routingTracks_.shrink_to_fit();
+  inflationList_.shrink_to_fit();
+  
+  inflatedAreaDelta_ = 0;
+  numCall_ = 0;
 }
 
 void
@@ -595,6 +615,16 @@ RouteBase::updateCongestionMap() {
   updateInflationRatio();
 
   log_->infoString("Congestion Map building is done");
+}
+
+int64_t 
+RouteBase::inflatedAreaDelta() const {
+  return inflatedAreaDelta_; 
+}
+
+int
+RouteBase::numCall() const {
+  return numCall_;
 }
 
 // fill 
@@ -1210,6 +1240,93 @@ RouteBase::updateInflationRatio() {
       std::cout << std::endl;
     }
   }
+}
+
+
+void
+RouteBase::routability() {
+  numCall_ ++;
+  inflatedAreaDelta_ = 0;
+
+  // set inflated ratio
+  for(auto& tile : tg_.tiles()) {
+    if( tile->inflationRatio() > 1 ) {
+      tile->setInflatedRatio( tile->inflationRatio() );
+    }
+    else {
+      tile->setInflatedRatio( 1.0 );
+    }
+  }
+
+  // get inflatedAreaDelta_
+  for(auto& gCell : nb_->gCells()) {
+    int idxX = (gCell->dCx() - tg_.lx())/tg_.tileSizeX();
+    int idxY = (gCell->dCy() - tg_.ly())/tg_.tileSizeY();
+
+    Tile* tile = tg_.tiles()[idxY * tg_.tileCntX() + idxX];
+
+    // Don't care when inflRatio <= 1
+    if( tile->inflatedRatio() <= 1.0 ) {
+      continue;
+    } 
+
+    // deltaArea is equal to area * deltaRatio
+    inflatedAreaDelta_ 
+      += static_cast<int64_t>(round( 
+        static_cast<int64_t>(gCell->dDx()) 
+        * static_cast<int64_t>(gCell->dDy()) 
+        * (tile->inflatedRatio() - 1.0)));
+
+  }
+
+  inflationList_.clear();
+  inflationList_.shrink_to_fit();
+
+  // update inflationList_
+  for(auto& tile : tg_.tiles()) {
+    inflationList_.push_back(
+        make_pair(tile, tile->inflatedRatio()));
+  }
+
+  // sort by inflatedRatio
+  sort(inflationList_.begin(), inflationList_.end(), 
+      inflationListCompare);
+
+
+}
+
+// compare based on the inflatedRatio
+static bool
+inflationListCompare(std::pair<Tile*, float> l, 
+   std::pair<Tile*, float> r) {
+
+  // inflatedRatio order
+  if ( l.second < r.second ) {
+    return true;
+  }
+  else if( l.second > r.second ) {
+    return false;
+  }
+
+  // x/y index sorts for deterministic
+  // when inflatedRatio is the same
+  //
+  // x sort
+  if( l.first->x() < r.first->x() ) {
+    return true;
+  }
+  else if( l.first->x() > r.first->x() ) { 
+    return false;
+  }
+
+  // y sort
+  if( l.first->y() < r.first->y() ) {
+    return true;
+  }
+  else if( l.first->y() > r.first->y() ) {
+    return false;
+  }
+  return true;
 }
 
 
