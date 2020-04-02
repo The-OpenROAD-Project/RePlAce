@@ -219,6 +219,9 @@ public:
   int coreDx() const;
   int coreDy() const;
 
+  int64_t dieArea() const;
+  int64_t coreArea() const;
+
 private:
   int dieLx_;
   int dieLy_;

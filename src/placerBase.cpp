@@ -581,6 +581,16 @@ Die::coreDy() const {
   return coreUy_ - coreLy_;
 }
 
+int64_t
+Die::dieArea() const {
+  return static_cast<int64_t>(dieDx()) * static_cast<int64_t>(dieDy());
+}
+
+int64_t
+Die::coreArea() const {
+  return static_cast<int64_t>(coreDx()) * static_cast<int64_t>(coreDy());
+}
+
 ////////////////////////////////////////////////////////
 // PlacerBase
 
@@ -933,9 +943,7 @@ PlacerBase::printInfo() const {
   log_->infoIntPair("CoreAreaLxLy", die_.coreLx(), die_.coreLy() );
   log_->infoIntPair("CoreAreaUxUy", die_.coreUx(), die_.coreUy() );
 
-  int64_t coreArea = 
-    static_cast<int64_t>(die_.coreUx() - die_.coreLx()) * 
-    static_cast<int64_t>(die_.coreUy() - die_.coreLy());
+  const int64_t coreArea = die_.coreArea();
   float util = 
     static_cast<float>(placeInstsArea_) 
     / (coreArea - nonPlaceInstsArea_) * 100;
