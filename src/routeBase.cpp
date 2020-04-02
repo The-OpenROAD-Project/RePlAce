@@ -569,6 +569,7 @@ RouteBase::~RouteBase() {
 void 
 RouteBase::reset() {
   rbVars_.reset();
+  tg_.reset();
   db_ = nullptr;
   nb_ = nullptr;
   log_ = nullptr;
@@ -1139,7 +1140,8 @@ RouteBase::updateInflationRatio() {
 
     maxInflV = std::max(maxInflV, tile->inflationRatioV());
     
-    float newRatioH = (tile->usageV() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyV();
+    float newRatioH 
+      = (tile->usageV() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyV();
     newRatioH = pow(newRatioH, rbVars_.inflationRatioCoef);
 
     // Horizontal InflationRatio
@@ -1237,7 +1239,6 @@ RouteBase::updateInflationRatio() {
           tile->inflationRatioH(),
           tile->inflationRatioV(), 5);
       log_->infoFloat("calcInflationRatio", tile->inflationRatio(), 5);
-      std::cout << std::endl;
     }
   }
 }

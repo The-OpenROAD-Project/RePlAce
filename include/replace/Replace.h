@@ -63,6 +63,7 @@ class Replace
 
     void setTimingDrivenMode(bool mode);
     void setRoutabilityDrivenMode(bool mode);
+    void setRoutabilityCheckOverflow(float overflow);
 
   private:
     odb::dbDatabase* db_;
@@ -93,6 +94,7 @@ class Replace
     float minPhiCoef_;
     float maxPhiCoef_;
     float referenceHpwl_;
+    float routabilityCheckOverflow_;
 
     bool timingDrivenMode_;
     bool routabilityDrivenMode_;

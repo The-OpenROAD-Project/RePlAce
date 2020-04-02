@@ -28,8 +28,10 @@ NesterovPlaceVars::NesterovPlaceVars()
   minPreconditioner(1.0),
   initialPrevCoordiUpdateCoef(100),
   referenceHpwl(446000000),
+  routabilityCheckOverflow(0.20),
   timingDrivenMode(true),
   routabilityDrivenMode(true) {}
+
 
 void
 NesterovPlaceVars::reset() {
@@ -43,6 +45,7 @@ NesterovPlaceVars::reset() {
   minPreconditioner = 1.0;
   initialPrevCoordiUpdateCoef = 100;
   referenceHpwl = 446000000;
+  routabilityCheckOverflow = 0.20;
   timingDrivenMode = true;
   routabilityDrivenMode = true;
 }
@@ -193,11 +196,6 @@ void NesterovPlace::init() {
 
   log_->infoFloatSignificant("InitialStepLength", stepLength_, 3);
   log_->procEnd("NesterovInit", 3);
-
-  if( npVars_.routabilityDrivenMode ) {
-    // init routeBase structure 
-    rb_->updateCongestionMap();
-  }
 }
 
 // clear reset
@@ -499,6 +497,13 @@ NesterovPlace::doNesterovPlace() {
       divergeCode = 4;
       isDiverged_ = true;
       break;
+    }
+
+    // check routability
+    if( npVars_.routabilityDrivenMode 
+        && npVars_.routabilityCheckOverflow >= sumOverflow_ ) {
+      rb_->updateCongestionMap();
+      rb_->routability();
     }
 
     // minimum iteration is 50

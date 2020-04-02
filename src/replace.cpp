@@ -29,6 +29,7 @@ Replace::Replace()
   initWireLengthCoef_(0.25),
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(446000000),
+  routabilityCheckOverflow_(0.20),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -68,6 +69,7 @@ void Replace::reset() {
   minPhiCoef_ = 0.95;
   maxPhiCoef_ = 1.05;
   referenceHpwl_= 446000000;
+  routabilityCheckOverflow_ = 0.20;
 
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
@@ -132,6 +134,7 @@ void Replace::doNesterovPlace() {
   npVars.minPhiCoef = minPhiCoef_;
   npVars.maxPhiCoef = maxPhiCoef_;
   npVars.referenceHpwl = referenceHpwl_;
+  npVars.routabilityCheckOverflow = routabilityCheckOverflow_;
   npVars.initDensityPenalty = initDensityPenalityFactor_;
   npVars.initWireLengthCoef = initWireLengthCoef_;
   npVars.targetOverflow = overflow_;
@@ -239,6 +242,11 @@ Replace::setTimingDrivenMode(bool mode) {
 void
 Replace::setRoutabilityDrivenMode(bool mode) {
   routabilityDrivenMode_ = mode;  
+}
+
+void
+Replace::setRoutabilityCheckOverflow(float overflow) {
+  routabilityCheckOverflow_ = overflow;
 }
 
 }

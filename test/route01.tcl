@@ -5,7 +5,7 @@ read_def ./$test_name.def
 
 #global_placement -disable_routability_driven
 #fastroute -write_route -write_est
-global_placement -verbose 7 
+global_placement -verbose 1 
 
 
 set def_file [make_result_file route01.def]

@@ -26,6 +26,7 @@ class NesterovPlaceVars {
   float minPreconditioner; // MIN_PRE
   float initialPrevCoordiUpdateCoef; // z_ref_alpha
   float referenceHpwl; // refDeltaHpwl
+  float routabilityCheckOverflow;
   bool timingDrivenMode;
   bool routabilityDrivenMode;
 

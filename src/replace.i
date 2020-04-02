@@ -147,4 +147,11 @@ set_replace_disable_routability_driven_mode_cmd()
   replace->setRoutabilityDrivenMode(false);
 }
 
+void
+set_replace_routability_check_overflow(float overflow) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityCheckOverflow(overflow);
+}
+
 %} // inline

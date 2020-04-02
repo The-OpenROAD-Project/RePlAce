@@ -14,6 +14,7 @@ proc global_placement { args } {
       -init_density_penalty -init_wirelength_coef \
       -min_phi_coef -max_phi_coef -overflow \
       -initial_place_max_iter -initial_place_max_fanout \
+      -routability_check_overflow
       -verbose_level} \
       flags {-skip_initial_place -disable_timing_driven -disable_routability_driven -incremental}
     
@@ -80,11 +81,19 @@ proc global_placement { args } {
     sta::check_positive_float "-init_wirelength_coef" $coef
     set_replace_init_wirelength_coef_cmd $coef
   }
-  
+ 
+  # overflow 
   if { [info exists keys(-overflow)] } {
     set overflow $keys(-overflow)
     sta::check_positive_float "-overflow" $overflow
     set_replace_overflow_cmd $overflow
+  }
+  
+  # routability_check_overflow
+  if { [info exists keys(-routability_check_overflow)] } {
+    set routability_check_overflow $keys(-routability_check_overflow)
+    sta::check_positive_float "-routability_check_overflow" $routability_check_overflow
+    set_replace_routability_check_overflow $routability_check_overflow
   }
 
   if { [info exists keys(-verbose_level)] } {
