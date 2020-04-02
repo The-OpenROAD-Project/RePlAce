@@ -499,10 +499,9 @@ NesterovPlace::doNesterovPlace() {
       break;
     }
 
-    // check routability
+    // check routability using GR
     if( npVars_.routabilityDrivenMode 
         && npVars_.routabilityCheckOverflow >= sumOverflow_ ) {
-      rb_->updateCongestionMap();
       rb_->routability();
     }
 

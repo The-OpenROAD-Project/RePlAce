@@ -305,6 +305,7 @@ class RouteBase {
     void importRoute(const char* fileName);
     void importEst(const char* fileName);
 
+    void getGlobalRouterResult();
     void updateCongestionMap();
     void routability();
 
@@ -318,7 +319,7 @@ class RouteBase {
     std::shared_ptr<NesterovBase> nb_;
     std::shared_ptr<Logger> log_;
 
-    TileGrid tg_;
+    std::unique_ptr<TileGrid> tg_;
 
     // from *.route file
     std::vector<int> verticalCapacity_;
@@ -339,6 +340,7 @@ class RouteBase {
 
     void init();
     void reset();
+    void resetRoutabilityResources();
 
     // init congestion maps based on given points
     void updateSupplies();
