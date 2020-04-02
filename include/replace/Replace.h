@@ -62,9 +62,13 @@ class Replace
     void setVerboseLevel(int verbose);
 
     void setTimingDrivenMode(bool mode);
+
     void setRoutabilityDrivenMode(bool mode);
     void setRoutabilityCheckOverflow(float overflow);
     void setRoutabilityMaxDensity(float density);
+
+    void setRoutabilityMaxBloatIter(int iter);
+    void setRoutabilityMaxInflationIter(int iter);
 
   private:
     odb::dbDatabase* db_;
@@ -97,6 +101,9 @@ class Replace
     float referenceHpwl_;
     float routabilityCheckOverflow_;
     float routabilityMaxDensity_;
+
+    int routabilityMaxBloatIter_;
+    int routabilityMaxInflationIter_;
 
     bool timingDrivenMode_;
     bool routabilityDrivenMode_;

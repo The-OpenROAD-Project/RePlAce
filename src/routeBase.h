@@ -288,6 +288,9 @@ public:
   float blockagePorosity;
   float maxDensity;
 
+  int maxBloatIter;
+  int maxInflationIter;
+
   RouteBaseVars();
   void reset();
 };
@@ -337,6 +340,9 @@ class RouteBase {
     std::vector<std::pair<Tile*, float>> inflationList_;
 
     int64_t inflatedAreaDelta_;
+
+    int bloatIterCnt_;
+    int inflationIterCnt_;
     int numCall_;
 
     void init();
@@ -349,6 +355,9 @@ class RouteBase {
     void updatePinCount();
     void updateRoutes();
     void updateInflationRatio();
+
+    // update inflationCnt_, bloatCnt_ and numCall_
+    void increaseCounter();
 
     // routability funcs
     void initGCells();

@@ -161,4 +161,20 @@ set_replace_routability_max_density(float density)
   replace->setRoutabilityMaxDensity(density);
 }
 
+void
+set_replace_routability_max_bloat_iter(int iter)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxBloatIter(iter);
+}
+
+void
+set_replace_routability_max_inflation_iter(int iter) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxInflationIter(iter);
+}
+
+
+
 %} // inline

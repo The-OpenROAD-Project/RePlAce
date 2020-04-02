@@ -15,6 +15,7 @@ proc global_placement { args } {
       -min_phi_coef -max_phi_coef -overflow \
       -initial_place_max_iter -initial_place_max_fanout \
       -routability_check_overflow -routability_max_density \
+      -routability_max_bloat_iter -routability_max_inflation_iter \
       -verbose_level} \
       flags {-skip_initial_place -disable_timing_driven -disable_routability_driven -incremental}
 
@@ -110,6 +111,21 @@ proc global_placement { args } {
     sta::check_positive_float "-routability_check_overflow" $routability_check_overflow
     set_replace_routability_check_overflow $routability_check_overflow
   }
+  
+  # routability bloat iter
+  if { [info exists keys(-routability_max_bloat_iter)] } {
+    set routability_max_bloat_iter $keys(-routability_max_bloat_iter)
+    sta::check_positive_float "-routability_max_bloat_iter" $routability_max_bloat_iter
+    set_replace_routability_max_bloat_iter $routability_max_bloat_iter
+  }
+  
+  # routability inflation iter
+  if { [info exists keys(-routability_max_inflation_iter)] } {
+    set routability_max_inflation_iter $keys(-routability_max_inflation_iter)
+    sta::check_positive_float "-routability_max_inflation_iter" $routability_max_inflation_iter
+    set_replace_routability_max_inflation_iter $routability_max_inflation_iter
+  }
+
 
   if { [info exists keys(-verbose_level)] } {
     set verbose_level $keys(-verbose_level)

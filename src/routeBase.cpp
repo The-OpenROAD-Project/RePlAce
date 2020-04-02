@@ -528,7 +528,9 @@ RouteBaseVars::RouteBaseVars()
   inflationRatioCoef(2.33), 
   maxInflationRatio(2.5), 
   blockagePorosity(0),
-  maxDensity(0.99) {}
+  maxDensity(0.99),
+  maxBloatIter(1),
+  maxInflationIter(4) {}
 
 void 
 RouteBaseVars::reset() {
@@ -540,6 +542,8 @@ RouteBaseVars::reset() {
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
   maxDensity = 0.99;
+  maxBloatIter = 1;
+  maxInflationIter = 4;
 }
 
 /////////////////////////////////////////////
@@ -548,7 +552,8 @@ RouteBaseVars::reset() {
 RouteBase::RouteBase()
   : rbVars_(), 
   db_(nullptr), nb_(nullptr), log_(nullptr),
-  inflatedAreaDelta_(0), numCall_(0) {}
+  inflatedAreaDelta_(0), 
+  bloatIterCnt_(0), inflationIterCnt_(0), numCall_(0) {}
 
 RouteBase::RouteBase(
     RouteBaseVars rbVars, 
@@ -575,6 +580,7 @@ RouteBase::reset() {
   nb_ = nullptr;
   log_ = nullptr;
 
+  bloatIterCnt_ = inflationIterCnt_ = 0;
   numCall_ = 0;
   resetRoutabilityResources();
 }
@@ -1254,7 +1260,7 @@ RouteBase::updateInflationRatio() {
 
 void
 RouteBase::routability() {
-  numCall_ ++;
+  increaseCounter();
 
   // create Tile Grid
   std::unique_ptr<TileGrid> tg(new TileGrid());
@@ -1305,8 +1311,27 @@ RouteBase::routability() {
   sort(inflationList_.begin(), inflationList_.end(), 
       inflationListCompare);
 
+
+  // target ratio
+  float targetInflationDeltaAreaRatio  
+    = 1.0 / static_cast<float>(rbVars_.maxInflationIter);
+
+//  if( inflatedAreaDelta_ >
+//     targetInflationDeltaAreaRatio * pb_-> 
+//      )
+
   // reset
   resetRoutabilityResources();  
+}
+
+void
+RouteBase::increaseCounter() {
+  numCall_ ++;
+  inflationIterCnt_ ++;
+  if( inflationIterCnt_ > rbVars_.maxInflationIter ) {
+    inflationIterCnt_ = 0;
+    bloatIterCnt_ ++;
+  }
 }
 
 

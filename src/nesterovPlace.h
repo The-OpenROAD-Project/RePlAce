@@ -27,6 +27,10 @@ class NesterovPlaceVars {
   float initialPrevCoordiUpdateCoef; // z_ref_alpha
   float referenceHpwl; // refDeltaHpwl
   float routabilityCheckOverflow;
+
+  int routabilityMaxBloatIter;
+  int routabilityMaxInflationIter;
+
   bool timingDrivenMode;
   bool routabilityDrivenMode;
 

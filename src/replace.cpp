@@ -31,6 +31,8 @@ Replace::Replace()
   referenceHpwl_(446000000),
   routabilityCheckOverflow_(0.20),
   routabilityMaxDensity_(0.99),
+  routabilityMaxBloatIter_(1),
+  routabilityMaxInflationIter_(4),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -72,6 +74,8 @@ void Replace::reset() {
   referenceHpwl_= 446000000;
   routabilityCheckOverflow_ = 0.20;
   routabilityMaxDensity_ = 0.99;
+  routabilityMaxBloatIter_ = 1;
+  routabilityMaxInflationIter_ = 4;
 
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
@@ -255,6 +259,16 @@ Replace::setRoutabilityCheckOverflow(float overflow) {
 void
 Replace::setRoutabilityMaxDensity(float density) {
   routabilityMaxDensity_ = density;
+}
+
+void
+Replace::setRoutabilityMaxBloatIter(int iter) {
+  routabilityMaxBloatIter_ = iter; 
+}
+
+void
+Replace::setRoutabilityMaxInflationIter(int iter) {
+  routabilityMaxInflationIter_ = iter;
 }
 
 }
