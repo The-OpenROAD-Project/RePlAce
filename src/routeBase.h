@@ -286,6 +286,7 @@ public:
   float inflationRatioCoef;
   float maxInflationRatio;
   float blockagePorosity;
+  float maxDensity;
 
   RouteBaseVars();
   void reset();

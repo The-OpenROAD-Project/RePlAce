@@ -129,7 +129,7 @@ void Replace::doNesterovPlace() {
   
 
   RouteBaseVars rbVars;
-  rbVars_.maxDensity = routabilityMaxDensity_;
+  rbVars.maxDensity = routabilityMaxDensity_;
   rb_ = std::make_shared<RouteBase>(rbVars, db_, nb_, log_);
 
   NesterovPlaceVars npVars;
@@ -250,6 +250,11 @@ Replace::setRoutabilityDrivenMode(bool mode) {
 void
 Replace::setRoutabilityCheckOverflow(float overflow) {
   routabilityCheckOverflow_ = overflow;
+}
+
+void
+Replace::setRoutabilityMaxDensity(float density) {
+  routabilityMaxDensity_ = density;
 }
 
 }

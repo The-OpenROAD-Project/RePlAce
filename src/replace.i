@@ -155,7 +155,7 @@ set_replace_routability_check_overflow(float overflow)
 }
 
 void
-set_replace_routability_max_density(float denstiy) 
+set_replace_routability_max_density(float density) 
 {
   Replace* replace = getReplace();
   replace->setRoutabilityMaxDensity(density);
