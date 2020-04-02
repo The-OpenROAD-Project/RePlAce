@@ -154,4 +154,11 @@ set_replace_routability_check_overflow(float overflow)
   replace->setRoutabilityCheckOverflow(overflow);
 }
 
+void
+set_replace_routability_max_density(float denstiy) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxDensity(density);
+}
+
 %} // inline

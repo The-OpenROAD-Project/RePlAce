@@ -64,6 +64,7 @@ class Replace
     void setTimingDrivenMode(bool mode);
     void setRoutabilityDrivenMode(bool mode);
     void setRoutabilityCheckOverflow(float overflow);
+    void setRoutabilityMaxDensity(float density);
 
   private:
     odb::dbDatabase* db_;
@@ -95,6 +96,7 @@ class Replace
     float maxPhiCoef_;
     float referenceHpwl_;
     float routabilityCheckOverflow_;
+    float routabilityMaxDensity_;
 
     bool timingDrivenMode_;
     bool routabilityDrivenMode_;

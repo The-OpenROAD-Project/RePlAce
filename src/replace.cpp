@@ -30,6 +30,7 @@ Replace::Replace()
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(446000000),
   routabilityCheckOverflow_(0.20),
+  routabilityMaxDensity_(0.99),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -70,6 +71,7 @@ void Replace::reset() {
   maxPhiCoef_ = 1.05;
   referenceHpwl_= 446000000;
   routabilityCheckOverflow_ = 0.20;
+  routabilityMaxDensity_ = 0.99;
 
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
@@ -127,6 +129,7 @@ void Replace::doNesterovPlace() {
   
 
   RouteBaseVars rbVars;
+  rbVars_.maxDensity = routabilityMaxDensity_;
   rb_ = std::make_shared<RouteBase>(rbVars, db_, nb_, log_);
 
   NesterovPlaceVars npVars;

@@ -14,16 +14,10 @@ proc global_placement { args } {
       -init_density_penalty -init_wirelength_coef \
       -min_phi_coef -max_phi_coef -overflow \
       -initial_place_max_iter -initial_place_max_fanout \
-      -routability_check_overflow
+      -routability_check_overflow -routability_max_density \
       -verbose_level} \
       flags {-skip_initial_place -disable_timing_driven -disable_routability_driven -incremental}
-    
-  set target_density 0.7
-  if { [info exists keys(-density)] } {
-    set target_density $keys(-density) 
-    sta::check_positive_float "-density" $target_density
-  }
-  set_replace_density_cmd $target_density
+
 
   # flow control for initial_place
   if { [info exists flags(-skip_initial_place)] } {
@@ -55,9 +49,23 @@ proc global_placement { args } {
     sta::check_positive_integer "-initial_place_max_fanout" $initial_place_max_fanout
     set_replace_initial_place_max_fanout_cmd $initial_place_max_fanout
   }
+  
+  # density settings    
+  set target_density 0.7
+  if { [info exists keys(-density)] } {
+    set target_density $keys(-density) 
+    sta::check_positive_float "-density" $target_density
+  }
+  set_replace_density_cmd $target_density
+
+  if { [info exists keys(-routability_max_density)] } {
+    set routability_max_density $keys(-routability_max_density)
+    sta::check_positive_float "-routability_max_density" $routability_max_density
+    set_replace_routability_max_density_cmd $routability_max_density
+  }
 
 
-  # hidden parameter to control the RePlAce divergence
+  # parameter to control the RePlAce divergence
   if { [info exists keys(-min_phi_coef)] } { 
     set min_phi_coef $keys(-min_phi_coef)
     sta::check_positive_float "-min_phi_coef" $min_phi_coef
@@ -81,6 +89,13 @@ proc global_placement { args } {
     sta::check_positive_float "-init_wirelength_coef" $coef
     set_replace_init_wirelength_coef_cmd $coef
   }
+  
+  if { [info exists keys(-bin_grid_count)] } {
+    set bin_grid_count  $keys(-bin_grid_count)
+    sta::check_positive_integer "-bin_grid_count" $bin_grid_count
+    set_replace_bin_grid_cnt_x_cmd $bin_grid_count
+    set_replace_bin_grid_cnt_y_cmd $bin_grid_count    
+  }
  
   # overflow 
   if { [info exists keys(-overflow)] } {
@@ -89,7 +104,7 @@ proc global_placement { args } {
     set_replace_overflow_cmd $overflow
   }
   
-  # routability_check_overflow
+  # routability check overflow
   if { [info exists keys(-routability_check_overflow)] } {
     set routability_check_overflow $keys(-routability_check_overflow)
     sta::check_positive_float "-routability_check_overflow" $routability_check_overflow
@@ -102,12 +117,6 @@ proc global_placement { args } {
     set_replace_verbose_level_cmd $verbose_level
   } 
 
-  if { [info exists keys(-bin_grid_count)] } {
-    set bin_grid_count  $keys(-bin_grid_count)
-    sta::check_positive_integer "-bin_grid_count" $bin_grid_count
-    set_replace_bin_grid_cnt_x_cmd $bin_grid_count
-    set_replace_bin_grid_cnt_y_cmd $bin_grid_count    
-  }
 
 
   if { [ord::db_has_rows] } {

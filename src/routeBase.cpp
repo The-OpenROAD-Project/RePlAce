@@ -527,7 +527,8 @@ RouteBaseVars::RouteBaseVars()
   pinBlockageFactor(0.05),
   inflationRatioCoef(2.33), 
   maxInflationRatio(2.5), 
-  blockagePorosity(0) {}
+  blockagePorosity(0),
+  maxDensity(0.99) {}
 
 void 
 RouteBaseVars::reset() {
@@ -538,6 +539,7 @@ RouteBaseVars::reset() {
   inflationRatioCoef = 2.33;
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
+  maxDensity = 0.99;
 }
 
 /////////////////////////////////////////////
@@ -573,14 +575,14 @@ RouteBase::reset() {
   nb_ = nullptr;
   log_ = nullptr;
 
-  inflatedAreaDelta_ = 0;
   numCall_ = 0;
-
   resetRoutabilityResources();
 }
 
 void
 RouteBase::resetRoutabilityResources() {
+  inflatedAreaDelta_ = 0;
+
   tg_.reset();
   verticalCapacity_.clear();
   horizontalCapacity_.clear();
@@ -1257,14 +1259,10 @@ RouteBase::routability() {
   // create Tile Grid
   std::unique_ptr<TileGrid> tg(new TileGrid());
   tg_ = std::move(tg);
-
   tg_->setLogger(log_);
 
   getGlobalRouterResult();
   updateCongestionMap();
-
-  // other parts update
-  inflatedAreaDelta_ = 0;
 
   // set inflated ratio
   for(auto& tile : tg_->tiles()) {
@@ -1297,9 +1295,6 @@ RouteBase::routability() {
 
   }
 
-  inflationList_.clear();
-  inflationList_.shrink_to_fit();
-
   // update inflationList_
   for(auto& tile : tg_->tiles()) {
     inflationList_.push_back(
@@ -1313,7 +1308,6 @@ RouteBase::routability() {
   // reset
   resetRoutabilityResources();  
 }
-
 
 
 // compare based on the inflatedRatio
