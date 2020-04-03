@@ -30,11 +30,10 @@ set(REPLACE_HOME ${PROJECT_SOURCE_DIR}/src/replace )
 set(FLUTE_HOME ${PROJECT_SOURCE_DIR}/src/flute3)
 set(OPENSTA_HOME ${PROJECT_SOURCE_DIR}/src/OpenSTA)
 
-set(EIGEN_HOME ${PROJECT_SOURCE_DIR}/src/eigen)
-
 set(OPENROAD_HOME ${PROJECT_SOURCE_DIR})
 set(OPENDB_HOME ${PROJECT_SOURCE_DIR}/src/OpenDB)
 
+find_package(Eigen3 REQUIRED)
 find_package(ZLIB REQUIRED)
 
 # for cimg
@@ -96,7 +95,6 @@ target_include_directories( replace
   PRIVATE
   ${REPLACE_HOME}/src
 
-  ${EIGEN_HOME}
   ${FLUTE_HOME}
 
   ${OPENSTA_HOME}/util
@@ -111,6 +109,7 @@ target_include_directories( replace
   ${OPENDB_HOME}/include
   ${OPENROAD_HOME}/include
   ${TCL_INCLUDE_PATH}
+  Eigen3
 )
 
 # CIMG_USE case

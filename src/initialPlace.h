@@ -1,8 +1,8 @@
 #ifndef __REPLACE_INIT_PLACE__
 #define __REPLACE_INIT_PLACE__
 
-#include <Eigen/SparseCore>
-#include <opendb/db.h>
+#include <eigen3/Eigen/SparseCore>
+#include "opendb/db.h"
 #include <memory>
 
 namespace replace {
