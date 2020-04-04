@@ -485,7 +485,8 @@ class GPin {
 class Bin {
 public:
   Bin();
-  Bin(int x, int y, int lx, int ly, int ux, int uy, float targetDensity);
+  Bin(int x, int y, int lx, int ly, int ux, int uy,
+      float targetDensity);
 
   ~Bin();
 
@@ -761,10 +762,26 @@ public:
   int binCntY() const;
   int binSizeX() const;
   int binSizeY() const;
+  int64_t overflowArea() const;
 
   const std::vector<Bin*> & bins() const;
 
-  int64_t overflowArea() const;
+  // filler cells / area control
+  // will be used in Routability-driven loop
+  int fillerDx() const;
+  int fillerDy() const;
+  int fillerCnt() const;
+  int64_t fillerArea() const;
+  int64_t whiteSpaceArea() const;
+  int64_t movableArea() const;
+  int64_t totalFillerArea() const;
+
+  // should be separately defined.
+  // This is mainly used for NesterovLoop
+  int64_t nesterovInstsArea() const;
+
+  // sum phi and target density
+  // used in NesterovPlace
   float sumPhi() const;
   float targetDensity() const;
 
@@ -815,6 +832,12 @@ private:
 
   BinGrid bg_;
   std::unique_ptr<FFT> fft_;
+
+  int fillerDx_, fillerDy_;
+  int fillerCnt_;
+  int64_t whiteSpaceArea_;
+  int64_t movableArea_;
+  int64_t totalFillerArea_;
 
   std::vector<GCell> gCellStor_;
   std::vector<GNet> gNetStor_;

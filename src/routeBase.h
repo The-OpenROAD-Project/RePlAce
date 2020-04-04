@@ -315,6 +315,8 @@ class RouteBase {
 
     int64_t inflatedAreaDelta() const;
     int numCall() const;
+    int bloatIterCnt() const;
+    int inflationIterCnt() const;
 
   private:
     RouteBaseVars rbVars_;
@@ -356,7 +358,7 @@ class RouteBase {
     void updateRoutes();
     void updateInflationRatio();
 
-    // update inflationCnt_, bloatCnt_ and numCall_
+    // update inflationIterCnt_, bloatIterCnt_ and numCall_
     void increaseCounter();
 
     // routability funcs

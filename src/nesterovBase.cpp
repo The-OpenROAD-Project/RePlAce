@@ -896,7 +896,12 @@ NesterovBaseVars::reset() {
 // NesterovBase 
 
 NesterovBase::NesterovBase()
-  : pb_(nullptr), log_(nullptr), sumPhi_(0) {}
+  : pb_(nullptr), log_(nullptr), 
+  fillerDx_(0), fillerDy_(0),
+  fillerCnt_(0), 
+  whiteSpaceArea_(0), 
+  movableArea_(0), totalFillerArea_(0),
+  sumPhi_(0) {}
 
 NesterovBase::NesterovBase(
     NesterovBaseVars nbVars, 
@@ -910,9 +915,49 @@ NesterovBase::NesterovBase(
 }
 
 NesterovBase::~NesterovBase() {
-  pb_ = nullptr;
   reset();
 }
+
+void
+NesterovBase::reset() { 
+  nbVars_.reset();
+  pb_ = nullptr;
+  log_ = nullptr;
+  
+  fillerDx_ = fillerDy_ = 0;
+  fillerCnt_ = 0;
+  whiteSpaceArea_ = movableArea_ = 0;
+  totalFillerArea_ = 0;
+
+  gCellStor_.clear();
+  gNetStor_.clear();
+  gPinStor_.clear();
+
+  gCells_.clear();
+  gCellInsts_.clear();
+  gCellFillers_.clear();
+
+  gNets_.clear();
+  gPins_.clear();
+
+  gCellMap_.clear();
+  gPinMap_.clear();
+  gNetMap_.clear();
+  
+  gCellStor_.shrink_to_fit();
+  gNetStor_.shrink_to_fit();
+  gPinStor_.shrink_to_fit();
+
+  gCells_.shrink_to_fit();
+  gCellInsts_.shrink_to_fit();
+  gCellFillers_.shrink_to_fit();
+
+  gNets_.shrink_to_fit();
+  gPins_.shrink_to_fit();
+
+  sumPhi_ = 0;
+}
+
 
 void
 NesterovBase::init() {
@@ -1093,52 +1138,49 @@ NesterovBase::initFillerGCells() {
 
   // the avgDx and avgDy will be used as filler cells' 
   // width and height
-  int avgDx = static_cast<int>(dxSum / (maxIdx - minIdx));
-  int avgDy = static_cast<int>(dySum / (maxIdx - minIdx));
+  fillerDx_ = static_cast<int>(dxSum / (maxIdx - minIdx));
+  fillerDy_ = static_cast<int>(dySum / (maxIdx - minIdx));
 
-
-  int64_t coreArea = 
-    static_cast<int64_t>(pb_->die().coreDx()) *
-    static_cast<int64_t>(pb_->die().coreDy()); 
+  int64_t coreArea = pb_->die().coreArea(); 
 
   // nonPlaceInstsArea should not have targetDensity downscaling!!! 
-  int64_t whiteSpaceArea = coreArea - 
+  whiteSpaceArea_ = coreArea - 
     static_cast<int64_t>(pb_->nonPlaceInstsArea());
 
   // TODO density screening
-  int64_t movableArea = whiteSpaceArea 
+  movableArea_ = whiteSpaceArea_ 
     * nbVars_.targetDensity;
   
-  int64_t totalFillerArea = movableArea 
+  totalFillerArea_ = movableArea_
     - static_cast<int64_t>(pb_->stdInstsArea())
     - static_cast<int64_t>(pb_->macroInstsArea() * nbVars_.targetDensity);
 
 
-  if( totalFillerArea < 0 ) {
+  if( totalFillerArea_ < 0 ) {
     string msg = "Filler area is negative!!\n";
     msg += "       Please put higher target density or \n";
     msg += "       Re-floorplan to have enough coreArea\n";
     log_->error( msg, 1 );
   }
 
-  int fillerCnt = 
-    static_cast<int>(totalFillerArea 
-        / static_cast<int64_t>(avgDx * avgDy));
+  fillerCnt_ = 
+    static_cast<int>(totalFillerArea_ 
+        / static_cast<int64_t>(fillerDx_ * fillerDy_));
 
   log_->infoInt64("FillerInit: CoreArea", coreArea, 3);
-  log_->infoInt64("FillerInit: WhiteSpaceArea", whiteSpaceArea, 3);
-  log_->infoInt64("FillerInit: MovableArea", movableArea, 3);
-  log_->infoInt64("FillerInit: TotalFillerArea", totalFillerArea, 3);
-  log_->infoInt("FillerInit: NumFillerCells", fillerCnt, 3);
-  log_->infoInt64("FillerInit: FillerCellArea", static_cast<int64_t>(avgDx*avgDy), 3);
-  log_->infoIntPair("FillerInit: FillerCellSize", avgDx, avgDy, 3); 
+  log_->infoInt64("FillerInit: WhiteSpaceArea", whiteSpaceArea_, 3);
+  log_->infoInt64("FillerInit: MovableArea", movableArea_, 3);
+  log_->infoInt64("FillerInit: TotalFillerArea", totalFillerArea_, 3);
+  log_->infoInt("FillerInit: NumFillerCells", fillerCnt_, 3);
+  log_->infoInt64("FillerInit: FillerCellArea", fillerArea(), 3);
+  log_->infoIntPair("FillerInit: FillerCellSize", fillerDx_, fillerDy_, 3); 
 
   // 
   // mt19937 supports huge range of random values.
   // rand()'s RAND_MAX is only 32767.
   //
   mt19937 randVal(0);
-  for(int i=0; i<fillerCnt; i++) {
+  for(int i=0; i<fillerCnt_; i++) {
 
     // instability problem between g++ and clang++!
     auto randX = randVal();
@@ -1149,7 +1191,7 @@ NesterovBase::initFillerGCells() {
     GCell myGCell(
         randX % pb_->die().coreDx() + pb_->die().coreLx(), 
         randY % pb_->die().coreDy() + pb_->die().coreLy(),
-        avgDx, avgDy );
+        fillerDx_, fillerDy_);
 
     gCellStor_.push_back(myGCell);
   }
@@ -1256,6 +1298,48 @@ NesterovBase::binSizeY() const {
 int64_t 
 NesterovBase::overflowArea() const {
   return bg_.overflowArea(); 
+}
+
+int 
+NesterovBase::fillerDx() const {
+  return fillerDx_; 
+}
+
+int
+NesterovBase::fillerDy() const {
+  return fillerDy_; 
+}
+
+int
+NesterovBase::fillerCnt() const {
+  return fillerCnt_;
+}
+
+int64_t
+NesterovBase::fillerArea() const {
+  return static_cast<int64_t>(fillerDx_)
+    * static_cast<int64_t>(fillerDy_);
+}
+
+int64_t 
+NesterovBase::whiteSpaceArea() const {
+  return whiteSpaceArea_;
+}
+
+int64_t 
+NesterovBase::movableArea() const {
+  return movableArea_;
+}
+
+int64_t 
+NesterovBase::totalFillerArea() const {
+  return totalFillerArea_;
+}
+
+int64_t
+NesterovBase::nesterovInstsArea() const {
+  return static_cast<int64_t>(pb_->stdInstsArea()) 
+    + static_cast<int64_t>(round(pb_->macroInstsArea() * targetDensity()));
 }
 
 float
@@ -1539,12 +1623,6 @@ NesterovBase::getHpwl() {
     hpwl += gNet->hpwl();
   }
   return hpwl;
-}
-
-void
-NesterovBase::reset() { 
-  pb_ = nullptr;
-  nbVars_.reset();
 }
 
 

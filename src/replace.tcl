@@ -43,6 +43,8 @@ proc global_placement { args } {
   if { [info exists flags(-incremental)] } {
     set_replace_initial_place_max_iter_cmd 0
     set_replace_incremental_place_mode_cmd
+    # disable-routability-driven
+    set_replace_disable_routability_driven_mode_cmd
   }
 
   if { [info exists keys(-initial_place_max_fanout)] } { 

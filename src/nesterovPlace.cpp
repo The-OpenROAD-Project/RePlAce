@@ -135,8 +135,7 @@ void NesterovPlace::init() {
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
-        / static_cast<float>(pb_->stdInstsArea() 
-            + pb_->macroInstsArea() * nb_->targetDensity() );
+        / static_cast<float>(nb_->nesterovInstsArea());
 
   log_->infoFloatSignificant("InitSumOverflow", sumOverflow_, 3);
 
@@ -185,8 +184,7 @@ void NesterovPlace::init() {
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
-        / static_cast<float>(pb_->stdInstsArea() 
-            + pb_->macroInstsArea() * nb_->targetDensity() );
+        / static_cast<float>(nb_->nesterovInstsArea());
   
   log_->infoFloatSignificant("PrevSumOverflow", sumOverflow_, 3);
   
@@ -578,8 +576,7 @@ NesterovPlace::updateNextIter() {
 
   sumOverflow_ = 
       static_cast<float>(nb_->overflowArea()) 
-        / static_cast<float>(pb_->stdInstsArea() 
-            + pb_->macroInstsArea() * nb_->targetDensity() );
+        / static_cast<float>(nb_->nesterovInstsArea());
 
   log_->infoFloatSignificant("  Gradient", getSecondNorm(curSLPSumGrads_), 3);
   log_->infoFloatSignificant("  Phi", nb_->sumPhi(), 3);

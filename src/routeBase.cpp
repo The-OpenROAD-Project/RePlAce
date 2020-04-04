@@ -648,6 +648,16 @@ RouteBase::numCall() const {
   return numCall_;
 }
 
+int 
+RouteBase::bloatIterCnt() const {
+  return bloatIterCnt_;
+}
+
+int
+RouteBase::inflationIterCnt() const {
+  return inflationIterCnt_;
+}
+
 // fill 
 //
 // TileGrids' 
@@ -1316,9 +1326,13 @@ RouteBase::routability() {
   float targetInflationDeltaAreaRatio  
     = 1.0 / static_cast<float>(rbVars_.maxInflationIter);
 
-//  if( inflatedAreaDelta_ >
-//     targetInflationDeltaAreaRatio * pb_-> 
-//      )
+  if( inflatedAreaDelta_ >
+     targetInflationDeltaAreaRatio * 
+     (nb_->whiteSpaceArea() - nb_->nesterovInstsArea() + nb_->fillerArea())) {
+    using std::cout;
+    using std::endl;
+    cout << "dynamic inflation proc:" << endl; 
+  } 
 
   // reset
   resetRoutabilityResources();  
