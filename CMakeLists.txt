@@ -19,19 +19,9 @@ endif()
 # For Multithread
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Dcimg_use_jpeg=1 -DUSE_FFT2D_PTHREADS=1 -DFFT_2D_MAX_THREADS=16 -O3 ${OpenMP_CXX_FLAGS}")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-
-set(REPLACE_HOME ${PROJECT_SOURCE_DIR}/src/replace )
-set(FLUTE_HOME ${PROJECT_SOURCE_DIR}/src/flute3)
-set(OPENSTA_HOME ${PROJECT_SOURCE_DIR}/src/OpenSTA)
-
-set(OPENROAD_HOME ${PROJECT_SOURCE_DIR})
-set(OPENDB_HOME ${PROJECT_SOURCE_DIR}/src/OpenDB)
 
 find_package(Eigen3 REQUIRED)
 find_package(ZLIB REQUIRED)
@@ -110,6 +100,7 @@ target_include_directories( replace
   ${OPENROAD_HOME}/include
   ${TCL_INCLUDE_PATH}
   Eigen3
+  flute3
 )
 
 # CIMG_USE case
