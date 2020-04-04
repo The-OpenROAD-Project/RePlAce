@@ -222,11 +222,17 @@ GCell::isFiller() const {
 
 bool
 GCell::isMacroInstance() const {
+  if( !isInstance() ) {
+    return false;
+  }
   return isMacroInstance_; 
 }
 
 bool
 GCell::isStdInstance() const {
+  if( !isInstance() ) {
+    return false;
+  }
   return !isMacroInstance_;
 }
 
@@ -901,7 +907,7 @@ NesterovBase::NesterovBase()
   fillerCnt_(0), 
   whiteSpaceArea_(0), 
   movableArea_(0), totalFillerArea_(0),
-  sumPhi_(0) {}
+  sumPhi_(0), density_(0) {}
 
 NesterovBase::NesterovBase(
     NesterovBaseVars nbVars, 
@@ -956,6 +962,7 @@ NesterovBase::reset() {
   gPins_.shrink_to_fit();
 
   sumPhi_ = 0;
+  density_ = 0;
 }
 
 
@@ -1046,6 +1053,9 @@ NesterovBase::init() {
     }
   }
 
+  // density update
+  density_ = nbVars_.targetDensity;
+
   log_->infoInt("FillerInit: NumGCells", gCells_.size());
   log_->infoInt("FillerInit: NumGNets", gNets_.size());
   log_->infoInt("FillerInit: NumGPins", gPins_.size());
@@ -1068,9 +1078,9 @@ NesterovBase::init() {
   // update binGrid info
   bg_.initBins();
 
-
   // initialize fft structrue based on bins
-  std::unique_ptr<FFT> fft(new FFT(bg_.binCntX(), bg_.binCntY(), 
+  std::unique_ptr<FFT> fft(
+      new FFT(bg_.binCntX(), bg_.binCntY(), 
         bg_.binSizeX(), bg_.binSizeY()));
 
   fft_ = std::move(fft);
@@ -1274,6 +1284,11 @@ NesterovBase::updateGCellDensityCenterLocation(
   bg_.updateBinsGCellDensityArea( gCells_ );
 }
 
+void
+NesterovBase::setDensity(float density) {
+  density_ = density;
+}
+
 int
 NesterovBase::binCntX() const {
   return bg_.binCntX(); 
@@ -1318,7 +1333,8 @@ NesterovBase::fillerCnt() const {
 int64_t
 NesterovBase::fillerArea() const {
   return static_cast<int64_t>(fillerDx_)
-    * static_cast<int64_t>(fillerDy_);
+    * static_cast<int64_t>(fillerDy_) 
+    * static_cast<int64_t>(fillerCnt_);
 }
 
 int64_t 
@@ -1336,10 +1352,12 @@ NesterovBase::totalFillerArea() const {
   return totalFillerArea_;
 }
 
+
 int64_t
 NesterovBase::nesterovInstsArea() const {
   return static_cast<int64_t>(pb_->stdInstsArea()) 
-    + static_cast<int64_t>(round(pb_->macroInstsArea() * targetDensity()));
+    + static_cast<int64_t>(round(pb_->macroInstsArea() 
+          * density_));
 }
 
 float
@@ -1350,6 +1368,11 @@ NesterovBase::sumPhi() const {
 float
 NesterovBase::targetDensity() const {
   return nbVars_.targetDensity;
+}
+
+float
+NesterovBase::density() const {
+  return density_;
 }
 
 void 

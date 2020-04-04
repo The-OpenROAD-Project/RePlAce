@@ -776,6 +776,11 @@ public:
   int64_t movableArea() const;
   int64_t totalFillerArea() const;
 
+  // update 
+  // fillerArea, whiteSpaceArea, movableArea 
+  // and totalFillerArea after changing gCell's size
+  void updateAreas();
+
   // should be separately defined.
   // This is mainly used for NesterovLoop
   int64_t nesterovInstsArea() const;
@@ -783,7 +788,14 @@ public:
   // sum phi and target density
   // used in NesterovPlace
   float sumPhi() const;
+
+  // targetDensity is set by users
   float targetDensity() const;
+
+  // density can be changed dynamically 
+  // on routabilityDriven Loop.
+  float density() const;
+  void setDensity(float density);
 
   void updateDensityCoordiLayoutInside(GCell* gcell);
 
@@ -855,6 +867,7 @@ private:
   std::unordered_map<Net*, GNet*> gNetMap_;
 
   float sumPhi_;
+  float density_;
 
   void init();
   void initFillerGCells();
