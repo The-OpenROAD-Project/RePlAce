@@ -60,6 +60,7 @@ NesterovPlace::NesterovPlace()
   wireLengthCoefX_(0), 
   wireLengthCoefY_(0),
   prevHpwl_(0),
+  firstRoutabilityIter_(0),
   isDiverged_(false) {}
 
 NesterovPlace::NesterovPlace(
@@ -218,6 +219,8 @@ void NesterovPlace::reset() {
   
   curCoordi_.clear();
   nextCoordi_.clear();
+
+  densityPenaltyStor_.clear();
   
   curSLPCoordi_.shrink_to_fit();
   curSLPWireLengthGrads_.shrink_to_fit();
@@ -236,6 +239,18 @@ void NesterovPlace::reset() {
   
   curCoordi_.shrink_to_fit();
   nextCoordi_.shrink_to_fit();
+
+  densityPenaltyStor_.shrink_to_fit();
+
+  wireLengthGradSum_ = 0;
+  densityGradSum_ = 0;
+  stepLength_ = 0;
+  densityPenalty_ = 0;
+  baseWireLengthCoef_ = 0;
+  wireLengthCoefX_ = wireLengthCoefY_ = 0;
+  prevHpwl_ = 0;
+  firstRoutabilityIter_ = 0;
+  isDiverged_ = false;
 }
 
 // to execute following function,
@@ -500,7 +515,14 @@ NesterovPlace::doNesterovPlace() {
     // check routability using GR
     if( npVars_.routabilityDrivenMode 
         && npVars_.routabilityCheckOverflow >= sumOverflow_ ) {
+      if( rb_->numCall() == 0 ) {
+        firstRoutabilityIter_ = i;
+      }
+     
       rb_->routability();
+
+      // back the densityPenalty values 
+      densityPenalty_ = getRoutabilityDensityPenalty();
     }
 
     // minimum iteration is 50
@@ -597,6 +619,11 @@ NesterovPlace::updateNextIter() {
   densityPenalty_ *= phiCoef;
   
   log_->infoFloatSignificant("  PhiCoef", phiCoef, 3);
+
+  // for routability densityPenalty recovery
+  if( rb_->numCall() == 0 ) {
+    densityPenaltyStor_.push_back( densityPenalty_ );
+  }
 }
 
 float
@@ -638,6 +665,16 @@ NesterovPlace::updateDb() {
       inst->setLocation( gCell->dCx()-gCell->dDx()/2,
            gCell->dCy()-gCell->dDy()/2 ); 
     }
+  }
+}
+
+float 
+NesterovPlace::getRoutabilityDensityPenalty() {
+  if( firstRoutabilityIter_ > 130 ) {
+    return densityPenaltyStor_[firstRoutabilityIter_-130];
+  }
+  else {
+    return densityPenaltyStor_[0];
   }
 }
 

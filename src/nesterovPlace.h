@@ -106,6 +106,9 @@ private:
   std::vector<FloatPoint> curCoordi_;
   std::vector<FloatPoint> nextCoordi_;
 
+  // densityPenalty stor
+  std::vector<float> densityPenaltyStor_;
+
   float wireLengthGradSum_;
   float densityGradSum_;
 
@@ -129,9 +132,12 @@ private:
   // half-parameter-wire-length
   int64_t prevHpwl_;
 
+  // routability-iter
+  int firstRoutabilityIter_;
+
   float isDiverged_;
 
-  float getWireLengthCoef(float overflow);
+  float getRoutabilityDensityPenalty();
 
   void init();
   void reset();

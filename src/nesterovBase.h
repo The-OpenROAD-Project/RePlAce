@@ -776,10 +776,21 @@ public:
   int64_t movableArea() const;
   int64_t totalFillerArea() const;
 
-  // update 
-  // fillerArea, whiteSpaceArea, movableArea 
+  // bloating cell will change the following areas.
+  int64_t stdInstsArea() const;
+  int64_t macroInstsArea() const;
+
+  // update
+  // fillerArea, whiteSpaceArea, movableArea
   // and totalFillerArea after changing gCell's size
   void updateAreas();
+
+  // change fillerCell's size
+  void updateFillerCellSize(int dx, int dy);
+
+  // update density sizes with changed dx and dy
+  void updateDensitySize();
+
 
   // should be separately defined.
   // This is mainly used for NesterovLoop
@@ -792,7 +803,7 @@ public:
   // targetDensity is set by users
   float targetDensity() const;
 
-  // density can be changed dynamically 
+  // density can be changed dynamically
   // on routabilityDriven Loop.
   float density() const;
   void setDensity(float density);
@@ -850,6 +861,9 @@ private:
   int64_t whiteSpaceArea_;
   int64_t movableArea_;
   int64_t totalFillerArea_;
+
+  int64_t stdInstsArea_;
+  int64_t macroInstsArea_;
 
   std::vector<GCell> gCellStor_;
   std::vector<GNet> gNetStor_;

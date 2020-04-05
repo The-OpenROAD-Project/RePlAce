@@ -528,7 +528,7 @@ RouteBaseVars::RouteBaseVars()
   inflationRatioCoef(2.33), 
   maxInflationRatio(2.5), 
   blockagePorosity(0),
-  maxDensity(0.99),
+  maxDensity(0.90),
   maxBloatIter(1),
   maxInflationIter(4) {}
 
@@ -541,7 +541,7 @@ RouteBaseVars::reset() {
   inflationRatioCoef = 2.33;
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
-  maxDensity = 0.99;
+  maxDensity = 0.90;
   maxBloatIter = 1;
   maxInflationIter = 4;
 }
@@ -1293,7 +1293,7 @@ RouteBase::routability() {
   using std::cout;
   using std::endl;
 
-  // get inflatedAreaDelta_
+  // run bloating and get inflatedAreaDelta_
   for(auto& gCell : nb_->gCells()) {
     // only care about "standard cell"
     if( !gCell->isStdInstance() ) {
@@ -1310,19 +1310,32 @@ RouteBase::routability() {
       continue;
     } 
 
+    int64_t prevCellArea 
+      = static_cast<int64_t>(gCell->dx())
+      * static_cast<int64_t>(gCell->dy());
+
+    // bloat
+    gCell->setSize(
+        static_cast<int>(round(gCell->dx() 
+            * sqrt(tile->inflatedRatio()))), 
+        static_cast<int>(round(gCell->dy() 
+            * sqrt(tile->inflatedRatio()))));
+
+
+    int64_t newCellArea
+      = static_cast<int64_t>(gCell->dx())
+      * static_cast<int64_t>(gCell->dy());
+    
     // deltaArea is equal to area * deltaRatio
-    //
-    // Here, original code chagnes 
-    // both of original and density size, 
-    // but I'll bloat the "Density Size" ONLY
-    // 
-    // Original size doesn't need to be changed at all.
+    // both of original and density size will be changed 
     inflatedAreaDelta_ 
-      += static_cast<int64_t>(round( 
-        static_cast<int64_t>(gCell->dDx()) 
-        * static_cast<int64_t>(gCell->dDy())
-        * gCell->densityScale() 
-        * (tile->inflatedRatio() - 1.0)));
+      += newCellArea - prevCellArea;
+
+//    inflatedAreaDelta_ 
+//      = static_cast<int64_t>(round( 
+//        static_cast<int64_t>(gCell->dx()) 
+//        * static_cast<int64_t>(gCell->dy())
+//        * (tile->inflatedRatio() - 1.0)));
   }
 
   // update inflationList_
@@ -1339,32 +1352,51 @@ RouteBase::routability() {
   float targetInflationDeltaAreaRatio  
     = 1.0 / static_cast<float>(rbVars_.maxInflationIter);
 
-
+  // TODO: looks weird
   if( inflatedAreaDelta_ >
      targetInflationDeltaAreaRatio * 
      (nb_->whiteSpaceArea() - nb_->nesterovInstsArea() + nb_->totalFillerArea())) {
     cout << "Needs dynamic inflation proc:" << endl; 
   } 
 
-  int64_t newNesterovInstsArea 
-    = nb_->nesterovInstsArea() + inflatedAreaDelta_;
+  log_->infoInt64("InflatedAreaDelta", inflatedAreaDelta_ );
+  log_->infoFloat("Density", nb_->density());
 
-  nb_->setDensity( static_cast<float>(newNesterovInstsArea) 
-      / static_cast<float>(nb_->movableArea()) );
+  int64_t totalGCellArea = inflatedAreaDelta_ 
+        + nb_->nesterovInstsArea() + nb_->totalFillerArea();
 
+  // newly set Density
+  nb_->setDensity( static_cast<float>(totalGCellArea) 
+      / static_cast<float>(nb_->whiteSpaceArea()) );
+
+  // TODO: looks weird, too
   if( nb_->density() > rbVars_.maxDensity ) {
     cout << "Need to shrink fillercells" << endl;
+//    nb_->updateFillerCellSize(dx, dy);
   }
 
-  log_->infoInt64("InflatedAreaDelta", inflatedAreaDelta_ );
-  log_->infoFloat("NewDensity", nb_->density());
   log_->infoInt64("WhiteSpaceArea", nb_->whiteSpaceArea());
-  log_->infoInt64("MovableArea", nb_->movableArea());
   log_->infoInt64("NesterovInstsArea", nb_->nesterovInstsArea());
   log_->infoInt64("TotalFillerArea", nb_->totalFillerArea());
-  log_->infoInt64("TotalGCellsArea", nb_->nesterovInstsArea() + nb_->totalFillerArea());
+  log_->infoInt64("TotalGCellsArea", nb_->nesterovInstsArea() 
+      + nb_->totalFillerArea());
   log_->infoInt64("NewTotalGCellsArea", inflatedAreaDelta_ 
       + nb_->nesterovInstsArea() + nb_->totalFillerArea());
+ 
+  // updateArea 
+  log_->infoString("UpdateArea");
+  nb_->updateAreas();
+
+  log_->infoFloat("NewDensity", nb_->density());
+  log_->infoInt64("NewWhiteSpaceArea", nb_->whiteSpaceArea());
+  log_->infoInt64("MovableArea", nb_->movableArea());
+  log_->infoInt64("NewNesterovInstsArea", nb_->nesterovInstsArea());
+  log_->infoInt64("NewTotalFillerArea", nb_->totalFillerArea());
+  log_->infoInt64("NewTotalGCellsArea", nb_->nesterovInstsArea() 
+      + nb_->totalFillerArea());
+
+  // update densitySizes for all gCell
+  nb_->updateDensitySize();
 
   // reset
   resetRoutabilityResources();  

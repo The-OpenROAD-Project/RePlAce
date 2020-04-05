@@ -907,6 +907,7 @@ NesterovBase::NesterovBase()
   fillerCnt_(0), 
   whiteSpaceArea_(0), 
   movableArea_(0), totalFillerArea_(0),
+  stdInstsArea_(0), macroInstsArea_(0),
   sumPhi_(0), density_(0) {}
 
 NesterovBase::NesterovBase(
@@ -934,6 +935,8 @@ NesterovBase::reset() {
   fillerCnt_ = 0;
   whiteSpaceArea_ = movableArea_ = 0;
   totalFillerArea_ = 0;
+
+  stdInstsArea_ = macroInstsArea_ = 0;
 
   gCellStor_.clear();
   gNetStor_.clear();
@@ -968,6 +971,13 @@ NesterovBase::reset() {
 
 void
 NesterovBase::init() {
+  // density update
+  density_ = nbVars_.targetDensity;
+  
+  // area update from pb
+  stdInstsArea_ = pb_->stdInstsArea();
+  macroInstsArea_ = pb_->macroInstsArea(); 
+
   // gCellStor init
   gCellStor_.reserve(pb_->placeInsts().size());
   for(auto& inst: pb_->placeInsts()) {
@@ -1053,8 +1063,6 @@ NesterovBase::init() {
     }
   }
 
-  // density update
-  density_ = nbVars_.targetDensity;
 
   log_->infoInt("FillerInit: NumGCells", gCells_.size());
   log_->infoInt("FillerInit: NumGNets", gNets_.size());
@@ -1085,36 +1093,8 @@ NesterovBase::init() {
 
   fft_ = std::move(fft);
 
-
   // update densitySize and densityScale in each gCell
-  for(auto& gCell : gCells_) {
-    float scaleX = 0, scaleY = 0;
-    float densitySizeX = 0, densitySizeY = 0;
-    if( gCell->dx() < REPLACE_SQRT2 * bg_.binSizeX() ) {
-      scaleX = static_cast<float>(gCell->dx()) 
-        / static_cast<float>( REPLACE_SQRT2 * bg_.binSizeX());
-      densitySizeX = REPLACE_SQRT2 
-        * static_cast<float>(bg_.binSizeX());
-    }
-    else {
-      scaleX = 1.0;
-      densitySizeX = gCell->dx();
-    }
-
-    if( gCell->dy() < REPLACE_SQRT2 * bg_.binSizeY() ) {
-      scaleY = static_cast<float>(gCell->dy()) 
-        / static_cast<float>( REPLACE_SQRT2 * bg_.binSizeY());
-      densitySizeY = REPLACE_SQRT2 
-        * static_cast<float>(bg_.binSizeY());
-    }
-    else {
-      scaleY = 1.0;
-      densitySizeY = gCell->dy();
-    }
-
-    gCell->setDensitySize(densitySizeX, densitySizeY);
-    gCell->setDensityScale(scaleX * scaleY);
-  } 
+  updateDensitySize();
 }
 
 
@@ -1153,19 +1133,14 @@ NesterovBase::initFillerGCells() {
 
   int64_t coreArea = pb_->die().coreArea(); 
 
-  // nonPlaceInstsArea should not have targetDensity downscaling!!! 
+  // nonPlaceInstsArea should not have density downscaling!!! 
   whiteSpaceArea_ = coreArea - 
     static_cast<int64_t>(pb_->nonPlaceInstsArea());
 
   // TODO density screening
-  movableArea_ = whiteSpaceArea_ 
-    * nbVars_.targetDensity;
+  movableArea_ = whiteSpaceArea_ * density_;
   
-  totalFillerArea_ = movableArea_
-    - static_cast<int64_t>(pb_->stdInstsArea())
-    - static_cast<int64_t>(pb_->macroInstsArea() * nbVars_.targetDensity);
-
-
+  totalFillerArea_ = movableArea_ - nesterovInstsArea();
   if( totalFillerArea_ < 0 ) {
     string msg = "Filler area is negative!!\n";
     msg += "       Please put higher target density or \n";
@@ -1355,9 +1330,8 @@ NesterovBase::totalFillerArea() const {
 
 int64_t
 NesterovBase::nesterovInstsArea() const {
-  return static_cast<int64_t>(pb_->stdInstsArea()) 
-    + static_cast<int64_t>(round(pb_->macroInstsArea() 
-          * density_));
+  return stdInstsArea_ 
+    + static_cast<int64_t>(round(macroInstsArea_ * density_));
 }
 
 float
@@ -1373,6 +1347,108 @@ NesterovBase::targetDensity() const {
 float
 NesterovBase::density() const {
   return density_;
+}
+
+void
+NesterovBase::updateFillerCellSize(int dx, int dy) {
+  fillerDx_ = dx;
+  fillerDy_ = dy; 
+
+  // 
+  // note that fillerCnt_ will not be changed.
+  //
+  for(auto& gCell : gCells_) {
+    if( !gCell->isFiller() ) {
+      continue;
+    }
+
+    gCell->setSize(dx, dy);
+  }
+
+  // update areas
+  updateAreas();
+
+  // update densitySize
+  updateDensitySize();
+
+  for(auto& gCell : gCells_) {
+    if( !gCell->isFiller() ) {
+      continue;
+    }
+    
+    // update the cell locations if they are
+    // outside of diearea.
+    updateDensityCoordiLayoutInside(gCell);
+  }
+}
+
+// update densitySize and densityScale in each gCell
+void
+NesterovBase::updateDensitySize() {
+  for(auto& gCell : gCells_) {
+    float scaleX = 0, scaleY = 0;
+    float densitySizeX = 0, densitySizeY = 0;
+    if( gCell->dx() < REPLACE_SQRT2 * bg_.binSizeX() ) {
+      scaleX = static_cast<float>(gCell->dx()) 
+        / static_cast<float>( REPLACE_SQRT2 * bg_.binSizeX());
+      densitySizeX = REPLACE_SQRT2 
+        * static_cast<float>(bg_.binSizeX());
+    }
+    else {
+      scaleX = 1.0;
+      densitySizeX = gCell->dx();
+    }
+
+    if( gCell->dy() < REPLACE_SQRT2 * bg_.binSizeY() ) {
+      scaleY = static_cast<float>(gCell->dy()) 
+        / static_cast<float>( REPLACE_SQRT2 * bg_.binSizeY());
+      densitySizeY = REPLACE_SQRT2 
+        * static_cast<float>(bg_.binSizeY());
+    }
+    else {
+      scaleY = 1.0;
+      densitySizeY = gCell->dy();
+    }
+
+    gCell->setDensitySize(densitySizeX, densitySizeY);
+    gCell->setDensityScale(scaleX * scaleY);
+  } 
+}
+
+void
+NesterovBase::updateAreas() {
+  // bloating can change the following :
+  // stdInstsArea and macroInstsArea
+  stdInstsArea_ = macroInstsArea_ = 0;
+  for( auto& gCell : gCells_) {
+    if( gCell->isMacroInstance() ) {
+      macroInstsArea_ 
+        += static_cast<int64_t>(gCell->dx())
+        * static_cast<int64_t>(gCell->dy());
+    }
+    else if( gCell->isStdInstance() ) {
+      stdInstsArea_ 
+        += static_cast<int64_t>(gCell->dx())
+        * static_cast<int64_t>(gCell->dy());
+    }
+  }
+
+  int64_t coreArea = pb_->die().coreArea(); 
+
+  // nonPlaceInstsArea should not have density downscaling!!! 
+  whiteSpaceArea_ = coreArea - 
+    static_cast<int64_t>(pb_->nonPlaceInstsArea());
+
+  // TODO density screening
+  movableArea_ = whiteSpaceArea_ * density_;
+  
+  totalFillerArea_ = movableArea_ - nesterovInstsArea();
+  if( totalFillerArea_ < 0 ) {
+    string msg = "Filler area is negative!!\n";
+    msg += "       Please put higher target density or \n";
+    msg += "       Re-floorplan to have enough coreArea\n";
+    log_->error( msg, 1 );
+  }
 }
 
 void 
