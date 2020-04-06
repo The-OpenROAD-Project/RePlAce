@@ -87,14 +87,7 @@ target_include_directories( replace
 
   ${FLUTE_HOME}
 
-  ${OPENSTA_HOME}/util
-  ${OPENSTA_HOME}/liberty
-  ${OPENSTA_HOME}/network
-  ${OPENSTA_HOME}/graph
-  ${OPENSTA_HOME}/sdc
-  ${OPENSTA_HOME}/parasitics
-  ${OPENSTA_HOME}/search
-  ${OPENSTA_HOME}/app
+  ${OPENSTA_HOME}/include
 
   ${OPENDB_HOME}/include
   ${OPENROAD_HOME}/include
