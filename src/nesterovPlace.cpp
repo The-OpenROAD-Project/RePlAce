@@ -515,14 +515,20 @@ NesterovPlace::doNesterovPlace() {
     // check routability using GR
     if( npVars_.routabilityDrivenMode 
         && npVars_.routabilityCheckOverflow >= sumOverflow_ ) {
+
+      // remember when routability Iteration is executed
+      // will be used for getRoutabilityDensityPelanty()
+      //
       if( rb_->numCall() == 0 ) {
         firstRoutabilityIter_ = i;
       }
      
       rb_->routability();
 
-      // back the densityPenalty values 
-      densityPenalty_ = getRoutabilityDensityPenalty();
+      // recover the densityPenalty values 
+      if( rb_->inflationIterCnt() == 1 ) {
+        densityPenalty_ = getRoutabilityDensityPenalty();
+      }
     }
 
     // minimum iteration is 50
