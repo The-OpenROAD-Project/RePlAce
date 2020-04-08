@@ -92,8 +92,11 @@ target_include_directories( replace
   ${OPENDB_HOME}/include
   ${OPENROAD_HOME}/include
   ${TCL_INCLUDE_PATH}
-  Eigen3
   flute3
+)
+
+target_link_libraries( replace
+  Eigen3::Eigen
 )
 
 # CIMG_USE case

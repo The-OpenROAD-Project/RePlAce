@@ -3,7 +3,7 @@
 #include "logger.h" 
 #include <iostream>
 
-#include <eigen3/Eigen/IterativeLinearSolvers>
+#include <Eigen/IterativeLinearSolvers>
 
 #include "plot.h"
 
