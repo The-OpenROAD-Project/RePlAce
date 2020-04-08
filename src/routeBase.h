@@ -8,6 +8,10 @@ namespace odb {
   class dbDatabase;
 }
 
+namespace FastRoute {
+  class FastRouteKernel;
+}
+
 namespace replace {
 
 class Logger;
@@ -325,6 +329,7 @@ class RouteBase {
     std::shared_ptr<NesterovBase> nb_;
     std::shared_ptr<Logger> log_;
 
+    std::unique_ptr<FastRoute::FastRouteKernel> fr_;
     std::unique_ptr<TileGrid> tg_;
 
     // from *.route file

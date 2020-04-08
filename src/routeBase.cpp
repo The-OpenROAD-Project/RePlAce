@@ -1,7 +1,10 @@
 #include "routeBase.h"
 #include "logger.h"
 #include "nesterovBase.h"
-#include <opendb/db.h>
+
+#include "opendb/db.h"
+#include "FastRouteKernel.h"
+
 #include <string>
 #include <iostream>
 #include <cmath>

@@ -26,14 +26,8 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-set(REPLACE_HOME ${PROJECT_SOURCE_DIR}/src/replace )
 set(FLUTE_HOME ${PROJECT_SOURCE_DIR}/src/flute3)
-set(OPENSTA_HOME ${PROJECT_SOURCE_DIR}/src/OpenSTA)
-
 set(EIGEN_HOME ${PROJECT_SOURCE_DIR}/src/eigen)
-
-set(OPENROAD_HOME ${PROJECT_SOURCE_DIR})
-set(OPENDB_HOME ${PROJECT_SOURCE_DIR}/src/OpenDB)
 
 find_package(ZLIB REQUIRED)
 
@@ -111,6 +105,8 @@ target_include_directories( replace
 
   ${OPENDB_HOME}/include
   ${OPENROAD_HOME}/include
+  ${FASTROUTE_HOME}/include
+  ${FASTROUTE_HOME}/src
   ${TCL_INCLUDE_PATH}
 )
 
