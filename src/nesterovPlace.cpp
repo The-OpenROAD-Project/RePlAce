@@ -664,14 +664,7 @@ NesterovPlace::getPhiCoef(float scaledDiffHpwl) {
 
 void
 NesterovPlace::updateDb() {
-  for(auto& gCell : nb_->gCells()) {
-    if( gCell->isInstance() ) {
-      odb::dbInst* inst = gCell->instance()->dbInst();
-      inst->setPlacementStatus(odb::dbPlacementStatus::PLACED); 
-      inst->setLocation( gCell->dCx()-gCell->dDx()/2,
-           gCell->dCy()-gCell->dDy()/2 ); 
-    }
-  }
+  nb_->updateDbGCells();
 }
 
 float 

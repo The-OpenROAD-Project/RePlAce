@@ -16,6 +16,7 @@ using std::to_string;
 using std::pair;
 using std::make_pair;
 using std::sort;
+using FastRoute::FastRouteKernel;
 
 namespace replace {
 
@@ -612,14 +613,46 @@ RouteBase::resetRoutabilityResources() {
 
 void
 RouteBase::init() {
+  // tg_ init
   std::unique_ptr<TileGrid> tg(new TileGrid());
   tg_ = std::move(tg);
   
   tg_->setLogger(log_);
+  
+
 }
 
 void
 RouteBase::getGlobalRouterResult() {
+  // update gCells' location to DB for GR
+  nb_->updateDbGCells(); 
+
+  db_->getChip()->getBlock()->writeDb("./route01_db.db");
+  
+  // fr_ init
+  std::unique_ptr<FastRouteKernel> fr(new FastRouteKernel());
+  fr_ = std::move(fr);
+  fr_->setDbId(db_->getId());
+
+  // FR init funcs
+  fr_->setMinRoutingLayer(1);
+  fr_->setMaxRoutingLayer(-1);
+  fr_->setUnidirectionalRoute(0);
+  fr_->setAlpha(0.3);
+  fr_->setOverflowIterations(500);
+  fr_->setClockNetRouting(false);
+  fr_->setPDRev(false);
+  fr_->setPDRevForHighFanout(-1);
+  fr_->setAdjustment(0);
+  fr_->setGridOrigin(0,0);
+  fr_->setVerbose(0);
+
+  fr_->startFastRoute();
+  fr_->runFastRoute();
+
+  fr_.reset();
+
+
   // Note that *.route info is unique.
   // TODO: read *.route only once.
   importRoute("input.route");
@@ -1279,6 +1312,8 @@ RouteBase::routability() {
   std::unique_ptr<TileGrid> tg(new TileGrid());
   tg_ = std::move(tg);
   tg_->setLogger(log_);
+  
+  
 
   getGlobalRouterResult();
   updateCongestionMap();

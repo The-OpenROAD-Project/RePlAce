@@ -848,6 +848,8 @@ public:
   // update electrostatic forces within Bin
   void updateDensityForceBin();
 
+  void updateDbGCells();
+
 private:
   NesterovBaseVars nbVars_;
   std::shared_ptr<PlacerBase> pb_;

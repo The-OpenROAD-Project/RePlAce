@@ -1714,6 +1714,18 @@ NesterovBase::updateDensityForceBin() {
   }
 }
 
+void
+NesterovBase::updateDbGCells() {
+  for(auto& gCell : gCells()) {
+    if( gCell->isInstance() ) {
+      odb::dbInst* inst = gCell->instance()->dbInst();
+      inst->setPlacementStatus(odb::dbPlacementStatus::PLACED); 
+      inst->setLocation( gCell->dCx()-gCell->dDx()/2,
+           gCell->dCy()-gCell->dDy()/2 ); 
+    }
+  }
+}
+
 int64_t
 NesterovBase::getHpwl() {
   int64_t hpwl = 0;
