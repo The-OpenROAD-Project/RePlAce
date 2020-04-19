@@ -700,6 +700,7 @@ public:
   int binCntX;
   int binCntY;
   float minWireLengthForceBar;
+  // temp variables
   unsigned char isSetBinCntX:1;
   unsigned char isSetBinCntY:1;
 

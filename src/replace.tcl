@@ -11,6 +11,7 @@ proc global_placement { args } {
       -init_density_penalty -init_wirelength_coef \
       -min_phi_coef -max_phi_coef -overflow \
       -initial_place_max_iter -initial_place_max_fanout \
+      -pad_left -pad_right
       -verbose_level} \
       flags {-skip_initial_place -timing_driven -incremental}
     
@@ -85,6 +86,17 @@ proc global_placement { args } {
     set_replace_bin_grid_cnt_y_cmd $bin_grid_count    
   }
 
+  # temp code. 
+  if { [info exists keys(-pad_left)] } {
+    set pad_left $keys(-pad_left)
+    sta::check_positive_integer "-pad_left" $pad_left
+    set_replace_pad_left_cmd $pad_left
+  }
+  if { [info exists keys(-pad_right)] } {
+    set pad_right $keys(-pad_right)
+    sta::check_positive_integer "-pad_right" $pad_right
+    set_replace_pad_right_cmd $pad_right
+  }
 
   if { [ord::db_has_rows] } {
     sta::check_argc_eq0 "global_placement" $args

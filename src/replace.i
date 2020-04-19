@@ -120,6 +120,19 @@ set_replace_verbose_level_cmd(int verbose)
   replace->setVerboseLevel(verbose);
 }
 
+void
+set_replace_pad_left_cmd(int pad) 
+{
+  Replace* replace = getReplace();
+  replace->setPadLeft(pad);
+}
+
+void
+set_replace_pad_right_cmd(int pad) 
+{
+  Replace* replace = getReplace();
+  replace->setPadRight(pad);
+}
 
 
 %} // inline

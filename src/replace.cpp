@@ -29,6 +29,7 @@ Replace::Replace()
   minPhiCoef_(0.95), maxPhiCoef_(1.05),
   referenceHpwl_(446000000),
   incrementalPlaceMode_(false),
+  padLeft_(0), padRight_(0),
   verbose_(0) {
 };
 
@@ -61,6 +62,8 @@ void Replace::reset() {
   referenceHpwl_= 446000000;
 
   incrementalPlaceMode_ = false;
+
+  padLeft_ = padRight_ = 0;
   verbose_ = 0;
 }
 
@@ -72,7 +75,12 @@ void Replace::setSta(sta::dbSta* sta) {
 }
 void Replace::doInitialPlace() {
   log_ = std::make_shared<Logger>("REPL", verbose_);
-  pb_ = std::make_shared<PlacerBase>(db_, log_);
+
+  PlacerBaseVars pbVars;
+  pbVars.padLeft = padLeft_;
+  pbVars.padRight = padRight_;
+
+  pb_ = std::make_shared<PlacerBase>(db_, pbVars, log_);
 
   InitialPlaceVars ipVars;
   ipVars.maxIter = initialPlaceMaxIter_;
@@ -93,7 +101,11 @@ void Replace::doNesterovPlace() {
   }
 
   if( !pb_ ) {
-    pb_ = std::make_shared<PlacerBase>(db_, log_);
+    PlacerBaseVars pbVars;
+    pbVars.padLeft = padLeft_;
+    pbVars.padRight = padRight_;
+
+    pb_ = std::make_shared<PlacerBase>(db_, pbVars, log_);
   }
 
   NesterovBaseVars nbVars;
@@ -108,6 +120,7 @@ void Replace::doNesterovPlace() {
     nbVars.isSetBinCntY = 1;
     nbVars.binCntY = binGridCntY_;
   }
+
 
   nb_ = std::make_shared<NesterovBase>(nbVars, pb_, log_);
 
@@ -211,6 +224,16 @@ Replace::setIncrementalPlaceMode(bool mode) {
 void
 Replace::setVerboseLevel(int verbose) {
   verbose_ = verbose;
+}
+
+void
+Replace::setPadLeft(int pad) {
+  padLeft_ = pad;
+}
+
+void
+Replace::setPadRight(int pad) {
+  padRight_ = pad;
 }
 
 }

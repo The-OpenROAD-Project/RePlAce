@@ -92,7 +92,7 @@ void NesterovPlace::init() {
       = FloatPoint(gCell->dCx(), gCell->dCy()); 
   }
 
-  // bin update
+  // bin 
   nb_->updateGCellDensityCenterLocation(curSLPCoordi_);
   
   prevHpwl_ 
@@ -588,8 +588,12 @@ NesterovPlace::updateDb() {
     if( gCell->isInstance() ) {
       odb::dbInst* inst = gCell->instance()->dbInst();
       inst->setPlacementStatus(odb::dbPlacementStatus::PLACED); 
-      inst->setLocation( gCell->dCx()-gCell->dDx()/2,
-           gCell->dCy()-gCell->dDy()/2 ); 
+
+      // pad awareness on X coordinates
+      inst->setLocation( 
+          gCell->dCx()-gCell->dDx()/2 
+          + pb_->siteSizeX() * pb_->padLeft(),
+          gCell->dCy()-gCell->dDy()/2 ); 
     }
   }
 }
