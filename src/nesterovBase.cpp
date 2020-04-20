@@ -908,7 +908,7 @@ NesterovBase::NesterovBase()
   whiteSpaceArea_(0), 
   movableArea_(0), totalFillerArea_(0),
   stdInstsArea_(0), macroInstsArea_(0),
-  sumPhi_(0), density_(0) {}
+  sumPhi_(0), targetDensity_(0) {}
 
 NesterovBase::NesterovBase(
     NesterovBaseVars nbVars, 
@@ -965,14 +965,14 @@ NesterovBase::reset() {
   gPins_.shrink_to_fit();
 
   sumPhi_ = 0;
-  density_ = 0;
+  targetDensity_ = 0;
 }
 
 
 void
 NesterovBase::init() {
   // density update
-  density_ = nbVars_.targetDensity;
+  targetDensity_ = nbVars_.targetDensity;
   
   // area update from pb
   stdInstsArea_ = pb_->stdInstsArea();
@@ -1138,7 +1138,7 @@ NesterovBase::initFillerGCells() {
     static_cast<int64_t>(pb_->nonPlaceInstsArea());
 
   // TODO density screening
-  movableArea_ = whiteSpaceArea_ * density_;
+  movableArea_ = whiteSpaceArea_ * targetDensity_;
   
   totalFillerArea_ = movableArea_ - nesterovInstsArea();
   if( totalFillerArea_ < 0 ) {
@@ -1260,8 +1260,12 @@ NesterovBase::updateGCellDensityCenterLocation(
 }
 
 void
-NesterovBase::setDensity(float density) {
-  density_ = density;
+NesterovBase::setTargetDensity(float density) {
+  targetDensity_ = density;
+  bg_.setTargetDensity(density);
+  for(auto& bin : bins()) {
+    bin->setTargetDensity(density);
+  }
 }
 
 int
@@ -1331,7 +1335,7 @@ NesterovBase::totalFillerArea() const {
 int64_t
 NesterovBase::nesterovInstsArea() const {
   return stdInstsArea_ 
-    + static_cast<int64_t>(round(macroInstsArea_ * density_));
+    + static_cast<int64_t>(round(macroInstsArea_ * targetDensity_));
 }
 
 float
@@ -1340,13 +1344,13 @@ NesterovBase::sumPhi() const {
 }
 
 float
-NesterovBase::targetDensity() const {
+NesterovBase::initTargetDensity() const {
   return nbVars_.targetDensity;
 }
 
 float
-NesterovBase::density() const {
-  return density_;
+NesterovBase::targetDensity() const {
+  return targetDensity_;
 }
 
 void
@@ -1440,7 +1444,7 @@ NesterovBase::updateAreas() {
     static_cast<int64_t>(pb_->nonPlaceInstsArea());
 
   // TODO density screening
-  movableArea_ = whiteSpaceArea_ * density_;
+  movableArea_ = whiteSpaceArea_ * targetDensity_;
   
   totalFillerArea_ = movableArea_ - nesterovInstsArea();
   if( totalFillerArea_ < 0 ) {

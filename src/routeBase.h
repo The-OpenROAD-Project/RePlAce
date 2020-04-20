@@ -291,9 +291,13 @@ public:
   float maxInflationRatio;
   float blockagePorosity;
   float maxDensity;
+  float ignoreEdgeRatio;
+  float targetRC;
 
   int maxBloatIter;
   int maxInflationIter;
+  int minPinBlockLayer;
+  int maxPinBlockLayer;
 
   RouteBaseVars();
   void reset();
@@ -315,7 +319,7 @@ class RouteBase {
 
     void getGlobalRouterResult();
     void updateCongestionMap();
-    void routability();
+    bool routability();
 
     int64_t inflatedAreaDelta() const;
     int numCall() const;

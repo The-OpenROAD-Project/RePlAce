@@ -533,8 +533,12 @@ RouteBaseVars::RouteBaseVars()
   maxInflationRatio(2.5), 
   blockagePorosity(0),
   maxDensity(0.90),
+  ignoreEdgeRatio(0.8),
+  targetRC(1.01),
   maxBloatIter(1),
-  maxInflationIter(4) {}
+  maxInflationIter(4),
+  minPinBlockLayer(1),
+  maxPinBlockLayer(2) {}
 
 void 
 RouteBaseVars::reset() {
@@ -546,8 +550,12 @@ RouteBaseVars::reset() {
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
   maxDensity = 0.90;
+  ignoreEdgeRatio = 0.8;
+  targetRC = 1.01;
   maxBloatIter = 1;
   maxInflationIter = 4;
+  minPinBlockLayer = 1;
+  maxPinBlockLayer = 2;
 }
 
 /////////////////////////////////////////////
@@ -1121,6 +1129,8 @@ RouteBase::updateRoutes() {
   //
   // Note that route += blockage
   //
+  
+  // edgeCapacity will generate blockage
   for(auto& ecInfo : edgeCapacityStor_) {
     int lx = std::min( ecInfo.lx, ecInfo.ux );
     int ly = std::min( ecInfo.ly, ecInfo.uy );
@@ -1128,14 +1138,28 @@ RouteBase::updateRoutes() {
     int capacity = ecInfo.capacity;
     
     Tile* tile = tg_->tiles()[ly * tg_->tileCntX() + lx];
-    tile->setRoute(layer, 
-        tile->route(layer) 
+    tile->setBlockage(layer, 
+        tile->blockage(layer) 
         + tile->capacity(layer) - capacity);
   }
 
-  // update routes based on pin Density
+  // blockage is merged into route resources.
   for(auto& tile : tg_->tiles()) {
     for(int i=0; i<tg_->numRoutingLayers(); i++) {
+      tile->setRoute( i, tile->route(i) + tile->blockage(i) );
+    }
+  }
+  
+  // update routes based on pin Density
+  //
+  // Note that 
+  // minPinBlockLayer and 
+  // maxPinBlockLayer can be changed by
+  // user tuning; Default: M2~M3 
+  //
+  for(auto& tile : tg_->tiles()) {
+    for(int i=rbVars_.minPinBlockLayer; 
+        i<=rbVars_.maxPinBlockLayer; i++) {
 
       if( horizontalCapacity_[i] > 0 ) {
         tile->setRoute(i,
@@ -1230,13 +1254,19 @@ RouteBase::updateInflationRatio() {
     for(int i=0; i<tg_->numRoutingLayers(); i++) {
       // horizontal
       if( horizontalCapacity_[i] > 0 ) {
-        tile->setInflationRatio(
-            fmax( 
-              tile->inflationRatio(), 
-              static_cast<float>(tile->route(i)) 
-              / horizontalCapacity_[i]
-              * rbVars_.gRoutePitchScale)
-            );
+        
+        if( tile->blockage(i) 
+            <= rbVars_.ignoreEdgeRatio 
+            * horizontalCapacity_[i] ) {
+          
+          tile->setInflationRatio(
+              fmax( 
+                tile->inflationRatio(), 
+                static_cast<float>(tile->route(i)) 
+                / horizontalCapacity_[i]
+                * rbVars_.gRoutePitchScale)
+              );
+        }
 
         // left tile exists
         if( tile->x() >= 1 ) {
@@ -1245,25 +1275,33 @@ RouteBase::updateInflationRatio() {
             [ tile->y() * tg_->tileCntX() 
             + (tile->x()-1) ];
         
-          tile->setInflationRatio(
-            fmax(
-              tile->inflationRatio(),
-              static_cast<float>(leftTile->route(i)) 
-              / horizontalCapacity_[i]
-              * rbVars_.gRoutePitchScale)
-      
-            );
+          if( leftTile->blockage(i) 
+            <= rbVars_.ignoreEdgeRatio 
+            * horizontalCapacity_[i] ) {
+
+            tile->setInflationRatio(
+                fmax(
+                  tile->inflationRatio(),
+                  static_cast<float>(leftTile->route(i)) 
+                  / horizontalCapacity_[i]
+                  * rbVars_.gRoutePitchScale)
+                );
+          }
         }
       }
       // vertical
       else if( verticalCapacity_[i] > 0 ) {
-        tile->setInflationRatio(
-            fmax(
-               tile->inflationRatio(),
-               static_cast<float>(tile->route(i))
-               / verticalCapacity_[i]
-               * rbVars_.gRoutePitchScale)
-            );
+        if( tile->blockage(i) 
+            <= rbVars_.ignoreEdgeRatio 
+            * verticalCapacity_[i] ) {
+          tile->setInflationRatio(
+              fmax(
+                tile->inflationRatio(),
+                static_cast<float>(tile->route(i))
+                / verticalCapacity_[i]
+                * rbVars_.gRoutePitchScale)
+              );
+        }
            
         // lower tile exists
         if( tile->y() >= 1 ) {
@@ -1271,20 +1309,56 @@ RouteBase::updateInflationRatio() {
             [ (tile->y()-1) * tg_->tileCntX()
             + tile->x() ];
 
-          tile->setInflationRatio(
-              fmax(
-                tile->inflationRatio(),
-                static_cast<float>(lowerTile->route(i))
-                / verticalCapacity_[i]
-                * rbVars_.gRoutePitchScale)
-              );
+          if( lowerTile->blockage(i) 
+              <= rbVars_.ignoreEdgeRatio 
+              * verticalCapacity_[i] ) {
+
+            tile->setInflationRatio(
+                fmax(
+                  tile->inflationRatio(),
+                  static_cast<float>(lowerTile->route(i))
+                  / verticalCapacity_[i]
+                  * rbVars_.gRoutePitchScale)
+                );
+          }
         }
       } 
     } 
 
     if( tile->inflationRatio() > 1.0 ) {
-      tile->setInflationRatio( pow(tile->inflationRatio(), rbVars_.inflationRatioCoef) );
+      tile->setInflationRatio( pow(tile->inflationRatio(), 
+            rbVars_.inflationRatioCoef) );
     }
+
+    /*
+    if( tile->x() == 91 && 
+        tile->y() == 55 ) {
+      for(int i=0; i<tg_->numRoutingLayers(); i++) {
+        std::cout << "9155 route: " << tile->route(i) << std::endl;
+      }
+
+      Tile* leftTile = tg_->tiles()
+        [ tile->y() * tg_->tileCntX() 
+        + (tile->x()-1) ];
+          
+      Tile* lowerTile = tg_->tiles()
+        [ (tile->y()-1) * tg_->tileCntX()
+        + tile->x() ];
+
+      std::cout << "leftTile XY: " << leftTile->x() << " " << leftTile->y() << std::endl;
+      
+      for(int i=0; i<tg_->numRoutingLayers(); i++) {
+        std::cout << "leftTile route: " << leftTile->route(i) << std::endl;
+      }
+
+      std::cout << "lowerTile XY: " << lowerTile->x() << " " << lowerTile->y() << std::endl;
+      
+      for(int i=0; i<tg_->numRoutingLayers(); i++) {
+        std::cout << "lowerTile route: " << lowerTile->route(i) << std::endl;
+      }
+    }
+
+    */
   }
     
   for(auto& tile : tg_->tiles()) {
@@ -1306,7 +1380,7 @@ RouteBase::updateInflationRatio() {
 }
 
 
-void
+bool 
 RouteBase::routability() {
   increaseCounter();
 
@@ -1315,12 +1389,14 @@ RouteBase::routability() {
   tg_ = std::move(tg);
   tg_->setLogger(log_);
   
-  
-
   getGlobalRouterResult();
   updateCongestionMap();
 
-  getRC();
+  // no need routing if RC is lower than targetRC val
+  if( getRC() < rbVars_.targetRC ) {
+    resetRoutabilityResources();  
+    return false;
+  }
 
   // set inflated ratio
   for(auto& tile : tg_->tiles()) {
@@ -1404,17 +1480,17 @@ RouteBase::routability() {
   } 
 
   log_->infoInt64("InflatedAreaDelta", inflatedAreaDelta_ );
-  log_->infoFloat("Density", nb_->density());
+  log_->infoFloat("TargetDensity", nb_->targetDensity());
 
   int64_t totalGCellArea = inflatedAreaDelta_ 
         + nb_->nesterovInstsArea() + nb_->totalFillerArea();
 
   // newly set Density
-  nb_->setDensity( static_cast<float>(totalGCellArea) 
+  nb_->setTargetDensity( static_cast<float>(totalGCellArea) 
       / static_cast<float>(nb_->whiteSpaceArea()) );
 
   // TODO: looks weird, too
-  if( nb_->density() > rbVars_.maxDensity ) {
+  if( nb_->targetDensity() > rbVars_.maxDensity ) {
     cout << "Need to shrink fillercells" << endl;
 //    nb_->updateFillerCellSize(dx, dy);
   }
@@ -1431,7 +1507,7 @@ RouteBase::routability() {
   log_->infoString("UpdateArea");
   nb_->updateAreas();
 
-  log_->infoFloat("NewDensity", nb_->density());
+  log_->infoFloat("NewTargetDensity", nb_->targetDensity());
   log_->infoInt64("NewWhiteSpaceArea", nb_->whiteSpaceArea());
   log_->infoInt64("MovableArea", nb_->movableArea());
   log_->infoInt64("NewNesterovInstsArea", nb_->nesterovInstsArea());
@@ -1444,6 +1520,8 @@ RouteBase::routability() {
 
   // reset
   resetRoutabilityResources();  
+
+  return true;
 }
 
 // extract RC values
@@ -1477,8 +1555,11 @@ RouteBase::getRC() const {
   for(auto& tile : tg_->tiles()) {
     for(int j = 0; j < tg_->numRoutingLayers() ; j++) {
       if(horizontalCapacity_[j] != 0) {
-//        if(bp->blkg[j] > ignoreEdgeRatio * horizontalCapacity_[j])
-//          continue;
+        if(tile->blockage(j) 
+            > rbVars_.ignoreEdgeRatio 
+            * horizontalCapacity_[j]) {
+          continue;
+        }
         totalRouteOverflowH2 +=
             (double)fmax(0.0, -1 + tile->route(j) * 1.0 / horizontalCapacity_[j]);
         horEdgeCongArray.push_back(tile->route(j) * 1.0 / horizontalCapacity_[j]);
@@ -1487,8 +1568,11 @@ RouteBase::getRC() const {
         }
       }
       else if(verticalCapacity_[j] != 0) {
-//        if(bp->blkg[j] > ignoreEdgeRatio * verticalCapacity_[j])
-//          continue;
+        if(tile->blockage(j) 
+            > rbVars_.ignoreEdgeRatio 
+            * verticalCapacity_[j]) {
+          continue;
+        }
         totalRouteOverflowV2 +=
             (double)fmax(0.0, -1 + tile->route(j) * 1.0 / verticalCapacity_[j]);
         verEdgeCongArray.push_back(tile->route(j) * 1.0 / verticalCapacity_[j]);

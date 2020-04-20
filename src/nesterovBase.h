@@ -800,13 +800,14 @@ public:
   // used in NesterovPlace
   float sumPhi() const;
 
-  // targetDensity is set by users
+  // initTargetDensity is set by users
+  // targetDensity is equal to initTargetDensity and 
+  // would be changed dynamically in RD loop
+  //
+  float initTargetDensity() const;
   float targetDensity() const;
 
-  // density can be changed dynamically
-  // on routabilityDriven Loop.
-  float density() const;
-  void setDensity(float density);
+  void setTargetDensity(float targetDensity);
 
   void updateDensityCoordiLayoutInside(GCell* gcell);
 
@@ -883,7 +884,7 @@ private:
   std::unordered_map<Net*, GNet*> gNetMap_;
 
   float sumPhi_;
-  float density_;
+  float targetDensity_;
 
   void init();
   void initFillerGCells();

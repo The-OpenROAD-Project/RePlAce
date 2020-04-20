@@ -523,10 +523,10 @@ NesterovPlace::doNesterovPlace() {
         firstRoutabilityIter_ = i;
       }
      
-      rb_->routability();
-
-      // recover the densityPenalty values 
-      if( rb_->inflationIterCnt() == 1 ) {
+      // recover the densityPenalty values
+      // if further routability-driven is required 
+      if( rb_->routability() 
+          && rb_->inflationIterCnt() == 1 ) {
         densityPenalty_ = getRoutabilityDensityPenalty();
       }
     }
