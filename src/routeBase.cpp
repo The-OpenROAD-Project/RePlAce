@@ -627,7 +627,7 @@ RouteBase::getGlobalRouterResult() {
   // update gCells' location to DB for GR
   nb_->updateDbGCells(); 
 
-  db_->getChip()->getBlock()->writeDb("./route01_db.db");
+  //db_->getChip()->getBlock()->writeDb("./route01_db.db");
   
   // fr_ init
   std::unique_ptr<FastRouteKernel> fr(new FastRouteKernel());
@@ -649,6 +649,8 @@ RouteBase::getGlobalRouterResult() {
 
   fr_->startFastRoute();
   fr_->runFastRoute();
+  fr_->writeEst();
+  fr_->writeRoute();
 
   fr_.reset();
 
@@ -1318,6 +1320,8 @@ RouteBase::routability() {
   getGlobalRouterResult();
   updateCongestionMap();
 
+  getRC();
+
   // set inflated ratio
   for(auto& tile : tg_->tiles()) {
     if( tile->inflationRatio() > 1 ) {
@@ -1330,6 +1334,8 @@ RouteBase::routability() {
   
   using std::cout;
   using std::endl;
+
+  inflatedAreaDelta_ = 0;
 
   // run bloating and get inflatedAreaDelta_
   for(auto& gCell : nb_->gCells()) {
@@ -1438,6 +1444,132 @@ RouteBase::routability() {
 
   // reset
   resetRoutabilityResources();  
+}
+
+// extract RC values
+float
+RouteBase::getRC() const {
+  double totalRouteOverflowH = 0;
+  double totalRouteOverflowV = 0;
+
+  int overflowTileCnt = 0;
+  for(auto& tile : tg_->tiles()) {
+    totalRouteOverflowH += (double)fmax(0.0, (double)tile->usageH() - tile->supplyH());
+    totalRouteOverflowV += (double)fmax(0.0, (double)tile->usageV() - tile->supplyV());
+    if(tile->usageH() > tile->supplyH() 
+        || tile->usageV() > tile->supplyV()) {
+      overflowTileCnt++;
+    }
+  }
+
+  log_->infoFloatSignificant("TotalRouteOverflowH", totalRouteOverflowH);
+  log_->infoFloatSignificant("TotalRouteOverflowV", totalRouteOverflowV);
+  log_->infoInt("OverflowTileCnt", overflowTileCnt);
+
+  // what's the difference between 1 and 2?
+  double totalRouteOverflowH2 = 0;
+  double totalRouteOverflowV2 = 0;
+  int overflowTileCnt2 = 0;
+  
+  std::vector< double > horEdgeCongArray;
+  std::vector< double > verEdgeCongArray;
+
+  for(auto& tile : tg_->tiles()) {
+    for(int j = 0; j < tg_->numRoutingLayers() ; j++) {
+      if(horizontalCapacity_[j] != 0) {
+//        if(bp->blkg[j] > ignoreEdgeRatio * horizontalCapacity_[j])
+//          continue;
+        totalRouteOverflowH2 +=
+            (double)fmax(0.0, -1 + tile->route(j) * 1.0 / horizontalCapacity_[j]);
+        horEdgeCongArray.push_back(tile->route(j) * 1.0 / horizontalCapacity_[j]);
+        if(tile->route(j) - horizontalCapacity_[j] > 0) {
+          overflowTileCnt2++;
+        }
+      }
+      else if(verticalCapacity_[j] != 0) {
+//        if(bp->blkg[j] > ignoreEdgeRatio * verticalCapacity_[j])
+//          continue;
+        totalRouteOverflowV2 +=
+            (double)fmax(0.0, -1 + tile->route(j) * 1.0 / verticalCapacity_[j]);
+        verEdgeCongArray.push_back(tile->route(j) * 1.0 / verticalCapacity_[j]);
+        if(tile->route(j) - verticalCapacity_[j] > 0) {
+          overflowTileCnt2++;
+        }
+      }
+    }
+  }
+
+  log_->infoFloatSignificant("TotalRouteOverflowH2", totalRouteOverflowH2);
+  log_->infoFloatSignificant("TotalRouteOverflowV2", totalRouteOverflowV2);
+  log_->infoInt("OverflowTileCnt2", overflowTileCnt2);
+
+  int horArraySize = horEdgeCongArray.size();
+  int verArraySize = verEdgeCongArray.size();
+
+  std::sort(horEdgeCongArray.rbegin(), 
+      horEdgeCongArray.rend());
+  std::sort(verEdgeCongArray.rbegin(), 
+      verEdgeCongArray.rend());
+
+  double horAvg005RC = 0;
+  double horAvg010RC = 0;
+  double horAvg020RC = 0;
+  double horAvg050RC = 0;
+  for(int i = 0; i < horArraySize; ++i) {
+    if(i < 0.005 * horArraySize) {
+      horAvg005RC += horEdgeCongArray[i];
+    }
+    if(i < 0.01 * horArraySize) {
+      horAvg010RC += horEdgeCongArray[i];
+    }
+    if(i < 0.02 * horArraySize) {
+      horAvg020RC += horEdgeCongArray[i];
+    }
+    if(i < 0.05 * horArraySize) {
+      horAvg050RC += horEdgeCongArray[i];
+    }
+  }
+  horAvg005RC /= 1.0 * 0.005 * horArraySize;
+  horAvg010RC /= 1.0 * 0.010 * horArraySize;
+  horAvg020RC /= 1.0 * 0.020 * horArraySize;
+  horAvg050RC /= 1.0 * 0.050 * horArraySize;
+
+  double verAvg005RC = 0;
+  double verAvg010RC = 0;
+  double verAvg020RC = 0;
+  double verAvg050RC = 0;
+  for(int i = 0; i < verArraySize; ++i) {
+    if(i < 0.005 * verArraySize) {
+      verAvg005RC += verEdgeCongArray[i];
+    }
+    if(i < 0.01 * verArraySize) {
+      verAvg010RC += verEdgeCongArray[i];
+    }
+    if(i < 0.02 * verArraySize) {
+      verAvg020RC += verEdgeCongArray[i];
+    }
+    if(i < 0.05 * verArraySize) {
+      verAvg050RC += verEdgeCongArray[i];
+    }
+  }
+  verAvg005RC /= 1.0 * 0.005 * verArraySize;
+  verAvg010RC /= 1.0 * 0.010 * verArraySize;
+  verAvg020RC /= 1.0 * 0.020 * verArraySize;
+  verAvg050RC /= 1.0 * 0.050 * verArraySize;
+
+  log_->infoFloatSignificant("0.5%RC", fmax(horAvg005RC, verAvg005RC));
+  log_->infoFloatSignificant("1.0%RC", fmax(horAvg010RC, verAvg010RC));
+  log_->infoFloatSignificant("2.0%RC", fmax(horAvg020RC, verAvg020RC));
+  log_->infoFloatSignificant("5.0%RC", fmax(horAvg050RC, verAvg050RC));
+
+  float finalRC = (1.0 * fmax(horAvg005RC, verAvg005RC) +
+                  1.0 * fmax(horAvg010RC, verAvg010RC) +
+                  1.0 * fmax(horAvg020RC, verAvg020RC) +
+                  1.0 * fmax(horAvg050RC, verAvg050RC)) /
+                 (1.0 + 1.0 + 1.0 + 1.0);
+
+  log_->infoFloatSignificant("FinalRC", finalRC);
+  return finalRC;
 }
 
 void

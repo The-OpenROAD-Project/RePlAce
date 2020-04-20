@@ -322,6 +322,8 @@ class RouteBase {
     int bloatIterCnt() const;
     int inflationIterCnt() const;
 
+    float getRC() const;
+
   private:
     RouteBaseVars rbVars_;
     odb::dbDatabase* db_;
