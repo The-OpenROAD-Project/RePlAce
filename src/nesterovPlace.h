@@ -136,6 +136,7 @@ private:
   int firstRoutabilityIter_;
 
   float isDiverged_;
+  float isRoutabilityNeed_;
 
   float getRoutabilityDensityPenalty();
 
