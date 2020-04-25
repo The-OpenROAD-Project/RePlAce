@@ -601,7 +601,6 @@ void
 RouteBase::resetRoutabilityResources() {
   inflatedAreaDelta_ = 0;
 
-  fr_->reset();
   tg_.reset();
   verticalCapacity_.clear();
   horizontalCapacity_.clear();
@@ -628,9 +627,7 @@ RouteBase::init() {
   
   tg_->setLogger(log_);
   
-  // call FR only once
-  std::unique_ptr<FastRouteKernel> fr(new FastRouteKernel());
-  fr_ = std::move(fr);
+
 }
 
 void
@@ -638,15 +635,16 @@ RouteBase::getGlobalRouterResult() {
   // update gCells' location to DB for GR
   nb_->updateDbGCells(); 
 
-//  db_->getChip()->getBlock()->writeDb("./route01_mem_err.db");
+  //db_->getChip()->getBlock()->writeDb("./route01_db.db");
   
   // fr_ init
+  std::unique_ptr<FastRouteKernel> fr(new FastRouteKernel());
+  fr_ = std::move(fr);
   fr_->setDbId(db_->getId());
 
   // FR init funcs
   fr_->setMinRoutingLayer(1);
-  fr_->setMaxRoutingLayer(3);
-
+  fr_->setMaxRoutingLayer(-1);
   fr_->setUnidirectionalRoute(0);
   fr_->setAlpha(0.3);
   fr_->setOverflowIterations(500);
@@ -661,6 +659,9 @@ RouteBase::getGlobalRouterResult() {
   fr_->runFastRoute();
   fr_->writeEst();
   fr_->writeRoute();
+
+  fr_.reset();
+
 
   // Note that *.route info is unique.
   // TODO: read *.route only once.
@@ -1394,7 +1395,6 @@ RouteBase::routability() {
   // no need routing if RC is lower than targetRC val
   if( getRC() < rbVars_.targetRC ) {
     resetRoutabilityResources();  
-    std::cout << "reset and quit RouteBase" << std::endl;
     return false;
   }
 
