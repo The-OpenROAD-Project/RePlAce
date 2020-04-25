@@ -61,7 +61,8 @@ NesterovPlace::NesterovPlace()
   wireLengthCoefY_(0),
   prevHpwl_(0),
   firstRoutabilityIter_(0),
-  isDiverged_(false) {}
+  isDiverged_(false),
+  isRoutabilityNeed_(true) {}
 
 NesterovPlace::NesterovPlace(
     NesterovPlaceVars npVars,
@@ -251,6 +252,7 @@ void NesterovPlace::reset() {
   prevHpwl_ = 0;
   firstRoutabilityIter_ = 0;
   isDiverged_ = false;
+  isRoutabilityNeed_ = true;
 }
 
 // to execute following function,
@@ -514,6 +516,7 @@ NesterovPlace::doNesterovPlace() {
 
     // check routability using GR
     if( npVars_.routabilityDrivenMode 
+        && isRoutabilityNeed_ 
         && npVars_.routabilityCheckOverflow >= sumOverflow_ ) {
 
       // remember when routability Iteration is executed
@@ -524,9 +527,11 @@ NesterovPlace::doNesterovPlace() {
       }
      
       // recover the densityPenalty values
-      // if further routability-driven is required 
-      if( rb_->routability() 
-          && rb_->inflationIterCnt() == 1 ) {
+      // if further routability-driven is needed 
+      isRoutabilityNeed_ = rb_->routability();
+
+      // revert back the current density penality
+      if( isRoutabilityNeed_ ) {
         densityPenalty_ = getRoutabilityDensityPenalty();
       }
     }
