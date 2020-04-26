@@ -282,6 +282,7 @@ Replace::setRoutabilityMaxBloatIter(int iter) {
 void
 Replace::setRoutabilityMaxInflationIter(int iter) {
   routabilityMaxInflationIter_ = iter;
+}
 
 void
 Replace::setPadLeft(int pad) {

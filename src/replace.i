@@ -175,6 +175,7 @@ set_replace_routability_max_inflation_iter(int iter)
   replace->setRoutabilityMaxInflationIter(iter);
 }
 
+void
 set_replace_pad_left_cmd(int pad) 
 {
   Replace* replace = getReplace();
