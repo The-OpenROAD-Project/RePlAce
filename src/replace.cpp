@@ -33,6 +33,7 @@ Replace::Replace()
   routabilityMaxDensity_(0.99),
   routabilityMaxBloatIter_(1),
   routabilityMaxInflationIter_(4),
+  routabilityTargetRcMetric_(1.01),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -77,6 +78,7 @@ void Replace::reset() {
   routabilityMaxDensity_ = 0.99;
   routabilityMaxBloatIter_ = 1;
   routabilityMaxInflationIter_ = 4;
+  routabilityTargetRcMetric_ = 1.01;
 
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
@@ -147,6 +149,10 @@ void Replace::doNesterovPlace() {
 
   RouteBaseVars rbVars;
   rbVars.maxDensity = routabilityMaxDensity_;
+  rbVars.maxBloatIter = routabilityMaxBloatIter_;
+  rbVars.maxInflationIter = routabilityMaxInflationIter_;
+  rbVars.targetRC = routabilityTargetRcMetric_;
+
   rb_ = std::make_shared<RouteBase>(rbVars, db_, nb_, log_);
 
   NesterovPlaceVars npVars;
@@ -282,6 +288,11 @@ Replace::setRoutabilityMaxBloatIter(int iter) {
 void
 Replace::setRoutabilityMaxInflationIter(int iter) {
   routabilityMaxInflationIter_ = iter;
+}
+
+void
+Replace::setRoutabilityTargetRcMetric(float rc) {
+  routabilityTargetRcMetric_ = rc;
 }
 
 void

@@ -148,31 +148,38 @@ set_replace_disable_routability_driven_mode_cmd()
 }
 
 void
-set_replace_routability_check_overflow(float overflow) 
+set_replace_routability_check_overflow_cmd(float overflow) 
 {
   Replace* replace = getReplace();
   replace->setRoutabilityCheckOverflow(overflow);
 }
 
 void
-set_replace_routability_max_density(float density) 
+set_replace_routability_max_density_cmd(float density) 
 {
   Replace* replace = getReplace();
   replace->setRoutabilityMaxDensity(density);
 }
 
 void
-set_replace_routability_max_bloat_iter(int iter)
+set_replace_routability_max_bloat_iter_cmd(int iter)
 {
   Replace* replace = getReplace();
   replace->setRoutabilityMaxBloatIter(iter);
 }
 
 void
-set_replace_routability_max_inflation_iter(int iter) 
+set_replace_routability_max_inflation_iter_cmd(int iter) 
 {
   Replace* replace = getReplace();
   replace->setRoutabilityMaxInflationIter(iter);
+}
+
+void
+set_replace_routability_target_rc_metric_cmd(float rc)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityTargetRcMetric(rc);
 }
 
 void

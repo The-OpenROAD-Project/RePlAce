@@ -74,6 +74,8 @@ class Replace
     void setRoutabilityMaxBloatIter(int iter);
     void setRoutabilityMaxInflationIter(int iter);
 
+    void setRoutabilityTargetRcMetric(float rc);
+
   private:
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
@@ -105,6 +107,7 @@ class Replace
     float referenceHpwl_;
     float routabilityCheckOverflow_;
     float routabilityMaxDensity_;
+    float routabilityTargetRcMetric_;
 
     int routabilityMaxBloatIter_;
     int routabilityMaxInflationIter_;

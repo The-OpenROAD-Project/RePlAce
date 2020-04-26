@@ -16,9 +16,13 @@ proc global_placement { args } {
       -initial_place_max_iter -initial_place_max_fanout \
       -routability_check_overflow -routability_max_density \
       -routability_max_bloat_iter -routability_max_inflation_iter \
-      -pad_left -pad_right
+      -routability_target_rc_metric \
+      -pad_left -pad_right \
       -verbose_level} \
-      flags {-skip_initial_place -disable_timing_driven -disable_routability_driven -incremental}
+    flags {-skip_initial_place \
+      -disable_timing_driven \
+      -disable_routability_driven \
+      -incremental}
 
 
   # flow control for initial_place
@@ -112,21 +116,28 @@ proc global_placement { args } {
   if { [info exists keys(-routability_check_overflow)] } {
     set routability_check_overflow $keys(-routability_check_overflow)
     sta::check_positive_float "-routability_check_overflow" $routability_check_overflow
-    set_replace_routability_check_overflow $routability_check_overflow
+    set_replace_routability_check_overflow_cmd $routability_check_overflow
   }
   
   # routability bloat iter
   if { [info exists keys(-routability_max_bloat_iter)] } {
     set routability_max_bloat_iter $keys(-routability_max_bloat_iter)
     sta::check_positive_float "-routability_max_bloat_iter" $routability_max_bloat_iter
-    set_replace_routability_max_bloat_iter $routability_max_bloat_iter
+    set_replace_routability_max_bloat_iter_cmd $routability_max_bloat_iter
   }
   
   # routability inflation iter
   if { [info exists keys(-routability_max_inflation_iter)] } {
     set routability_max_inflation_iter $keys(-routability_max_inflation_iter)
     sta::check_positive_float "-routability_max_inflation_iter" $routability_max_inflation_iter
-    set_replace_routability_max_inflation_iter $routability_max_inflation_iter
+    set_replace_routability_max_inflation_iter_cmd $routability_max_inflation_iter
+  }
+  
+  # routability inflation iter
+  if { [info exists keys(-routability_target_rc_metric)] } {
+    set target_rc_metric $keys(-routability_target_rc_metric)
+    sta::check_positive_float "-routability_target_rc_metric" $target_rc_metric
+    set_replace_routability_target_rc_metric_cmd $target_rc_metric
   }
 
 
