@@ -60,6 +60,10 @@ class Replace
 
     void setIncrementalPlaceMode(bool mode);
     void setVerboseLevel(int verbose);
+    
+    // temp funcs; OpenDB should have these values. 
+    void setPadLeft(int padding);
+    void setPadRight(int padding);
 
     void setTimingDrivenMode(bool mode);
 
@@ -108,6 +112,11 @@ class Replace
     bool timingDrivenMode_;
     bool routabilityDrivenMode_;
     bool incrementalPlaceMode_;
+   
+    // temp variable; OpenDB should have these values. 
+    int padLeft_;
+    int padRight_;
+
     int verbose_;
 };
 }

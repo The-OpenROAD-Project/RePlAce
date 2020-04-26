@@ -16,6 +16,7 @@ proc global_placement { args } {
       -initial_place_max_iter -initial_place_max_fanout \
       -routability_check_overflow -routability_max_density \
       -routability_max_bloat_iter -routability_max_inflation_iter \
+      -pad_left -pad_right
       -verbose_level} \
       flags {-skip_initial_place -disable_timing_driven -disable_routability_driven -incremental}
 
@@ -136,6 +137,17 @@ proc global_placement { args } {
   } 
 
 
+  # temp code. 
+  if { [info exists keys(-pad_left)] } {
+    set pad_left $keys(-pad_left)
+    sta::check_positive_integer "-pad_left" $pad_left
+    set_replace_pad_left_cmd $pad_left
+  }
+  if { [info exists keys(-pad_right)] } {
+    set pad_right $keys(-pad_right)
+    sta::check_positive_integer "-pad_right" $pad_right
+    set_replace_pad_right_cmd $pad_right
+  }
 
   if { [ord::db_has_rows] } {
     sta::check_argc_eq0 "global_placement" $args

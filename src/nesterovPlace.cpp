@@ -118,7 +118,7 @@ void NesterovPlace::init() {
       = FloatPoint(gCell->dCx(), gCell->dCy()); 
   }
 
-  // bin update
+  // bin 
   nb_->updateGCellDensityCenterLocation(curSLPCoordi_);
   
   prevHpwl_ 

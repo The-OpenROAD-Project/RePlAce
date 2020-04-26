@@ -36,6 +36,7 @@ Replace::Replace()
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
+  padLeft_(0), padRight_(0),
   verbose_(0) {
 };
 
@@ -80,6 +81,8 @@ void Replace::reset() {
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
   incrementalPlaceMode_ = false;
+
+  padLeft_ = padRight_ = 0;
   verbose_ = 0;
 }
 
@@ -91,7 +94,12 @@ void Replace::setSta(sta::dbSta* sta) {
 }
 void Replace::doInitialPlace() {
   log_ = std::make_shared<Logger>("REPL", verbose_);
-  pb_ = std::make_shared<PlacerBase>(db_, log_);
+
+  PlacerBaseVars pbVars;
+  pbVars.padLeft = padLeft_;
+  pbVars.padRight = padRight_;
+
+  pb_ = std::make_shared<PlacerBase>(db_, pbVars, log_);
 
   InitialPlaceVars ipVars;
   ipVars.maxIter = initialPlaceMaxIter_;
@@ -112,7 +120,11 @@ void Replace::doNesterovPlace() {
   }
 
   if( !pb_ ) {
-    pb_ = std::make_shared<PlacerBase>(db_, log_);
+    PlacerBaseVars pbVars;
+    pbVars.padLeft = padLeft_;
+    pbVars.padRight = padRight_;
+
+    pb_ = std::make_shared<PlacerBase>(db_, pbVars, log_);
   }
   
 
@@ -128,6 +140,7 @@ void Replace::doNesterovPlace() {
     nbVars.isSetBinCntY = 1;
     nbVars.binCntY = binGridCntY_;
   }
+
 
   nb_ = std::make_shared<NesterovBase>(nbVars, pb_, log_);
   
@@ -269,6 +282,15 @@ Replace::setRoutabilityMaxBloatIter(int iter) {
 void
 Replace::setRoutabilityMaxInflationIter(int iter) {
   routabilityMaxInflationIter_ = iter;
+
+void
+Replace::setPadLeft(int pad) {
+  padLeft_ = pad;
+}
+
+void
+Replace::setPadRight(int pad) {
+  padRight_ = pad;
 }
 
 }

@@ -32,7 +32,7 @@ class Logger;
 class Instance {
 public:
   Instance();
-  Instance(odb::dbInst* inst);
+  Instance(odb::dbInst* inst, int padLeft, int padRight);
   Instance(int lx, int ly, int ux, int uy);
   ~Instance();
 
@@ -233,10 +233,22 @@ private:
   int coreUy_;
 };
 
+class PlacerBaseVars {
+public:
+  int padLeft;
+  int padRight;
+
+  PlacerBaseVars();
+  void reset(); 
+};
+
 class PlacerBase {
 public:
   PlacerBase();
-  PlacerBase(odb::dbDatabase* db, std::shared_ptr<Logger> log);
+  // temp padLeft/Right before OpenDB supporting...
+  PlacerBase(odb::dbDatabase* db, 
+      PlacerBaseVars pbVars, 
+      std::shared_ptr<Logger> log);
   ~PlacerBase();
 
   const std::vector<Instance*>& insts() const { return insts_; }
@@ -266,6 +278,9 @@ public:
   int siteSizeX() const { return siteSizeX_; }
   int siteSizeY() const { return siteSizeY_; }
 
+  int padLeft() const { return pbVars_.padLeft; }
+  int padRight() const { return pbVars_.padRight; }
+
   int64_t hpwl() const;
   void printInfo() const;
 
@@ -279,6 +294,8 @@ public:
 private:
   odb::dbDatabase* db_;
   std::shared_ptr<Logger> log_;
+
+  PlacerBaseVars pbVars_;
 
   Die die_;
 

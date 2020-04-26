@@ -34,18 +34,32 @@ getOverlapWithCoreArea(Die& die, Instance& inst);
 ////////////////////////////////////////////////////////
 // Instance 
 
-Instance::Instance() : inst_(nullptr), 
-  lx_(0), ly_(0), ux_(0), uy_(0), extId_(INT_MIN) {}
+Instance::Instance() 
+  : inst_(nullptr), 
+  lx_(0), ly_(0), 
+  ux_(0), uy_(0), extId_(INT_MIN) {}
 
 // for movable real instances
-Instance::Instance(odb::dbInst* inst) : Instance() {
+Instance::Instance(odb::dbInst* inst, 
+    int padLeft, int padRight) 
+  : Instance() {
   inst_ = inst;
   int lx = 0, ly = 0;
   inst_->getLocation(lx, ly);
-  lx_ = lx; 
-  ly_ = ly;
-  ux_ = lx + inst_->getBBox()->getDX();
-  uy_ = ly + inst_->getBBox()->getDY();
+
+  // padding apply on placeInstance
+  if( isPlaceInstance() ) {
+    lx_ = lx - padLeft; 
+    ly_ = ly;
+    ux_ = lx + inst_->getBBox()->getDX() + padRight;
+    uy_ = ly + inst_->getBBox()->getDY();
+  }
+  else {
+    lx_ = lx; 
+    ly_ = ly;
+    ux_ = lx + inst_->getBBox()->getDX();
+    uy_ = ly + inst_->getBBox()->getDY();
+  }
 
   // 
   // TODO
@@ -591,19 +605,31 @@ Die::coreArea() const {
   return static_cast<int64_t>(coreDx()) * static_cast<int64_t>(coreDy());
 }
 
+PlacerBaseVars::PlacerBaseVars()
+  : padLeft(0), padRight(0) {}
+
+void 
+PlacerBaseVars::reset() {
+  padLeft = padRight = 0;
+}
+
 ////////////////////////////////////////////////////////
 // PlacerBase
 
 PlacerBase::PlacerBase() 
-  : db_(nullptr), log_(nullptr), siteSizeX_(0), siteSizeY_(0),
+  : db_(nullptr), log_(nullptr), 
+  pbVars_(), 
+  siteSizeX_(0), siteSizeY_(0),
   placeInstsArea_(0), nonPlaceInstsArea_(0),
   macroInstsArea_(0), stdInstsArea_(0) {}
 
 PlacerBase::PlacerBase(odb::dbDatabase* db,
+    PlacerBaseVars pbVars,
     std::shared_ptr<Logger> log)
   : PlacerBase() {
   db_ = db;
   log_ = log;
+  pbVars_ = pbVars;
   init();
 }
 
@@ -638,7 +664,9 @@ PlacerBase::init() {
   // insts fill with real instances
   instStor_.reserve(insts.size());
   for(dbInst* inst : insts) {
-    Instance myInst(inst);
+    Instance myInst(inst, 
+        pbVars_.padLeft * siteSizeX_,
+        pbVars_.padRight * siteSizeX_ );
     instStor_.push_back( myInst );
   }
 
@@ -858,6 +886,8 @@ PlacerBase::initInstsForFragmentedRow() {
 void
 PlacerBase::reset() {
   db_ = nullptr;
+  pbVars_.reset();
+
   instStor_.clear();
   pinStor_.clear();
   netStor_.clear();
