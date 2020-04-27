@@ -313,9 +313,10 @@ class RouteBase {
         std::shared_ptr<Logger> log);
     ~RouteBase();
 
-    // temp func
-    void importRoute(const char* fileName);
-    void importEst(const char* fileName);
+    // update Route and Est info
+    // from GlobalRouter
+    void updateRoute();
+    void updateEst();
 
     void getGlobalRouterResult();
     void updateCongestionMap();

@@ -659,16 +659,14 @@ RouteBase::getGlobalRouterResult() {
 
   fr_->startFastRoute();
   fr_->runFastRoute();
-  fr_->writeEst();
-  fr_->writeRoute();
 
   // Note that *.route info is unique.
   // TODO: read *.route only once.
-  importRoute("input.route");
-  log_->infoString("input.route parsing is done");
+  updateRoute();
+  log_->infoString("route parsing is done");
 
-  importEst("out.guide.est");
-  log_->infoString("out.guide.est parsing is done");
+  updateEst();
+  log_->infoString("est parsing is done");
   tg_->initTiles();
 }
 
@@ -721,209 +719,61 @@ RouteBase::inflationIterCnt() const {
 // minWireSpacing_
 //
 // edgeCapacityStor_
-
-// following code is temp!
-void
-RouteBase::importRoute(const char* fileName) {
-  char *token = NULL;
-  char temp[255];
-  char line[255];
-  bool blockageFlag = false;
-  bool beolFlag = false;
-  bool edgeFlag = false;
-
-  FILE *fp = nullptr;
-  if((fp = fopen(fileName, "r")) == NULL) {
-    log_->error("Cannot open " + string(fileName) + " file!", 999);
-    exit(1);
-  }
+void 
+RouteBase::updateRoute() {
+  using FastRoute::FastRouteKernel;
+  FastRouteKernel::ROUTE_ route = fr_->getRoute();
   
-  int tileCntX = 0, tileCntY = 0, numRoutingLayers = 0;
+  tg_->setTileCnt(route.gridCountX, route.gridCountY);
+  tg_->setNumRoutingLayers(route.numLayers);
 
-  while(!feof(fp)) {
-    *line = '\0';
-    char* ptr = fgets(line, 255, fp);
-    sscanf(line, "%s%*s", temp);
+  tg_->setLx(route.gridOriginX);
+  tg_->setLy(route.gridOriginY);
 
-    if(strlen(line) < 5 || temp[0] == '#' || strcmp(temp, "route") == 0)
-      continue;
-    if(strcmp(temp, "NumBlockageNodes") == 0) {
-      blockageFlag = true;
-      continue;
-    }
-    if(strcmp(temp, "NumEdgeCapacityAdjustments") == 0) {
-      blockageFlag = false;
-      edgeFlag = true;
-      continue;
-    }
-    if(strcmp(temp, "Grid") == 0) {
-      beolFlag = true;
-    }
-    if(strcmp(temp, "NumNiTerminals") == 0) {
-      beolFlag = false;
-      continue;
-    }
+  tg_->setTileSize( route.tileWidth, route.tileHeight);
 
-    if(beolFlag) {
-      sscanf(line, "%s :%*s", temp);
-      if(strcmp(temp, "Grid") == 0) {
+  rbVars_.blockagePorosity
+    = route.blockPorosity;
 
-        sscanf(line, "%*s : %d %d %d", &tileCntX, &tileCntY, &numRoutingLayers);
+  verticalCapacity_ = route.verticalEdgesCapacities;
+  horizontalCapacity_ = route.horizontalEdgesCapacities;
+  minWireWidth_ = route.minWireWidths;
+  minWireSpacing_ = route.minWireSpacings;
 
-        tg_->setTileCnt(tileCntX, tileCntY);
-        tg_->setNumRoutingLayers(numRoutingLayers);
-      }
-      else if(strcmp(temp, "VerticalCapacity") == 0) {
-        token = strtok(line, " \t\n");
-        token = strtok(NULL, " \t\n");
-        token = strtok(NULL, " \t\n");
-        for(int i = 0; i < numRoutingLayers; i++) {
-          verticalCapacity_.push_back(atoi(token));
-          token = strtok(NULL, " \t\n");
-        }
-      }
-      else if(strcmp(temp, "HorizontalCapacity") == 0) {
-        token = strtok(line, " \t\n");
-        token = strtok(NULL, " \t\n");
-        token = strtok(NULL, " \t\n");
-        for(int i = 0; i < numRoutingLayers; i++) {
-          horizontalCapacity_.push_back(atoi(token));
-          token = strtok(NULL, " \t\n");
-        }
-      }
-      else if(strcmp(temp, "MinWireWidth") == 0) {
-        token = strtok(line, " \t\n");
-        token = strtok(NULL, " \t\n");
-        token = strtok(NULL, " \t\n");
-        for(int i = 0; i < numRoutingLayers; i++) {
-          minWireWidth_.push_back(atof(token));
-
-          token = strtok(NULL, " \t\n");
-        }
-      }
-      else if(strcmp(temp, "MinWireSpacing") == 0) {
-        token = strtok(line, " \t\n");
-        token = strtok(NULL, " \t\n");
-        token = strtok(NULL, " \t\n");
-        for(int i = 0; i < numRoutingLayers; i++) {
-          minWireSpacing_.push_back(atof(token));
-          token = strtok(NULL, " \t\n");
-        }
-      }
-      else if(strcmp(temp, "ViaSpacing") == 0) {
-        token = strtok(line, " \t\n");
-        token = strtok(NULL, " \t\n");
-        token = strtok(NULL, " \t\n");
-        for(int i = 0; i < numRoutingLayers; i++) {
-          token = strtok(NULL, " \t\n");
-        }
-      }
-      else if(strcmp(temp, "GridOrigin") == 0) {
-        double temp_gridLLx, temp_gridLLy;
-        sscanf(line, "%*s : %lf %lf", &temp_gridLLx, &temp_gridLLy);
-
-        int lx = 0, ly = 0;
-        lx = static_cast<int>(round(temp_gridLLx));
-        ly = static_cast<int>(round(temp_gridLLy));
-
-        tg_->setLx(lx);
-        tg_->setLy(ly);
-      }
-      else if(strcmp(temp, "TileSize") == 0) {
-        double temp_tileWidth, temp_tileHeight;
-        sscanf(line, "%*s : %lf %lf", &temp_tileWidth, &temp_tileHeight);
-        int tileSizeX = 0, tileSizeY = 0;
-        tileSizeX = static_cast<int>(round(temp_tileWidth));
-        tileSizeY = static_cast<int>(round(temp_tileHeight));
-
-        tg_->setTileSize(tileSizeX, tileSizeY);
-      }
-      else if(strcmp(temp, "BlockagePorosity") == 0) {
-        double temp_blockagePorosity;
-        sscanf(line, "%*s : %lf", &temp_blockagePorosity);
-        // blockagePorosity changes..!
-        rbVars_.blockagePorosity 
-          = static_cast<float>(temp_blockagePorosity);
-      }
-    }
-
-    // No need to care
-    if(blockageFlag) {
-    }
-
-    if(edgeFlag) {
-      int e1, e2, e3, e4, e5, e6, e7;
-      sscanf(line, "%d %d %d %d %d %d %d ", &e1, &e2, &e3, &e4, &e5, &e6, &e7);
-      edgeCapacityStor_.push_back(EdgeCapacityInfo(e1, e2, e3, e4, e5, e6, e7));
-    }
+  edgeCapacityStor_.reserve(route.adjustments.size());
+  for(auto& e : route.adjustments) {
+    edgeCapacityStor_.push_back(
+        EdgeCapacityInfo(e.firstX, e.firstY, e.firstLayer,
+          e.finalX, e.finalY, e.finalLayer, 
+          e.edgeCapacity));
   }
 }
 
 // Fill routingTracks_;
-// following code is temp!
-void 
-RouteBase::importEst(const char* fileName) {
-  // *.est importing.
-  //
+void
+RouteBase::updateEst() {
+  using FastRoute::FastRouteKernel;
+  std::vector<FastRouteKernel::EST_> estStor 
+    = fr_->getEst();
 
-  FILE *fp = fopen(fileName, "r");
-  if(fp == NULL) {
-    log_->error("Cannot open " + string(fileName) + " file!", 999);
-		exit(1);
-  }
-      
-  char temp[255] = {0, };
-  char netName[255] = {0, };
-  char line[255] = {0, };
-  bool flag = false;
+  for(auto& netEst : estStor) {
+    odb::dbNet* dbNet = 
+        db_->getChip()->getBlock()->findNet(netEst.netName.c_str());
+    GNet* gNet = nb_->dbToNb(dbNet);
 
-  while(!feof(fp)) {
-    *line = '\0';
-    fgets(line, 255, fp);
-    sscanf(line, "%s%*s", temp);
-
-    if(strlen(line) < 3)
-      continue;
-
-    if(temp[0] != '(') {
-			int netIdx = 0;
-      sscanf(line, "%s %d%*s", netName, &netIdx);
-      flag = true;
-      continue;
-    }
-
-    if(temp[0] == '!') {
-      flag = false;
-      continue;
-    }
-
-    if(flag) {
-      if(temp[0] == '(') {
-  			int lx = 0, ly = 0, ll = 0, 
-            ux = 0, uy = 0, ul = 0;
-
-        sscanf(line, "(%d,%d,%d)-(%d,%d,%d)%*s", &lx, &ly, &ll, 
-            &ux, &uy, &ul);
-
-        // This can be ignored
-        // CGM doesn't care about this.
-        if(ll != ul) {
-          continue;
-        }
-
-        // CGN doesn't care about the single tile consumption
-        if( lx == ux && ly == uy && ll == ul ) {
-          continue;
-        }
-
-        odb::dbNet* dbNet = 
-          db_->getChip()->getBlock()->findNet(netName);
-        //log_->infoString("net " + string(netName) + " " + string(dbNet->getConstName()));
-        GNet* gNet = nb_->dbToNb(dbNet);
-        routingTracks_.push_back(
-            RoutingTrack(lx, ly, ux, uy, ll, gNet));
+    for(int i=0; i<netEst.numSegments; i++) {
+      // only focus on the same layer!
+      if( netEst.initLayer[i] != netEst.finalLayer[i] ) {
+        continue;
       }
-    }
+
+      routingTracks_.push_back(
+          RoutingTrack(
+            netEst.initX[i], netEst.initY[i], 
+            netEst.finalX[i], netEst.finalY[i],
+            netEst.initLayer[i], 
+            gNet));
+    } 
   }
 }
 
