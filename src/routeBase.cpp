@@ -645,9 +645,15 @@ RouteBase::getGlobalRouterResult() {
 
   // FR init funcs
   fr_->setMinRoutingLayer(1);
-  fr_->setMaxRoutingLayer(3);
+  fr_->setMaxRoutingLayer(9);
+  fr_->setUnidirectionalRoute(1);
+  fr_->setOverflowIterations(100);
+  fr_->setAdjustment(0.15);
 
-  fr_->setUnidirectionalRoute(0);
+  fr_->addLayerAdjustment(2, 50);
+  fr_->addLayerAdjustment(3, 50);
+
+  /*
   fr_->setAlpha(0.3);
   fr_->setOverflowIterations(500);
   fr_->setClockNetRouting(false);
@@ -656,6 +662,7 @@ RouteBase::getGlobalRouterResult() {
   fr_->setAdjustment(0);
   fr_->setGridOrigin(0,0);
   fr_->setVerbose(0);
+  */
 
   fr_->startFastRoute();
   fr_->runFastRoute();
@@ -1058,8 +1065,8 @@ RouteBase::updateInflationRatio() {
   float maxInflV = 0, maxInflH = 0;
 
   for(auto& tile : tg_->tiles()) {
-
-    float newRatioV = (tile->usageH() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyH();
+    float newRatioV 
+      = (tile->usageH() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyH();
     newRatioV = pow(newRatioV, rbVars_.inflationRatioCoef);
 
     // Vertical InflationRatio
@@ -1095,7 +1102,7 @@ RouteBase::updateInflationRatio() {
   log_->infoFloatPair("MaxInflationRatioHV", maxInflH, maxInflV);
 
 
-  // newly set inflationRatio from H/V
+  // newly set inflationRatio from route arr
   // for each tile
   for(auto& tile : tg_->tiles()) {
 

@@ -17,6 +17,7 @@ proc global_placement { args } {
       -routability_check_overflow -routability_max_density \
       -routability_max_bloat_iter -routability_max_inflation_iter \
       -routability_target_rc_metric \
+      -routability_pitch_scale \
       -pad_left -pad_right \
       -verbose_level} \
     flags {-skip_initial_place \
@@ -138,6 +139,13 @@ proc global_placement { args } {
     set target_rc_metric $keys(-routability_target_rc_metric)
     sta::check_positive_float "-routability_target_rc_metric" $target_rc_metric
     set_replace_routability_target_rc_metric_cmd $target_rc_metric
+  }
+  
+  # routability inflation iter
+  if { [info exists keys(-routability_pitch_scale)] } {
+    set pitch_scale $keys(-routability_pitch_scale)
+    sta::check_positive_float "-routability_pitch_scale" $pitch_scale
+    set_replace_routability_pitch_scale_cmd  $pitch_scale
   }
 
 

@@ -34,6 +34,7 @@ Replace::Replace()
   routabilityMaxBloatIter_(1),
   routabilityMaxInflationIter_(4),
   routabilityTargetRcMetric_(1.01),
+  routabilityPitchScale_(1.08),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -79,6 +80,7 @@ void Replace::reset() {
   routabilityMaxBloatIter_ = 1;
   routabilityMaxInflationIter_ = 4;
   routabilityTargetRcMetric_ = 1.01;
+  routabilityPitchScale_ = 1.08;
 
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
@@ -152,6 +154,7 @@ void Replace::doNesterovPlace() {
   rbVars.maxBloatIter = routabilityMaxBloatIter_;
   rbVars.maxInflationIter = routabilityMaxInflationIter_;
   rbVars.targetRC = routabilityTargetRcMetric_;
+  rbVars.gRoutePitchScale = routabilityPitchScale_;
 
   rb_ = std::make_shared<RouteBase>(rbVars, db_, nb_, log_);
 
@@ -293,6 +296,11 @@ Replace::setRoutabilityMaxInflationIter(int iter) {
 void
 Replace::setRoutabilityTargetRcMetric(float rc) {
   routabilityTargetRcMetric_ = rc;
+}
+
+void
+Replace::setRoutabilityPitchScale(float scale) {
+  routabilityPitchScale_ = scale;
 }
 
 void
