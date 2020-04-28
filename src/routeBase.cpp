@@ -33,8 +33,6 @@ Tile::Tile()
   supplyH_(0), supplyV_(0),
   supplyHL_(0), supplyHR_(0),
   supplyVL_(0), supplyVR_(0), 
-  inflationRatioH_(0),
-  inflationRatioV_(0),
   inflationRatio_(1.0),
   inflationArea_(0),
   inflationAreaDelta_(0),
@@ -69,7 +67,6 @@ Tile::reset() {
   x_ = y_ = lx_ = ly_ = ux_ = uy_ = pinCnt_ = 0;
   usageH_ = usageV_ = supplyH_ = supplyV_ = 0;
   supplyHL_ = supplyHR_ = supplyVL_ = supplyVR_ = 0;
-  inflationRatioH_ = inflationRatioV_ = 0;
   inflationRatio_ = 1.0;
 
   inflationArea_ = inflationAreaDelta_ = 0;
@@ -162,16 +159,6 @@ Tile::supplyH() const {
 float
 Tile::supplyV() const {
   return supplyV_;
-}
-
-float 
-Tile::inflationRatioH() const {
-  return inflationRatioH_;
-}
-
-float 
-Tile::inflationRatioV() const {
-  return inflationRatioV_;
 }
 
 float
@@ -277,16 +264,6 @@ Tile::setSupplyVL(float supply) {
 void
 Tile::setSupplyVR(float supply) {
   supplyVR_ = supply; 
-}
-
-void
-Tile::setInflationRatioH(float val) {
-  inflationRatioH_ = val;
-}
-
-void
-Tile::setInflationRatioV(float val) {
-  inflationRatioV_ = val;
 }
 
 void
@@ -1062,46 +1039,6 @@ RouteBase::updateRoutes() {
 // inflationRatio
 void
 RouteBase::updateInflationRatio() {
-  float maxInflV = 0, maxInflH = 0;
-
-  for(auto& tile : tg_->tiles()) {
-    float newRatioV 
-      = (tile->usageH() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyH();
-    newRatioV = pow(newRatioV, rbVars_.inflationRatioCoef);
-
-    // Vertical InflationRatio
-    tile->setInflationRatioV( 
-        std::fmax(
-          tile->inflationRatioV(), newRatioV));
-
-    // upper bound
-    tile->setInflationRatioV(
-        std::fmin( 
-          rbVars_.maxInflationRatio, 
-          tile->inflationRatioV()));
-
-    maxInflV = std::max(maxInflV, tile->inflationRatioV());
-    
-    float newRatioH 
-      = (tile->usageV() + rbVars_.pinInflationCoef * tile->pinCnt()) / tile->supplyV();
-    newRatioH = pow(newRatioH, rbVars_.inflationRatioCoef);
-
-    // Horizontal InflationRatio
-    tile->setInflationRatioH( 
-        std::fmax(
-          tile->inflationRatioH(), newRatioH));
-
-    // upper bound
-    tile->setInflationRatioH(
-        std::fmin( 
-          rbVars_.maxInflationRatio, 
-          tile->inflationRatioH()));
-
-    maxInflH = std::max(maxInflH, tile->inflationRatioH());
-  }
-  log_->infoFloatPair("MaxInflationRatioHV", maxInflH, maxInflV);
-
-
   // newly set inflationRatio from route arr
   // for each tile
   for(auto& tile : tg_->tiles()) {
@@ -1185,36 +1122,6 @@ RouteBase::updateInflationRatio() {
       tile->setInflationRatio( pow(tile->inflationRatio(), 
             rbVars_.inflationRatioCoef) );
     }
-
-    /*
-    if( tile->x() == 91 && 
-        tile->y() == 55 ) {
-      for(int i=0; i<tg_->numRoutingLayers(); i++) {
-        std::cout << "9155 route: " << tile->route(i) << std::endl;
-      }
-
-      Tile* leftTile = tg_->tiles()
-        [ tile->y() * tg_->tileCntX() 
-        + (tile->x()-1) ];
-          
-      Tile* lowerTile = tg_->tiles()
-        [ (tile->y()-1) * tg_->tileCntX()
-        + tile->x() ];
-
-      std::cout << "leftTile XY: " << leftTile->x() << " " << leftTile->y() << std::endl;
-      
-      for(int i=0; i<tg_->numRoutingLayers(); i++) {
-        std::cout << "leftTile route: " << leftTile->route(i) << std::endl;
-      }
-
-      std::cout << "lowerTile XY: " << lowerTile->x() << " " << lowerTile->y() << std::endl;
-      
-      for(int i=0; i<tg_->numRoutingLayers(); i++) {
-        std::cout << "lowerTile route: " << lowerTile->route(i) << std::endl;
-      }
-    }
-
-    */
   }
     
   for(auto& tile : tg_->tiles()) {
@@ -1227,9 +1134,6 @@ RouteBase::updateInflationRatio() {
       log_->infoFloatPair("supplyHV", 
           tile->supplyH(), tile->supplyV(), 5); 
       log_->infoInt("pinCnt", tile->pinCnt(), 5);
-      log_->infoFloatPair("calcInflRatioHV", 
-          tile->inflationRatioH(),
-          tile->inflationRatioV(), 5);
       log_->infoFloat("calcInflationRatio", tile->inflationRatio(), 5);
     }
   }

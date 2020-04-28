@@ -59,9 +59,6 @@ class Tile {
     float supplyH() const;
     float supplyV() const;
 
-    float inflationRatioH() const;
-    float inflationRatioV() const;
-
     float inflationRatio() const;
     float inflationArea() const;
     float inflationAreaDelta() const;
@@ -149,8 +146,6 @@ class Tile {
     float supplyVR_;
 
     // to bloat cells in tile
-    float inflationRatioH_;
-    float inflationRatioV_;
     float inflationRatio_;
 
     float inflationArea_;
