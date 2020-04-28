@@ -627,8 +627,8 @@ RouteBase::getGlobalRouterResult() {
   fr_->setOverflowIterations(100);
   fr_->setAdjustment(0.15);
 
-  fr_->addLayerAdjustment(2, 50);
-  fr_->addLayerAdjustment(3, 50);
+  fr_->addLayerAdjustment(2, 0.5);
+  fr_->addLayerAdjustment(3, 0.5);
 
   /*
   fr_->setAlpha(0.3);
@@ -1056,7 +1056,7 @@ RouteBase::updateInflationRatio() {
               fmax( 
                 tile->inflationRatio(), 
                 static_cast<float>(tile->route(i)) 
-                / horizontalCapacity_[i]
+                / (horizontalCapacity_[i] * rbVars_.targetRC)
                 * rbVars_.gRoutePitchScale)
               );
         }
@@ -1076,7 +1076,7 @@ RouteBase::updateInflationRatio() {
                 fmax(
                   tile->inflationRatio(),
                   static_cast<float>(leftTile->route(i)) 
-                  / horizontalCapacity_[i]
+                  / (horizontalCapacity_[i] * rbVars_.targetRC)
                   * rbVars_.gRoutePitchScale)
                 );
           }
@@ -1091,7 +1091,7 @@ RouteBase::updateInflationRatio() {
               fmax(
                 tile->inflationRatio(),
                 static_cast<float>(tile->route(i))
-                / verticalCapacity_[i]
+                / (verticalCapacity_[i] * rbVars_.targetRC)
                 * rbVars_.gRoutePitchScale)
               );
         }
@@ -1110,7 +1110,7 @@ RouteBase::updateInflationRatio() {
                 fmax(
                   tile->inflationRatio(),
                   static_cast<float>(lowerTile->route(i))
-                  / verticalCapacity_[i]
+                  / (verticalCapacity_[i] * rbVars_.targetRC)
                   * rbVars_.gRoutePitchScale)
                 );
           }
@@ -1118,9 +1118,17 @@ RouteBase::updateInflationRatio() {
       } 
     } 
 
-    if( tile->inflationRatio() > 1.0 ) {
+    if( tile->inflationRatio() >= rbVars_.targetRC ) {
+      // takes power with inflationRatioCoef
       tile->setInflationRatio( pow(tile->inflationRatio(), 
             rbVars_.inflationRatioCoef) );
+
+
+      // <= maxInflationRatio
+      tile->setInflationRatio( 
+          std::fmin(tile->inflationRatio(), 
+            rbVars_.maxInflationRatio));
+
     }
   }
     

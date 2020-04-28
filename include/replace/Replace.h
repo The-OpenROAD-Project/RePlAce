@@ -75,7 +75,9 @@ class Replace
     void setRoutabilityMaxInflationIter(int iter);
 
     void setRoutabilityTargetRcMetric(float rc);
+    void setRoutabilityInflationRatioCoef(float ratio);
     void setRoutabilityPitchScale(float scale);
+    void setRoutabilityMaxInflationRatio(float ratio);
 
   private:
     odb::dbDatabase* db_;
@@ -109,7 +111,9 @@ class Replace
     float routabilityCheckOverflow_;
     float routabilityMaxDensity_;
     float routabilityTargetRcMetric_;
+    float routabilityInflationRatioCoef_;
     float routabilityPitchScale_;
+    float routabilityMaxInflationRatio_;
 
     int routabilityMaxBloatIter_;
     int routabilityMaxInflationIter_;

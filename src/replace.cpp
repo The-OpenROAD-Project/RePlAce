@@ -34,7 +34,9 @@ Replace::Replace()
   routabilityMaxBloatIter_(1),
   routabilityMaxInflationIter_(4),
   routabilityTargetRcMetric_(1.01),
+  routabilityInflationRatioCoef_(2.33),
   routabilityPitchScale_(1.08),
+  routabilityMaxInflationRatio_(2.5),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -80,7 +82,9 @@ void Replace::reset() {
   routabilityMaxBloatIter_ = 1;
   routabilityMaxInflationIter_ = 4;
   routabilityTargetRcMetric_ = 1.01;
+  routabilityInflationRatioCoef_ = 2.33;
   routabilityPitchScale_ = 1.08;
+  routabilityMaxInflationRatio_ = 2.5;
 
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
@@ -154,7 +158,9 @@ void Replace::doNesterovPlace() {
   rbVars.maxBloatIter = routabilityMaxBloatIter_;
   rbVars.maxInflationIter = routabilityMaxInflationIter_;
   rbVars.targetRC = routabilityTargetRcMetric_;
+  rbVars.inflationRatioCoef = routabilityInflationRatioCoef_;
   rbVars.gRoutePitchScale = routabilityPitchScale_;
+  rbVars.maxInflationRatio = routabilityMaxInflationRatio_;
 
   rb_ = std::make_shared<RouteBase>(rbVars, db_, nb_, log_);
 
@@ -299,8 +305,18 @@ Replace::setRoutabilityTargetRcMetric(float rc) {
 }
 
 void
+Replace::setRoutabilityInflationRatioCoef(float coef) {
+  routabilityInflationRatioCoef_ = coef;
+}
+
+void
 Replace::setRoutabilityPitchScale(float scale) {
   routabilityPitchScale_ = scale;
+}
+
+void
+Replace::setRoutabilityMaxInflationRatio(float ratio) {
+  routabilityMaxInflationRatio_ = ratio;
 }
 
 void

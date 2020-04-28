@@ -183,11 +183,27 @@ set_replace_routability_target_rc_metric_cmd(float rc)
 }
 
 void
+set_replace_routability_inflation_ratio_coef_cmd(float coef)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityInflationRatioCoef(coef);
+}
+
+void
 set_replace_routability_pitch_scale_cmd(float scale) 
 {
   Replace* replace = getReplace();
   replace->setRoutabilityPitchScale(scale);
 }
+
+void
+set_replace_routability_max_inflation_ratio_cmd(float ratio) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxInflationRatio(ratio);
+}
+
+
 
 void
 set_replace_pad_left_cmd(int pad) 

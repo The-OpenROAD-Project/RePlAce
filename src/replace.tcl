@@ -17,7 +17,9 @@ proc global_placement { args } {
       -routability_check_overflow -routability_max_density \
       -routability_max_bloat_iter -routability_max_inflation_iter \
       -routability_target_rc_metric \
+      -routability_inflation_ratio_coef \
       -routability_pitch_scale \
+      -routability_max_inflation_ratio \
       -pad_left -pad_right \
       -verbose_level} \
     flags {-skip_initial_place \
@@ -141,11 +143,25 @@ proc global_placement { args } {
     set_replace_routability_target_rc_metric_cmd $target_rc_metric
   }
   
-  # routability inflation iter
+  # routability pitch scale 
   if { [info exists keys(-routability_pitch_scale)] } {
     set pitch_scale $keys(-routability_pitch_scale)
     sta::check_positive_float "-routability_pitch_scale" $pitch_scale
     set_replace_routability_pitch_scale_cmd  $pitch_scale
+  }
+  
+  # routability inflation ratio coef 
+  if { [info exists keys(-routability_inflation_ratio_coef)] } {
+    set ratio_coef $keys(-routability_inflation_ratio_coef)
+    sta::check_positive_float "-routability_inflation_ratio_coef" $ratio_coef
+    set_replace_routability_inflation_ratio_coef_cmd $ratio_coef
+  }
+  
+  # routability max inflation ratio
+  if { [info exists keys(-routability_max_inflation_ratio)] } {
+    set max_inflation_ratio $keys(-routability_max_inflation_ratio)
+    sta::check_positive_float "-routability_max_inflation_ratio" $max_inflation_ratio
+    set_replace_routability_max_inflation_ratio_cmd $max_inflation_ratio
   }
 
 
