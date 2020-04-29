@@ -530,9 +530,15 @@ NesterovPlace::doNesterovPlace() {
       // if further routability-driven is needed 
       isRoutabilityNeed_ = rb_->routability();
 
+      // only execute three times and see what's happen
+      if( rb_->numCall() >= 3) {
+        isRoutabilityNeed_ = false;
+      }
+
       // revert back the current density penality
       if( isRoutabilityNeed_ ) {
         densityPenalty_ = getRoutabilityDensityPenalty();
+        cutFillerCoordinates();
       }
     }
 
@@ -680,6 +686,27 @@ NesterovPlace::getRoutabilityDensityPenalty() {
   else {
     return densityPenaltyStor_[0];
   }
+}
+
+void
+NesterovPlace::cutFillerCoordinates() {
+  curSLPCoordi_.resize( nb_->fillerCnt() );
+  curSLPWireLengthGrads_.resize( nb_->fillerCnt() );
+  curSLPDensityGrads_.resize( nb_->fillerCnt() );
+  curSLPSumGrads_.resize( nb_->fillerCnt() );
+
+  nextSLPCoordi_.resize( nb_->fillerCnt() );
+  nextSLPWireLengthGrads_.resize( nb_->fillerCnt() );
+  nextSLPDensityGrads_.resize( nb_->fillerCnt() );
+  nextSLPSumGrads_.resize( nb_->fillerCnt() );
+
+  prevSLPCoordi_.resize( nb_->fillerCnt() );
+  prevSLPWireLengthGrads_.resize( nb_->fillerCnt() );
+  prevSLPDensityGrads_.resize( nb_->fillerCnt() );
+  prevSLPSumGrads_.resize( nb_->fillerCnt() );
+
+  curCoordi_.resize(nb_->fillerCnt());
+  nextCoordi_.resize(nb_->fillerCnt());
 }
 
 

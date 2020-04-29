@@ -140,6 +140,8 @@ private:
 
   float getRoutabilityDensityPenalty();
 
+  void cutFillerCoordinates();
+
   void init();
   void reset();
 

@@ -904,7 +904,6 @@ NesterovBaseVars::reset() {
 NesterovBase::NesterovBase()
   : pb_(nullptr), log_(nullptr), 
   fillerDx_(0), fillerDy_(0),
-  fillerCnt_(0), 
   whiteSpaceArea_(0), 
   movableArea_(0), totalFillerArea_(0),
   stdInstsArea_(0), macroInstsArea_(0),
@@ -932,7 +931,6 @@ NesterovBase::reset() {
   log_ = nullptr;
   
   fillerDx_ = fillerDy_ = 0;
-  fillerCnt_ = 0;
   whiteSpaceArea_ = movableArea_ = 0;
   totalFillerArea_ = 0;
 
@@ -1020,6 +1018,10 @@ NesterovBase::init() {
     gCells_.push_back(&gCell);
     if( gCell.isInstance() ) {
       gCellMap_[gCell.instance()] = &gCell;
+      gCellInsts_.push_back(&gCell);
+    }
+    else if( gCell.isFiller() ) {
+      gCellFillers_.push_back(&gCell);
     }
   }
   
@@ -1148,7 +1150,7 @@ NesterovBase::initFillerGCells() {
     log_->error( msg, 1 );
   }
 
-  fillerCnt_ = 
+  int fillerCnt = 
     static_cast<int>(totalFillerArea_ 
         / static_cast<int64_t>(fillerDx_ * fillerDy_));
 
@@ -1156,8 +1158,8 @@ NesterovBase::initFillerGCells() {
   log_->infoInt64("FillerInit: WhiteSpaceArea", whiteSpaceArea_, 3);
   log_->infoInt64("FillerInit: MovableArea", movableArea_, 3);
   log_->infoInt64("FillerInit: TotalFillerArea", totalFillerArea_, 3);
-  log_->infoInt("FillerInit: NumFillerCells", fillerCnt_, 3);
-  log_->infoInt64("FillerInit: FillerCellArea", fillerArea(), 3);
+  log_->infoInt("FillerInit: NumFillerCells", fillerCnt, 3);
+  log_->infoInt64("FillerInit: FillerCellArea", fillerCellArea(), 3);
   log_->infoIntPair("FillerInit: FillerCellSize", fillerDx_, fillerDy_, 3); 
 
   // 
@@ -1165,7 +1167,7 @@ NesterovBase::initFillerGCells() {
   // rand()'s RAND_MAX is only 32767.
   //
   mt19937 randVal(0);
-  for(int i=0; i<fillerCnt_; i++) {
+  for(int i=0; i<fillerCnt; i++) {
 
     // instability problem between g++ and clang++!
     auto randX = randVal();
@@ -1306,14 +1308,13 @@ NesterovBase::fillerDy() const {
 
 int
 NesterovBase::fillerCnt() const {
-  return fillerCnt_;
+  return static_cast<int>(gCellFillers_.size());
 }
 
 int64_t
-NesterovBase::fillerArea() const {
+NesterovBase::fillerCellArea() const {
   return static_cast<int64_t>(fillerDx_)
-    * static_cast<int64_t>(fillerDy_) 
-    * static_cast<int64_t>(fillerCnt_);
+    * static_cast<int64_t>(fillerDy_); 
 }
 
 int64_t 
@@ -1359,7 +1360,7 @@ NesterovBase::updateFillerCellSize(int dx, int dy) {
   fillerDy_ = dy; 
 
   // 
-  // note that fillerCnt_ will not be changed.
+  // note that numFillerCells will not be changed.
   //
   for(auto& gCell : gCells_) {
     if( !gCell->isFiller() ) {
@@ -1453,6 +1454,39 @@ NesterovBase::updateAreas() {
     msg += "       Re-floorplan to have enough coreArea\n";
     log_->error( msg, 1 );
   }
+}
+
+// cut the filler cells
+void
+NesterovBase::cutFillerCells(int64_t targetFillerArea) {
+  std::vector<GCell*> newGCells = gCellInsts_;
+  std::vector<GCell*> newGCellFillers;
+
+  int64_t curFillerArea = 0;
+  log_->infoInt("gCellFiller", gCellFillers_.size());
+
+  for(auto& gCellFiller : gCellFillers_ ) {
+    curFillerArea += 
+      static_cast<int64_t>(gCellFiller->dx()) 
+      * static_cast<int64_t>(gCellFiller->dy());
+
+    if( curFillerArea >= targetFillerArea ) {
+      curFillerArea -= 
+        static_cast<int64_t>(gCellFiller->dx()) 
+      * static_cast<int64_t>(gCellFiller->dy());
+      break;
+    }
+
+    newGCells.push_back(gCellFiller);
+    newGCellFillers.push_back(gCellFiller);
+  }
+
+  // update totalFillerArea_
+  totalFillerArea_ = curFillerArea;
+  log_->infoInt64("NewTotalFillerArea", totalFillerArea_);
+
+  gCells_.swap(newGCells);
+  gCellFillers_.swap(newGCellFillers);
 }
 
 void 

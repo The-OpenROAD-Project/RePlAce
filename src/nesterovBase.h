@@ -759,6 +759,7 @@ public:
   void updateGCellDensityCenterLocation(
       std::vector<FloatPoint>& points);
 
+
   int binCntX() const;
   int binCntY() const;
   int binSizeX() const;
@@ -772,7 +773,7 @@ public:
   int fillerDx() const;
   int fillerDy() const;
   int fillerCnt() const;
-  int64_t fillerArea() const;
+  int64_t fillerCellArea() const;
   int64_t whiteSpaceArea() const;
   int64_t movableArea() const;
   int64_t totalFillerArea() const;
@@ -791,6 +792,7 @@ public:
 
   // update density sizes with changed dx and dy
   void updateDensitySize();
+  
 
 
   // should be separately defined.
@@ -809,6 +811,9 @@ public:
   float targetDensity() const;
 
   void setTargetDensity(float targetDensity);
+  
+  // RD can shrink the number of fillerCells.
+  void cutFillerCells(int64_t targetFillerArea);
 
   void updateDensityCoordiLayoutInside(GCell* gcell);
 
@@ -861,7 +866,6 @@ private:
   std::unique_ptr<FFT> fft_;
 
   int fillerDx_, fillerDy_;
-  int fillerCnt_;
   int64_t whiteSpaceArea_;
   int64_t movableArea_;
   int64_t totalFillerArea_;
