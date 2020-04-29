@@ -540,18 +540,23 @@ RouteBaseVars::reset() {
 
 RouteBase::RouteBase()
   : rbVars_(), 
-  db_(nullptr), nb_(nullptr), log_(nullptr),
+  db_(nullptr), 
+  fr_(nullptr), 
+  nb_(nullptr), 
+  log_(nullptr),
   inflatedAreaDelta_(0), 
   bloatIterCnt_(0), inflationIterCnt_(0), numCall_(0) {}
 
 RouteBase::RouteBase(
     RouteBaseVars rbVars, 
     odb::dbDatabase* db, 
+    FastRoute::FastRouteKernel* fr, 
     std::shared_ptr<NesterovBase> nb,
     std::shared_ptr<Logger> log)
   : RouteBase() {
   rbVars_ = rbVars;
   db_ = db;
+  fr_ = fr; 
   nb_ = nb;
   log_ = log;
 
@@ -604,10 +609,6 @@ RouteBase::init() {
   tg_ = std::move(tg);
   
   tg_->setLogger(log_);
-  
-  // call FR only once
-  std::unique_ptr<FastRouteKernel> fr(new FastRouteKernel());
-  fr_ = std::move(fr);
 }
 
 void
@@ -618,14 +619,16 @@ RouteBase::getGlobalRouterResult() {
 //  db_->getChip()->getBlock()->writeDb("./route01_mem_err.db");
   
   // fr_ init
-  fr_->setDbId(db_->getId());
+//  fr_->setDbId(db_->getId());
 
   // FR init funcs
+  /*
   fr_->setMinRoutingLayer(1);
   fr_->setMaxRoutingLayer(9);
   fr_->setUnidirectionalRoute(1);
   fr_->setAllowOverflow(true);
   fr_->setOverflowIterations(0);
+  */
 //  fr_->setAdjustment(0.50);
 
 //  fr_->addLayerAdjustment(2, 0.75);

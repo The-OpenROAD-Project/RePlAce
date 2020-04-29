@@ -304,6 +304,7 @@ class RouteBase {
     RouteBase();
     RouteBase(RouteBaseVars rbVars,
         odb::dbDatabase* db,
+        FastRoute::FastRouteKernel* fr,
         std::shared_ptr<NesterovBase> nb,
         std::shared_ptr<Logger> log);
     ~RouteBase();
@@ -327,11 +328,11 @@ class RouteBase {
   private:
     RouteBaseVars rbVars_;
     odb::dbDatabase* db_;
+    FastRoute::FastRouteKernel* fr_;
 
     std::shared_ptr<NesterovBase> nb_;
     std::shared_ptr<Logger> log_;
 
-    std::unique_ptr<FastRoute::FastRouteKernel> fr_;
     std::unique_ptr<TileGrid> tg_;
 
     // from *.route file

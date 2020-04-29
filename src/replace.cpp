@@ -14,6 +14,7 @@ using namespace std;
 Replace::Replace()
   : db_(nullptr), 
   sta_(nullptr), 
+  fr_(nullptr),
   pb_(nullptr), nb_(nullptr), 
   ip_(nullptr), np_(nullptr),
   log_(nullptr),
@@ -55,6 +56,7 @@ void Replace::reset() {
   // two pointers should not be freed.
   db_ = nullptr;
   sta_ = nullptr;
+  fr_ = nullptr;
 
   ip_.reset();
   np_.reset();
@@ -99,6 +101,9 @@ void Replace::setDb(odb::dbDatabase* db) {
 }
 void Replace::setSta(sta::dbSta* sta) {
   sta_ = sta;
+}
+void Replace::setFastRoute(FastRoute::FastRouteKernel* fr) {
+  fr_ = fr;
 }
 void Replace::doInitialPlace() {
   log_ = std::make_shared<Logger>("REPL", verbose_);
@@ -162,7 +167,7 @@ void Replace::doNesterovPlace() {
   rbVars.gRoutePitchScale = routabilityPitchScale_;
   rbVars.maxInflationRatio = routabilityMaxInflationRatio_;
 
-  rb_ = std::make_shared<RouteBase>(rbVars, db_, nb_, log_);
+  rb_ = std::make_shared<RouteBase>(rbVars, db_, fr_, nb_, log_);
 
   NesterovPlaceVars npVars;
 
