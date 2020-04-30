@@ -539,6 +539,10 @@ NesterovPlace::doNesterovPlace() {
       if( isRoutabilityNeed_ ) {
         densityPenalty_ = getRoutabilityDensityPenalty();
         cutFillerCoordinates();
+  
+        // reset the divergence conditions
+        minSumOverflow = 1e30;
+        hpwlWithMinSumOverflow = 1e30; 
       }
     }
 
