@@ -583,7 +583,7 @@ void
 RouteBase::resetRoutabilityResources() {
   inflatedAreaDelta_ = 0;
 
-  fr_->reset();
+  fr_->resetResources();
   tg_.reset();
   verticalCapacity_.clear();
   horizontalCapacity_.clear();
@@ -616,42 +616,12 @@ RouteBase::getGlobalRouterResult() {
   // update gCells' location to DB for GR
   nb_->updateDbGCells(); 
 
-//  db_->getChip()->getBlock()->writeDb("./route01_mem_err.db");
-  
-  // fr_ init
-//  fr_->setDbId(db_->getId());
-
-  // FR init funcs
-  /*
-  fr_->setMinRoutingLayer(1);
-  fr_->setMaxRoutingLayer(9);
-  fr_->setUnidirectionalRoute(1);
+  // these two options must be on 
   fr_->setAllowOverflow(true);
   fr_->setOverflowIterations(0);
-  */
-//  fr_->setAdjustment(0.50);
-
-//  fr_->addLayerAdjustment(2, 0.75);
-//  fr_->addLayerAdjustment(3, 0.75);
-
-//  for(int i=4; i<=9; i++) {
-//    fr_->addLayerAdjustment(i, 0.5);
-//  }
-
-  /*
-  fr_->setAlpha(0.3);
-  fr_->setOverflowIterations(500);
-  fr_->setClockNetRouting(false);
-  fr_->setPDRev(false);
-  fr_->setPDRevForHighFanout(-1);
-  fr_->setAdjustment(0);
-  fr_->setGridOrigin(0,0);
-  fr_->setVerbose(0);
-  */
 
   fr_->startFastRoute();
   fr_->runFastRoute();
-
 
   // Note that *.route info is unique.
   // TODO: read *.route only once.
@@ -738,6 +708,10 @@ RouteBase::updateRoute() {
   cout << "capacity" << endl;
   for(int i=0; i<route.verticalEdgesCapacities.size(); i++) {
     cout << i << " V:" << verticalCapacity_[i] << " H:" << horizontalCapacity_[i] << endl;
+  }
+  
+  for(int i=0; i<route.verticalEdgesCapacities.size(); i++) {
+    cout << i << " MinWidth:" << minWireWidth_[i] << " MinSpacing:" << minWireSpacing_[i] << endl;
   }
 
   edgeCapacityStor_.reserve(route.adjustments.size());
