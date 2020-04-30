@@ -530,17 +530,12 @@ NesterovPlace::doNesterovPlace() {
       // if further routability-driven is needed 
       isRoutabilityNeed_ = rb_->routability();
 
-      // only execute three times and see what's happen
-      if( rb_->numCall() >= 3) {
-        isRoutabilityNeed_ = false;
-      }
-
       // revert back the current density penality
       if( isRoutabilityNeed_ ) {
         densityPenalty_ = getRoutabilityDensityPenalty();
         cutFillerCoordinates();
   
-        // reset the divergence conditions
+        // reset the divergence detect conditions 
         minSumOverflow = 1e30;
         hpwlWithMinSumOverflow = 1e30; 
       }

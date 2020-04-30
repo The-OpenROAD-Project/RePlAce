@@ -289,6 +289,9 @@ public:
   float ignoreEdgeRatio;
   float targetRC;
 
+  // targetRC metric coefficients.
+  float rcK1, rcK2, rcK3, rcK4;
+
   int maxBloatIter;
   int maxInflationIter;
   int minPinBlockLayer;

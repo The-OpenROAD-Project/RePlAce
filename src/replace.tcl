@@ -20,6 +20,7 @@ proc global_placement { args } {
       -routability_inflation_ratio_coef \
       -routability_pitch_scale \
       -routability_max_inflation_ratio \
+      -routability_rc_coefficients \
       -pad_left -pad_right \
       -verbose_level} \
     flags {-skip_initial_place \
@@ -162,6 +163,16 @@ proc global_placement { args } {
     set max_inflation_ratio $keys(-routability_max_inflation_ratio)
     sta::check_positive_float "-routability_max_inflation_ratio" $max_inflation_ratio
     set_replace_routability_max_inflation_ratio_cmd $max_inflation_ratio
+  }
+  
+  # routability rc coefficients control
+  if { [info exists keys(-routability_rc_coefficients)] } {
+    set rc_coefficients $keys(-routability_rc_coefficients)
+    set k1 [lindex $rc_coefficients 0]
+    set k2 [lindex $rc_coefficients 1]
+    set k3 [lindex $rc_coefficients 2]
+    set k4 [lindex $rc_coefficients 3]
+    set_replace_routability_rc_coefficients_cmd $k1 $k2 $k3 $k4
   }
 
 

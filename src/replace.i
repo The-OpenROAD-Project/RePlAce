@@ -204,6 +204,12 @@ set_replace_routability_max_inflation_ratio_cmd(float ratio)
   replace->setRoutabilityMaxInflationRatio(ratio);
 }
 
+void
+set_replace_routability_rc_coefficients_cmd(float k1, float k2, float k3, float k4)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityRcCoefficients(k1, k2, k3, k4);
+}
 
 
 void

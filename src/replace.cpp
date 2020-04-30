@@ -38,6 +38,10 @@ Replace::Replace()
   routabilityInflationRatioCoef_(2.33),
   routabilityPitchScale_(1.08),
   routabilityMaxInflationRatio_(2.5),
+  routabilityRcK1_(1.0),
+  routabilityRcK2_(1.0),
+  routabilityRcK3_(1.0),
+  routabilityRcK4_(1.0),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -166,6 +170,10 @@ void Replace::doNesterovPlace() {
   rbVars.inflationRatioCoef = routabilityInflationRatioCoef_;
   rbVars.gRoutePitchScale = routabilityPitchScale_;
   rbVars.maxInflationRatio = routabilityMaxInflationRatio_;
+  rbVars.rcK1 = routabilityRcK1_;
+  rbVars.rcK2 = routabilityRcK2_;
+  rbVars.rcK3 = routabilityRcK3_;
+  rbVars.rcK4 = routabilityRcK4_;
 
   rb_ = std::make_shared<RouteBase>(rbVars, db_, fr_, nb_, log_);
 
@@ -322,6 +330,14 @@ Replace::setRoutabilityPitchScale(float scale) {
 void
 Replace::setRoutabilityMaxInflationRatio(float ratio) {
   routabilityMaxInflationRatio_ = ratio;
+}
+
+void
+Replace::setRoutabilityRcCoefficients(float k1, float k2, float k3, float k4) {
+  routabilityRcK1_ = k1;
+  routabilityRcK2_ = k2;
+  routabilityRcK3_ = k3;
+  routabilityRcK4_ = k4;
 }
 
 void

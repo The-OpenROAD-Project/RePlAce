@@ -83,6 +83,8 @@ class Replace
     void setRoutabilityPitchScale(float scale);
     void setRoutabilityMaxInflationRatio(float ratio);
 
+    void setRoutabilityRcCoefficients(float k1, float k2, float k3, float k4);
+
   private:
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
@@ -119,6 +121,9 @@ class Replace
     float routabilityInflationRatioCoef_;
     float routabilityPitchScale_;
     float routabilityMaxInflationRatio_;
+
+    // routability RC metric coefficients
+    float routabilityRcK1_, routabilityRcK2_, routabilityRcK3_, routabilityRcK4_;
 
     int routabilityMaxBloatIter_;
     int routabilityMaxInflationIter_;

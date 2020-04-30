@@ -512,6 +512,10 @@ RouteBaseVars::RouteBaseVars()
   maxDensity(0.90),
   ignoreEdgeRatio(0.8),
   targetRC(1.01),
+  rcK1(1.0),
+  rcK2(1.0),
+  rcK3(1.0),
+  rcK4(1.0),
   maxBloatIter(1),
   maxInflationIter(4),
   minPinBlockLayer(1),
@@ -529,6 +533,7 @@ RouteBaseVars::reset() {
   maxDensity = 0.90;
   ignoreEdgeRatio = 0.8;
   targetRC = 1.01;
+  rcK1 = rcK2 = rcK3 = rcK4 = 1.0;
   maxBloatIter = 1;
   maxInflationIter = 4;
   minPinBlockLayer = 1;
@@ -923,7 +928,6 @@ RouteBase::updateUsages() {
         + minWireWidth_[layer] + minWireSpacing_[layer] );
   }
 
-  
   // update usageH and usageV
   for(auto& tile : tg_->tiles()) {
     tile->updateUsages();
@@ -1172,6 +1176,9 @@ RouteBase::routability() {
 
   inflatedAreaDelta_ = 0;
 
+  // store previous gCellArea for reverting
+  std::vector<pair<int, int>> prevGCellAreas(nb_->gCells().size(), make_pair(0, 0));
+
   // run bloating and get inflatedAreaDelta_
   for(auto& gCell : nb_->gCells()) {
     // only care about "standard cell"
@@ -1192,6 +1199,10 @@ RouteBase::routability() {
     int64_t prevCellArea 
       = static_cast<int64_t>(gCell->dx())
       * static_cast<int64_t>(gCell->dy());
+   
+    // store history to revert 
+    prevGCellAreas[&gCell-&nb_->gCells()[0]] 
+      = make_pair(gCell->dx(), gCell->dy());
 
     // bloat
     gCell->setSize(
@@ -1244,6 +1255,8 @@ RouteBase::routability() {
   int64_t totalGCellArea = inflatedAreaDelta_ 
         + nb_->nesterovInstsArea() + nb_->totalFillerArea();
 
+  float prevDensity = nb_->targetDensity();
+
   // newly set Density
   nb_->setTargetDensity( static_cast<float>(totalGCellArea) 
       / static_cast<float>(nb_->whiteSpaceArea()) );
@@ -1251,8 +1264,24 @@ RouteBase::routability() {
 
   // TODO: looks weird, too
   if( nb_->targetDensity() > rbVars_.maxDensity ) {
-    cout << "Need to shrink fillercells" << endl;
-//    nb_->updateFillerCellSize(dx, dy);
+    log_->infoString("Revert Routability Procedure Due to Higher Density");
+
+    nb_->setTargetDensity(prevDensity);
+
+    // revert back the gcell sizes
+    for(auto& gCell : nb_->gCells()) {
+      if( !gCell->isStdInstance() ) {
+        continue;
+      }
+   
+      int idx = &gCell - &nb_->gCells()[0];
+
+      gCell->setSize(
+          prevGCellAreas[idx].first,
+          prevGCellAreas[idx].second ); 
+    }
+    resetRoutabilityResources();
+    return false; 
   }
 
   log_->infoInt64("WhiteSpaceArea", nb_->whiteSpaceArea());
@@ -1416,11 +1445,16 @@ RouteBase::getRC() const {
   log_->infoFloatSignificant("2.0%RC", fmax(horAvg020RC, verAvg020RC));
   log_->infoFloatSignificant("5.0%RC", fmax(horAvg050RC, verAvg050RC));
 
-  float finalRC = (1.0 * fmax(horAvg005RC, verAvg005RC) +
-                  1.0 * fmax(horAvg010RC, verAvg010RC) +
-                  1.0 * fmax(horAvg020RC, verAvg020RC) +
-                  1.0 * fmax(horAvg050RC, verAvg050RC)) /
-                 (1.0 + 1.0 + 1.0 + 1.0);
+  log_->infoFloatSignificant("0.5rcK", rbVars_.rcK1);
+  log_->infoFloatSignificant("1.0rcK", rbVars_.rcK2);
+  log_->infoFloatSignificant("2.0rcK", rbVars_.rcK3);
+  log_->infoFloatSignificant("5.0rcK", rbVars_.rcK4);
+
+  float finalRC = (rbVars_.rcK1 * fmax(horAvg005RC, verAvg005RC) +
+                  rbVars_.rcK2 * fmax(horAvg010RC, verAvg010RC) +
+                  rbVars_.rcK3 * fmax(horAvg020RC, verAvg020RC) +
+                  rbVars_.rcK4 * fmax(horAvg050RC, verAvg050RC)) /
+                 (rbVars_.rcK1 + rbVars_.rcK2 + rbVars_.rcK3 + rbVars_.rcK4);
 
   log_->infoFloatSignificant("FinalRC", finalRC);
   return finalRC;
