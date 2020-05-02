@@ -373,8 +373,10 @@ NesterovPlace::doNesterovPlace() {
   // snapshot saving detection 
   bool isSnapshotSaved = false;
   vector<FloatPoint> snapshotCoordi, snapshotSLPCoordi;
+  vector<FloatPoint> snapshotSLPSumGrads;
+
   float snapshotStepLength = 0, snapshotDensityPenalty = 0;
-  float snapshotWireLengthCoef = 0;
+  float snapshotWireLengthCoef = 0, snapshotA = 0;
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
@@ -483,7 +485,7 @@ NesterovPlace::doNesterovPlace() {
     // For JPEG Saving
     // debug
 
-    if( i == 0 || (i+1) % 10 == 0 ) {
+    if( i == 0 || (i+1) % 1 == 0 ) {
       cout << "[NesterovSolve] Iter: " << i+1 
         << " overflow: " << sumOverflow_ << " HPWL: " << prevHpwl_ << endl; 
 #ifdef ENABLE_CIMG_LIB
@@ -522,12 +524,14 @@ NesterovPlace::doNesterovPlace() {
     
     if( !isSnapshotSaved 
         && npVars_.routabilityDrivenMode 
-        && 0.5 >= sumOverflow_ ) {
+        && 0.9 >= sumOverflow_ ) {
       snapshotCoordi = curCoordi_; 
       snapshotSLPCoordi = curSLPCoordi_;
+      snapshotSLPSumGrads = curSLPSumGrads_;
       snapshotStepLength = stepLength_;
       snapshotDensityPenalty = densityPenalty_;
       snapshotWireLengthCoef = wireLengthCoefX_;
+      snapshotA = curA;
 
       isSnapshotSaved = true;
       cout << "[NesterovSolve] Snapshot saved at iter = " + to_string(i) << endl;
@@ -559,16 +563,13 @@ NesterovPlace::doNesterovPlace() {
 
         curCoordi_ = snapshotCoordi;
         curSLPCoordi_ = snapshotSLPCoordi;
+        curSLPSumGrads_ = snapshotSLPSumGrads;
         stepLength_ = snapshotStepLength;
+//        densityPenalty_ = densityPenaltyStor_[0]; 
         densityPenalty_ = snapshotDensityPenalty;
         wireLengthCoefX_ = wireLengthCoefY_ 
           = snapshotWireLengthCoef;
-     
-        // additional revert 
-        nb_->updateGCellDensityCenterLocation(curSLPCoordi_);
-        nb_->updateDensityForceBin();
-        nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_);
-        updateGradients(curSLPSumGrads_, curSLPWireLengthGrads_, curSLPDensityGrads_ );
+        curA = snapshotA;
   
         // reset the divergence detect conditions 
         minSumOverflow = 1e30;
