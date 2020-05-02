@@ -106,6 +106,9 @@ private:
   std::vector<FloatPoint> curCoordi_;
   std::vector<FloatPoint> nextCoordi_;
 
+  // save initial coordinates -- needed for RD
+  std::vector<FloatPoint> initCoordi_;
+
   // densityPenalty stor
   std::vector<float> densityPenaltyStor_;
 

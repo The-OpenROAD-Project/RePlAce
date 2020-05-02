@@ -109,12 +109,15 @@ void NesterovPlace::init() {
   curCoordi_.resize(gCellSize, FloatPoint());
   nextCoordi_.resize(gCellSize, FloatPoint());
 
+  initCoordi_.resize(gCellSize, FloatPoint());
+
   for(auto& gCell : nb_->gCells()) {
     nb_->updateDensityCoordiLayoutInside( gCell );
     int idx = &gCell - &nb_->gCells()[0];
     curSLPCoordi_[idx] 
       = prevSLPCoordi_[idx] 
       = curCoordi_[idx] 
+      = initCoordi_[idx]
       = FloatPoint(gCell->dCx(), gCell->dCy()); 
   }
 
@@ -370,14 +373,6 @@ NesterovPlace::doNesterovPlace() {
   string divergeMsg = "";
   int divergeCode = 0;
 
-  // snapshot saving detection 
-  bool isSnapshotSaved = false;
-  vector<FloatPoint> snapshotCoordi, snapshotSLPCoordi;
-  vector<FloatPoint> snapshotSLPSumGrads;
-
-  float snapshotStepLength = 0, snapshotDensityPenalty = 0;
-  float snapshotWireLengthCoef = 0, snapshotA = 0;
-
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
     log_->infoInt("Iter", i+1, 3);
@@ -485,7 +480,7 @@ NesterovPlace::doNesterovPlace() {
     // For JPEG Saving
     // debug
 
-    if( i == 0 || (i+1) % 1 == 0 ) {
+    if( i == 0 || (i+1) % 10 == 0 ) {
       cout << "[NesterovSolve] Iter: " << i+1 
         << " overflow: " << sumOverflow_ << " HPWL: " << prevHpwl_ << endl; 
 #ifdef ENABLE_CIMG_LIB
@@ -522,21 +517,6 @@ NesterovPlace::doNesterovPlace() {
       break;
     }
     
-    if( !isSnapshotSaved 
-        && npVars_.routabilityDrivenMode 
-        && 0.9 >= sumOverflow_ ) {
-      snapshotCoordi = curCoordi_; 
-      snapshotSLPCoordi = curSLPCoordi_;
-      snapshotSLPSumGrads = curSLPSumGrads_;
-      snapshotStepLength = stepLength_;
-      snapshotDensityPenalty = densityPenalty_;
-      snapshotWireLengthCoef = wireLengthCoefX_;
-      snapshotA = curA;
-
-      isSnapshotSaved = true;
-      cout << "[NesterovSolve] Snapshot saved at iter = " + to_string(i) << endl;
-    }
-
     // check routability using GR
     if( npVars_.routabilityDrivenMode 
         && isRoutabilityNeed_ 
@@ -557,20 +537,13 @@ NesterovPlace::doNesterovPlace() {
       if( isRoutabilityNeed_ ) {
 
         // revert back the current density penality
-        densityPenalty_ 
-          = getRoutabilityDensityPenalty();
         cutFillerCoordinates();
 
-        curCoordi_ = snapshotCoordi;
-        curSLPCoordi_ = snapshotSLPCoordi;
-        curSLPSumGrads_ = snapshotSLPSumGrads;
-        stepLength_ = snapshotStepLength;
-//        densityPenalty_ = densityPenaltyStor_[0]; 
-        densityPenalty_ = snapshotDensityPenalty;
-        wireLengthCoefX_ = wireLengthCoefY_ 
-          = snapshotWireLengthCoef;
-        curA = snapshotA;
-  
+        nb_->updateGCellDensityCenterLocation(initCoordi_);
+        init();
+//        densityPenalty_ 
+//          = getRoutabilityDensityPenalty();
+
         // reset the divergence detect conditions 
         minSumOverflow = 1e30;
         hpwlWithMinSumOverflow = 1e30; 
@@ -715,8 +688,8 @@ NesterovPlace::updateDb() {
 
 float 
 NesterovPlace::getRoutabilityDensityPenalty() {
-  if( firstRoutabilityIter_ > 180 ) {
-    return densityPenaltyStor_[firstRoutabilityIter_-180];
+  if( firstRoutabilityIter_ > 150 ) {
+    return densityPenaltyStor_[firstRoutabilityIter_-150];
   }
   else {
     return densityPenaltyStor_[0];
