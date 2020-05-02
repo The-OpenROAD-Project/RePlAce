@@ -18,7 +18,7 @@ static float
 getSecondNorm(vector<FloatPoint>& a);
 
 NesterovPlaceVars::NesterovPlaceVars()
-  : maxNesterovIter(2000), 
+  : maxNesterovIter(5000), 
   maxBackTrack(10),
   initDensityPenalty(0.00008),
   initWireLengthCoef(0.25),
@@ -35,7 +35,7 @@ NesterovPlaceVars::NesterovPlaceVars()
 
 void
 NesterovPlaceVars::reset() {
-  maxNesterovIter = 2000;
+  maxNesterovIter = 5000;
   maxBackTrack = 10;
   initDensityPenalty = 0.00008;
   initWireLengthCoef = 0.25;
@@ -370,6 +370,12 @@ NesterovPlace::doNesterovPlace() {
   string divergeMsg = "";
   int divergeCode = 0;
 
+  // snapshot saving detection 
+  bool isSnapshotSaved = false;
+  vector<FloatPoint> snapshotCoordi, snapshotSLPCoordi;
+  float snapshotStepLength = 0, snapshotDensityPenalty = 0;
+  float snapshotWireLengthCoef = 0;
+
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
     log_->infoInt("Iter", i+1, 3);
@@ -513,6 +519,19 @@ NesterovPlace::doNesterovPlace() {
       isDiverged_ = true;
       break;
     }
+    
+    if( !isSnapshotSaved 
+        && npVars_.routabilityDrivenMode 
+        && 0.5 >= sumOverflow_ ) {
+      snapshotCoordi = curCoordi_; 
+      snapshotSLPCoordi = curSLPCoordi_;
+      snapshotStepLength = stepLength_;
+      snapshotDensityPenalty = densityPenalty_;
+      snapshotWireLengthCoef = wireLengthCoefX_;
+
+      isSnapshotSaved = true;
+      cout << "[NesterovSolve] Snapshot saved at iter = " + to_string(i) << endl;
+    }
 
     // check routability using GR
     if( npVars_.routabilityDrivenMode 
@@ -530,10 +549,26 @@ NesterovPlace::doNesterovPlace() {
       // if further routability-driven is needed 
       isRoutabilityNeed_ = rb_->routability();
 
-      // revert back the current density penality
+      // if routability is needed
       if( isRoutabilityNeed_ ) {
-        densityPenalty_ = getRoutabilityDensityPenalty();
+
+        // revert back the current density penality
+        densityPenalty_ 
+          = getRoutabilityDensityPenalty();
         cutFillerCoordinates();
+
+        curCoordi_ = snapshotCoordi;
+        curSLPCoordi_ = snapshotSLPCoordi;
+        stepLength_ = snapshotStepLength;
+        densityPenalty_ = snapshotDensityPenalty;
+        wireLengthCoefX_ = wireLengthCoefY_ 
+          = snapshotWireLengthCoef;
+     
+        // additional revert 
+        nb_->updateGCellDensityCenterLocation(curSLPCoordi_);
+        nb_->updateDensityForceBin();
+        nb_->updateWireLengthForceWA(wireLengthCoefX_, wireLengthCoefY_);
+        updateGradients(curSLPSumGrads_, curSLPWireLengthGrads_, curSLPDensityGrads_ );
   
         // reset the divergence detect conditions 
         minSumOverflow = 1e30;
@@ -679,8 +714,8 @@ NesterovPlace::updateDb() {
 
 float 
 NesterovPlace::getRoutabilityDensityPenalty() {
-  if( firstRoutabilityIter_ > 130 ) {
-    return densityPenaltyStor_[firstRoutabilityIter_-130];
+  if( firstRoutabilityIter_ > 180 ) {
+    return densityPenaltyStor_[firstRoutabilityIter_-180];
   }
   else {
     return densityPenaltyStor_[0];

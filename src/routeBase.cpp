@@ -506,7 +506,7 @@ RouteBaseVars::RouteBaseVars()
   edgeAdjustmentCoef(1.19),
   pinInflationCoef(1.66), 
   pinBlockageFactor(0.05),
-  inflationRatioCoef(2.33), 
+  inflationRatioCoef(2.5), 
   maxInflationRatio(2.5), 
   blockagePorosity(0),
   maxDensity(0.90),
@@ -527,7 +527,7 @@ RouteBaseVars::reset() {
   edgeAdjustmentCoef = 1.19;
   pinInflationCoef = 1.66;
   pinBlockageFactor = 0.05;
-  inflationRatioCoef = 2.33;
+  inflationRatioCoef = 2.5;
   maxInflationRatio = 2.5;
   blockagePorosity = 0;
   maxDensity = 0.90;
@@ -1042,9 +1042,9 @@ RouteBase::updateInflationRatio() {
       // horizontal
       if( horizontalCapacity_[i] > 0 ) {
         
-//        if( tile->blockage(i) 
-//            <= rbVars_.ignoreEdgeRatio 
-//            * horizontalCapacity_[i] ) {
+        if( tile->blockage(i) 
+            <= rbVars_.ignoreEdgeRatio 
+            * horizontalCapacity_[i] ) {
           
           tile->setInflationRatio(
               fmax( 
@@ -1053,7 +1053,7 @@ RouteBase::updateInflationRatio() {
                 / (horizontalCapacity_[i])
                 * rbVars_.gRoutePitchScale)
               );
-//        }
+        }
 
         // left tile exists
         if( tile->x() >= 1 ) {
@@ -1062,9 +1062,9 @@ RouteBase::updateInflationRatio() {
             [ tile->y() * tg_->tileCntX() 
             + (tile->x()-1) ];
         
-//          if( leftTile->blockage(i) 
-//            <= rbVars_.ignoreEdgeRatio 
-//            * horizontalCapacity_[i] ) {
+          if( leftTile->blockage(i) 
+            <= rbVars_.ignoreEdgeRatio 
+            * horizontalCapacity_[i] ) {
 
             tile->setInflationRatio(
                 fmax(
@@ -1073,14 +1073,14 @@ RouteBase::updateInflationRatio() {
                   / (horizontalCapacity_[i])
                   * rbVars_.gRoutePitchScale)
                 );
-//          }
+          }
         }
       }
       // vertical
       else if( verticalCapacity_[i] > 0 ) {
-//        if( tile->blockage(i) 
-//            <= rbVars_.ignoreEdgeRatio 
-//            * verticalCapacity_[i] ) {
+        if( tile->blockage(i) 
+            <= rbVars_.ignoreEdgeRatio 
+            * verticalCapacity_[i] ) {
           tile->setInflationRatio(
               fmax(
                 tile->inflationRatio(),
@@ -1088,7 +1088,7 @@ RouteBase::updateInflationRatio() {
                 / (verticalCapacity_[i])
                 * rbVars_.gRoutePitchScale)
               );
-//        }
+        }
            
         // lower tile exists
         if( tile->y() >= 1 ) {
@@ -1096,9 +1096,9 @@ RouteBase::updateInflationRatio() {
             [ (tile->y()-1) * tg_->tileCntX()
             + tile->x() ];
 
-//          if( lowerTile->blockage(i) 
-//              <= rbVars_.ignoreEdgeRatio 
-//              * verticalCapacity_[i] ) {
+          if( lowerTile->blockage(i) 
+              <= rbVars_.ignoreEdgeRatio 
+              * verticalCapacity_[i] ) {
 
             tile->setInflationRatio(
                 fmax(
@@ -1107,7 +1107,7 @@ RouteBase::updateInflationRatio() {
                   / (verticalCapacity_[i])
                   * rbVars_.gRoutePitchScale)
                 );
-//          }
+          }
         }
       } 
     } 
@@ -1245,7 +1245,7 @@ RouteBase::routability() {
   // TODO: looks weird
   if( inflatedAreaDelta_ >
      targetInflationDeltaAreaRatio * 
-     (nb_->whiteSpaceArea() - nb_->nesterovInstsArea() + nb_->totalFillerArea())) {
+     (nb_->whiteSpaceArea() - (nb_->nesterovInstsArea() + nb_->totalFillerArea()))) {
     cout << "Needs dynamic inflation proc:" << endl; 
   } 
 

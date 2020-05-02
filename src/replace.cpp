@@ -23,7 +23,7 @@ Replace::Replace()
   initialPlaceMaxSolverIter_(100),
   initialPlaceMaxFanout_(200),
   initialPlaceNetWeightScale_(800),
-  nesterovPlaceMaxIter_(2000),
+  nesterovPlaceMaxIter_(5000),
   binGridCntX_(0), binGridCntY_(0), 
   overflow_(0.1), density_(1.0),
   initDensityPenalityFactor_(0.00008), 
@@ -35,7 +35,7 @@ Replace::Replace()
   routabilityMaxBloatIter_(1),
   routabilityMaxInflationIter_(4),
   routabilityTargetRcMetric_(1.01),
-  routabilityInflationRatioCoef_(2.33),
+  routabilityInflationRatioCoef_(2.5),
   routabilityPitchScale_(1.08),
   routabilityMaxInflationRatio_(2.5),
   routabilityRcK1_(1.0),
@@ -74,7 +74,7 @@ void Replace::reset() {
   initialPlaceMaxFanout_ = 200;
   initialPlaceNetWeightScale_ = 800;
 
-  nesterovPlaceMaxIter_ = 2000;
+  nesterovPlaceMaxIter_ = 5000;
   binGridCntX_ = binGridCntY_ = 0;
   overflow_ = 0.1;
   density_ = 1.0;
@@ -88,7 +88,7 @@ void Replace::reset() {
   routabilityMaxBloatIter_ = 1;
   routabilityMaxInflationIter_ = 4;
   routabilityTargetRcMetric_ = 1.01;
-  routabilityInflationRatioCoef_ = 2.33;
+  routabilityInflationRatioCoef_ = 2.5;
   routabilityPitchScale_ = 1.08;
   routabilityMaxInflationRatio_ = 2.5;
 
