@@ -319,7 +319,11 @@ class RouteBase {
 
     void getGlobalRouterResult();
     void updateCongestionMap();
-    bool routability();
+
+    // first: is Routability Need
+    // second: reverting procedure need in NesterovPlace
+    //         (e.g. calling NesterovPlace's init())
+    std::pair<bool, bool> routability();
 
     int64_t inflatedAreaDelta() const;
     int numCall() const;

@@ -542,10 +542,12 @@ NesterovPlace::doNesterovPlace() {
 
       // recover the densityPenalty values
       // if further routability-driven is needed 
-      isRoutabilityNeed_ = rb_->routability();
+      std::pair<bool, bool> result = rb_->routability();
+      isRoutabilityNeed_ = result.first;
+      bool isRevertInitNeeded = result.second;
 
       // if routability is needed
-      if( isRoutabilityNeed_ ) {
+      if( isRoutabilityNeed_ || isRevertInitNeeded ) {
         // cutFillerCoordinates();
 
         // revert back the current density penality

@@ -1149,7 +1149,10 @@ RouteBase::updateInflationRatio() {
 }
 
 
-bool 
+// first: is Routability Need
+// second: reverting procedure init need 
+//          (e.g. calling NesterovPlace's init()) 
+std::pair<bool, bool>
 RouteBase::routability() {
   increaseCounter();
 
@@ -1164,9 +1167,9 @@ RouteBase::routability() {
   // no need routing if RC is lower than targetRC val
   float curRc = getRC();
 
-  if( getRC() < rbVars_.targetRC ) {
+  if( curRc < rbVars_.targetRC ) {
     resetRoutabilityResources();  
-    return false;
+    return make_pair(false, false);
   }
 
   // 
@@ -1272,7 +1275,7 @@ RouteBase::routability() {
   if( inflatedAreaDelta_ >
      targetInflationDeltaAreaRatio * 
      (nb_->whiteSpaceArea() - (nb_->nesterovInstsArea() + nb_->totalFillerArea()))) {
-    cout << "Needs dynamic inflation proc:" << endl; 
+    // TODO dynamic inflation procedure?
   } 
 
   log_->infoInt64("InflatedAreaDelta", inflatedAreaDelta_ );
@@ -1296,6 +1299,7 @@ RouteBase::routability() {
       || minRcViolatedCnt_ >= 3 ) {
     log_->infoString("Revert Routability Procedure");
     log_->infoFloatSignificant("SavedMinRC", minRc_);
+    log_->infoFloatSignificant("SavedTargetDensity", minRcTargetDensity_);
 
     nb_->setTargetDensity(minRcTargetDensity_);
 
@@ -1311,8 +1315,10 @@ RouteBase::routability() {
           minRcCellSize_[idx].first,
           minRcCellSize_[idx].second ); 
     }
+    nb_->updateDensitySize();
     resetRoutabilityResources();
-    return false; 
+
+    return make_pair(false, true);
   }
 
   log_->infoInt64("WhiteSpaceArea", nb_->whiteSpaceArea());
@@ -1351,7 +1357,7 @@ RouteBase::routability() {
   // reset
   resetRoutabilityResources();  
 
-  return true;
+  return make_pair(true, true);
 }
 
 // extract RC values
