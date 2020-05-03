@@ -78,7 +78,7 @@ void Replace::reset() {
   binGridCntX_ = binGridCntY_ = 0;
   overflow_ = 0.1;
   density_ = 1.0;
-  initDensityPenalityFactor_ = 0.0001;
+  initDensityPenalityFactor_ = 0.00008;
   initWireLengthCoef_ = 0.25;
   minPhiCoef_ = 0.95;
   maxPhiCoef_ = 1.05;

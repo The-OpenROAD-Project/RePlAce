@@ -551,7 +551,12 @@ RouteBase::RouteBase()
   nb_(nullptr), 
   log_(nullptr),
   inflatedAreaDelta_(0), 
-  bloatIterCnt_(0), inflationIterCnt_(0), numCall_(0) {}
+  bloatIterCnt_(0), 
+  inflationIterCnt_(0), 
+  numCall_(0),
+  minRc_(1e30), 
+  minRcTargetDensity_(0), 
+  minRcViolatedCnt_(0) {}
 
 RouteBase::RouteBase(
     RouteBaseVars rbVars, 
@@ -582,6 +587,14 @@ RouteBase::reset() {
 
   bloatIterCnt_ = inflationIterCnt_ = 0;
   numCall_ = 0;
+  
+  minRc_ = 1e30;
+  minRcTargetDensity_ = 0;
+  minRcViolatedCnt_ = 0;
+
+  minRcCellSize_.clear();
+  minRcCellSize_.shrink_to_fit();
+ 
   resetRoutabilityResources();
 }
 
@@ -615,6 +628,7 @@ RouteBase::init() {
   tg_ = std::move(tg);
   
   tg_->setLogger(log_);
+  minRcCellSize_.resize(nb_->gCells().size(), std::make_pair(0,0));
 }
 
 void
@@ -711,14 +725,6 @@ RouteBase::updateRoute() {
 
   using std::cout;
   using std::endl;
-  cout << "capacity" << endl;
-  for(int i=0; i<route.verticalEdgesCapacities.size(); i++) {
-    cout << i << " V:" << verticalCapacity_[i] << " H:" << horizontalCapacity_[i] << endl;
-  }
-  
-  for(int i=0; i<route.verticalEdgesCapacities.size(); i++) {
-    cout << i << " MinWidth:" << minWireWidth_[i] << " MinSpacing:" << minWireSpacing_[i] << endl;
-  }
 
   edgeCapacityStor_.reserve(route.adjustments.size());
   for(auto& e : route.adjustments) {
@@ -1156,11 +1162,37 @@ RouteBase::routability() {
   updateCongestionMap();
 
   // no need routing if RC is lower than targetRC val
+  float curRc = getRC();
+
   if( getRC() < rbVars_.targetRC ) {
     resetRoutabilityResources();  
-    std::cout << "reset and quit RouteBase" << std::endl;
     return false;
   }
+
+  // 
+  // saving solutions when minRc happen.
+  // I hope to get lower Rc gradually as RD goes on
+  //
+  if( minRc_ > curRc ) {
+    minRc_ = curRc;
+    minRcTargetDensity_ = nb_->targetDensity();
+    minRcViolatedCnt_ = 0; 
+   
+    // save cell size info 
+    for(auto& gCell : nb_->gCells()) {
+      if( !gCell->isStdInstance() ) {
+        continue;
+      }
+
+      minRcCellSize_[&gCell - &nb_->gCells()[0]]
+        = std::make_pair(gCell->dx(), gCell->dy());
+    }
+  } 
+  else {
+    minRcViolatedCnt_++;
+  }
+
+
 
   // set inflated ratio
   for(auto& tile : tg_->tiles()) {
@@ -1176,9 +1208,6 @@ RouteBase::routability() {
   using std::endl;
 
   inflatedAreaDelta_ = 0;
-
-  // store previous gCellArea for reverting
-  std::vector<pair<int, int>> prevGCellAreas(nb_->gCells().size(), make_pair(0, 0));
 
   // run bloating and get inflatedAreaDelta_
   for(auto& gCell : nb_->gCells()) {
@@ -1201,10 +1230,6 @@ RouteBase::routability() {
       = static_cast<int64_t>(gCell->dx())
       * static_cast<int64_t>(gCell->dy());
    
-    // store history to revert 
-    prevGCellAreas[&gCell-&nb_->gCells()[0]] 
-      = make_pair(gCell->dx(), gCell->dy());
-
     // bloat
     gCell->setSize(
         static_cast<int>(round(gCell->dx() 
@@ -1263,11 +1288,16 @@ RouteBase::routability() {
       / static_cast<float>(nb_->whiteSpaceArea()) );
 
 
-  // TODO: looks weird, too
-  if( nb_->targetDensity() > rbVars_.maxDensity ) {
-    log_->infoString("Revert Routability Procedure Due to Higher Density");
+  // 
+  // max density detection or, 
+  // rc not improvement detection -- (not improved the RC values 3 times in a row)
+  //
+  if( nb_->targetDensity() > rbVars_.maxDensity 
+      || minRcViolatedCnt_ >= 3 ) {
+    log_->infoString("Revert Routability Procedure");
+    log_->infoFloatSignificant("SavedMinRC", minRc_);
 
-    nb_->setTargetDensity(prevDensity);
+    nb_->setTargetDensity(minRcTargetDensity_);
 
     // revert back the gcell sizes
     for(auto& gCell : nb_->gCells()) {
@@ -1278,8 +1308,8 @@ RouteBase::routability() {
       int idx = &gCell - &nb_->gCells()[0];
 
       gCell->setSize(
-          prevGCellAreas[idx].first,
-          prevGCellAreas[idx].second ); 
+          minRcCellSize_[idx].first,
+          minRcCellSize_[idx].second ); 
     }
     resetRoutabilityResources();
     return false; 

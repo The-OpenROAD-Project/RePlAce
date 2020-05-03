@@ -358,6 +358,15 @@ class RouteBase {
     int inflationIterCnt_;
     int numCall_;
 
+    // if solutions are not improved at all,
+    // needs to revert back to have the minimized RC values.
+    // minRcInflationSize_ will store 
+    // GCell's width and height 
+    float minRc_;
+    float minRcTargetDensity_;
+    int minRcViolatedCnt_;
+    std::vector<std::pair<int, int>> minRcCellSize_;
+
     void init();
     void reset();
     void resetRoutabilityResources();
