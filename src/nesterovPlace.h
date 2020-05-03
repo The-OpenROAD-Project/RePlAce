@@ -132,13 +132,8 @@ private:
   // half-parameter-wire-length
   int64_t prevHpwl_;
 
-  // routability-iter
-  int firstRoutabilityIter_;
-
   float isDiverged_;
   float isRoutabilityNeed_;
-
-  float getRoutabilityDensityPenalty();
 
   void cutFillerCoordinates();
 

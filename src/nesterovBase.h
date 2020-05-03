@@ -675,6 +675,8 @@ public:
   std::pair<int, int> getMinMaxIdxY(Instance* inst);
 
   const std::vector<Bin*> & bins() const;
+  
+  void updateBinsNonPlaceArea();
 
 private:
   std::vector<Bin> binStor_;
@@ -693,8 +695,6 @@ private:
   int64_t overflowArea_;
   unsigned char isSetBinCntX_:1;
   unsigned char isSetBinCntY_:1;
-
-  void updateBinsNonPlaceArea();
 };
 
 inline const std::vector<Bin*>&

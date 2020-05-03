@@ -1268,6 +1268,8 @@ NesterovBase::setTargetDensity(float density) {
   for(auto& bin : bins()) {
     bin->setTargetDensity(density);
   }
+  // update nonPlaceArea's target denstiy
+  bg_.updateBinsNonPlaceArea();
 }
 
 int

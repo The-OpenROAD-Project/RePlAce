@@ -40,8 +40,8 @@ Replace::Replace()
   routabilityMaxInflationRatio_(2.5),
   routabilityRcK1_(1.0),
   routabilityRcK2_(1.0),
-  routabilityRcK3_(1.0),
-  routabilityRcK4_(1.0),
+  routabilityRcK3_(0.0),
+  routabilityRcK4_(0.0),
   timingDrivenMode_(true),
   routabilityDrivenMode_(true),
   incrementalPlaceMode_(false),
@@ -95,6 +95,9 @@ void Replace::reset() {
   timingDrivenMode_ = true;
   routabilityDrivenMode_ = true; 
   incrementalPlaceMode_ = false;
+  
+  routabilityRcK1_ = routabilityRcK2_ = 1.0;
+  routabilityRcK3_ = routabilityRcK4_ = 0.0;
 
   padLeft_ = padRight_ = 0;
   verbose_ = 0;
