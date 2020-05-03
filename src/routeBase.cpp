@@ -514,8 +514,8 @@ RouteBaseVars::RouteBaseVars()
   targetRC(1.01),
   rcK1(1.0),
   rcK2(1.0),
-  rcK3(1.0),
-  rcK4(1.0),
+  rcK3(0.0),
+  rcK4(0.0),
   maxBloatIter(1),
   maxInflationIter(4),
   minPinBlockLayer(1),
@@ -533,7 +533,8 @@ RouteBaseVars::reset() {
   maxDensity = 0.90;
   ignoreEdgeRatio = 0.8;
   targetRC = 1.01;
-  rcK1 = rcK2 = rcK3 = rcK4 = 1.0;
+  rcK1 = rcK2 = 1.0;
+  rcK3 = rcK4 = 0.0;
   maxBloatIter = 1;
   maxInflationIter = 4;
   minPinBlockLayer = 1;
@@ -1242,7 +1243,7 @@ RouteBase::routability() {
   float targetInflationDeltaAreaRatio  
     = 1.0 / static_cast<float>(rbVars_.maxInflationIter);
 
-  // TODO: looks weird
+  // TODO: will be implemented
   if( inflatedAreaDelta_ >
      targetInflationDeltaAreaRatio * 
      (nb_->whiteSpaceArea() - (nb_->nesterovInstsArea() + nb_->totalFillerArea()))) {
