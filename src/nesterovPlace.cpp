@@ -379,6 +379,8 @@ NesterovPlace::doNesterovPlace() {
   float snapshotA = 0;
   float snapshotDensityPenalty = 0;
 
+  bool isDivergeTriedRevert = false;
+
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
@@ -521,7 +523,31 @@ NesterovPlace::doNesterovPlace() {
       divergeMsg += "        Please decrease max_phi_cof value";
       divergeCode = 4;
       isDiverged_ = true;
-      break;
+
+      // revert back to the original rb solutions
+      // one more opportunity
+      if( !isDivergeTriedRevert 
+          && rb_->numCall() >= 1 ) {
+
+        // get back to the working rc size
+        rb_->revertGCellSizeToMinRc();
+
+        // revert back the current density penality
+        curA = snapshotA;
+        nb_->updateGCellDensityCenterLocation(snapshotCoordi);
+        init();
+        densityPenalty_ 
+          = snapshotDensityPenalty;
+        isDiverged_ = false;
+        isDivergeTriedRevert = true;
+
+        // turn off the RD forcely
+        isRoutabilityNeed_ = false;
+      } 
+      else {
+        // no way to revert
+        break;
+      }
     }
     
     if( !isSnapshotSaved 

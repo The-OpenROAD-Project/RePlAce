@@ -1149,6 +1149,7 @@ RouteBase::updateInflationRatio() {
 }
 
 
+
 // first: is Routability Need
 // second: reverting procedure init need 
 //          (e.g. calling NesterovPlace's init()) 
@@ -1303,18 +1304,8 @@ RouteBase::routability() {
 
     nb_->setTargetDensity(minRcTargetDensity_);
 
-    // revert back the gcell sizes
-    for(auto& gCell : nb_->gCells()) {
-      if( !gCell->isStdInstance() ) {
-        continue;
-      }
-   
-      int idx = &gCell - &nb_->gCells()[0];
+    revertGCellSizeToMinRc();
 
-      gCell->setSize(
-          minRcCellSize_[idx].first,
-          minRcCellSize_[idx].second ); 
-    }
     nb_->updateDensitySize();
     resetRoutabilityResources();
 
@@ -1358,6 +1349,22 @@ RouteBase::routability() {
   resetRoutabilityResources();  
 
   return make_pair(true, true);
+}
+
+void 
+RouteBase::revertGCellSizeToMinRc() {
+  // revert back the gcell sizes
+  for(auto& gCell : nb_->gCells()) {
+    if( !gCell->isStdInstance() ) {
+      continue;
+    }
+
+    int idx = &gCell - &nb_->gCells()[0];
+
+    gCell->setSize(
+        minRcCellSize_[idx].first,
+        minRcCellSize_[idx].second ); 
+  }
 }
 
 // extract RC values

@@ -332,6 +332,8 @@ class RouteBase {
 
     float getRC() const;
 
+    void revertGCellSizeToMinRc();
+
   private:
     RouteBaseVars rbVars_;
     odb::dbDatabase* db_;
