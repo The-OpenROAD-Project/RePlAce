@@ -97,6 +97,7 @@ target_include_directories( replace
 )
 
 target_link_libraries( replace
+  PRIVATE
   Eigen3::Eigen
 )
 
