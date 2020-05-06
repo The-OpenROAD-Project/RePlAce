@@ -20,8 +20,8 @@ Notice 0: Finished DEF file: ./simple01.def
 [INFO] NumDummyInstances = 0
 [INFO] NumNets = 364
 [INFO] NumPins = 1122
-[INFO] DieAreaLxLy = (-140, -140)
-[INFO] DieAreaUxUy = (62070, 61740)
+[INFO] DieAreaLxLy = (0, 0)
+[INFO] DieAreaUxUy = (61940, 61600)
 [INFO] CoreAreaLxLy = (0, 0)
 [INFO] CoreAreaUxUy = (61940, 61600)
 [INFO] CoreArea = 3815504000

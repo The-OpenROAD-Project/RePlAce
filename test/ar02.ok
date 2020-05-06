@@ -20,8 +20,8 @@ Notice 0: Finished DEF file: ./ar02.def
 [INFO] NumDummyInstances = 0
 [INFO] NumNets = 364
 [INFO] NumPins = 1122
-[INFO] DieAreaLxLy = (-140, -140)
-[INFO] DieAreaUxUy = (90580, 57820)
+[INFO] DieAreaLxLy = (0, 0)
+[INFO] DieAreaUxUy = (90440, 57680)
 [INFO] CoreAreaLxLy = (2280, 2240)
 [INFO] CoreAreaUxUy = (88160, 55440)
 [INFO] CoreArea = 4568816000

@@ -194,11 +194,11 @@ private:
 class Die {
 public:
   Die();
-  Die(odb::dbBox* dieBox, odb::Rect* coreRect);
+  Die(const odb::Rect& dieBox, const odb::Rect& coreRect);
   ~Die();
 
-  void setDieBox(odb::dbBox* dieBox);
-  void setCoreBox(odb::Rect* coreBox);
+  void setDieBox(const odb::Rect& dieBox);
+  void setCoreBox(const odb::Rect& coreBox);
 
   int dieLx() const { return dieLx_; }
   int dieLy() const { return dieLy_; }

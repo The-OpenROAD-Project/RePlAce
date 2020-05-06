@@ -531,10 +531,15 @@ Die::Die() :
   dieLx_(0), dieLy_(0), dieUx_(0), dieUy_(0),
   coreLx_(0), coreLy_(0), coreUx_(0), coreUy_(0) {}
 
-Die::Die(odb::dbBox* dieBox, 
-    odb::Rect* coreRect) : Die() {
-  setDieBox(dieBox);
+Die::Die(const odb::Rect& dieRect, 
+         const odb::Rect& coreRect) : Die() {
+  setDieBox(dieRect);
   setCoreBox(coreRect);
+
+  assert(dieLx_ <= coreLx_);
+  assert(dieLy_ <= coreLy_);
+  assert(dieUx_ >= coreUx_);
+  assert(dieUy_ >= coreUy_);
 }
 
 Die::~Die() {
@@ -543,19 +548,19 @@ Die::~Die() {
 }
 
 void
-Die::setDieBox(odb::dbBox* dieBox) {
-  dieLx_ = dieBox->xMin();
-  dieLy_ = dieBox->yMin();
-  dieUx_ = dieBox->xMax();
-  dieUy_ = dieBox->yMax();
+Die::setDieBox(const odb::Rect& dieRect) {
+  dieLx_ = dieRect.xMin();
+  dieLy_ = dieRect.yMin();
+  dieUx_ = dieRect.xMax();
+  dieUy_ = dieRect.yMax();
 }
 
 void
-Die::setCoreBox(odb::Rect* coreRect) {
-  coreLx_ = coreRect->xMin();
-  coreLy_ = coreRect->yMin();
-  coreUx_ = coreRect->xMax();
-  coreUy_ = coreRect->yMax();
+Die::setCoreBox(const odb::Rect& coreRect) {
+  coreLx_ = coreRect.xMin();
+  coreLy_ = coreRect.yMin();
+  coreUx_ = coreRect.xMax();
+  coreUy_ = coreRect.yMax();
 }
 
 int
@@ -653,7 +658,9 @@ PlacerBase::init() {
   // die-core area update
   dbSet<dbRow> rows = block->getRows();
   odb::Rect coreRect = getCoreRectFromDb(rows);
-  die_ = Die(block->getBBox(), &coreRect);
+  odb::Rect dieRect;
+  block->getDieArea(dieRect);
+  die_ = Die(dieRect, coreRect);
  
   // siteSize update 
   dbRow* firstRow = *(rows.begin());
