@@ -9,11 +9,15 @@ namespace odb {
 namespace sta {
   class dbSta;
 }
+namespace FastRoute{
+  class FastRouteKernel;
+}
 
 namespace replace {
 
 class PlacerBase;
 class NesterovBase;
+class RouteBase;
 
 class InitialPlace;
 class NesterovPlace;
@@ -31,6 +35,7 @@ class Replace
 
     void setDb(odb::dbDatabase* odb);
     void setSta(sta::dbSta* dbSta);
+    void setFastRoute(FastRoute::FastRouteKernel* fr);
 
     void doInitialPlace();
     void doNesterovPlace();
@@ -64,12 +69,30 @@ class Replace
     void setPadLeft(int padding);
     void setPadRight(int padding);
 
+    void setTimingDrivenMode(bool mode);
+
+    void setRoutabilityDrivenMode(bool mode);
+    void setRoutabilityCheckOverflow(float overflow);
+    void setRoutabilityMaxDensity(float density);
+
+    void setRoutabilityMaxBloatIter(int iter);
+    void setRoutabilityMaxInflationIter(int iter);
+
+    void setRoutabilityTargetRcMetric(float rc);
+    void setRoutabilityInflationRatioCoef(float ratio);
+    void setRoutabilityPitchScale(float scale);
+    void setRoutabilityMaxInflationRatio(float ratio);
+
+    void setRoutabilityRcCoefficients(float k1, float k2, float k3, float k4);
+
   private:
     odb::dbDatabase* db_;
     sta::dbSta* sta_;
+    FastRoute::FastRouteKernel* fr_;
 
     std::shared_ptr<PlacerBase> pb_;
     std::shared_ptr<NesterovBase> nb_;
+    std::shared_ptr<RouteBase> rb_;
 
     std::unique_ptr<InitialPlace> ip_;
     std::unique_ptr<NesterovPlace> np_;
@@ -92,7 +115,21 @@ class Replace
     float minPhiCoef_;
     float maxPhiCoef_;
     float referenceHpwl_;
+    float routabilityCheckOverflow_;
+    float routabilityMaxDensity_;
+    float routabilityTargetRcMetric_;
+    float routabilityInflationRatioCoef_;
+    float routabilityPitchScale_;
+    float routabilityMaxInflationRatio_;
 
+    // routability RC metric coefficients
+    float routabilityRcK1_, routabilityRcK2_, routabilityRcK3_, routabilityRcK4_;
+
+    int routabilityMaxBloatIter_;
+    int routabilityMaxInflationIter_;
+
+    bool timingDrivenMode_;
+    bool routabilityDrivenMode_;
     bool incrementalPlaceMode_;
    
     // temp variable; OpenDB should have these values. 

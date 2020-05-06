@@ -7,6 +7,14 @@
 
 #include "point.h"
 
+
+namespace odb {
+class dbInst;
+class dbITerm;
+class dbBTerm;
+class dbNet;
+}
+
 namespace replace {
 
 class Instance;
@@ -417,7 +425,7 @@ class GPin {
 
     int cx() const { return cx_; }
     int cy() const { return cy_; }
-    
+
     // clear WA(Weighted Average) variables.
     void clearWaVars();
 
@@ -477,7 +485,8 @@ class GPin {
 class Bin {
 public:
   Bin();
-  Bin(int x, int y, int lx, int ly, int ux, int uy, float targetDensity);
+  Bin(int x, int y, int lx, int ly, int ux, int uy,
+      float targetDensity);
 
   ~Bin();
 
@@ -631,7 +640,7 @@ public:
 
   void setPlacerBase(std::shared_ptr<PlacerBase> pb);
   void setLogger(std::shared_ptr<Logger> log);
-  void setCoordi(Die* die);
+  void setCorePoints(Die* die);
   void setBinCnt(int binCntX, int binCntY);
   void setBinCntX(int binCntX);
   void setBinCntY(int binCntY);
@@ -666,6 +675,8 @@ public:
   std::pair<int, int> getMinMaxIdxY(Instance* inst);
 
   const std::vector<Bin*> & bins() const;
+  
+  void updateBinsNonPlaceArea();
 
 private:
   std::vector<Bin> binStor_;
@@ -684,12 +695,11 @@ private:
   int64_t overflowArea_;
   unsigned char isSetBinCntX_:1;
   unsigned char isSetBinCntY_:1;
-
-  void updateBinsNonPlaceArea();
 };
 
-inline const std::vector<Bin*> & BinGrid::bins() const {
-  return bins_; 
+inline const std::vector<Bin*>&
+BinGrid::bins() const {
+  return bins_;
 }
 
 class NesterovBaseVars {
@@ -711,7 +721,8 @@ public:
 class NesterovBase {
 public:
   NesterovBase();
-  NesterovBase(NesterovBaseVars nbVars, std::shared_ptr<PlacerBase> pb,
+  NesterovBase(NesterovBaseVars nbVars,
+      std::shared_ptr<PlacerBase> pb,
       std::shared_ptr<Logger> log);
   ~NesterovBase();
 
@@ -725,9 +736,17 @@ public:
   //
   // placerBase To NesterovBase functions
   //
-  GCell* placerToNesterov(Instance* inst);
-  GPin* placerToNesterov(Pin* pin);
-  GNet* placerToNesterov(Net* net);
+  GCell* pbToNb(Instance* inst) const;
+  GPin* pbToNb(Pin* pin) const;
+  GNet* pbToNb(Net* net) const;
+
+  //
+  // OpenDB To NesterovBase functions
+  //
+  GCell* dbToNb(odb::dbInst* inst) const;
+  GPin* dbToNb(odb::dbITerm* pin) const;
+  GPin* dbToNb(odb::dbBTerm* pin) const;
+  GNet* dbToNb(odb::dbNet* net) const;
 
   // update gCells with lx, ly
   void updateGCellLocation(
@@ -740,16 +759,61 @@ public:
   void updateGCellDensityCenterLocation(
       std::vector<FloatPoint>& points);
 
+
   int binCntX() const;
   int binCntY() const;
   int binSizeX() const;
   int binSizeY() const;
-  
-  const std::vector<Bin*> & bins() const; 
-
   int64_t overflowArea() const;
+
+  const std::vector<Bin*> & bins() const;
+
+  // filler cells / area control
+  // will be used in Routability-driven loop
+  int fillerDx() const;
+  int fillerDy() const;
+  int fillerCnt() const;
+  int64_t fillerCellArea() const;
+  int64_t whiteSpaceArea() const;
+  int64_t movableArea() const;
+  int64_t totalFillerArea() const;
+
+  // bloating cell will change the following areas.
+  int64_t stdInstsArea() const;
+  int64_t macroInstsArea() const;
+
+  // update
+  // fillerArea, whiteSpaceArea, movableArea
+  // and totalFillerArea after changing gCell's size
+  void updateAreas();
+
+  // change fillerCell's size
+  void updateFillerCellSize(int dx, int dy);
+
+  // update density sizes with changed dx and dy
+  void updateDensitySize();
+  
+
+
+  // should be separately defined.
+  // This is mainly used for NesterovLoop
+  int64_t nesterovInstsArea() const;
+
+  // sum phi and target density
+  // used in NesterovPlace
   float sumPhi() const;
+
+  // initTargetDensity is set by users
+  // targetDensity is equal to initTargetDensity and 
+  // would be changed dynamically in RD loop
+  //
+  float initTargetDensity() const;
   float targetDensity() const;
+
+  void setTargetDensity(float targetDensity);
+  
+  // RD can shrink the number of fillerCells.
+  void cutFillerCells(int64_t targetFillerArea);
 
   void updateDensityCoordiLayoutInside(GCell* gcell);
 
@@ -791,6 +855,8 @@ public:
   // update electrostatic forces within Bin
   void updateDensityForceBin();
 
+  void updateDbGCells();
+
 private:
   NesterovBaseVars nbVars_;
   std::shared_ptr<PlacerBase> pb_;
@@ -798,6 +864,14 @@ private:
 
   BinGrid bg_;
   std::unique_ptr<FFT> fft_;
+
+  int fillerDx_, fillerDy_;
+  int64_t whiteSpaceArea_;
+  int64_t movableArea_;
+  int64_t totalFillerArea_;
+
+  int64_t stdInstsArea_;
+  int64_t macroInstsArea_;
 
   std::vector<GCell> gCellStor_;
   std::vector<GNet> gNetStor_;
@@ -815,6 +889,7 @@ private:
   std::unordered_map<Net*, GNet*> gNetMap_;
 
   float sumPhi_;
+  float targetDensity_;
 
   void init();
   void initFillerGCells();

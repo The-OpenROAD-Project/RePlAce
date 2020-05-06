@@ -32,7 +32,6 @@ void Logger::error(string input, int code, int verbose) {
   VERBOSE_CHECK()
   cout << "[ERROR] " << input;
   cout << " (" << name_ << "-" << code << ")" << endl;
-  exit(code);
 }
 
 void Logger::warn(string input, int code, int verbose) {

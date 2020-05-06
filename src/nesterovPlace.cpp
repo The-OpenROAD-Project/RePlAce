@@ -2,6 +2,7 @@
 #include "nesterovBase.h"
 #include "nesterovPlace.h"
 #include "opendb/db.h"
+#include "routeBase.h"
 #include "logger.h"
 #include <iostream>
 using namespace std;
@@ -17,7 +18,7 @@ static float
 getSecondNorm(vector<FloatPoint>& a);
 
 NesterovPlaceVars::NesterovPlaceVars()
-  : maxNesterovIter(2000), 
+  : maxNesterovIter(5000), 
   maxBackTrack(10),
   initDensityPenalty(0.00008),
   initWireLengthCoef(0.25),
@@ -26,10 +27,31 @@ NesterovPlaceVars::NesterovPlaceVars()
   maxPhiCoef(1.05),
   minPreconditioner(1.0),
   initialPrevCoordiUpdateCoef(100),
-  referenceHpwl(446000000) {}
+  referenceHpwl(446000000),
+  routabilityCheckOverflow(0.20),
+  timingDrivenMode(true),
+  routabilityDrivenMode(true) {}
+
+
+void
+NesterovPlaceVars::reset() {
+  maxNesterovIter = 5000;
+  maxBackTrack = 10;
+  initDensityPenalty = 0.00008;
+  initWireLengthCoef = 0.25;
+  targetOverflow = 0.1;
+  minPhiCoef = 0.95;
+  maxPhiCoef = 1.05;
+  minPreconditioner = 1.0;
+  initialPrevCoordiUpdateCoef = 100;
+  referenceHpwl = 446000000;
+  routabilityCheckOverflow = 0.20;
+  timingDrivenMode = true;
+  routabilityDrivenMode = true;
+}
 
 NesterovPlace::NesterovPlace() 
-  : pb_(nullptr), nb_(nullptr), log_(nullptr), npVars_(), 
+  : pb_(nullptr), nb_(nullptr), rb_(nullptr), log_(nullptr), npVars_(), 
   wireLengthGradSum_(0), 
   densityGradSum_(0),
   stepLength_(0),
@@ -38,17 +60,20 @@ NesterovPlace::NesterovPlace()
   wireLengthCoefX_(0), 
   wireLengthCoefY_(0),
   prevHpwl_(0),
-  isDiverged_(false) {}
+  isDiverged_(false),
+  isRoutabilityNeed_(true) {}
 
 NesterovPlace::NesterovPlace(
     NesterovPlaceVars npVars,
     std::shared_ptr<PlacerBase> pb, 
     std::shared_ptr<NesterovBase> nb,
+    std::shared_ptr<RouteBase> rb,
     std::shared_ptr<Logger> log) 
 : NesterovPlace() {
   npVars_ = npVars;
   pb_ = pb;
   nb_ = nb;
+  rb_ = rb;
   log_ = log;
   init();
 }
@@ -83,12 +108,15 @@ void NesterovPlace::init() {
   curCoordi_.resize(gCellSize, FloatPoint());
   nextCoordi_.resize(gCellSize, FloatPoint());
 
+  initCoordi_.resize(gCellSize, FloatPoint());
+
   for(auto& gCell : nb_->gCells()) {
     nb_->updateDensityCoordiLayoutInside( gCell );
     int idx = &gCell - &nb_->gCells()[0];
     curSLPCoordi_[idx] 
       = prevSLPCoordi_[idx] 
       = curCoordi_[idx] 
+      = initCoordi_[idx]
       = FloatPoint(gCell->dCx(), gCell->dCy()); 
   }
 
@@ -111,8 +139,7 @@ void NesterovPlace::init() {
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
-        / static_cast<float>(pb_->stdInstsArea() 
-            + pb_->macroInstsArea() * nb_->targetDensity() );
+        / static_cast<float>(nb_->nesterovInstsArea());
 
   log_->infoFloatSignificant("InitSumOverflow", sumOverflow_, 3);
 
@@ -161,8 +188,7 @@ void NesterovPlace::init() {
   
   sumOverflow_ = 
     static_cast<float>(nb_->overflowArea()) 
-        / static_cast<float>(pb_->stdInstsArea() 
-            + pb_->macroInstsArea() * nb_->targetDensity() );
+        / static_cast<float>(nb_->nesterovInstsArea());
   
   log_->infoFloatSignificant("PrevSumOverflow", sumOverflow_, 3);
   
@@ -176,6 +202,8 @@ void NesterovPlace::init() {
 
 // clear reset
 void NesterovPlace::reset() {
+
+  npVars_.reset();
 
   curSLPCoordi_.clear();
   curSLPWireLengthGrads_.clear();
@@ -194,6 +222,38 @@ void NesterovPlace::reset() {
   
   curCoordi_.clear();
   nextCoordi_.clear();
+
+  densityPenaltyStor_.clear();
+  
+  curSLPCoordi_.shrink_to_fit();
+  curSLPWireLengthGrads_.shrink_to_fit();
+  curSLPDensityGrads_.shrink_to_fit();
+  curSLPSumGrads_.shrink_to_fit();
+  
+  nextSLPCoordi_.shrink_to_fit();
+  nextSLPWireLengthGrads_.shrink_to_fit();
+  nextSLPDensityGrads_.shrink_to_fit();
+  nextSLPSumGrads_.shrink_to_fit();
+  
+  prevSLPCoordi_.shrink_to_fit();
+  prevSLPWireLengthGrads_.shrink_to_fit();
+  prevSLPDensityGrads_.shrink_to_fit();
+  prevSLPSumGrads_.shrink_to_fit();
+  
+  curCoordi_.shrink_to_fit();
+  nextCoordi_.shrink_to_fit();
+
+  densityPenaltyStor_.shrink_to_fit();
+
+  wireLengthGradSum_ = 0;
+  densityGradSum_ = 0;
+  stepLength_ = 0;
+  densityPenalty_ = 0;
+  baseWireLengthCoef_ = 0;
+  wireLengthCoefX_ = wireLengthCoefY_ = 0;
+  prevHpwl_ = 0;
+  isDiverged_ = false;
+  isRoutabilityNeed_ = true;
 }
 
 // to execute following function,
@@ -310,6 +370,17 @@ NesterovPlace::doNesterovPlace() {
   // diverge error handling
   string divergeMsg = "";
   int divergeCode = 0;
+
+  // snapshot saving detection 
+  bool isSnapshotSaved = false;
+
+  // snapshot info
+  vector<FloatPoint> snapshotCoordi;
+  float snapshotA = 0;
+  float snapshotDensityPenalty = 0;
+
+  bool isDivergeTriedRevert = false;
+
 
   // Core Nesterov Loop
   for(int i=0; i<npVars_.maxNesterovIter; i++) {
@@ -452,7 +523,70 @@ NesterovPlace::doNesterovPlace() {
       divergeMsg += "        Please decrease max_phi_cof value";
       divergeCode = 4;
       isDiverged_ = true;
-      break;
+
+      // revert back to the original rb solutions
+      // one more opportunity
+      if( !isDivergeTriedRevert 
+          && rb_->numCall() >= 1 ) {
+
+        // get back to the working rc size
+        rb_->revertGCellSizeToMinRc();
+
+        // revert back the current density penality
+        curA = snapshotA;
+        nb_->updateGCellDensityCenterLocation(snapshotCoordi);
+        init();
+        densityPenalty_ 
+          = snapshotDensityPenalty;
+        isDiverged_ = false;
+        isDivergeTriedRevert = true;
+
+        // turn off the RD forcely
+        isRoutabilityNeed_ = false;
+      } 
+      else {
+        // no way to revert
+        break;
+      }
+    }
+    
+    if( !isSnapshotSaved 
+        && npVars_.routabilityDrivenMode 
+        && 0.6 >= sumOverflow_ ) {
+      snapshotCoordi = curCoordi_; 
+      snapshotDensityPenalty = densityPenalty_;
+      snapshotA = curA;
+
+      isSnapshotSaved = true;
+      cout << "[NesterovSolve] Snapshot saved at iter = " + to_string(i) << endl;
+    }
+
+    // check routability using GR
+    if( npVars_.routabilityDrivenMode 
+        && isRoutabilityNeed_ 
+        && npVars_.routabilityCheckOverflow >= sumOverflow_ ) {
+
+      // recover the densityPenalty values
+      // if further routability-driven is needed 
+      std::pair<bool, bool> result = rb_->routability();
+      isRoutabilityNeed_ = result.first;
+      bool isRevertInitNeeded = result.second;
+
+      // if routability is needed
+      if( isRoutabilityNeed_ || isRevertInitNeeded ) {
+        // cutFillerCoordinates();
+
+        // revert back the current density penality
+        curA = snapshotA;
+        nb_->updateGCellDensityCenterLocation(snapshotCoordi);
+        init();
+        densityPenalty_ 
+          = snapshotDensityPenalty;
+  
+        // reset the divergence detect conditions 
+        minSumOverflow = 1e30;
+        hpwlWithMinSumOverflow = 1e30; 
+      }
     }
 
     // minimum iteration is 50
@@ -528,8 +662,7 @@ NesterovPlace::updateNextIter() {
 
   sumOverflow_ = 
       static_cast<float>(nb_->overflowArea()) 
-        / static_cast<float>(pb_->stdInstsArea() 
-            + pb_->macroInstsArea() * nb_->targetDensity() );
+        / static_cast<float>(nb_->nesterovInstsArea());
 
   log_->infoFloatSignificant("  Gradient", getSecondNorm(curSLPSumGrads_), 3);
   log_->infoFloatSignificant("  Phi", nb_->sumPhi(), 3);
@@ -550,6 +683,11 @@ NesterovPlace::updateNextIter() {
   densityPenalty_ *= phiCoef;
   
   log_->infoFloatSignificant("  PhiCoef", phiCoef, 3);
+
+  // for routability densityPenalty recovery
+  if( rb_->numCall() == 0 ) {
+    densityPenaltyStor_.push_back( densityPenalty_ );
+  }
 }
 
 float
@@ -584,18 +722,28 @@ NesterovPlace::getPhiCoef(float scaledDiffHpwl) {
 
 void
 NesterovPlace::updateDb() {
-  for(auto& gCell : nb_->gCells()) {
-    if( gCell->isInstance() ) {
-      odb::dbInst* inst = gCell->instance()->dbInst();
-      inst->setPlacementStatus(odb::dbPlacementStatus::PLACED); 
+  nb_->updateDbGCells();
+}
 
-      // pad awareness on X coordinates
-      inst->setLocation( 
-          gCell->dCx()-gCell->dDx()/2 
-          + pb_->siteSizeX() * pb_->padLeft(),
-          gCell->dCy()-gCell->dDy()/2 ); 
-    }
-  }
+void
+NesterovPlace::cutFillerCoordinates() {
+  curSLPCoordi_.resize( nb_->fillerCnt() );
+  curSLPWireLengthGrads_.resize( nb_->fillerCnt() );
+  curSLPDensityGrads_.resize( nb_->fillerCnt() );
+  curSLPSumGrads_.resize( nb_->fillerCnt() );
+
+  nextSLPCoordi_.resize( nb_->fillerCnt() );
+  nextSLPWireLengthGrads_.resize( nb_->fillerCnt() );
+  nextSLPDensityGrads_.resize( nb_->fillerCnt() );
+  nextSLPSumGrads_.resize( nb_->fillerCnt() );
+
+  prevSLPCoordi_.resize( nb_->fillerCnt() );
+  prevSLPWireLengthGrads_.resize( nb_->fillerCnt() );
+  prevSLPDensityGrads_.resize( nb_->fillerCnt() );
+  prevSLPSumGrads_.resize( nb_->fillerCnt() );
+
+  curCoordi_.resize(nb_->fillerCnt());
+  nextCoordi_.resize(nb_->fillerCnt());
 }
 
 

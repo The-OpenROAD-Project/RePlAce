@@ -5,15 +5,29 @@
 #include "replace/Replace.h"
 
 namespace ord {
+OpenRoad*
+getOpenRoad();
+
 replace::Replace*
 getReplace();
 }
 
+using ord::getOpenRoad;
 using ord::getReplace;
 using replace::Replace;
 %}
 
 %inline %{
+
+void 
+replace_reset_cmd() 
+{
+  Replace* replace = getReplace();  
+  replace->reset();
+  replace->setDb(getOpenRoad()->getDb());
+  replace->setSta(getOpenRoad()->getSta());
+  replace->setFastRoute(getOpenRoad()->getFastRoute());
+}
 
 void 
 replace_initial_place_cmd()
@@ -119,6 +133,84 @@ set_replace_verbose_level_cmd(int verbose)
   Replace* replace = getReplace();
   replace->setVerboseLevel(verbose);
 }
+
+void
+set_replace_disable_timing_driven_mode_cmd()
+{
+  Replace* replace = getReplace();
+  replace->setTimingDrivenMode(false);
+}
+
+void
+set_replace_disable_routability_driven_mode_cmd()
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityDrivenMode(false);
+}
+
+void
+set_replace_routability_check_overflow_cmd(float overflow) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityCheckOverflow(overflow);
+}
+
+void
+set_replace_routability_max_density_cmd(float density) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxDensity(density);
+}
+
+void
+set_replace_routability_max_bloat_iter_cmd(int iter)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxBloatIter(iter);
+}
+
+void
+set_replace_routability_max_inflation_iter_cmd(int iter) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxInflationIter(iter);
+}
+
+void
+set_replace_routability_target_rc_metric_cmd(float rc)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityTargetRcMetric(rc);
+}
+
+void
+set_replace_routability_inflation_ratio_coef_cmd(float coef)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityInflationRatioCoef(coef);
+}
+
+void
+set_replace_routability_pitch_scale_cmd(float scale) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityPitchScale(scale);
+}
+
+void
+set_replace_routability_max_inflation_ratio_cmd(float ratio) 
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityMaxInflationRatio(ratio);
+}
+
+void
+set_replace_routability_rc_coefficients_cmd(float k1, float k2, float k3, float k4)
+{
+  Replace* replace = getReplace();
+  replace->setRoutabilityRcCoefficients(k1, k2, k3, k4);
+}
+
 
 void
 set_replace_pad_left_cmd(int pad) 

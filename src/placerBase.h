@@ -219,6 +219,9 @@ public:
   int coreDx() const;
   int coreDy() const;
 
+  int64_t dieArea() const;
+  int64_t coreArea() const;
+
 private:
   int dieLx_;
   int dieLy_;
@@ -266,10 +269,11 @@ public:
 
   Die& die() { return die_; }
 
-  Instance* dbToPlace(odb::dbInst* inst) const;
-  Pin* dbToPlace(odb::dbITerm* pin) const;
-  Pin* dbToPlace(odb::dbBTerm* pin) const;
-  Net* dbToPlace(odb::dbNet* net) const;
+  // Pb : PlacerBase
+  Instance* dbToPb(odb::dbInst* inst) const;
+  Pin* dbToPb(odb::dbITerm* pin) const;
+  Pin* dbToPb(odb::dbBTerm* pin) const;
+  Net* dbToPb(odb::dbNet* net) const;
 
   int siteSizeX() const { return siteSizeX_; }
   int siteSizeY() const { return siteSizeY_; }
@@ -284,6 +288,8 @@ public:
   int64_t nonPlaceInstsArea() const { return nonPlaceInstsArea_; }
   int64_t macroInstsArea() const { return macroInstsArea_; }
   int64_t stdInstsArea() const { return stdInstsArea_; }
+
+  odb::dbDatabase* db() const { return db_; }
 
 private:
   odb::dbDatabase* db_;
@@ -315,7 +321,7 @@ private:
 
   int64_t placeInstsArea_;
   int64_t nonPlaceInstsArea_;
-  
+
   // macroInstsArea_ + stdInstsArea_ = placeInstsArea_;
   // macroInstsArea_ should be separated
   // because of target_density tuning

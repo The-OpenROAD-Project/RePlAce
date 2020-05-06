@@ -12,6 +12,7 @@ class PlacerBase;
 class Instance;
 class NesterovBase;
 class Logger;
+class RouteBase;
 
 class NesterovPlaceVars {
   public:
@@ -25,7 +26,16 @@ class NesterovPlaceVars {
   float minPreconditioner; // MIN_PRE
   float initialPrevCoordiUpdateCoef; // z_ref_alpha
   float referenceHpwl; // refDeltaHpwl
+  float routabilityCheckOverflow;
+
+  int routabilityMaxBloatIter;
+  int routabilityMaxInflationIter;
+
+  bool timingDrivenMode;
+  bool routabilityDrivenMode;
+
   NesterovPlaceVars();
+  void reset();
 };
 
 class NesterovPlace {
@@ -34,6 +44,7 @@ public:
   NesterovPlace(NesterovPlaceVars npVars,
       std::shared_ptr<PlacerBase> pb,
       std::shared_ptr<NesterovBase> nb,
+      std::shared_ptr<RouteBase> rb,
       std::shared_ptr<Logger> log);
   ~NesterovPlace();
 
@@ -68,6 +79,7 @@ private:
   std::shared_ptr<PlacerBase> pb_;
   std::shared_ptr<NesterovBase> nb_;
   std::shared_ptr<Logger> log_;
+  std::shared_ptr<RouteBase> rb_;
   NesterovPlaceVars npVars_;
 
   // SLP is Step Length Prediction.
@@ -94,6 +106,12 @@ private:
   std::vector<FloatPoint> curCoordi_;
   std::vector<FloatPoint> nextCoordi_;
 
+  // save initial coordinates -- needed for RD
+  std::vector<FloatPoint> initCoordi_;
+
+  // densityPenalty stor
+  std::vector<float> densityPenaltyStor_;
+
   float wireLengthGradSum_;
   float densityGradSum_;
 
@@ -118,8 +136,9 @@ private:
   int64_t prevHpwl_;
 
   float isDiverged_;
+  float isRoutabilityNeed_;
 
-  float getWireLengthCoef(float overflow);
+  void cutFillerCoordinates();
 
   void init();
   void reset();
