@@ -30,6 +30,9 @@ isCoreAreaOverlap(Die& die, Instance& inst);
 static int64_t
 getOverlapWithCoreArea(Die& die, Instance& inst);
 
+static bool
+isPlacementInst(dbInst* inst);
+
 
 ////////////////////////////////////////////////////////
 // Instance 
@@ -656,6 +659,9 @@ PlacerBase::init() {
   // insts fill with real instances
   instStor_.reserve(insts.size());
   for(dbInst* inst : insts) {
+    if( !isPlacementInst(inst) ) {
+      continue;
+    }
     Instance myInst(inst, 
         pbVars_.padLeft * siteSizeX_,
         pbVars_.padRight * siteSizeX_ );
@@ -1043,6 +1049,25 @@ getOverlapWithCoreArea(Die& die, Instance& inst) {
     * static_cast<int64_t>(rectUy - rectLy);
 }
 
+static bool
+isPlacementInst(dbInst* inst) {
+  switch(inst->getMaster()->getType()) {
+    case dbMasterType::BLOCK:
+    case dbMasterType::BLOCK_BLACKBOX:
+    case dbMasterType::BLOCK_SOFT:
+    case dbMasterType::CORE: 
+    case dbMasterType::CORE_FEEDTHRU:
+    case dbMasterType::CORE_TIEHIGH:
+    case dbMasterType::CORE_TIELOW:
+    case dbMasterType::CORE_SPACER:
+    case dbMasterType::CORE_ANTENNACELL:
+    case dbMasterType::CORE_WELLTAP:
+      return true;
+    default:
+      return false;
+  }
+  return false;
+}
 
 }
 
