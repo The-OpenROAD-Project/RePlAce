@@ -27,7 +27,8 @@ static const unsigned char yellow[] = {255, 255, 0}, white[] = {255, 255, 255},
                            green[] = {0, 255, 0}, blue[] = {120, 200, 255},
                            darkblue[] = {69, 66, 244},
                            purple[] = {255, 100, 255}, black[] = {0, 0, 0},
-                           red[] = {255, 0, 0}, pink[] = {255, 192, 203};
+                           red[] = {255, 0, 0}, pink[] = {255, 192, 203},
+                           orange[] = {255, 165, 0};
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -181,7 +182,7 @@ void
 PlotEnv::DrawTerminal(CImgObj *img, 
     const unsigned char termColor[],
     const unsigned char pinColor[], float opacity) {
-  int pinWidth = 30;
+  int pinWidth = 300;
 
   // FIXED CELL
   for(auto& npInst : pb_->nonPlaceInsts()) {
@@ -200,6 +201,22 @@ PlotEnv::DrawTerminal(CImgObj *img,
 //
 //      img.draw_rectangle( x1, y1, x3, y3, pinColor, opacity );
 //    }
+  }
+  // BTerms
+  for(auto pin : pb_->pins()) {
+    if (!pin->isBTerm()) {
+      continue;
+    }
+    int cx = pin->cx();
+    int cy = pin->cy();
+
+    int x1 = GetX(cx - pinWidth / 2.0);
+    int y1 = GetY(cy - pinWidth / 2.0);
+
+    int x2 = GetX(cx + pinWidth / 2.0);
+    int y2 = GetY(cy + pinWidth / 2.0);
+
+    img->draw_rectangle( x1, y1, x2, y2, orange, opacity );
   }
 }
 
