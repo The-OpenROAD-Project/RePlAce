@@ -683,8 +683,8 @@ PlacerBase::init() {
     instStor_.push_back( myInst );
   }
 
-  // insts fill with fake instances (fragmented row)
-  initInstsForFragmentedRow();
+  // insts fill with fake instances (fragmented row or blockage)
+  initInstsForUnusableSites();
 
 
   // init inst ptrs and areas
@@ -808,13 +808,12 @@ PlacerBase::init() {
   printInfo();
 }
 
+// Use dummy instance to fill unusable sites.  Sites are unusable
+// due to fragmented rows or placement blockages.
 void
-PlacerBase::initInstsForFragmentedRow() {
+PlacerBase::initInstsForUnusableSites() {
   dbSet<dbRow> rows = db_->getChip()->getBlock()->getRows();
   
-  // dummy cell update to understand fragmented-row
-  //
-
   int siteCountX = (die_.coreUx()-die_.coreLx())/siteSizeX_;
   int siteCountY = (die_.coreUy()-die_.coreLy())/siteSizeY_;
   
@@ -866,6 +865,31 @@ PlacerBase::initInstsForFragmentedRow() {
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
         siteGrid[ j * siteCountX + i ] = FixedInst; 
+      }
+    }
+  }
+
+  // Mark blockage areas as empty so that their sites will be blocked.
+  for (dbBlockage* blockage : db_->getChip()->getBlock()->getBlockages()) {
+    dbInst* inst = blockage->getInstance();
+    if (inst && !inst->isFixed()) {
+      string msg = "Blockages associated with moveable instances "
+        " are unsupported and ignored [inst: " + inst->getName() + "]\n";
+      slog_->error(msg, 3);
+      continue;
+    }
+    dbBox* bbox = blockage->getBBox();
+    std::pair<int, int> pairX
+      = getMinMaxIdx(bbox->xMin(), bbox->xMax(),
+                     die_.coreLx(), siteSizeX_, 0, siteCountX);
+
+    std::pair<int, int> pairY
+      = getMinMaxIdx(bbox->yMin(), bbox->yMax(),
+                     die_.coreLy(), siteSizeY_, 0, siteCountY);
+
+    for(int i=pairX.first; i<pairX.second; i++) {
+      for(int j=pairY.first; j<pairY.second; j++) {
+        siteGrid[ j * siteCountX + i ] = Empty;
       }
     }
   }

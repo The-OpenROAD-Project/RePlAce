@@ -47,8 +47,7 @@ public:
   bool isPlaceInstance() const;
 
   // Dummy is virtual instance to fill in
-  // empty fragmented row structures.
-  // will have inst_ as nullptr
+  // unusable sites.  It will have inst_ as nullptr
   bool isDummy() const;
 
   void setLocation(int x, int y);
@@ -258,7 +257,7 @@ public:
   //
   // placeInsts : a real instance that need to be placed
   // fixedInsts : a real instance that is fixed (e.g. macros, tapcells)
-  // dummyInsts : a fake instance that is for fragmented-row handling
+  // dummyInsts : a fake instance that is for unusable site handling
   //
   // nonPlaceInsts : fixedInsts + dummyInsts to enable fast-iterate on Bin-init
   //
@@ -329,7 +328,7 @@ private:
   int64_t stdInstsArea_;
 
   void init();
-  void initInstsForFragmentedRow();
+  void initInstsForUnusableSites();
 
   void reset();
 };

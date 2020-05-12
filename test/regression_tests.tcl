@@ -1,5 +1,6 @@
 record_tests {
   simple01
+  simple01-obs
   simple02
   simple03
   simple04
