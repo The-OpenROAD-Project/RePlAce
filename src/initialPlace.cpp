@@ -236,17 +236,11 @@ void InitialPlace::createSparseMatrix() {
     //cout << "net: " << net.net()->getConstName() << endl;
 
     // foreach two pins in single nets.
-    for(auto& pin1 : net->pins()) {
-      int pinIdx1 = &pin1 - &(net->pins()[0]);
-      for(auto& pin2 : net->pins()) {
-        int pinIdx2 = &pin2 - &(net->pins()[0]);
-
-        // 
-        // will compare two pins "only once."
-        //
-        if( pinIdx1 < pinIdx2 ) {
-          break;
-        }
+    auto& pins = net->pins();
+    for(int pinIdx1 = 1; pinIdx1 < pins.size(); ++pinIdx1) {
+      Pin* pin1 = pins[pinIdx1];
+      for(int pinIdx2 = 0; pinIdx2 < pinIdx1; ++pinIdx2) {
+        Pin* pin2 = pins[pinIdx2];
 
         // no need to fill in when instance is same
         if( pin1->instance() == pin2->instance() ) {
