@@ -257,6 +257,19 @@ Pin::Pin(odb::dbBTerm* bTerm): Pin() {
   updateCoordi(bTerm);
 }
 
+std::string Pin::name() const
+{
+  if (!term_) {
+    return "DUMMY";
+  }
+  if (isITerm()) {
+    return dbITerm()->getInst()->getName() + ':' +
+      dbITerm()->getMTerm()->getName();
+  } else {
+    return dbBTerm()->getName();
+  }
+}
+
 void Pin::setITerm() {
   iTermField_ = 1;
 }

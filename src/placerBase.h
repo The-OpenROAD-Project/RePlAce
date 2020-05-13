@@ -127,7 +127,8 @@ public:
 
   Instance* instance() const { return inst_; }
   Net* net() const { return net_; }
-
+  std::string name() const;
+  
 private:
   void* term_;
   Instance* inst_;
