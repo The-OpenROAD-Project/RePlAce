@@ -850,25 +850,6 @@ PlacerBase::initInstsForUnusableSites() {
     }
   }
 
-  // fill fixed instances' bbox
-  for(auto& inst: instStor_) {
-    if( !inst.isFixed() ) {
-      continue;
-    }
-    std::pair<int, int> pairX 
-      = getMinMaxIdx(inst.lx(), inst.ux(),
-          die_.coreLx(), siteSizeX_, 0, siteCountX);
-    std::pair<int, int> pairY 
-      = getMinMaxIdx(inst.ly(), inst.uy(),
-          die_.coreLy(), siteSizeY_, 0, siteCountY);
-
-    for(int i=pairX.first; i<pairX.second; i++) {
-      for(int j=pairY.first; j<pairY.second; j++) {
-        siteGrid[ j * siteCountX + i ] = FixedInst; 
-      }
-    }
-  }
-
   // Mark blockage areas as empty so that their sites will be blocked.
   for (dbBlockage* blockage : db_->getChip()->getBlock()->getBlockages()) {
     dbInst* inst = blockage->getInstance();
@@ -890,6 +871,25 @@ PlacerBase::initInstsForUnusableSites() {
     for(int i=pairX.first; i<pairX.second; i++) {
       for(int j=pairY.first; j<pairY.second; j++) {
         siteGrid[ j * siteCountX + i ] = Empty;
+      }
+    }
+  }
+
+  // fill fixed instances' bbox
+  for(auto& inst: instStor_) {
+    if( !inst.isFixed() ) {
+      continue;
+    }
+    std::pair<int, int> pairX 
+      = getMinMaxIdx(inst.lx(), inst.ux(),
+          die_.coreLx(), siteSizeX_, 0, siteCountX);
+    std::pair<int, int> pairY 
+      = getMinMaxIdx(inst.ly(), inst.uy(),
+          die_.coreLy(), siteSizeY_, 0, siteCountY);
+
+    for(int i=pairX.first; i<pairX.second; i++) {
+      for(int j=pairY.first; j<pairY.second; j++) {
+        siteGrid[ j * siteCountX + i ] = FixedInst; 
       }
     }
   }
