@@ -14,10 +14,10 @@ Notice 0: Finished DEF file: ./simple01-obs.def
 [INFO] SiteSize = (380, 2800)
 [INFO] CoreAreaLxLy = (0, 0)
 [INFO] CoreAreaUxUy = (61940, 61600)
-[INFO] NumInstances = 302
+[INFO] NumInstances = 700
 [INFO] NumPlaceInstances = 294
 [INFO] NumFixedInstances = 0
-[INFO] NumDummyInstances = 8
+[INFO] NumDummyInstances = 406
 [INFO] NumNets = 364
 [INFO] NumPins = 1122
 [INFO] DieAreaLxLy = (0, 0)
@@ -25,12 +25,16 @@ Notice 0: Finished DEF file: ./simple01-obs.def
 [INFO] CoreAreaLxLy = (0, 0)
 [INFO] CoreAreaUxUy = (61940, 61600)
 [INFO] CoreArea = 3815504000
-[INFO] NonPlaceInstsArea = 451136000
+[INFO] NonPlaceInstsArea = 874608000
 [INFO] PlaceInstsArea = 2279088000
-[INFO] Util(%) = 67.741943
+[INFO] Util(%) = 77.496384
 [INFO] StdInstsArea = 2279088000
 [INFO] MacroInstsArea = 0
-[INFO] FillerInit: NumGCells = 304
+[ERROR] Filler area is negative!!
+       Please put higher target density or 
+       Re-floorplan to have enough coreArea
+ (REPL-1)
+[INFO] FillerInit: NumGCells = 294
 [INFO] FillerInit: NumGNets = 364
 [INFO] FillerInit: NumGPins = 1122
 [INFO] TargetDensity = 0.700000
@@ -41,28 +45,33 @@ Notice 0: Finished DEF file: ./simple01-obs.def
 [INFO] BinCnt = (16, 16)
 [INFO] BinSize = (3872, 3850)
 [INFO] NumBins = 256
-[NesterovSolve] Iter: 1 overflow: 0.855528 HPWL: 3669060
-[NesterovSolve] Iter: 10 overflow: 0.759923 HPWL: 4246189
-[NesterovSolve] Iter: 20 overflow: 0.754342 HPWL: 4243282
-[NesterovSolve] Iter: 30 overflow: 0.746722 HPWL: 4270717
-[NesterovSolve] Iter: 40 overflow: 0.731188 HPWL: 4304433
-[NesterovSolve] Iter: 50 overflow: 0.715253 HPWL: 4355521
-[NesterovSolve] Iter: 60 overflow: 0.699047 HPWL: 4430923
-[NesterovSolve] Iter: 70 overflow: 0.666358 HPWL: 4504667
-[NesterovSolve] Iter: 80 overflow: 0.629352 HPWL: 4585409
-[NesterovSolve] Iter: 90 overflow: 0.592637 HPWL: 4690417
-[NesterovSolve] Iter: 100 overflow: 0.538288 HPWL: 4751993
-[NesterovSolve] Iter: 110 overflow: 0.487286 HPWL: 4778333
-[NesterovSolve] Iter: 120 overflow: 0.431226 HPWL: 4807797
-[NesterovSolve] Iter: 130 overflow: 0.375246 HPWL: 4838609
-[NesterovSolve] Iter: 140 overflow: 0.323052 HPWL: 4874338
-[NesterovSolve] Iter: 150 overflow: 0.293097 HPWL: 4928138
-[NesterovSolve] Iter: 160 overflow: 0.263619 HPWL: 4996820
-[NesterovSolve] Iter: 170 overflow: 0.227331 HPWL: 5019078
-[NesterovSolve] Iter: 180 overflow: 0.192919 HPWL: 5052028
-[NesterovSolve] Iter: 190 overflow: 0.161494 HPWL: 5079730
-[NesterovSolve] Iter: 200 overflow: 0.137529 HPWL: 5115222
-[NesterovSolve] Iter: 210 overflow: 0.118697 HPWL: 5143651
-[NesterovSolve] Iter: 220 overflow: 0.102628 HPWL: 5172273
-[NesterovSolve] Finished with Overflow: 0.0990554
-Differences found at line 64.
+[NesterovSolve] Iter: 1 overflow: 0.861002 HPWL: 3669060
+[NesterovSolve] Iter: 10 overflow: 0.773033 HPWL: 4299341
+[NesterovSolve] Iter: 20 overflow: 0.762224 HPWL: 4314755
+[NesterovSolve] Iter: 30 overflow: 0.749843 HPWL: 4374787
+[NesterovSolve] Iter: 40 overflow: 0.728087 HPWL: 4449550
+[NesterovSolve] Iter: 50 overflow: 0.700297 HPWL: 4540235
+[NesterovSolve] Iter: 60 overflow: 0.665551 HPWL: 4645984
+[NesterovSolve] Iter: 70 overflow: 0.627238 HPWL: 4765648
+[NesterovSolve] Iter: 80 overflow: 0.58047 HPWL: 4850725
+[NesterovSolve] Iter: 90 overflow: 0.53151 HPWL: 4941530
+[NesterovSolve] Iter: 100 overflow: 0.480543 HPWL: 4984201
+[NesterovSolve] Iter: 110 overflow: 0.429178 HPWL: 5027109
+[NesterovSolve] Iter: 120 overflow: 0.379137 HPWL: 5082170
+[NesterovSolve] Iter: 130 overflow: 0.332262 HPWL: 5136978
+[NesterovSolve] Iter: 140 overflow: 0.305291 HPWL: 5174627
+[NesterovSolve] Iter: 150 overflow: 0.271866 HPWL: 5182370
+[NesterovSolve] Iter: 160 overflow: 0.24375 HPWL: 5209931
+[NesterovSolve] Iter: 170 overflow: 0.214034 HPWL: 5235024
+[NesterovSolve] Iter: 180 overflow: 0.191325 HPWL: 5263150
+[NesterovSolve] Iter: 190 overflow: 0.170955 HPWL: 5282611
+[NesterovSolve] Iter: 200 overflow: 0.154668 HPWL: 5308608
+[NesterovSolve] Iter: 210 overflow: 0.143672 HPWL: 5338591
+[NesterovSolve] Iter: 220 overflow: 0.130023 HPWL: 5359310
+[NesterovSolve] Iter: 230 overflow: 0.123243 HPWL: 5379137
+[NesterovSolve] Iter: 240 overflow: 0.114746 HPWL: 5394705
+[NesterovSolve] Iter: 250 overflow: 0.108118 HPWL: 5416249
+[NesterovSolve] Iter: 260 overflow: 0.104558 HPWL: 5436445
+[NesterovSolve] Iter: 270 overflow: 0.101025 HPWL: 5450608
+[NesterovSolve] Finished with Overflow: 0.0992666
+No differences found.

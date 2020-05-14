@@ -881,9 +881,17 @@ PlacerBase::initInstsForUnusableSites() {
       = getMinMaxIdx(bbox->yMin(), bbox->yMax(),
                      die_.coreLy(), siteSizeY_, 0, siteCountY);
 
-    for(int i=pairX.first; i<pairX.second; i++) {
-      for(int j=pairY.first; j<pairY.second; j++) {
-        siteGrid[ j * siteCountX + i ] = Empty;
+    float filler_density = (100 - blockage->getMaxDensity()) / 100;
+    int cells = 0;
+    int filled = 0;
+
+    for(int j=pairY.first; j<pairY.second; j++) {
+      for(int i=pairX.first; i<pairX.second; i++) {
+        if (cells == 0 || filled / (float) cells <= filler_density) {
+          siteGrid[ j * siteCountX + i ] = Empty;
+          ++filled;
+        }
+        ++cells;
       }
     }
   }
