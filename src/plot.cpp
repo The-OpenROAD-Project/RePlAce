@@ -202,9 +202,9 @@ PlotEnv::DrawTerminal(CImgObj *img,
 //      img.draw_rectangle( x1, y1, x3, y3, pinColor, opacity );
 //    }
   }
-  // BTerms
+  // BTerms or ITerms from insts outside the core
   for(auto pin : pb_->pins()) {
-    if (!pin->isBTerm()) {
+    if (pin->isBTerm() && pin->instance() != nullptr) {
       continue;
     }
     int cx = pin->cx();
