@@ -37,7 +37,7 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 * Recommended OS: Centos6, Centos7 or Ubuntu 16.04
 
 ### Clone repo and submodules 
-    $ git clone --recursive https://github.com/The-OpenROAD-Project/RePlAce.git
+    $ git clone --recursive --branch standalone https://github.com/The-OpenROAD-Project/RePlAce.git
     $ cd ~/RePlAce
     $ ./prerequisite/install_centos7.sh   // for centos 7
     $ ./prerequisite/install_ubuntu16.sh  // for ubuntu 16
