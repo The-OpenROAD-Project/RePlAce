@@ -446,16 +446,24 @@ void PlotEnv::SaveCellPlot(CImgObj *img, bool isGCell) {
   auto& die = pb_->die();
 
   // draw die bounds
-  img->draw_line(die.dieLx(), die.dieLy(), die.dieUx(), die.dieLy(), pink);
-  img->draw_line(die.dieUx(), die.dieLy(), die.dieUx(), die.dieUy(), pink);
-  img->draw_line(die.dieUx(), die.dieUy(), die.dieLx(), die.dieUy(), pink);
-  img->draw_line(die.dieLx(), die.dieUy(), die.dieLx(), die.dieLy(), pink);
+  img->draw_line(GetX(die.dieLx()), GetY(die.dieLy()),
+                 GetX(die.dieUx()), GetY(die.dieLy()), pink);
+  img->draw_line(GetX(die.dieUx()), GetY(die.dieLy()),
+                 GetX(die.dieUx()), GetY(die.dieUy()), pink);
+  img->draw_line(GetX(die.dieUx()), GetY(die.dieUy()),
+                 GetX(die.dieLx()), GetY(die.dieUy()), pink);
+  img->draw_line(GetX(die.dieLx()), GetY(die.dieUy()),
+                 GetX(die.dieLx()), GetY(die.dieLy()), pink);
 
   // draw core bounds
-  img->draw_line(die.coreLx(), die.coreLy(), die.coreUx(), die.coreLy(), yellow);
-  img->draw_line(die.coreUx(), die.coreLy(), die.coreUx(), die.coreUy(), yellow);
-  img->draw_line(die.coreUx(), die.coreUy(), die.coreLx(), die.coreUy(), yellow);
-  img->draw_line(die.coreLx(), die.coreUy(), die.coreLx(), die.coreLy(), yellow);
+  img->draw_line(GetX(die.coreLx()), GetY(die.coreLy()),
+                 GetX(die.coreUx()), GetY(die.coreLy()), yellow);
+  img->draw_line(GetX(die.coreUx()), GetY(die.coreLy()),
+                 GetX(die.coreUx()), GetY(die.coreUy()), yellow);
+  img->draw_line(GetX(die.coreUx()), GetY(die.coreUy()),
+                 GetX(die.coreLx()), GetY(die.coreUy()), yellow);
+  img->draw_line(GetX(die.coreLx()), GetY(die.coreUy()),
+                 GetX(die.coreLx()), GetY(die.coreLy()), yellow);
 
   float opacity = 0.7;
   // FIXED CELL
