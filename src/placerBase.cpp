@@ -10,9 +10,6 @@ namespace replace {
 using namespace odb;
 using namespace std;
 
-static odb::Rect 
-getCoreRectFromDb(dbSet<odb::dbRow> &rows);
-
 static int 
 fastModulo(const int input, const int ceil);
 
@@ -670,7 +667,8 @@ PlacerBase::init() {
   
   // die-core area update
   dbSet<dbRow> rows = block->getRows();
-  odb::Rect coreRect = getCoreRectFromDb(rows);
+  odb::Rect coreRect;
+  block->getCoreArea(coreRect);
   odb::Rect dieRect;
   block->getDieArea(dieRect);
   die_ = Die(dieRect, coreRect);
@@ -1051,24 +1049,6 @@ PlacerBase::printInfo() const {
     exit(1);
   }
 
-}
-
-
-static odb::Rect 
-getCoreRectFromDb(dbSet<odb::dbRow> &rows) {
-  int minX = INT_MAX, minY = INT_MAX;
-  int maxX = INT_MIN, maxY = INT_MIN;
-
-  for(dbRow* row : rows) {
-    Rect rowRect;
-    row->getBBox( rowRect );
-
-    minX = std::min(rowRect.xMin(), minX);
-    minY = std::min(rowRect.yMin(), minY);
-    maxX = std::max(rowRect.xMax(), maxX);
-    maxY = std::max(rowRect.yMax(), maxY);
-  }
-  return odb::Rect(minX, minY, maxX, maxY);
 }
 
 // https://stackoverflow.com/questions/33333363/built-in-mod-vs-custom-mod-function-improve-the-performance-of-modulus-op
