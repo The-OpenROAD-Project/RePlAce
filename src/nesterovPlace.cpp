@@ -518,6 +518,7 @@ NesterovPlace::doNesterovPlace() {
     // do reweight on timing-critical nets. 
     if( npVars_.timingDrivenMode 
         && tb_->isTimingUpdateIter(sumOverflow_) ){
+      log_->infoFloat("TimingUpdateOvfl",sumOverflow_); 
       tb_->updateGNetWeight(); 
     } 
 

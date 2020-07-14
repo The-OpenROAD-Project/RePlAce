@@ -1,6 +1,12 @@
 #include "timingBase.h"
+#include "nesterovBase.h"
+#include "placerBase.h"
+#include "logger.h"
+
+#include <opendb/db.h>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 namespace replace {
 
@@ -100,7 +106,7 @@ TimingBase::isTimingUpdateIter(float overflow) {
     return false;
   }
 
-  int intOverflow = std::round(overflow);
+  int intOverflow = std::round(overflow * 100);
   if( intOverflow > tbVars_.timingUpdateIter_[0] ) { 
     return false;
   } 
@@ -127,6 +133,35 @@ TimingBase::isTimingUpdateIter(float overflow) {
 // TODO: update corresponding net weights
 void
 TimingBase::updateGNetWeight() {
+  log_->procBegin("TimingInst: updateGNetWeight");
+
+  // get all instances' location
+  for(auto& gCell : nb_->gCells()) {
+    if( gCell->isFiller() ) {
+      continue;
+    }
+
+    // print gCell's name and density center points. (dCx,dCy)
+    // -- note that during Nesterov loop, dCx() and dCy() are used.
+    //
+    //std::cout << gCell->instance()->dbInst()->getConstName() << " " 
+    //  << gCell->dCx() << " " <<gCell->dCy () << std::endl;
+  }
+
+  // get all nets 
+  for(auto& gNet : nb_->gNets()) {
+    // print all net names
+    // std::cout << gNet->net()->dbNet()->getConstName() << std::endl;
+    
+
+    // do some calculation(?)
+
+    // do reweight!
+    // gNet->setTimingWeight(1.1);
+  }
+
+  // Note that updated timingWeight will be applied in nesterovBase.cpp:1627-1628
+  log_->procEnd("TimingInst: updateGNetWeight");
 }
 
 
