@@ -4,6 +4,7 @@
 #include "placerBase.h"
 #include "nesterovBase.h"
 #include "routeBase.h" 
+#include "timingBase.h"
 #include "logger.h"
 #include <iostream>
 
@@ -180,6 +181,10 @@ void Replace::doNesterovPlace() {
 
   rb_ = std::make_shared<RouteBase>(rbVars, db_, fr_, nb_, log_);
 
+
+  TimingBaseVars tbVars;
+  tb_ = std::make_shared<TimingBase>(tbVars, db_, nb_, log_);
+
   NesterovPlaceVars npVars;
 
   npVars.minPhiCoef = minPhiCoef_;
@@ -193,7 +198,7 @@ void Replace::doNesterovPlace() {
   npVars.timingDrivenMode = timingDrivenMode_;
   npVars.routabilityDrivenMode = routabilityDrivenMode_;
 
-  std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_, rb_, log_));
+  std::unique_ptr<NesterovPlace> np(new NesterovPlace(npVars, pb_, nb_, rb_, tb_, log_));
   np_ = std::move(np);
 
   np_->doNesterovPlace();

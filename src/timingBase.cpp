@@ -74,13 +74,16 @@ TimingBase::TimingBase(
     initTimingIterChk();
   }
 
+TimingBase::~TimingBase() {
+  reset();
+}
+
 void
 TimingBase::initTimingIterChk() {
   timingIterChk_.clear();
   timingIterChk_.shrink_to_fit();
   timingIterChk_.resize(tbVars_.timingUpdateIter_.size(), false);
 }
-
 
 void
 TimingBase::reset() {
@@ -123,8 +126,7 @@ TimingBase::isTimingUpdateIter(float overflow) {
 
 // TODO: update corresponding net weights
 void
-TimingBase::updateNetWeight() {
-  // 
+TimingBase::updateGNetWeight() {
 }
 
 

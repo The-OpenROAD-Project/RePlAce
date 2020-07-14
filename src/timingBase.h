@@ -41,7 +41,7 @@ class TimingBase {
     bool isTimingUpdateIter(float overflow);
 
     // updateNetWeight.
-    void updateNetWeight();
+    void updateGNetWeight();
 
   private:
     TimingBaseVars tbVars_;

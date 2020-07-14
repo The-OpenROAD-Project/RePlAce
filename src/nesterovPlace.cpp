@@ -3,6 +3,7 @@
 #include "nesterovPlace.h"
 #include "opendb/db.h"
 #include "routeBase.h"
+#include "timingBase.h"
 #include "logger.h"
 #include <iostream>
 using namespace std;
@@ -51,7 +52,8 @@ NesterovPlaceVars::reset() {
 }
 
 NesterovPlace::NesterovPlace() 
-  : pb_(nullptr), nb_(nullptr), rb_(nullptr), log_(nullptr), npVars_(), 
+  : pb_(nullptr), nb_(nullptr), rb_(nullptr), tb_(nullptr), 
+  log_(nullptr), npVars_(), 
   wireLengthGradSum_(0), 
   densityGradSum_(0),
   stepLength_(0),
@@ -68,12 +70,14 @@ NesterovPlace::NesterovPlace(
     std::shared_ptr<PlacerBase> pb, 
     std::shared_ptr<NesterovBase> nb,
     std::shared_ptr<RouteBase> rb,
+    std::shared_ptr<TimingBase> tb,
     std::shared_ptr<Logger> log) 
 : NesterovPlace() {
   npVars_ = npVars;
   pb_ = pb;
   nb_ = nb;
   rb_ = rb;
+  tb_ = tb;
   log_ = log;
   init();
 }
@@ -510,6 +514,14 @@ NesterovPlace::doNesterovPlace() {
       hpwlWithMinSumOverflow = prevHpwl_; 
     }
 
+    // timing driven feature
+    // do reweight on timing-critical nets. 
+    if( npVars_.timingDrivenMode 
+        && tb_->isTimingUpdateIter(sumOverflow_) ){
+      tb_->updateGNetWeight(); 
+    } 
+
+
     // diverge detection on
     // large max_phi_cof value + large design 
     //
@@ -549,7 +561,8 @@ NesterovPlace::doNesterovPlace() {
         break;
       }
     }
-    
+  
+    // save snapshots for routability-driven  
     if( !isSnapshotSaved 
         && npVars_.routabilityDrivenMode 
         && 0.6 >= sumOverflow_ ) {
