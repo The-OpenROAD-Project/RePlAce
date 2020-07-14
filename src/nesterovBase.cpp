@@ -1622,6 +1622,10 @@ NesterovBase::getWireLengthGradientWA(GCell* gCell, float wlCoeffX, float wlCoef
     auto tmpPair = getWireLengthGradientPinWA(gPin, wlCoeffX, wlCoeffY);
     gradientPair.x += tmpPair.x;
     gradientPair.y += tmpPair.y;
+
+    // apply timing/custom net weight
+    gradientPair.x *= gPin->gNet()->totalWeight();
+    gradientPair.y *= gPin->gNet()->totalWeight();
   }
 
   // return sum
