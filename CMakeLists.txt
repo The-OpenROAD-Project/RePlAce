@@ -53,6 +53,7 @@ set (REPLACE_SRC
   src/plot.cpp
   src/logger.cpp
   src/routeBase.cpp
+  src/timingBase.cpp
   )
 
 set (REPLACE_HEADER
