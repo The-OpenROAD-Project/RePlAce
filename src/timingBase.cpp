@@ -85,9 +85,6 @@ TimingBase::initTimingIterChk() {
 void
 TimingBase::reset() {
   tbVars_.reset();
-  db_ = nullptr;
-  nb_.reset();
-  log_.reset();
   timingIterChk_.clear();
   timingIterChk_.shrink_to_fit();
 }
