@@ -1,3 +1,4 @@
+#include "openroad/Error.hh"
 #include "logger.h"
 #include <iostream>
 #include <cstdlib>
@@ -32,6 +33,11 @@ void Logger::error(string input, int code, int verbose) {
   VERBOSE_CHECK()
   cout << "[ERROR] " << input;
   cout << " (" << name_ << "-" << code << ")" << endl;
+}
+
+void Logger::errorQuit(string input, int code, int verbose) {
+  error(input, code, verbose);
+  ord::error("RePlAce found configuration errors. Please check your inputs");
 }
 
 void Logger::warn(string input, int code, int verbose) {

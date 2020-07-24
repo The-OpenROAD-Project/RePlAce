@@ -16,6 +16,7 @@ public:
   void procEnd(std::string input, int verbose = 0);
 
   void error(std::string input, int code, int verbose = 0);
+  void errorQuit(std::string input, int code, int verbose = 0);
 
   void warn(std::string input, int code, int verbose = 0);
 

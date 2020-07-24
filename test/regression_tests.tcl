@@ -8,6 +8,7 @@ record_tests {
   ar01 
   ar02 
   incremental01
+  error01
 }
 
 # commented out at this moment..

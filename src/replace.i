@@ -17,6 +17,8 @@ using ord::getReplace;
 using replace::Replace;
 %}
 
+%include "../../Exception.i"
+
 %inline %{
 
 void 
