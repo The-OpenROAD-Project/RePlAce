@@ -198,6 +198,13 @@ void NesterovPlace::init() {
 
   log_->infoFloatSignificant("InitialStepLength", stepLength_, 3);
   log_->procEnd("NesterovInit", 3);
+
+  if( isnan(stepLength_) ) {
+    string msg = "RePlAce diverged at initial iteration.\n";
+    msg += "        Please tune the parameters again";
+    log_->errorQuit(msg, 5);
+    isDiverged_ = true;
+  }
 }
 
 // clear reset
@@ -449,6 +456,14 @@ NesterovPlace::doNesterovPlace() {
      
       log_->infoFloatSignificant("  NewStepLength", newStepLength, 3);
 
+      if( isnan(newStepLength) ) {
+        divergeMsg = "RePlAce divergence detected. \n";
+        divergeMsg += "        Please tune the parameters again";
+        divergeCode = 6;
+        isDiverged_ = true;
+        break;
+      }
+
       if( newStepLength > stepLength_ * 0.95) {
         stepLength_ = newStepLength;
         break;
@@ -601,7 +616,7 @@ NesterovPlace::doNesterovPlace() {
   updateDb();
 
   if( isDiverged_ ) { 
-    log_->error(divergeMsg, divergeCode);
+    log_->errorQuit(divergeMsg, divergeCode);
   }
 }
 

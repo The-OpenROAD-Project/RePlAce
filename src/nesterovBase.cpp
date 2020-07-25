@@ -1123,6 +1123,14 @@ NesterovBase::initFillerGCells() {
 
   int minIdx = dxStor.size()*0.05;
   int maxIdx = dxStor.size()*0.95;
+
+  // when #instances are too small,
+  // extracts average values in whole ranges.
+  if( minIdx == maxIdx ) {
+    minIdx = 0;
+    maxIdx = dxStor.size();
+  }
+  
   for(int i=minIdx; i<maxIdx; i++) {
     dxSum += dxStor[i];
     dySum += dyStor[i];

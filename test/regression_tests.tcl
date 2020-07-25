@@ -4,11 +4,14 @@ record_tests {
   simple02
   simple03
   simple04
+  simple05
   core01 
   ar01 
   ar02 
   incremental01
   error01
+  diverge01
+  diverge02 
 }
 
 # commented out at this moment..

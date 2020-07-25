@@ -34,4 +34,4 @@ Notice 0: Finished DEF file: ./error01.def
        Please put higher target density or 
        Re-floorplan to have enough coreArea
  (REPL-1)
-Error: RePlAce found configuration errors. Please check your inputs
+Error: RePlAce terminated with errors.

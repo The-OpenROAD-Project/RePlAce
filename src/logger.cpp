@@ -37,7 +37,7 @@ void Logger::error(string input, int code, int verbose) {
 
 void Logger::errorQuit(string input, int code, int verbose) {
   error(input, code, verbose);
-  ord::error("RePlAce found configuration errors. Please check your inputs");
+  ord::error("RePlAce terminated with errors.");
 }
 
 void Logger::warn(string input, int code, int verbose) {
