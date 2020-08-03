@@ -11,7 +11,7 @@ RePlAce: Advancing Solution Quality and Routability Validation in Global Placeme
 - Supports Mixed-size placement mode.
 - Supports fast image drawing modes with CImg library.
 
-| <img src="/doc/image/adaptec2.inf.gif" width=350px> | <img src="/doc/image/coyote_TSMC16.gif" width=400px> | 
+| <img src="/doc/image/adaptec2.inf.gif" width=350px> | <img src="/doc/image/coyote_movie.gif" width=400px> | 
 |:--:|:--:|
 | *Visualized examples from ISPD 2006 contest; adaptec2.inf* |*Real-world Design: Coyote (TSMC16 7.5T)* |
 
